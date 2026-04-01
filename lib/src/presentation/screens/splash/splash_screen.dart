@@ -83,20 +83,19 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
                   scale: Tween<double>(begin: 0.8, end: 1.0).animate(_logoAnimation),
                   child: SvgPicture.asset(
                     isDark ? IconConstants.logoWhite : IconConstants.logo,
-                    width: 200.w,
-                    height: 200.h,
+                    width: 200.r,
+                    height: 200.r,
                   ),
                 ),
               ),
 
               // SizedBox(height: 40.h),
-
               SizedBox(
-                height: 30.h,
+                height: 30.r,
                 child: Text(
                   _displayedText,
                   style: TextStyle(
-                    fontSize: 18.sp,
+                    fontSize: 18.r,
                     fontWeight: FontWeight.w600,
                     letterSpacing: 2.5,
                     color: isDark ? Colors.white : const Color(0xFF0C2485),

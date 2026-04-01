@@ -6,6 +6,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'src/presentation/providers/theme_provider.dart';
 import 'src/presentation/theme/app_theme.dart';
 import 'src/presentation/routes/app_router.dart';
+import 'src/presentation/widgets/responsive_wrapper.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -53,16 +54,18 @@ class MyApp extends StatelessWidget {
             minTextAdapt: true,
             splitScreenMode: true,
             builder: (context, child) {
-              return MaterialApp.router(
-                title: 'SLF Drive',
-                debugShowCheckedModeBanner: false,
-                theme: AppTheme.lightTheme(_getFontFamily(context.locale)),
-                darkTheme: AppTheme.darkTheme(_getFontFamily(context.locale)),
-                themeMode: themeProvider.themeMode,
-                locale: context.locale,
-                supportedLocales: context.supportedLocales,
-                localizationsDelegates: context.localizationDelegates,
-                routerConfig: AppRouter.router,
+              return ResponsiveWrapper(
+                child: MaterialApp.router(
+                  title: 'SLF Drive',
+                  debugShowCheckedModeBanner: false,
+                  theme: AppTheme.lightTheme(_getFontFamily(context.locale)),
+                  darkTheme: AppTheme.darkTheme(_getFontFamily(context.locale)),
+                  themeMode: themeProvider.themeMode,
+                  locale: context.locale,
+                  supportedLocales: context.supportedLocales,
+                  localizationsDelegates: context.localizationDelegates,
+                  routerConfig: AppRouter.router,
+                ),
               );
             },
           );

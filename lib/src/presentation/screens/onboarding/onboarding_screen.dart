@@ -99,8 +99,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               children: [
                 // Logo at top
                 Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 20.h),
-                  child: SvgPicture.asset(IconConstants.logoWhite, width: 200.w, height: 200.h),
+                  padding: EdgeInsets.symmetric(horizontal: 24.r, vertical: 20.r),
+                  child: SvgPicture.asset(IconConstants.logoWhite, width: 200.r, height: 200.r),
                 ),
 
                 const Spacer(),
@@ -122,11 +122,11 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                     children: [
                       // Title
                       Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 32.w),
+                        padding: EdgeInsets.symmetric(horizontal: 32.r),
                         child: Text(
                           _pages[_currentPage].title,
                           style: TextStyle(
-                            fontSize: 40.sp,
+                            fontSize: 40.r,
                             fontWeight: FontWeight.bold,
                             color: Colors.white,
                             height: 1.2,
@@ -135,13 +135,13 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         ),
                       ),
 
-                      SizedBox(height: 48.h),
+                      SizedBox(height: 48.r),
 
                       // Description Card
                       Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 32.w),
+                        padding: EdgeInsets.symmetric(horizontal: 32.r),
                         child: Container(
-                          padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 20.h),
+                          padding: EdgeInsets.symmetric(horizontal: 24.r, vertical: 20.r),
                           decoration: BoxDecoration(
                             color: Colors.white.withValues(alpha: 0.15),
                             borderRadius: BorderRadius.circular(16.r),
@@ -150,7 +150,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                           child: Text(
                             _pages[_currentPage].description,
                             textAlign: TextAlign.center,
-                            style: TextStyle(fontSize: 14.sp, color: Colors.white, height: 1.5),
+                            style: TextStyle(fontSize: 14.r, color: Colors.white, height: 1.5),
                           ),
                         ),
                       ),
@@ -158,11 +158,11 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   ),
                 ),
 
-                SizedBox(height: 32.h),
+                SizedBox(height: 32.r),
 
                 // Fixed Bottom Area
                 Container(
-                  padding: EdgeInsets.symmetric(horizontal: 32.w, vertical: 24.h),
+                  padding: EdgeInsets.symmetric(horizontal: 32.r, vertical: 24.r),
                   child: Column(
                     children: [
                       // Page Indicators
@@ -172,9 +172,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                           _pages.length,
                           (index) => AnimatedContainer(
                             duration: const Duration(milliseconds: 300),
-                            margin: EdgeInsets.symmetric(horizontal: 4.w),
-                            width: index == _currentPage ? 32.w : 8.w,
-                            height: 8.h,
+                            margin: EdgeInsets.symmetric(horizontal: 4.r),
+                            width: index == _currentPage ? 32.r : 8.r,
+                            height: 8.r,
                             decoration: BoxDecoration(
                               color: index == _currentPage ? Colors.white : Colors.white.withValues(alpha: 0.4),
                               borderRadius: BorderRadius.circular(4.r),
@@ -183,7 +183,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         ),
                       ),
 
-                      SizedBox(height: 24.h),
+                      SizedBox(height: 24.r),
 
                       // Buttons Row
                       Row(
@@ -191,8 +191,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                           // Back Button (only show on pages 2 and 3)
                           if (_currentPage > 0)
                             Container(
-                              width: 56.w,
-                              height: 56.h,
+                              width: 56.r,
+                              height: 56.r,
                               decoration: BoxDecoration(
                                 color: Colors.white.withValues(alpha: 0.2),
                                 borderRadius: BorderRadius.circular(16.r),
@@ -203,17 +203,17 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                                 child: InkWell(
                                   onTap: _onBack,
                                   borderRadius: BorderRadius.circular(16.r),
-                                  child: Icon(Icons.arrow_back_ios_new, color: Colors.white, size: 20.sp),
+                                  child: Icon(Icons.arrow_back_ios_new, color: Colors.white, size: 20.r),
                                 ),
                               ),
                             ),
 
-                          if (_currentPage > 0) SizedBox(width: 12.w),
+                          if (_currentPage > 0) SizedBox(width: 12.r),
 
                           // Next/Get Started Button
                           Expanded(
                             child: Container(
-                              height: 56.h,
+                              height: 56.r,
                               decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16.r)),
                               child: Material(
                                 color: Colors.transparent,
@@ -227,13 +227,13 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                                         Text(
                                           isLastPage ? 'get_started'.tr() : 'next'.tr(),
                                           style: TextStyle(
-                                            fontSize: 16.sp,
+                                            fontSize: 16.r,
                                             fontWeight: FontWeight.w600,
                                             color: secondaryColor,
                                           ),
                                         ),
-                                        SizedBox(width: 8.w),
-                                        Icon(Icons.arrow_forward_ios, color: secondaryColor, size: 16.sp),
+                                        SizedBox(width: 8.r),
+                                        Icon(Icons.arrow_forward_ios, color: secondaryColor, size: 16.r),
                                       ],
                                     ),
                                   ),
@@ -242,13 +242,13 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                             ),
                           ),
 
-                          if (!isLastPage) SizedBox(width: 12.w),
+                          if (!isLastPage) SizedBox(width: 12.r),
 
                           // Skip Button (only show on pages 1 and 2)
                           if (!isLastPage)
                             Container(
-                              width: 80.w,
-                              height: 56.h,
+                              width: 80.r,
+                              height: 56.r,
                               decoration: BoxDecoration(
                                 color: Colors.white.withValues(alpha: 0.2),
                                 borderRadius: BorderRadius.circular(16.r),
@@ -263,7 +263,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                                     child: Text(
                                       'skip'.tr(),
                                       style: TextStyle(
-                                        fontSize: 14.sp,
+                                        fontSize: 14.r,
                                         fontWeight: FontWeight.w600,
                                         color: Colors.white,
                                       ),

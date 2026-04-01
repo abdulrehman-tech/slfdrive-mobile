@@ -81,7 +81,7 @@ class _LanguageSelectionScreenState extends State<LanguageSelectionScreen> {
         child: Column(
           children: [
             Padding(
-              padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 16.h),
+              padding: EdgeInsets.symmetric(horizontal: 24.r, vertical: 16.r),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
@@ -111,37 +111,37 @@ class _LanguageSelectionScreenState extends State<LanguageSelectionScreen> {
 
             Expanded(
               child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: 24.w),
+                padding: EdgeInsets.symmetric(horizontal: 24.r),
                 child: Column(
                   children: [
-                    SizedBox(height: 20.h),
+                    SizedBox(height: 20.r),
 
-                    SvgPicture.asset(isDark ? IconConstants.logoWhite : IconConstants.logo, width: 140.w, height: 80.h),
+                    SvgPicture.asset(isDark ? IconConstants.logoWhite : IconConstants.logo, width: 140.r, height: 80.r),
 
-                    SizedBox(height: 32.h),
+                    SizedBox(height: 32.r),
 
                     Text(
                       'choose_language'.tr(),
                       style: TextStyle(
-                        fontSize: 24.sp,
+                        fontSize: 24.r,
                         fontWeight: FontWeight.bold,
                         color: isDark ? Colors.white : const Color(0xFF3D3D3D),
                       ),
                     ),
 
-                    SizedBox(height: 8.h),
+                    SizedBox(height: 8.r),
 
                     Text(
                       'choose_language_subtitle'.tr(),
                       textAlign: TextAlign.center,
                       style: TextStyle(
-                        fontSize: 14.sp,
+                        fontSize: 14.r,
                         color: isDark ? Colors.white70 : const Color(0xFF757575),
                         height: 1.4,
                       ),
                     ),
 
-                    SizedBox(height: 24.h),
+                    SizedBox(height: 24.r),
 
                     Container(
                       decoration: BoxDecoration(
@@ -154,21 +154,21 @@ class _LanguageSelectionScreenState extends State<LanguageSelectionScreen> {
                           hintText: 'search'.tr(),
                           hintStyle: TextStyle(
                             color: isDark ? Colors.white38 : const Color(0xFF9E9E9E),
-                            fontSize: 16.sp,
+                            fontSize: 16.r,
                           ),
                           prefixIcon: Icon(
                             Icons.search,
                             color: isDark ? Colors.white38 : const Color(0xFF9E9E9E),
-                            size: 24.sp,
+                            size: 24.r,
                           ),
                           border: InputBorder.none,
-                          contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
+                          contentPadding: EdgeInsets.symmetric(horizontal: 16.r, vertical: 14.r),
                         ),
-                        style: TextStyle(color: isDark ? Colors.white : Colors.black, fontSize: 16.sp),
+                        style: TextStyle(color: isDark ? Colors.white : Colors.black, fontSize: 16.r),
                       ),
                     ),
 
-                    SizedBox(height: 20.h),
+                    SizedBox(height: 20.r),
 
                     Expanded(
                       child: Container(
@@ -177,7 +177,7 @@ class _LanguageSelectionScreenState extends State<LanguageSelectionScreen> {
                           borderRadius: BorderRadius.circular(16.r),
                         ),
                         child: ListView.separated(
-                          padding: EdgeInsets.symmetric(vertical: 8.h),
+                          padding: EdgeInsets.symmetric(vertical: 8.r),
                           itemCount: _filteredLanguages.length,
                           separatorBuilder: (context, index) => Divider(
                             height: 1,
@@ -193,28 +193,28 @@ class _LanguageSelectionScreenState extends State<LanguageSelectionScreen> {
                               child: InkWell(
                                 onTap: () => _onLanguageSelected(language),
                                 child: Container(
-                                  padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 16.h),
+                                  padding: EdgeInsets.symmetric(horizontal: 20.r, vertical: 16.r),
                                   decoration: BoxDecoration(
                                     color: isSelected ? secondaryColor.withOpacity(0.08) : Colors.transparent,
                                   ),
                                   child: Row(
                                     children: [
-                                      Text(language.flag, style: TextStyle(fontSize: 28.sp)),
+                                      Text(language.flag, style: TextStyle(fontSize: 28.r)),
 
-                                      SizedBox(width: 16.w),
+                                      SizedBox(width: 16.r),
 
                                       Expanded(
                                         child: Text(
                                           language.name,
                                           style: TextStyle(
-                                            fontSize: 16.sp,
+                                            fontSize: 16.r,
                                             fontWeight: FontWeight.w500,
                                             color: isDark ? Colors.white : const Color(0xFF3D3D3D),
                                           ),
                                         ),
                                       ),
 
-                                      if (isSelected) Icon(Icons.check_circle, color: secondaryColor, size: 24.sp),
+                                      if (isSelected) Icon(Icons.check_circle, color: secondaryColor, size: 24.r),
                                     ],
                                   ),
                                 ),
@@ -225,11 +225,11 @@ class _LanguageSelectionScreenState extends State<LanguageSelectionScreen> {
                       ),
                     ),
 
-                    SizedBox(height: 24.h),
+                    SizedBox(height: 24.r),
 
                     Container(
                       width: double.infinity,
-                      height: 56.h,
+                      height: 56.r,
                       decoration: BoxDecoration(
                         gradient: _selectedLanguage != null
                             ? const LinearGradient(
@@ -249,14 +249,14 @@ class _LanguageSelectionScreenState extends State<LanguageSelectionScreen> {
                           child: Center(
                             child: Text(
                               'continue'.tr(),
-                              style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.w600, color: Colors.white),
+                              style: TextStyle(fontSize: 18.r, fontWeight: FontWeight.w600, color: Colors.white),
                             ),
                           ),
                         ),
                       ),
                     ),
 
-                    SizedBox(height: 32.h),
+                    SizedBox(height: 32.r),
                   ],
                 ),
               ),
@@ -285,14 +285,14 @@ class _ThemeButton extends StatelessWidget {
         onTap: onTap,
         borderRadius: BorderRadius.circular(10.r),
         child: Container(
-          padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
+          padding: EdgeInsets.symmetric(horizontal: 12.r, vertical: 8.r),
           decoration: BoxDecoration(
             color: isSelected ? secondaryColor.withOpacity(0.15) : Colors.transparent,
             borderRadius: BorderRadius.circular(10.r),
           ),
           child: Icon(
             icon,
-            size: 20.sp,
+            size: 20.r,
             color: isSelected ? secondaryColor : (isDark ? Colors.white54 : Colors.black54),
           ),
         ),
