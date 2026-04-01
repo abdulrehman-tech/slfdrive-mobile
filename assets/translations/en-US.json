@@ -3,6 +3,21 @@
   "welcome": "Welcome to SLF Drive",
   "get_started": "Get Started",
   
+  "splash_tagline": "DRIVE. HIRE. TRUST.",
+  
+  "choose_language": "Choose the language",
+  "choose_language_subtitle": "Please Choose your Preferred language to\ncontinue to SLF-Drive",
+  "continue": "Continue",
+  
+  "onboarding_1_title": "Find and rent\ncar in easy\nsteps",
+  "onboarding_1_desc": "Browse a wide selection of vehicles from trusted fleet owners. Book instantly and hit the road in minutes.",
+  "onboarding_2_title": "Hire\nProfessional\nDrivers",
+  "onboarding_2_desc": "Connect with verified freelance drivers for any occasion. From airport transfers to full-day chauffeur services.",
+  "onboarding_3_title": "Reliable &\nSecure\nPlatform",
+  "onboarding_3_desc": "Every driver is verified. Every vehicle is inspected. Your safety and satisfaction are our priority.",
+  "skip": "Skip",
+  "next": "Next",
+  
   "login": "Login",
   "register": "Register",
   "logout": "Logout",

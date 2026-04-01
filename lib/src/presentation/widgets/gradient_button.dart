@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../constants/color_constants.dart';
 
 class GradientButton extends StatelessWidget {
@@ -28,52 +29,38 @@ class GradientButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: width,
-      height: height,
+      width: width?.w,
+      height: height.h,
       decoration: BoxDecoration(
         gradient: gradient ?? primaryGradient,
-        borderRadius: BorderRadius.circular(borderRadius),
+        borderRadius: BorderRadius.circular(borderRadius.r),
         boxShadow: onPressed != null
-            ? [
-                BoxShadow(
-                  color: primaryColor.withOpacity(0.3),
-                  blurRadius: 12,
-                  offset: const Offset(0, 6),
-                ),
-              ]
+            ? [BoxShadow(color: primaryColor.withOpacity(0.3), blurRadius: 12.r, offset: Offset(0, 6.h))]
             : null,
       ),
       child: Material(
         color: Colors.transparent,
         child: InkWell(
           onTap: isLoading ? null : onPressed,
-          borderRadius: BorderRadius.circular(borderRadius),
+          borderRadius: BorderRadius.circular(borderRadius.r),
           child: Center(
             child: isLoading
-                ? const SizedBox(
-                    width: 24,
-                    height: 24,
+                ? SizedBox(
+                    width: 24.w,
+                    height: 24.h,
                     child: CircularProgressIndicator(
-                      strokeWidth: 2,
-                      valueColor: AlwaysStoppedAnimation<Color>(whiteColor),
+                      strokeWidth: 2.w,
+                      valueColor: const AlwaysStoppedAnimation<Color>(whiteColor),
                     ),
                   )
                 : Row(
                     mainAxisSize: MainAxisSize.min,
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      if (icon != null) ...[
-                        icon!,
-                        const SizedBox(width: 8),
-                      ],
+                      if (icon != null) ...[icon!, SizedBox(width: 8.w)],
                       Text(
                         text,
-                        style: textStyle ??
-                            const TextStyle(
-                              color: whiteColor,
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
-                            ),
+                        style: textStyle ?? TextStyle(color: whiteColor, fontSize: 16.sp, fontWeight: FontWeight.w600),
                       ),
                     ],
                   ),

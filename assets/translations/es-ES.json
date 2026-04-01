@@ -1,0 +1,28 @@
+{
+  "app_name": "SLF Drive",
+  "welcome": "Bienvenido a SLF Drive",
+  "get_started": "Empezar",
+  
+  "splash_tagline": "CONDUCE. ALQUILA. CONFÍA.",
+  
+  "choose_language": "Elegir idioma",
+  "choose_language_subtitle": "Por favor, elija su idioma preferido\npara continuar con SLF-Drive",
+  "continue": "Continuar",
+  
+  "onboarding_1_title": "Bienvenido a SLF Drive",
+  "onboarding_1_desc": "Tu plataforma de confianza para alquiler de coches y servicios de conductor",
+  "onboarding_2_title": "Encuentra tu viaje perfecto",
+  "onboarding_2_desc": "Explora nuestra amplia selección de vehículos para cada ocasión",
+  "onboarding_3_title": "Conductores profesionales",
+  "onboarding_3_desc": "Contrata conductores experimentados y verificados para un viaje seguro",
+  "skip": "Saltar",
+  "next": "Siguiente",
+  
+  "login": "Iniciar sesión",
+  "register": "Registrarse",
+  "logout": "Cerrar sesión",
+  "search": "Buscar",
+  "filter": "Filtrar",
+  "cancel": "Cancelar",
+  "save": "Guardar"
+}

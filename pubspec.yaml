@@ -119,12 +119,12 @@ flutter:
   fonts:
     - family: OpenSans
       fonts:
-        - asset: assets/fonts/Open_Sans/OpenSans-Regular.ttf
-        - asset: assets/fonts/Open_Sans/OpenSans-Bold.ttf
+        - asset: assets/fonts/Open_Sans/static/OpenSans-Regular.ttf
+        - asset: assets/fonts/Open_Sans/static/OpenSans-Bold.ttf
           weight: 700
-        - asset: assets/fonts/Open_Sans/OpenSans-SemiBold.ttf
+        - asset: assets/fonts/Open_Sans/static/OpenSans-SemiBold.ttf
           weight: 600
-        - asset: assets/fonts/Open_Sans/OpenSans-Light.ttf
+        - asset: assets/fonts/Open_Sans/static/OpenSans-Light.ttf
           weight: 300
 
     - family: Tajawal

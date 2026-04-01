@@ -1,0 +1,28 @@
+{
+  "app_name": "SLF Drive",
+  "welcome": "Willkommen bei SLF Drive",
+  "get_started": "Loslegen",
+  
+  "splash_tagline": "FAHREN. MIETEN. VERTRAUEN.",
+  
+  "choose_language": "Sprache wählen",
+  "choose_language_subtitle": "Bitte wählen Sie Ihre bevorzugte Sprache,\num mit SLF-Drive fortzufahren",
+  "continue": "Weiter",
+  
+  "onboarding_1_title": "Willkommen bei SLF Drive",
+  "onboarding_1_desc": "Ihre vertrauenswürdige Plattform für Autovermietung und Fahrerservices",
+  "onboarding_2_title": "Finden Sie Ihre perfekte Fahrt",
+  "onboarding_2_desc": "Durchsuchen Sie unsere große Auswahl an Fahrzeugen für jeden Anlass",
+  "onboarding_3_title": "Professionelle Fahrer",
+  "onboarding_3_desc": "Stellen Sie erfahrene und verifizierte Fahrer für eine sichere Reise ein",
+  "skip": "Überspringen",
+  "next": "Weiter",
+  
+  "login": "Anmelden",
+  "register": "Registrieren",
+  "logout": "Abmelden",
+  "search": "Suchen",
+  "filter": "Filter",
+  "cancel": "Abbrechen",
+  "save": "Speichern"
+}
