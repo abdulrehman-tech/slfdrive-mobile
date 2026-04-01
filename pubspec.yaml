@@ -1,0 +1,138 @@
+name: slfdrive
+description: "SLF Drive - Car Rental & Driver Services Platform"
+publish_to: 'none'
+
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.10.0
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  cupertino_icons: ^1.0.8
+
+  # State Management & DI
+  provider: ^6.1.5
+  get_it: ^8.2.0
+  
+  # Navigation
+  go_router: ^14.6.2
+  
+  # Network
+  dio: ^5.9.0
+  connectivity_plus: ^7.0.0
+  
+  # Storage
+  flutter_secure_storage: ^9.2.4
+  shared_preferences: ^2.3.5
+  hive_flutter: ^1.1.0
+  flutter_dotenv: ^5.2.1
+  
+  # UI & Responsive
+  flutter_screenutil: ^5.9.3
+  responsive_framework: ^1.5.1
+  flutter_adaptive_scaffold: ^0.2.4
+  
+  # UI Components
+  flutter_svg: ^2.2.3
+  cached_network_image: ^3.4.1
+  lottie: ^3.3.2
+  iconsax_flutter: ^1.0.1
+  shimmer: ^3.0.0
+  skeletonizer: ^2.1.0
+  flutter_easyloading: ^3.0.5
+  
+  # Maps & Location
+  google_maps_flutter: ^2.9.0
+  google_maps_flutter_web: ^0.5.10
+  geolocator: ^13.0.2
+  geocoding: ^3.0.0
+  
+  # Date & Time
+  intl: ^0.20.2
+  easy_localization: ^3.0.8
+  syncfusion_flutter_datepicker: ^28.2.7
+  
+  # Payment
+  flutter_stripe: ^11.2.0
+  
+  # Firebase
+  firebase_core: ^3.13.0
+  firebase_auth: ^5.3.6
+  firebase_analytics: ^11.4.6
+  firebase_crashlytics: ^4.3.6
+  firebase_messaging: ^15.2.5
+  firebase_storage: ^12.3.8
+  firebase_performance: ^0.10.0+10
+  flutter_local_notifications: ^18.0.1
+  
+  # File Handling
+  file_picker: ^8.0.0
+  image_picker: ^1.2.0
+  image_cropper: ^8.0.2
+  
+  # PDF & Documents
+  pdf: ^3.11.1
+  printing: ^5.13.4
+  syncfusion_flutter_pdfviewer: ^28.2.7
+  
+  # Utilities
+  url_launcher: ^6.3.1
+  share_plus: ^10.1.4
+  package_info_plus: ^8.3.1
+  permission_handler: ^12.0.1
+  path_provider: ^2.1.5
+  country_code_picker: ^3.4.1
+  pinput: ^6.0.1
+  flutter_displaymode: ^0.7.0
+  
+  # Rating & Reviews
+  flutter_rating_bar: ^4.0.1
+  
+  # Analytics
+  clarity_flutter: ^1.7.1
+  
+  # Cache Management
+  flutter_cache_manager: ^3.4.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+  flutter_lints: ^6.0.0
+  flutter_launcher_icons: ^0.14.4
+  flutter_native_splash: ^2.4.7
+  build_runner: ^2.4.13
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    - assets/icons/
+    - assets/images/
+    - assets/lottie/
+    - assets/translations/
+    - assets/web/icons/
+    - assets/web/images/
+  fonts:
+    - family: OpenSans
+      fonts:
+        - asset: assets/fonts/Open_Sans/OpenSans-Regular.ttf
+        - asset: assets/fonts/Open_Sans/OpenSans-Bold.ttf
+          weight: 700
+        - asset: assets/fonts/Open_Sans/OpenSans-SemiBold.ttf
+          weight: 600
+        - asset: assets/fonts/Open_Sans/OpenSans-Light.ttf
+          weight: 300
+
+    - family: Tajawal
+      fonts:
+        - asset: assets/fonts/Tajawal/Tajawal-Regular.ttf
+        - asset: assets/fonts/Tajawal/Tajawal-Bold.ttf
+          weight: 700
+        - asset: assets/fonts/Tajawal/Tajawal-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/Tajawal/Tajawal-Light.ttf
+          weight: 300

@@ -1,0 +1,70 @@
+{
+  "app_name": "SLF درايف",
+  "welcome": "مرحباً بك في SLF درايف",
+  "get_started": "ابدأ الآن",
+  
+  "login": "تسجيل الدخول",
+  "register": "التسجيل",
+  "logout": "تسجيل الخروج",
+  "phone_number": "رقم الهاتف",
+  "email": "البريد الإلكتروني",
+  "password": "كلمة المرور",
+  "confirm_password": "تأكيد كلمة المرور",
+  "forgot_password": "نسيت كلمة المرور؟",
+  "enter_otp": "أدخل رمز التحقق",
+  "verify": "تحقق",
+  "resend_otp": "إعادة إرسال الرمز",
+  
+  "role_selection": "اختر دورك",
+  "customer": "عميل",
+  "driver": "سائق",
+  "customer_desc": "استئجار السيارات وتوظيف السائقين",
+  "driver_desc": "قدم خدمات القيادة الخاصة بك",
+  
+  "home": "الرئيسية",
+  "bookings": "الحجوزات",
+  "profile": "الملف الشخصي",
+  "notifications": "الإشعارات",
+  "settings": "الإعدادات",
+  
+  "explore_cars": "استكشف السيارات",
+  "find_drivers": "ابحث عن سائقين",
+  "my_bookings": "حجوزاتي",
+  "favorites": "المفضلة",
+  
+  "car_details": "تفاصيل السيارة",
+  "book_now": "احجز الآن",
+  "price_per_day": "السعر لليوم",
+  "available": "متاح",
+  "not_available": "غير متاح",
+  
+  "pickup_date": "تاريخ الاستلام",
+  "dropoff_date": "تاريخ التسليم",
+  "pickup_location": "موقع الاستلام",
+  "dropoff_location": "موقع التسليم",
+  
+  "driver_details": "تفاصيل السائق",
+  "rating": "التقييم",
+  "total_trips": "إجمالي الرحلات",
+  "price_per_hour": "السعر بالساعة",
+  "hire_driver": "توظيف سائق",
+  
+  "booking_confirmed": "تم تأكيد الحجز",
+  "booking_cancelled": "تم إلغاء الحجز",
+  "payment_successful": "تمت الدفعة بنجاح",
+  "payment_failed": "فشلت الدفعة",
+  
+  "search": "بحث",
+  "filter": "تصفية",
+  "sort_by": "ترتيب حسب",
+  "apply": "تطبيق",
+  "cancel": "إلغاء",
+  "save": "حفظ",
+  "delete": "حذف",
+  "edit": "تعديل",
+  
+  "error_occurred": "حدث خطأ",
+  "try_again": "حاول مرة أخرى",
+  "no_results": "لم يتم العثور على نتائج",
+  "loading": "جاري التحميل..."
+}
