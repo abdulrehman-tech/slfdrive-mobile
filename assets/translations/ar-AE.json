@@ -2,13 +2,13 @@
   "app_name": "SLF درايف",
   "welcome": "مرحباً بك في SLF درايف",
   "get_started": "ابدأ الآن",
-  
+
   "splash_tagline": "قُد. وظّف. ثق.",
-  
+
   "choose_language": "اختر اللغة",
   "choose_language_subtitle": "يرجى اختيار لغتك المفضلة\nللمتابعة إلى SLF-Drive",
   "continue": "متابعة",
-  
+
   "onboarding_1_title": "ابحث واستأجر\nسيارة بخطوات\nسهلة",
   "onboarding_1_desc": "تصفح مجموعة واسعة من المركبات من مالكي الأساطيل الموثوقين. احجز فوراً وانطلق في دقائق.",
   "onboarding_2_title": "وظف\nسائقين\nمحترفين",
@@ -17,7 +17,63 @@
   "onboarding_3_desc": "كل سائق موثق. كل مركبة مفحوصة. سلامتك ورضاك أولويتنا.",
   "skip": "تخطي",
   "next": "التالي",
-  
+
+  "pre_login_title": "SLF DRIVE",
+  "pre_login_subtitle": "منصتك الموثوقة لتأجير السيارات والسائقين المحترفين",
+  "pre_login_passenger": "أنا راكب",
+  "pre_login_passenger_desc": "أبحث عن رحلة أو سيارة للإيجار",
+  "pre_login_driver_desc": "أرغب في تقديم خدمات القيادة",
+  "sign_in": "تسجيل الدخول",
+  "become_driver": "كن سائقاً",
+  "skip_explore": "تخطي واستكشف المنصة",
+
+  "phone_title": "أدخل رقم هاتفك",
+  "driver_phone_title": "انضم كسائق",
+  "phone_subtitle": "سنرسل لك رمز التحقق",
+  "select_country_code": "اختر رمز الدولة",
+
+  "otp_title": "تحقق من رقمك",
+  "otp_subtitle": "أدخل الرمز المرسل إلى {0}",
+  "resend_in": "إعادة الإرسال خلال {0}ث",
+  "resend_code": "إعادة إرسال الرمز",
+  "verify": "تحقق",
+
+  "profile_title": "أكمل ملفك الشخصي",
+  "driver_profile_title": "أكمل ملف السائق",
+  "profile_subtitle": "بضعة تفاصيل إضافية للبدء",
+  "full_name": "الاسم الكامل",
+  "enter_name": "أدخل اسمك الكامل",
+  "enter_email": "ادخل البريد الإلكتروني",
+  "get_started": "ابدأ الآن",
+  "start_driving": "ابدأ القيادة",
+  "submit_for_approval": "إرسال للموافقة",
+
+  "section_personal_info": "المعلومات الشخصية",
+  "section_license": "الرخصة والهوية",
+  "section_vehicle": "معلومات المركبة",
+  "section_documents": "الوثائق",
+
+  "license_number": "رقم رخصة القيادة",
+  "enter_license_number": "مثال: OM123456",
+  "license_expiry": "تاريخ انتهاء الرخصة",
+  "national_id": "رقم الهوية الوطنية / جواز السفر",
+  "enter_national_id": "مثال: 12345678",
+  "vehicle_make": "ماركة المركبة",
+  "eg_toyota": "مثال: تويوتا",
+  "vehicle_model": "موديل المركبة",
+  "eg_camry": "مثال: كامري",
+  "vehicle_year": "سنة الصنع",
+  "eg_2022": "مثال: 2022",
+  "vehicle_plate": "رقم اللوحة",
+  "eg_ab1234": "مثال: AB1234",
+  "insurance_doc": "وثيقة التأمين",
+  "insurance_doc_hint": "ارفع وثيقة تأمين مركبتك",
+  "profile_photo": "صورة الملف الشخصي",
+  "profile_photo_hint": "ارفع صورة واضحة لنفسك",
+  "tap_to_add_photo": "اضغط لإضافة صورة",
+  "photo_added": "تمت إضافة الصورة",
+  "pending_approval_note": "سيتم مراجعة حسابك من قبل فريقنا. ستُخطر عند الموافقة ويمكنك البدء في قبول الرحلات.",
+
   "login": "تسجيل الدخول",
   "register": "التسجيل",
   "logout": "تسجيل الخروج",
@@ -29,46 +85,46 @@
   "enter_otp": "أدخل رمز التحقق",
   "verify": "تحقق",
   "resend_otp": "إعادة إرسال الرمز",
-  
+
   "role_selection": "اختر دورك",
   "customer": "عميل",
   "driver": "سائق",
   "customer_desc": "استئجار السيارات وتوظيف السائقين",
   "driver_desc": "قدم خدمات القيادة الخاصة بك",
-  
+
   "home": "الرئيسية",
   "bookings": "الحجوزات",
   "profile": "الملف الشخصي",
   "notifications": "الإشعارات",
   "settings": "الإعدادات",
-  
+
   "explore_cars": "استكشف السيارات",
   "find_drivers": "ابحث عن سائقين",
   "my_bookings": "حجوزاتي",
   "favorites": "المفضلة",
-  
+
   "car_details": "تفاصيل السيارة",
   "book_now": "احجز الآن",
   "price_per_day": "السعر لليوم",
   "available": "متاح",
   "not_available": "غير متاح",
-  
+
   "pickup_date": "تاريخ الاستلام",
   "dropoff_date": "تاريخ التسليم",
   "pickup_location": "موقع الاستلام",
   "dropoff_location": "موقع التسليم",
-  
+
   "driver_details": "تفاصيل السائق",
   "rating": "التقييم",
   "total_trips": "إجمالي الرحلات",
   "price_per_hour": "السعر بالساعة",
   "hire_driver": "توظيف سائق",
-  
+
   "booking_confirmed": "تم تأكيد الحجز",
   "booking_cancelled": "تم إلغاء الحجز",
   "payment_successful": "تمت الدفعة بنجاح",
   "payment_failed": "فشلت الدفعة",
-  
+
   "search": "بحث",
   "filter": "تصفية",
   "sort_by": "ترتيب حسب",
@@ -77,9 +133,41 @@
   "save": "حفظ",
   "delete": "حذف",
   "edit": "تعديل",
-  
+
   "error_occurred": "حدث خطأ",
   "try_again": "حاول مرة أخرى",
   "no_results": "لم يتم العثور على نتائج",
-  "loading": "جاري التحميل..."
+  "loading": "جاري التحميل...",
+  "Oman": "عُمان",
+  "UAE": "الإمارات",
+  "Saudi Arabia": "السعودية",
+  "Kuwait": "الكويت",
+  "Qatar": "قطر",
+  "Bahrain": "البحرين",
+
+  "home_greeting": "صباح الخير، ضيف 👋",
+  "home_headline": "اكتشف رحلاتك\nبأقصى راحة",
+  "home_search_hint": "ابحث عن سيارات، سائقين...",
+  "home_all_brands": "جميع الماركات",
+  "home_all_collections": "جميع المجموعات",
+  "home_nearby_drivers": "السائقون القريبون",
+  "home_view_all": "عرض الكل",
+  "service_rent_car": "استئجار سيارة",
+  "service_car_driver": "سيارة + سائق",
+  "service_hire_driver": "توظيف سائق",
+
+  "home_location_label": "موقعك",
+  "home_location": "مسقط، عُمان",
+  "home_available_now": "متاح الآن",
+  "day": "يوم",
+
+  "my_vehicles": "سياراتي",
+  "settings": "الإعدادات",
+  "drawer_guest_badge": "عضو مجاني",
+  "drawer_trips": "الرحلات",
+  "drawer_saved": "المحفوظ",
+  "drawer_rating": "التقييم",
+  "drawer_sign_in": "تسجيل الدخول",
+  "theme_light": "فاتح",
+  "theme_dark": "داكن"
 }

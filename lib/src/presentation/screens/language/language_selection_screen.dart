@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import 'package:easy_localization/easy_localization.dart';
 import '../../../constants/icon_constants.dart';
 import '../../../constants/color_constants.dart';
+import '../../../constants/breakpoints.dart';
 import '../../providers/theme_provider.dart';
 
 class LanguageSelectionScreen extends StatefulWidget {
@@ -78,158 +79,320 @@ class _LanguageSelectionScreenState extends State<LanguageSelectionScreen> {
     return Scaffold(
       backgroundColor: isDark ? const Color(0xFF121212) : const Color(0xFFFAFAFA),
       body: SafeArea(
-        child: Column(
-          children: [
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 24.r, vertical: 16.r),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  Container(
-                    decoration: BoxDecoration(
-                      color: isDark ? const Color(0xFF1E1E1E) : Colors.white,
-                      borderRadius: BorderRadius.circular(12.r),
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            final isDesktop = Breakpoints.isDesktop(constraints.maxWidth);
+            final isTablet = Breakpoints.isTablet(constraints.maxWidth);
+
+            return Column(
+              children: [
+                Padding(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: isDesktop ? 48.0 : (isTablet ? 32.0 : 24.r),
+                    vertical: isDesktop ? 24.0 : (isTablet ? 20.0 : 16.r),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      Container(
+                        decoration: BoxDecoration(
+                          color: isDark ? const Color(0xFF1E1E1E) : Colors.white,
+                          borderRadius: BorderRadius.circular(12.r),
+                        ),
+                        child: Row(
+                          children: [
+                            _ThemeButton(
+                              icon: Icons.light_mode,
+                              isSelected: !isDark,
+                              onTap: () => themeProvider.setLightMode(),
+                            ),
+                            _ThemeButton(
+                              icon: Icons.dark_mode,
+                              isSelected: isDark,
+                              onTap: () => themeProvider.setDarkMode(),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
+                Expanded(child: isDesktop ? _buildDesktopLayout(isDark) : _buildMobileLayout(isDark, isTablet)),
+              ],
+            );
+          },
+        ),
+      ),
+    );
+  }
+
+  Widget _buildMobileLayout(bool isDark, bool isTablet) {
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: isTablet ? 32.r : 24.r),
+      child: Column(
+        children: [
+          SizedBox(height: 20.r),
+
+          SvgPicture.asset(isDark ? IconConstants.logoWhite : IconConstants.logo, width: 140.r, height: 120.r),
+
+          SizedBox(height: 32.r),
+
+          Text(
+            'choose_language'.tr(),
+            style: TextStyle(
+              fontSize: 24.r,
+              fontWeight: FontWeight.bold,
+              color: isDark ? Colors.white : const Color(0xFF3D3D3D),
+            ),
+          ),
+
+          SizedBox(height: 8.r),
+
+          Text(
+            'choose_language_subtitle'.tr(),
+            textAlign: TextAlign.center,
+            style: TextStyle(fontSize: 14.r, color: isDark ? Colors.white70 : const Color(0xFF757575), height: 1.4),
+          ),
+
+          SizedBox(height: 24.r),
+
+          Container(
+            decoration: BoxDecoration(
+              color: isDark ? const Color(0xFF1E1E1E) : Colors.white,
+              borderRadius: BorderRadius.circular(12.r),
+            ),
+            child: TextField(
+              controller: _searchController,
+              decoration: InputDecoration(
+                hintText: 'search'.tr(),
+                hintStyle: TextStyle(color: isDark ? Colors.white38 : const Color(0xFF9E9E9E), fontSize: 16.r),
+                prefixIcon: Icon(Icons.search, color: isDark ? Colors.white38 : const Color(0xFF9E9E9E), size: 24.r),
+                border: InputBorder.none,
+                contentPadding: EdgeInsets.symmetric(horizontal: 16.r, vertical: 14.r),
+              ),
+              style: TextStyle(color: isDark ? Colors.white : Colors.black, fontSize: 16.r),
+            ),
+          ),
+
+          SizedBox(height: 20.r),
+
+          Expanded(
+            child: Container(
+              decoration: BoxDecoration(
+                color: isDark ? const Color(0xFF1E1E1E) : Colors.white,
+                borderRadius: BorderRadius.circular(16.r),
+              ),
+              child: ListView.separated(
+                padding: EdgeInsets.symmetric(vertical: 8.r),
+                itemCount: _filteredLanguages.length,
+                separatorBuilder: (context, index) =>
+                    Divider(height: 1, thickness: 1, color: isDark ? Colors.grey[800] : const Color(0xFFF0F0F0)),
+                itemBuilder: (context, index) {
+                  final language = _filteredLanguages[index];
+                  final isSelected = _selectedLanguage == language.code;
+
+                  return Material(
+                    color: Colors.transparent,
+                    child: InkWell(
+                      onTap: () => _onLanguageSelected(language),
+                      child: Container(
+                        padding: EdgeInsets.symmetric(horizontal: 20.r, vertical: 16.r),
+                        decoration: BoxDecoration(
+                          color: isSelected ? secondaryColor.withOpacity(0.08) : Colors.transparent,
+                        ),
+                        child: Row(
+                          children: [
+                            Text(language.flag, style: TextStyle(fontSize: 28.r)),
+
+                            SizedBox(width: 16.r),
+
+                            Expanded(
+                              child: Text(
+                                language.name,
+                                style: TextStyle(
+                                  fontSize: 16.r,
+                                  fontWeight: FontWeight.w500,
+                                  color: isDark ? Colors.white : const Color(0xFF3D3D3D),
+                                ),
+                              ),
+                            ),
+
+                            if (isSelected) Icon(Icons.check_circle, color: secondaryColor, size: 24.r),
+                          ],
+                        ),
+                      ),
                     ),
-                    child: Row(
-                      children: [
-                        _ThemeButton(
-                          icon: Icons.light_mode,
-                          isSelected: !isDark,
-                          onTap: () => themeProvider.setLightMode(),
-                        ),
-                        _ThemeButton(
-                          icon: Icons.dark_mode,
-                          isSelected: isDark,
-                          onTap: () => themeProvider.setDarkMode(),
-                        ),
-                      ],
+                  );
+                },
+              ),
+            ),
+          ),
+
+          SizedBox(height: 24.r),
+
+          Container(
+            width: double.infinity,
+            height: 56.r,
+            decoration: BoxDecoration(
+              gradient: _selectedLanguage != null
+                  ? const LinearGradient(
+                      colors: [Color(0xFF4D63DD), Color(0xFF677EF0)],
+                      begin: Alignment.centerLeft,
+                      end: Alignment.centerRight,
+                    )
+                  : null,
+              color: _selectedLanguage == null ? (isDark ? Colors.grey[800] : const Color(0xFFE0E0E0)) : null,
+              borderRadius: BorderRadius.circular(16.r),
+            ),
+            child: Material(
+              color: Colors.transparent,
+              child: InkWell(
+                onTap: _selectedLanguage != null ? _onContinue : null,
+                borderRadius: BorderRadius.circular(16.r),
+                child: Center(
+                  child: Text(
+                    'continue'.tr(),
+                    style: TextStyle(fontSize: 18.r, fontWeight: FontWeight.w600, color: Colors.white),
+                  ),
+                ),
+              ),
+            ),
+          ),
+
+          SizedBox(height: 32.r),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDesktopLayout(bool isDark) {
+    return Center(
+      child: Container(
+        constraints: const BoxConstraints(maxWidth: 1200),
+        padding: const EdgeInsets.symmetric(horizontal: 48),
+        child: Row(
+          children: [
+            // Left side - Branding
+            Expanded(
+              flex: 5,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SvgPicture.asset(isDark ? IconConstants.logoWhite : IconConstants.logo, width: 200.r, height: 200.r),
+                  SizedBox(height: 40.r),
+                  Text(
+                    'choose_language'.tr(),
+                    style: TextStyle(
+                      fontSize: 48,
+                      fontWeight: FontWeight.bold,
+                      color: isDark ? Colors.white : const Color(0xFF3D3D3D),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    'choose_language_subtitle'.tr(),
+                    style: TextStyle(
+                      fontSize: 18,
+                      color: isDark ? Colors.white70 : const Color(0xFF757575),
+                      height: 1.5,
                     ),
                   ),
                 ],
               ),
             ),
 
+            const SizedBox(width: 80),
+
+            // Right side - Language selection
             Expanded(
-              child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: 24.r),
+              flex: 5,
+              child: Container(
+                constraints: const BoxConstraints(maxWidth: 500),
                 child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    SizedBox(height: 20.r),
-
-                    SvgPicture.asset(isDark ? IconConstants.logoWhite : IconConstants.logo, width: 140.r, height: 80.r),
-
-                    SizedBox(height: 32.r),
-
-                    Text(
-                      'choose_language'.tr(),
-                      style: TextStyle(
-                        fontSize: 24.r,
-                        fontWeight: FontWeight.bold,
-                        color: isDark ? Colors.white : const Color(0xFF3D3D3D),
-                      ),
-                    ),
-
-                    SizedBox(height: 8.r),
-
-                    Text(
-                      'choose_language_subtitle'.tr(),
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: 14.r,
-                        color: isDark ? Colors.white70 : const Color(0xFF757575),
-                        height: 1.4,
-                      ),
-                    ),
-
-                    SizedBox(height: 24.r),
-
                     Container(
                       decoration: BoxDecoration(
                         color: isDark ? const Color(0xFF1E1E1E) : Colors.white,
-                        borderRadius: BorderRadius.circular(12.r),
+                        borderRadius: BorderRadius.circular(16),
                       ),
                       child: TextField(
                         controller: _searchController,
                         decoration: InputDecoration(
                           hintText: 'search'.tr(),
-                          hintStyle: TextStyle(
-                            color: isDark ? Colors.white38 : const Color(0xFF9E9E9E),
-                            fontSize: 16.r,
-                          ),
+                          hintStyle: TextStyle(color: isDark ? Colors.white38 : const Color(0xFF9E9E9E), fontSize: 16),
                           prefixIcon: Icon(
                             Icons.search,
                             color: isDark ? Colors.white38 : const Color(0xFF9E9E9E),
-                            size: 24.r,
+                            size: 24,
                           ),
                           border: InputBorder.none,
-                          contentPadding: EdgeInsets.symmetric(horizontal: 16.r, vertical: 14.r),
+                          contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
                         ),
-                        style: TextStyle(color: isDark ? Colors.white : Colors.black, fontSize: 16.r),
+                        style: TextStyle(color: isDark ? Colors.white : Colors.black, fontSize: 16),
                       ),
                     ),
 
-                    SizedBox(height: 20.r),
+                    const SizedBox(height: 24),
 
-                    Expanded(
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: isDark ? const Color(0xFF1E1E1E) : Colors.white,
-                          borderRadius: BorderRadius.circular(16.r),
+                    Container(
+                      height: 400,
+                      decoration: BoxDecoration(
+                        color: isDark ? const Color(0xFF1E1E1E) : Colors.white,
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      child: ListView.separated(
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        itemCount: _filteredLanguages.length,
+                        separatorBuilder: (context, index) => Divider(
+                          height: 1,
+                          thickness: 1,
+                          color: isDark ? Colors.grey[800] : const Color(0xFFF0F0F0),
                         ),
-                        child: ListView.separated(
-                          padding: EdgeInsets.symmetric(vertical: 8.r),
-                          itemCount: _filteredLanguages.length,
-                          separatorBuilder: (context, index) => Divider(
-                            height: 1,
-                            thickness: 1,
-                            color: isDark ? Colors.grey[800] : const Color(0xFFF0F0F0),
-                          ),
-                          itemBuilder: (context, index) {
-                            final language = _filteredLanguages[index];
-                            final isSelected = _selectedLanguage == language.code;
+                        itemBuilder: (context, index) {
+                          final language = _filteredLanguages[index];
+                          final isSelected = _selectedLanguage == language.code;
 
-                            return Material(
-                              color: Colors.transparent,
-                              child: InkWell(
-                                onTap: () => _onLanguageSelected(language),
-                                child: Container(
-                                  padding: EdgeInsets.symmetric(horizontal: 20.r, vertical: 16.r),
-                                  decoration: BoxDecoration(
-                                    color: isSelected ? secondaryColor.withOpacity(0.08) : Colors.transparent,
-                                  ),
-                                  child: Row(
-                                    children: [
-                                      Text(language.flag, style: TextStyle(fontSize: 28.r)),
-
-                                      SizedBox(width: 16.r),
-
-                                      Expanded(
-                                        child: Text(
-                                          language.name,
-                                          style: TextStyle(
-                                            fontSize: 16.r,
-                                            fontWeight: FontWeight.w500,
-                                            color: isDark ? Colors.white : const Color(0xFF3D3D3D),
-                                          ),
+                          return Material(
+                            color: Colors.transparent,
+                            child: InkWell(
+                              onTap: () => _onLanguageSelected(language),
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 18),
+                                decoration: BoxDecoration(
+                                  color: isSelected ? secondaryColor.withOpacity(0.08) : Colors.transparent,
+                                ),
+                                child: Row(
+                                  children: [
+                                    Text(language.flag, style: const TextStyle(fontSize: 32)),
+                                    const SizedBox(width: 20),
+                                    Expanded(
+                                      child: Text(
+                                        language.name,
+                                        style: TextStyle(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.w500,
+                                          color: isDark ? Colors.white : const Color(0xFF3D3D3D),
                                         ),
                                       ),
-
-                                      if (isSelected) Icon(Icons.check_circle, color: secondaryColor, size: 24.r),
-                                    ],
-                                  ),
+                                    ),
+                                    if (isSelected) Icon(Icons.check_circle, color: secondaryColor, size: 28),
+                                  ],
                                 ),
                               ),
-                            );
-                          },
-                        ),
+                            ),
+                          );
+                        },
                       ),
                     ),
 
-                    SizedBox(height: 24.r),
+                    const SizedBox(height: 32),
 
                     Container(
                       width: double.infinity,
-                      height: 56.r,
+                      height: 60,
                       decoration: BoxDecoration(
                         gradient: _selectedLanguage != null
                             ? const LinearGradient(
@@ -239,24 +402,22 @@ class _LanguageSelectionScreenState extends State<LanguageSelectionScreen> {
                               )
                             : null,
                         color: _selectedLanguage == null ? (isDark ? Colors.grey[800] : const Color(0xFFE0E0E0)) : null,
-                        borderRadius: BorderRadius.circular(16.r),
+                        borderRadius: BorderRadius.circular(16),
                       ),
                       child: Material(
                         color: Colors.transparent,
                         child: InkWell(
                           onTap: _selectedLanguage != null ? _onContinue : null,
-                          borderRadius: BorderRadius.circular(16.r),
+                          borderRadius: BorderRadius.circular(16),
                           child: Center(
                             child: Text(
                               'continue'.tr(),
-                              style: TextStyle(fontSize: 18.r, fontWeight: FontWeight.w600, color: Colors.white),
+                              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: Colors.white),
                             ),
                           ),
                         ),
                       ),
                     ),
-
-                    SizedBox(height: 32.r),
                   ],
                 ),
               ),

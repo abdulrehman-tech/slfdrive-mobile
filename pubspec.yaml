@@ -112,6 +112,7 @@ flutter:
   assets:
     - assets/icons/
     - assets/images/
+    - assets/images/brands/
     - assets/lottie/
     - assets/translations/
     - assets/web/icons/

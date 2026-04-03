@@ -4,6 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:easy_localization/easy_localization.dart';
 import '../../../constants/icon_constants.dart';
+import '../../../constants/breakpoints.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -71,41 +72,51 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
     return Scaffold(
       backgroundColor: isDark ? const Color(0xFF121212) : Colors.white,
       body: SafeArea(
-        child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Spacer(flex: 2),
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            final isDesktop = Breakpoints.isDesktop(constraints.maxWidth);
+            final isTablet = Breakpoints.isTablet(constraints.maxWidth);
 
-              FadeTransition(
-                opacity: _logoAnimation,
-                child: ScaleTransition(
-                  scale: Tween<double>(begin: 0.8, end: 1.0).animate(_logoAnimation),
-                  child: SvgPicture.asset(
-                    isDark ? IconConstants.logoWhite : IconConstants.logo,
-                    width: 200.r,
-                    height: 200.r,
+            final logoSize = isDesktop ? 300.0 : (isTablet ? 250.0 : 200.r);
+            final fontSize = isDesktop ? 28.0 : (isTablet ? 22.0 : 18.r);
+            final textHeight = isDesktop ? 50.0 : (isTablet ? 40.0 : 30.r);
+
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Spacer(flex: 2),
+
+                  FadeTransition(
+                    opacity: _logoAnimation,
+                    child: ScaleTransition(
+                      scale: Tween<double>(begin: 0.8, end: 1.0).animate(_logoAnimation),
+                      child: SvgPicture.asset(
+                        isDark ? IconConstants.logoWhite : IconConstants.logo,
+                        width: logoSize,
+                        height: logoSize,
+                      ),
+                    ),
                   ),
-                ),
-              ),
 
-              // SizedBox(height: 40.h),
-              SizedBox(
-                height: 30.r,
-                child: Text(
-                  _displayedText,
-                  style: TextStyle(
-                    fontSize: 18.r,
-                    fontWeight: FontWeight.w600,
-                    letterSpacing: 2.5,
-                    color: isDark ? Colors.white : const Color(0xFF0C2485),
+                  SizedBox(
+                    height: textHeight,
+                    child: Text(
+                      _displayedText,
+                      style: TextStyle(
+                        fontSize: fontSize,
+                        fontWeight: FontWeight.w600,
+                        letterSpacing: 2.5,
+                        color: isDark ? Colors.white : const Color(0xFF0C2485),
+                      ),
+                    ),
                   ),
-                ),
-              ),
 
-              const Spacer(flex: 2),
-            ],
-          ),
+                  const Spacer(flex: 2),
+                ],
+              ),
+            );
+          },
         ),
       ),
     );
