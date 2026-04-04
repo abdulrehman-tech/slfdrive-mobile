@@ -4,10 +4,15 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
+import '../../../widgets/omr_icon.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import '../../../../constants/breakpoints.dart';
 import '../../../../constants/color_constants.dart';
 import '../../../providers/theme_provider.dart';
+import '../favorites/favorites_screen.dart';
+import '../bookings/bookings_screen.dart';
+import '../profile/profile_screen.dart';
 
 // ============================================================
 // MOCK DATA MODELS
@@ -20,6 +25,7 @@ class _CarBrand {
 }
 
 class _CarItem {
+  final String id;
   final String name;
   final String imageUrl;
   final double pricePerDay;
@@ -29,6 +35,7 @@ class _CarItem {
   final String tag;
   bool isFavourite;
   _CarItem({
+    required this.id,
     required this.name,
     required this.imageUrl,
     required this.pricePerDay,
@@ -41,12 +48,14 @@ class _CarItem {
 }
 
 class _DriverItem {
+  final String id;
   final String name;
   final String avatarUrl;
   final double rating;
   final int trips;
   final String speciality;
   const _DriverItem({
+    required this.id,
     required this.name,
     required this.avatarUrl,
     required this.rating,
@@ -72,6 +81,7 @@ final List<_CarBrand> _brands = [
 
 final List<_CarItem> _featuredCars = [
   _CarItem(
+    id: '1',
     name: 'Mercedes AMG GT',
     imageUrl: 'https://images.unsplash.com/photo-1617814076367-b759c7d7e738?w=800&q=80',
     pricePerDay: 250,
@@ -82,6 +92,7 @@ final List<_CarItem> _featuredCars = [
     isFavourite: true,
   ),
   _CarItem(
+    id: '2',
     name: 'BMW M4 Competition',
     imageUrl: 'https://images.unsplash.com/photo-1555215695-3004980ad54e?w=800&q=80',
     pricePerDay: 190,
@@ -91,6 +102,7 @@ final List<_CarItem> _featuredCars = [
     tag: 'New',
   ),
   _CarItem(
+    id: '3',
     name: 'Porsche 911 Turbo S',
     imageUrl: 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=800&q=80',
     pricePerDay: 320,
@@ -100,6 +112,7 @@ final List<_CarItem> _featuredCars = [
     tag: 'Luxury',
   ),
   _CarItem(
+    id: '4',
     name: 'Lamborghini Huracán',
     imageUrl: 'https://images.unsplash.com/photo-1544636331-e26879cd4d9b?w=800&q=80',
     pricePerDay: 500,
@@ -112,6 +125,7 @@ final List<_CarItem> _featuredCars = [
 
 final List<_DriverItem> _nearbyDrivers = [
   _DriverItem(
+    id: '1',
     name: 'Ahmed Al-Farsi',
     avatarUrl: 'https://randomuser.me/api/portraits/men/32.jpg',
     rating: 4.9,
@@ -119,6 +133,7 @@ final List<_DriverItem> _nearbyDrivers = [
     speciality: 'Chauffeur',
   ),
   _DriverItem(
+    id: '2',
     name: 'Mohammed K.',
     avatarUrl: 'https://randomuser.me/api/portraits/men/45.jpg',
     rating: 4.8,
@@ -126,6 +141,7 @@ final List<_DriverItem> _nearbyDrivers = [
     speciality: 'Airport',
   ),
   _DriverItem(
+    id: '3',
     name: 'Yusuf Hassan',
     avatarUrl: 'https://randomuser.me/api/portraits/men/61.jpg',
     rating: 4.7,
@@ -133,6 +149,7 @@ final List<_DriverItem> _nearbyDrivers = [
     speciality: 'City Tours',
   ),
   _DriverItem(
+    id: '4',
     name: 'Omar Saeed',
     avatarUrl: 'https://randomuser.me/api/portraits/men/77.jpg',
     rating: 4.9,
@@ -189,6 +206,26 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> with SingleTick
     return tp.isDarkMode || (tp.isSystemMode && MediaQuery.of(context).platformBrightness == Brightness.dark);
   }
 
+  Widget _buildScreenBody(bool isDesktop) {
+    switch (_currentNavIndex) {
+      case 0:
+        return isDesktop ? _buildDesktopLayout() : _buildMobileLayout();
+      case 1:
+        return const FavoritesScreen();
+      case 2:
+        return const BookingsScreen();
+      case 3:
+        // From bottom nav = Profile; from drawer = My Vehicles (placeholder)
+        return const ProfileScreen();
+      case 4: // Profile from drawer
+        return const ProfileScreen();
+      case 5: // Settings from drawer → now merged into Profile
+        return const ProfileScreen();
+      default:
+        return isDesktop ? _buildDesktopLayout() : _buildMobileLayout();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final isDesktop = Breakpoints.isDesktop(MediaQuery.of(context).size.width);
@@ -205,13 +242,23 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> with SingleTick
       ),
       drawerEnableOpenDragGesture: true,
       body: isDesktop
-          ? _buildDesktopLayout()
+          ? _buildDesktopLayoutWrapper()
           : Stack(
               children: [
-                _buildMobileLayout(),
+                _buildScreenBody(false),
                 Positioned(left: 24.r, right: 24.r, bottom: 20.r, child: _buildBottomNav()),
               ],
             ),
+    );
+  }
+
+  Widget _buildDesktopLayoutWrapper() {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _buildDesktopSideNav(),
+        Expanded(child: _buildScreenBody(true)),
+      ],
     );
   }
 
@@ -239,41 +286,33 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> with SingleTick
   // ==========================================================================
 
   Widget _buildDesktopLayout() {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        _buildDesktopSideNav(),
-        Expanded(
-          child: CustomScrollView(
-            physics: const BouncingScrollPhysics(),
-            slivers: [
-              SliverToBoxAdapter(
-                child: Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 40.r, vertical: 28.r),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _buildDesktopTopBar(),
-                      SizedBox(height: 28.r),
-                      _buildHeroBanner(isDesktop: true),
-                      SizedBox(height: 28.r),
-                      _buildServiceRow(isDesktop: true),
-                      SizedBox(height: 8.r),
-                      _buildBrandsSection(isDesktop: true),
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Expanded(flex: 3, child: _buildFeaturedCarsSection(isDesktop: true)),
-                          SizedBox(width: 24.r),
-                          SizedBox(width: 280.r, child: _buildNearbyDriversSection(isDesktop: true)),
-                        ],
-                      ),
-                      SizedBox(height: 40.r),
-                    ],
-                  ),
+    return CustomScrollView(
+      physics: const BouncingScrollPhysics(),
+      slivers: [
+        SliverToBoxAdapter(
+          child: Padding(
+            padding: EdgeInsets.symmetric(horizontal: 40.r, vertical: 28.r),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildDesktopTopBar(),
+                SizedBox(height: 28.r),
+                _buildHeroBanner(isDesktop: true),
+                SizedBox(height: 28.r),
+                _buildServiceRow(isDesktop: true),
+                SizedBox(height: 8.r),
+                _buildBrandsSection(isDesktop: true),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(flex: 3, child: _buildFeaturedCarsSection(isDesktop: true)),
+                    SizedBox(width: 24.r),
+                    SizedBox(width: 280.r, child: _buildNearbyDriversSection(isDesktop: true)),
+                  ],
                 ),
-              ),
-            ],
+                SizedBox(height: 40.r),
+              ],
+            ),
           ),
         ),
       ],
@@ -558,20 +597,18 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> with SingleTick
               Icon(Iconsax.search_normal_copy, color: isDark ? Colors.white54 : const Color(0xFFAAAAAA), size: 20.r),
               SizedBox(width: 10.r),
               Expanded(
-                child: TextField(
-                  decoration: InputDecoration(
-                    hintText: 'home_search_hint'.tr(),
-                    hintStyle: TextStyle(color: isDark ? Colors.white38 : const Color(0xFFAAAAAA), fontSize: 14.r),
-                    border: InputBorder.none,
-                    contentPadding: EdgeInsets.symmetric(vertical: 14.r),
-                    filled: false,
-                    isCollapsed: false,
+                child: GestureDetector(
+                  onTap: () => context.pushNamed('search'),
+                  child: AbsorbPointer(
+                    child: Text(
+                      'home_search_hint'.tr(),
+                      style: TextStyle(color: isDark ? Colors.white38 : const Color(0xFFAAAAAA), fontSize: 14.r),
+                    ),
                   ),
-                  style: TextStyle(fontSize: 14.r, color: isDark ? Colors.white : Colors.black87),
                 ),
               ),
               GestureDetector(
-                onTap: () {},
+                onTap: () => context.pushNamed('search'),
                 child: Container(
                   margin: EdgeInsets.all(6.r),
                   width: 38.r,
@@ -634,7 +671,15 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> with SingleTick
             child: Padding(
               padding: EdgeInsets.only(right: i < services.length - 1 ? 10.r : 0),
               child: GestureDetector(
-                onTap: () {},
+                onTap: () {
+                  if (i == 0) {
+                    context.pushNamed('car-listing');
+                  } else if (i == 1) {
+                    context.pushNamed('car-listing');
+                  } else {
+                    context.pushNamed('driver-listing');
+                  }
+                },
                 child: _GlassCard(
                   isDark: isDark,
                   borderRadius: 18.r,
@@ -680,7 +725,12 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> with SingleTick
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _SectionHeader(title: 'home_all_brands'.tr(), cs: cs, onViewAll: () {}, isDesktop: isDesktop),
+        _SectionHeader(
+          title: 'home_all_brands'.tr(),
+          cs: cs,
+          onViewAll: () => context.pushNamed('car-listing'),
+          isDesktop: isDesktop,
+        ),
         SizedBox(
           height: 98.r,
           child: ListView.builder(
@@ -778,7 +828,12 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> with SingleTick
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _SectionHeader(title: 'home_all_collections'.tr(), cs: cs, onViewAll: () {}, isDesktop: isDesktop),
+        _SectionHeader(
+          title: 'home_all_collections'.tr(),
+          cs: cs,
+          onViewAll: () => context.pushNamed('car-listing'),
+          isDesktop: isDesktop,
+        ),
         if (isDesktop)
           // Vertical list for desktop side-panel
           ...List.generate(
@@ -790,6 +845,7 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> with SingleTick
                 isDark: _isDark,
                 cs: cs,
                 onFavourite: () => setState(() => _cars[i].isFavourite = !_cars[i].isFavourite),
+                onTap: () => context.pushNamed('car-detail', pathParameters: {'id': _cars[i].id}),
               ),
             ),
           )
@@ -811,6 +867,7 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> with SingleTick
                     isDark: _isDark,
                     cs: cs,
                     onFavourite: () => setState(() => _cars[i].isFavourite = !_cars[i].isFavourite),
+                    onTap: () => context.pushNamed('car-detail', pathParameters: {'id': _cars[i].id}),
                   ),
                 ),
               ),
@@ -830,12 +887,23 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> with SingleTick
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _SectionHeader(title: 'home_nearby_drivers'.tr(), cs: cs, onViewAll: () {}, isDesktop: isDesktop),
+        _SectionHeader(
+          title: 'home_nearby_drivers'.tr(),
+          cs: cs,
+          onViewAll: () => context.pushNamed('driver-listing'),
+          isDesktop: isDesktop,
+        ),
         if (isDesktop)
           ..._nearbyDrivers.map(
             (d) => Padding(
               padding: EdgeInsets.only(bottom: 12.r),
-              child: _DriverCard(driver: d, isDark: _isDark, cs: cs, horizontal: true),
+              child: _DriverCard(
+                driver: d,
+                isDark: _isDark,
+                cs: cs,
+                horizontal: true,
+                onTap: () => context.pushNamed('driver-detail', pathParameters: {'id': d.id}),
+              ),
             ),
           )
         else
@@ -848,7 +916,12 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> with SingleTick
               itemCount: _nearbyDrivers.length,
               itemBuilder: (_, i) => Padding(
                 padding: EdgeInsets.only(right: 12.r),
-                child: _DriverCard(driver: _nearbyDrivers[i], isDark: _isDark, cs: cs),
+                child: _DriverCard(
+                  driver: _nearbyDrivers[i],
+                  isDark: _isDark,
+                  cs: cs,
+                  onTap: () => context.pushNamed('driver-detail', pathParameters: {'id': _nearbyDrivers[i].id}),
+                ),
               ),
             ),
           ),
@@ -1002,7 +1075,7 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> with SingleTick
                           fontSize: 10.r,
                           color: active ? cs.primary : cs.onSurface.withValues(alpha: isDark ? 0.35 : 0.4),
                           fontWeight: active ? FontWeight.w700 : FontWeight.w500,
-                          fontFamily: 'OpenSans',
+                          fontFamily: Theme.of(context).textTheme.bodyMedium?.fontFamily,
                         ),
                         child: Text(_navKeys[i].tr()),
                       ),
@@ -1114,103 +1187,105 @@ class _CarCard extends StatelessWidget {
   final bool isDark;
   final ColorScheme cs;
   final VoidCallback onFavourite;
+  final VoidCallback? onTap;
 
-  const _CarCard({required this.car, required this.isDark, required this.cs, required this.onFavourite});
+  const _CarCard({required this.car, required this.isDark, required this.cs, required this.onFavourite, this.onTap});
 
   @override
   Widget build(BuildContext context) {
-    return _GlassCard(
-      isDark: isDark,
-      borderRadius: 20.r,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          // Image
-          Stack(
-            children: [
-              ClipRRect(
-                borderRadius: BorderRadius.only(topLeft: Radius.circular(20.r), topRight: Radius.circular(20.r)),
-                child: CachedNetworkImage(
-                  imageUrl: car.imageUrl,
-                  height: 150.r,
-                  width: double.infinity,
-                  fit: BoxFit.cover,
-                  placeholder: (_, __) => Container(
+    return GestureDetector(
+      onTap: onTap,
+      child: _GlassCard(
+        isDark: isDark,
+        borderRadius: 20.r,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Image
+            Stack(
+              children: [
+                ClipRRect(
+                  borderRadius: BorderRadius.only(topLeft: Radius.circular(20.r), topRight: Radius.circular(20.r)),
+                  child: CachedNetworkImage(
+                    imageUrl: car.imageUrl,
                     height: 150.r,
-                    color: isDark ? const Color(0xFF1E1E2E) : const Color(0xFFF0F0F0),
-                    child: Center(
-                      child: Icon(Iconsax.car_copy, color: cs.primary.withValues(alpha: 0.4), size: 36.r),
+                    width: double.infinity,
+                    fit: BoxFit.cover,
+                    placeholder: (_, __) => Container(
+                      height: 150.r,
+                      color: isDark ? const Color(0xFF1E1E2E) : const Color(0xFFF0F0F0),
+                      child: Center(
+                        child: Icon(Iconsax.car_copy, color: cs.primary.withValues(alpha: 0.4), size: 36.r),
+                      ),
                     ),
-                  ),
-                  errorWidget: (_, __, ___) => Container(
-                    height: 150.r,
-                    color: isDark ? const Color(0xFF1E1E2E) : const Color(0xFFF0F0F0),
-                    child: Center(
-                      child: Icon(Iconsax.car_copy, color: cs.primary.withValues(alpha: 0.4), size: 36.r),
-                    ),
-                  ),
-                ),
-              ),
-              // Tag badge
-              if (car.tag.isNotEmpty)
-                Positioned(
-                  top: 10.r,
-                  left: 10.r,
-                  child: Container(
-                    padding: EdgeInsets.symmetric(horizontal: 8.r, vertical: 4.r),
-                    decoration: BoxDecoration(color: cs.primary, borderRadius: BorderRadius.circular(8.r)),
-                    child: Text(
-                      car.tag,
-                      style: TextStyle(fontSize: 10.r, color: Colors.white, fontWeight: FontWeight.w700),
+                    errorWidget: (_, __, ___) => Container(
+                      height: 150.r,
+                      color: isDark ? const Color(0xFF1E1E2E) : const Color(0xFFF0F0F0),
+                      child: Center(
+                        child: Icon(Iconsax.car_copy, color: cs.primary.withValues(alpha: 0.4), size: 36.r),
+                      ),
                     ),
                   ),
                 ),
-              // Favourite
-              Positioned(
-                top: 10.r,
-                right: 10.r,
-                child: GestureDetector(
-                  onTap: onFavourite,
-                  child: Container(
-                    width: 32.r,
-                    height: 32.r,
-                    decoration: BoxDecoration(
-                      color: isDark ? Colors.black.withValues(alpha: 0.5) : Colors.white.withValues(alpha: 0.85),
-                      borderRadius: BorderRadius.circular(10.r),
-                    ),
-                    child: Icon(
-                      car.isFavourite ? Iconsax.heart_copy : Iconsax.heart,
-                      color: car.isFavourite ? Colors.redAccent : (isDark ? Colors.white60 : Colors.black45),
-                      size: 16.r,
-                    ),
-                  ),
-                ),
-              ),
-              // Price overlay
-              Positioned(
-                bottom: 10.r,
-                right: 10.r,
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(10.r),
-                  child: BackdropFilter(
-                    filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                // Tag badge
+                if (car.tag.isNotEmpty)
+                  Positioned(
+                    top: 10.r,
+                    left: 10.r,
                     child: Container(
                       padding: EdgeInsets.symmetric(horizontal: 8.r, vertical: 4.r),
+                      decoration: BoxDecoration(color: cs.primary, borderRadius: BorderRadius.circular(8.r)),
+                      child: Text(
+                        car.tag,
+                        style: TextStyle(fontSize: 10.r, color: Colors.white, fontWeight: FontWeight.w700),
+                      ),
+                    ),
+                  ),
+                // Favourite
+                Positioned(
+                  top: 10.r,
+                  right: 10.r,
+                  child: GestureDetector(
+                    onTap: onFavourite,
+                    child: Container(
+                      width: 32.r,
+                      height: 32.r,
                       decoration: BoxDecoration(
-                        color: Colors.black.withValues(alpha: 0.45),
+                        color: isDark ? Colors.black.withValues(alpha: 0.5) : Colors.white.withValues(alpha: 0.85),
                         borderRadius: BorderRadius.circular(10.r),
                       ),
-                      child: RichText(
-                        text: TextSpan(
+                      child: Icon(
+                        car.isFavourite ? Iconsax.heart_copy : Iconsax.heart,
+                        color: car.isFavourite ? Colors.redAccent : (isDark ? Colors.white60 : Colors.black45),
+                        size: 16.r,
+                      ),
+                    ),
+                  ),
+                ),
+                // Price overlay
+                Positioned(
+                  bottom: 10.r,
+                  right: 10.r,
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(10.r),
+                    child: BackdropFilter(
+                      filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                      child: Container(
+                        padding: EdgeInsets.symmetric(horizontal: 8.r, vertical: 4.r),
+                        decoration: BoxDecoration(
+                          color: Colors.black.withValues(alpha: 0.45),
+                          borderRadius: BorderRadius.circular(10.r),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
-                            TextSpan(
-                              text: '\$${car.pricePerDay.toInt()}',
+                            OmrIcon(size: 12.r, color: Colors.white),
+                            SizedBox(width: 3.r),
+                            Text(
+                              '${car.pricePerDay.toInt()}/${'day'.tr()}',
                               style: TextStyle(fontSize: 14.r, fontWeight: FontWeight.bold, color: Colors.white),
-                            ),
-                            TextSpan(
-                              text: '/${'day'.tr()}',
-                              style: TextStyle(fontSize: 10.r, color: Colors.white70),
                             ),
                           ],
                         ),
@@ -1218,35 +1293,35 @@ class _CarCard extends StatelessWidget {
                     ),
                   ),
                 ),
-              ),
-            ],
-          ),
-          // Details
-          Padding(
-            padding: EdgeInsets.all(12.r),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  car.name,
-                  style: TextStyle(fontSize: 13.r, fontWeight: FontWeight.bold, color: cs.onSurface),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                SizedBox(height: 8.r),
-                Row(
-                  children: [
-                    _SpecPill(icon: Iconsax.flash_1_copy, label: '${car.horsepower}hp', isDark: isDark, cs: cs),
-                    SizedBox(width: 6.r),
-                    _SpecPill(icon: Iconsax.setting_copy, label: car.transmission, isDark: isDark, cs: cs),
-                    SizedBox(width: 6.r),
-                    _SpecPill(icon: Iconsax.people_copy, label: '${car.seats}', isDark: isDark, cs: cs),
-                  ],
-                ),
               ],
             ),
-          ),
-        ],
+            // Details
+            Padding(
+              padding: EdgeInsets.all(12.r),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    car.name,
+                    style: TextStyle(fontSize: 13.r, fontWeight: FontWeight.bold, color: cs.onSurface),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  SizedBox(height: 8.r),
+                  Row(
+                    children: [
+                      _SpecPill(icon: Iconsax.flash_1_copy, label: '${car.horsepower}hp', isDark: isDark, cs: cs),
+                      SizedBox(width: 6.r),
+                      _SpecPill(icon: Iconsax.setting_copy, label: car.transmission, isDark: isDark, cs: cs),
+                      SizedBox(width: 6.r),
+                      _SpecPill(icon: Iconsax.people_copy, label: '${car.seats}', isDark: isDark, cs: cs),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -1296,8 +1371,15 @@ class _DriverCard extends StatelessWidget {
   final bool isDark;
   final ColorScheme cs;
   final bool horizontal;
+  final VoidCallback? onTap;
 
-  const _DriverCard({required this.driver, required this.isDark, required this.cs, this.horizontal = false});
+  const _DriverCard({
+    required this.driver,
+    required this.isDark,
+    required this.cs,
+    this.horizontal = false,
+    this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -1306,19 +1388,87 @@ class _DriverCard extends StatelessWidget {
   }
 
   Widget _buildVertical() {
-    return _GlassCard(
-      isDark: isDark,
-      borderRadius: 18,
-      padding: EdgeInsets.symmetric(vertical: 10.r, horizontal: 10.r),
-      child: SizedBox(
-        width: 110.r,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
+    return GestureDetector(
+      onTap: onTap,
+      child: _GlassCard(
+        isDark: isDark,
+        borderRadius: 18,
+        padding: EdgeInsets.symmetric(vertical: 10.r, horizontal: 10.r),
+        child: SizedBox(
+          width: 110.r,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Stack(
+                alignment: Alignment.bottomRight,
+                children: [
+                  _avatar(28.r),
+                  Container(
+                    width: 10.r,
+                    height: 10.r,
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF4CAF50),
+                      shape: BoxShape.circle,
+                      border: Border.all(color: isDark ? const Color(0xFF1A1A2A) : Colors.white, width: 1.5),
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(height: 6.r),
+              Text(
+                driver.name.split(' ').first,
+                style: TextStyle(fontSize: 11.r, fontWeight: FontWeight.bold, color: cs.onSurface),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+              SizedBox(height: 3.r),
+              Container(
+                padding: EdgeInsets.symmetric(horizontal: 6.r, vertical: 2.r),
+                decoration: BoxDecoration(
+                  color: cs.primary.withValues(alpha: 0.08),
+                  borderRadius: BorderRadius.circular(6.r),
+                ),
+                child: Text(
+                  driver.speciality,
+                  style: TextStyle(fontSize: 9.r, color: cs.primary, fontWeight: FontWeight.w600),
+                ),
+              ),
+              SizedBox(height: 4.r),
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(Iconsax.star_1_copy, color: const Color(0xFFFFC107), size: 11.r),
+                  SizedBox(width: 2.r),
+                  Text(
+                    driver.rating.toString(),
+                    style: TextStyle(
+                      fontSize: 11.r,
+                      fontWeight: FontWeight.w700,
+                      color: cs.onSurface.withValues(alpha: 0.8),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildHorizontal() {
+    return GestureDetector(
+      onTap: onTap,
+      child: _GlassCard(
+        isDark: isDark,
+        borderRadius: 14,
+        padding: EdgeInsets.all(12.r),
+        child: Row(
           children: [
             Stack(
               alignment: Alignment.bottomRight,
               children: [
-                _avatar(28.r),
+                _avatar(24.r),
                 Container(
                   width: 10.r,
                   height: 10.r,
@@ -1330,106 +1480,44 @@ class _DriverCard extends StatelessWidget {
                 ),
               ],
             ),
-            SizedBox(height: 6.r),
-            Text(
-              driver.name.split(' ').first,
-              style: TextStyle(fontSize: 11.r, fontWeight: FontWeight.bold, color: cs.onSurface),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
+            SizedBox(width: 10.r),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    driver.name,
+                    style: TextStyle(fontSize: 12.r, fontWeight: FontWeight.bold, color: cs.onSurface),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  SizedBox(height: 3.r),
+                  Row(
+                    children: [
+                      Icon(Iconsax.star_1_copy, color: const Color(0xFFFFC107), size: 11.r),
+                      SizedBox(width: 2.r),
+                      Text(
+                        '${driver.rating}  ·  ${driver.trips} trips',
+                        style: TextStyle(fontSize: 10.r, color: cs.onSurface.withValues(alpha: 0.55)),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
-            SizedBox(height: 3.r),
             Container(
-              padding: EdgeInsets.symmetric(horizontal: 6.r, vertical: 2.r),
+              padding: EdgeInsets.symmetric(horizontal: 8.r, vertical: 4.r),
               decoration: BoxDecoration(
-                color: cs.primary.withValues(alpha: 0.08),
-                borderRadius: BorderRadius.circular(6.r),
+                color: const Color(0xFF4CAF50).withValues(alpha: 0.12),
+                borderRadius: BorderRadius.circular(7.r),
               ),
               child: Text(
-                driver.speciality,
-                style: TextStyle(fontSize: 9.r, color: cs.primary, fontWeight: FontWeight.w600),
+                'available'.tr(),
+                style: TextStyle(fontSize: 10.r, color: const Color(0xFF4CAF50), fontWeight: FontWeight.w700),
               ),
-            ),
-            SizedBox(height: 4.r),
-            Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(Iconsax.star_1_copy, color: const Color(0xFFFFC107), size: 11.r),
-                SizedBox(width: 2.r),
-                Text(
-                  driver.rating.toString(),
-                  style: TextStyle(
-                    fontSize: 11.r,
-                    fontWeight: FontWeight.w700,
-                    color: cs.onSurface.withValues(alpha: 0.8),
-                  ),
-                ),
-              ],
             ),
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _buildHorizontal() {
-    return _GlassCard(
-      isDark: isDark,
-      borderRadius: 14,
-      padding: EdgeInsets.all(12.r),
-      child: Row(
-        children: [
-          Stack(
-            alignment: Alignment.bottomRight,
-            children: [
-              _avatar(24.r),
-              Container(
-                width: 10.r,
-                height: 10.r,
-                decoration: BoxDecoration(
-                  color: const Color(0xFF4CAF50),
-                  shape: BoxShape.circle,
-                  border: Border.all(color: isDark ? const Color(0xFF1A1A2A) : Colors.white, width: 1.5),
-                ),
-              ),
-            ],
-          ),
-          SizedBox(width: 10.r),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  driver.name,
-                  style: TextStyle(fontSize: 12.r, fontWeight: FontWeight.bold, color: cs.onSurface),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                SizedBox(height: 3.r),
-                Row(
-                  children: [
-                    Icon(Iconsax.star_1_copy, color: const Color(0xFFFFC107), size: 11.r),
-                    SizedBox(width: 2.r),
-                    Text(
-                      '${driver.rating}  ·  ${driver.trips} trips',
-                      style: TextStyle(fontSize: 10.r, color: cs.onSurface.withValues(alpha: 0.55)),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-          Container(
-            padding: EdgeInsets.symmetric(horizontal: 8.r, vertical: 4.r),
-            decoration: BoxDecoration(
-              color: const Color(0xFF4CAF50).withValues(alpha: 0.12),
-              borderRadius: BorderRadius.circular(7.r),
-            ),
-            child: Text(
-              'available'.tr(),
-              style: TextStyle(fontSize: 10.r, color: const Color(0xFF4CAF50), fontWeight: FontWeight.w700),
-            ),
-          ),
-        ],
       ),
     );
   }

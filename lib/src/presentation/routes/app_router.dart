@@ -8,6 +8,11 @@ import '../screens/common/auth/login/phone_login_screen.dart';
 import '../screens/common/auth/otp/otp_verification_screen.dart';
 import '../screens/common/auth/profile_completion_screen.dart';
 import '../screens/customer/home/customer_home_screen.dart';
+import '../screens/customer/car_listing/car_listing_screen.dart';
+import '../screens/customer/car_detail/car_detail_screen.dart';
+import '../screens/customer/driver_listing/driver_listing_screen.dart';
+import '../screens/customer/driver_detail/driver_detail_screen.dart';
+import '../screens/customer/search/search_screen.dart';
 
 class AppRouter {
   static final GoRouter router = GoRouter(
@@ -51,6 +56,41 @@ class AppRouter {
         },
       ),
       GoRoute(path: '/home', name: 'home', builder: (context, state) => const CustomerHomeScreen()),
+      GoRoute(
+        path: '/cars',
+        name: 'car-listing',
+        builder: (context, state) {
+          final extra = state.extra as Map<String, dynamic>?;
+          final brand = extra?['brand'] as String?;
+          return CarListingScreen(initialBrand: brand);
+        },
+      ),
+      GoRoute(
+        path: '/cars/:id',
+        name: 'car-detail',
+        builder: (context, state) {
+          final id = state.pathParameters['id'] ?? '';
+          return CarDetailScreen(carId: id);
+        },
+      ),
+      GoRoute(
+        path: '/drivers',
+        name: 'driver-listing',
+        builder: (context, state) {
+          final extra = state.extra as Map<String, dynamic>?;
+          final filter = extra?['filter'] as String?;
+          return DriverListingScreen(initialFilter: filter);
+        },
+      ),
+      GoRoute(
+        path: '/drivers/:id',
+        name: 'driver-detail',
+        builder: (context, state) {
+          final id = state.pathParameters['id'] ?? '';
+          return DriverDetailScreen(driverId: id);
+        },
+      ),
+      GoRoute(path: '/search', name: 'search', builder: (context, state) => const SearchScreen()),
       GoRoute(
         path: '/driver/home',
         name: 'driver-home',
