@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'app_fade_through_transition.dart';
 import '../screens/splash/splash_screen.dart';
 import '../screens/language/language_selection_screen.dart';
 import '../screens/onboarding/onboarding_screen.dart';
@@ -13,89 +14,210 @@ import '../screens/customer/car_detail/car_detail_screen.dart';
 import '../screens/customer/driver_listing/driver_listing_screen.dart';
 import '../screens/customer/driver_detail/driver_detail_screen.dart';
 import '../screens/customer/search/search_screen.dart';
+import '../screens/driver/home/driver_home_screen.dart';
+
+/// Professional page transition with shared axis pattern.
+/// Uses Material 3 motion principles with elegant easing curves.
+class AppPageTransition extends CustomTransitionPage {
+  AppPageTransition({required super.child, super.name, super.arguments, super.restorationId})
+    : super(
+        transitionsBuilder: (context, animation, secondaryAnimation, child) {
+          // Material 3 emphasized easing for smooth, professional motion
+          const enterCurve = Curves.easeOutCubic;
+          const exitCurve = Curves.easeInCubic;
+
+          // Primary animation (entering screen)
+          final primaryAnimation = CurvedAnimation(parent: animation, curve: enterCurve, reverseCurve: exitCurve);
+
+          // Shared axis Z transition: fade + slide with scale
+          const slideDistance = 0.03; // Very subtle horizontal movement
+
+          // Entering screen: slide from right with fade in
+          final enterSlide = Tween<Offset>(
+            begin: const Offset(slideDistance, 0),
+            end: Offset.zero,
+          ).animate(primaryAnimation);
+
+          final enterFade = Tween<double>(begin: 0.0, end: 1.0).animate(primaryAnimation);
+
+          // Subtle scale for depth (Material 3 style)
+          final enterScale = Tween<double>(begin: 0.95, end: 1.0).animate(primaryAnimation);
+
+          // Single transition - no Stack to avoid GlobalKey conflicts
+          return SlideTransition(
+            position: enterSlide,
+            child: FadeTransition(
+              opacity: enterFade,
+              child: ScaleTransition(scale: enterScale, child: child),
+            ),
+          );
+        },
+        transitionDuration: const Duration(milliseconds: 500),
+        reverseTransitionDuration: const Duration(milliseconds: 450),
+      );
+}
+
+/// Modal-style transition for detail screens that should feel like overlays.
+/// Uses vertical slide with fade and scale for an elegant modal entrance.
+class AppModalTransition extends CustomTransitionPage {
+  AppModalTransition({required super.child, super.name, super.arguments, super.restorationId})
+    : super(
+        transitionsBuilder: (context, animation, secondaryAnimation, child) {
+          // Material 3 emphasized deceleration for modal entrance
+          const enterCurve = Curves.easeOutCubic;
+          const exitCurve = Curves.easeInCubic;
+
+          final primaryAnimation = CurvedAnimation(parent: animation, curve: enterCurve, reverseCurve: exitCurve);
+
+          // Modal slides up from bottom with fade
+          final slideAnimation = Tween<Offset>(
+            begin: const Offset(0, 0.05),
+            end: Offset.zero,
+          ).animate(primaryAnimation);
+
+          final fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(primaryAnimation);
+
+          // Subtle scale for depth
+          final scaleAnimation = Tween<double>(begin: 0.96, end: 1.0).animate(primaryAnimation);
+
+          // Single transition - no Stack to avoid GlobalKey conflicts
+          return SlideTransition(
+            position: slideAnimation,
+            child: FadeTransition(
+              opacity: fadeAnimation,
+              child: ScaleTransition(scale: scaleAnimation, child: child),
+            ),
+          );
+        },
+        transitionDuration: const Duration(milliseconds: 550),
+        reverseTransitionDuration: const Duration(milliseconds: 500),
+      );
+}
 
 class AppRouter {
   static final GoRouter router = GoRouter(
     initialLocation: '/',
     routes: [
-      GoRoute(path: '/', name: 'splash', builder: (context, state) => const SplashScreen()),
+      GoRoute(
+        path: '/',
+        name: 'splash',
+        pageBuilder: (context, state) => AppFadeThroughTransition(child: const SplashScreen(), name: state.name),
+      ),
       GoRoute(
         path: '/language-selection',
         name: 'language-selection',
-        builder: (context, state) => const LanguageSelectionScreen(),
+        pageBuilder: (context, state) =>
+            AppFadeThroughTransition(child: const LanguageSelectionScreen(), name: state.name),
       ),
-      GoRoute(path: '/onboarding', name: 'onboarding', builder: (context, state) => const OnboardingScreen()),
-      GoRoute(path: '/auth', name: 'auth', builder: (context, state) => const PreLoginScreen()),
+      GoRoute(
+        path: '/onboarding',
+        name: 'onboarding',
+        pageBuilder: (context, state) => AppFadeThroughTransition(child: const OnboardingScreen(), name: state.name),
+      ),
+      GoRoute(
+        path: '/auth',
+        name: 'auth',
+        pageBuilder: (context, state) => AppPageTransition(child: const PreLoginScreen(), name: state.name),
+      ),
       GoRoute(
         path: '/auth/phone',
         name: 'phone-login',
-        builder: (context, state) {
+        pageBuilder: (context, state) {
           final extra = state.extra as Map<String, dynamic>?;
           final isDriver = extra?['isDriver'] as bool? ?? false;
-          return PhoneLoginScreen(isDriver: isDriver);
+          return AppPageTransition(
+            child: PhoneLoginScreen(isDriver: isDriver),
+            name: state.name,
+          );
         },
       ),
       GoRoute(
         path: '/auth/otp',
         name: 'otp-verification',
-        builder: (context, state) {
+        pageBuilder: (context, state) {
           final extra = state.extra as Map<String, dynamic>?;
           final phone = extra?['phone'] as String? ?? '';
           final isDriver = extra?['isDriver'] as bool? ?? false;
-          return OtpVerificationScreen(phoneNumber: phone, isDriver: isDriver);
+          final deliveryMethod = extra?['deliveryMethod'] as String? ?? 'sms';
+          return AppPageTransition(
+            child: OtpVerificationScreen(phoneNumber: phone, isDriver: isDriver, deliveryMethod: deliveryMethod),
+            name: state.name,
+          );
         },
       ),
       GoRoute(
         path: '/auth/profile-completion',
         name: 'profile-completion',
-        builder: (context, state) {
+        pageBuilder: (context, state) {
           final extra = state.extra as Map<String, dynamic>?;
           final phone = extra?['phone'] as String? ?? '';
           final isDriver = extra?['isDriver'] as bool? ?? false;
-          return ProfileCompletionScreen(phoneNumber: phone, isDriver: isDriver);
+          return AppPageTransition(
+            child: ProfileCompletionScreen(phoneNumber: phone, isDriver: isDriver),
+            name: state.name,
+          );
         },
       ),
-      GoRoute(path: '/home', name: 'home', builder: (context, state) => const CustomerHomeScreen()),
+      GoRoute(
+        path: '/home',
+        name: 'home',
+        pageBuilder: (context, state) => AppPageTransition(child: const CustomerHomeScreen(), name: state.name),
+      ),
       GoRoute(
         path: '/cars',
         name: 'car-listing',
-        builder: (context, state) {
+        pageBuilder: (context, state) {
           final extra = state.extra as Map<String, dynamic>?;
           final brand = extra?['brand'] as String?;
-          return CarListingScreen(initialBrand: brand);
+          return AppPageTransition(
+            child: CarListingScreen(initialBrand: brand),
+            name: state.name,
+          );
         },
       ),
       GoRoute(
         path: '/cars/:id',
         name: 'car-detail',
-        builder: (context, state) {
+        pageBuilder: (context, state) {
           final id = state.pathParameters['id'] ?? '';
-          return CarDetailScreen(carId: id);
+          return AppModalTransition(
+            child: CarDetailScreen(carId: id),
+            name: state.name,
+          );
         },
       ),
       GoRoute(
         path: '/drivers',
         name: 'driver-listing',
-        builder: (context, state) {
+        pageBuilder: (context, state) {
           final extra = state.extra as Map<String, dynamic>?;
           final filter = extra?['filter'] as String?;
-          return DriverListingScreen(initialFilter: filter);
+          return AppPageTransition(
+            child: DriverListingScreen(initialFilter: filter),
+            name: state.name,
+          );
         },
       ),
       GoRoute(
         path: '/drivers/:id',
         name: 'driver-detail',
-        builder: (context, state) {
+        pageBuilder: (context, state) {
           final id = state.pathParameters['id'] ?? '';
-          return DriverDetailScreen(driverId: id);
+          return AppModalTransition(
+            child: DriverDetailScreen(driverId: id),
+            name: state.name,
+          );
         },
       ),
-      GoRoute(path: '/search', name: 'search', builder: (context, state) => const SearchScreen()),
+      GoRoute(
+        path: '/search',
+        name: 'search',
+        pageBuilder: (context, state) => AppModalTransition(child: const SearchScreen(), name: state.name),
+      ),
       GoRoute(
         path: '/driver/home',
         name: 'driver-home',
-        builder: (context, state) =>
-            const Scaffold(body: Center(child: Text('Driver Home Screen - To be implemented'))),
+        pageBuilder: (context, state) => AppPageTransition(child: const DriverHomeScreen(), name: state.name),
       ),
     ],
   );

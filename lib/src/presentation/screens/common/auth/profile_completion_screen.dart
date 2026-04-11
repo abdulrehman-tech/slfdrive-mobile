@@ -4,9 +4,13 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:intl_phone_field/countries.dart';
 import '../../../../constants/icon_constants.dart';
 import '../../../../constants/color_constants.dart';
 import '../../../../constants/breakpoints.dart';
+import '../../../widgets/bottom_sheets/dropdown_bottom_sheet.dart';
+import '../../../widgets/bottom_sheets/multi_select_bottom_sheet.dart';
+import '../../../widgets/country_selector_field.dart';
 
 class ProfileCompletionScreen extends StatefulWidget {
   final String phoneNumber;
@@ -22,34 +26,41 @@ class _ProfileCompletionScreenState extends State<ProfileCompletionScreen> {
   // Common
   final _nameController = TextEditingController();
   final _emailController = TextEditingController();
+  final _dobController = TextEditingController();
+  Country? _selectedCountry;
+  String? _selectedGender;
 
   // Driver-only
   final _licenseNumberController = TextEditingController();
   final _licenseExpiryController = TextEditingController();
   final _nationalIdController = TextEditingController();
-  final _vehicleMakeController = TextEditingController();
-  final _vehicleModelController = TextEditingController();
-  final _vehicleYearController = TextEditingController();
-  final _vehiclePlateController = TextEditingController();
+  final _yearsExperienceController = TextEditingController();
+  List<String> _selectedLanguages = [];
 
-  String? _insuranceFileName;
-  String? _profilePhotoFileName;
+  String? _civilIdFrontFileName;
+  String? _civilIdBackFileName;
+  String? _medicalCertificateFileName;
+  String? _drivingLicenseFileName;
   bool _avatarPicked = false;
   bool _isButtonEnabled = false;
+
+  // Language options
+  final _languages = ['English', 'Arabic', 'Hindi', 'Urdu', 'Malayalam', 'Tamil', 'Tagalog', 'Bengali', 'French'];
+
+  // Gender options
+  final _genders = ['Male', 'Female', 'Other', 'Prefer not to say'];
 
   @override
   void initState() {
     super.initState();
     _nameController.addListener(_validateForm);
     _emailController.addListener(_validateForm);
+    _dobController.addListener(_validateForm);
     if (widget.isDriver) {
       _licenseNumberController.addListener(_validateForm);
       _licenseExpiryController.addListener(_validateForm);
       _nationalIdController.addListener(_validateForm);
-      _vehicleMakeController.addListener(_validateForm);
-      _vehicleModelController.addListener(_validateForm);
-      _vehicleYearController.addListener(_validateForm);
-      _vehiclePlateController.addListener(_validateForm);
+      _yearsExperienceController.addListener(_validateForm);
     }
   }
 
@@ -57,13 +68,11 @@ class _ProfileCompletionScreenState extends State<ProfileCompletionScreen> {
   void dispose() {
     _nameController.dispose();
     _emailController.dispose();
+    _dobController.dispose();
     _licenseNumberController.dispose();
     _licenseExpiryController.dispose();
     _nationalIdController.dispose();
-    _vehicleMakeController.dispose();
-    _vehicleModelController.dispose();
-    _vehicleYearController.dispose();
-    _vehiclePlateController.dispose();
+    _yearsExperienceController.dispose();
     super.dispose();
   }
 
@@ -73,7 +82,10 @@ class _ProfileCompletionScreenState extends State<ProfileCompletionScreen> {
     final commonOk =
         _nameController.text.trim().isNotEmpty &&
         _emailController.text.trim().isNotEmpty &&
-        _isValidEmail(_emailController.text.trim());
+        _isValidEmail(_emailController.text.trim()) &&
+        _dobController.text.trim().isNotEmpty &&
+        _selectedCountry != null &&
+        _selectedGender != null;
 
     if (!widget.isDriver) {
       setState(() => _isButtonEnabled = commonOk);
@@ -85,10 +97,12 @@ class _ProfileCompletionScreenState extends State<ProfileCompletionScreen> {
         _licenseNumberController.text.trim().isNotEmpty &&
         _licenseExpiryController.text.trim().isNotEmpty &&
         _nationalIdController.text.trim().isNotEmpty &&
-        _vehicleMakeController.text.trim().isNotEmpty &&
-        _vehicleModelController.text.trim().isNotEmpty &&
-        _vehicleYearController.text.trim().isNotEmpty &&
-        _vehiclePlateController.text.trim().isNotEmpty;
+        _yearsExperienceController.text.trim().isNotEmpty &&
+        _selectedLanguages.isNotEmpty &&
+        _civilIdFrontFileName != null &&
+        _civilIdBackFileName != null &&
+        _medicalCertificateFileName != null &&
+        _drivingLicenseFileName != null;
 
     setState(() => _isButtonEnabled = driverOk);
   }
@@ -102,7 +116,7 @@ class _ProfileCompletionScreenState extends State<ProfileCompletionScreen> {
     }
   }
 
-  Future<void> _pickLicenseExpiry(BuildContext context) async {
+  void _pickLicenseExpiry(BuildContext context) async {
     final picked = await showDatePicker(
       context: context,
       initialDate: DateTime.now().add(const Duration(days: 365)),
@@ -111,6 +125,20 @@ class _ProfileCompletionScreenState extends State<ProfileCompletionScreen> {
     );
     if (picked != null) {
       _licenseExpiryController.text =
+          '${picked.day.toString().padLeft(2, '0')}/${picked.month.toString().padLeft(2, '0')}/${picked.year}';
+      _validateForm();
+    }
+  }
+
+  void _pickDateOfBirth(BuildContext context) async {
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: DateTime(1990, 1, 1),
+      firstDate: DateTime(1950),
+      lastDate: DateTime.now().subtract(const Duration(days: 365 * 18)),
+    );
+    if (picked != null) {
+      _dobController.text =
           '${picked.day.toString().padLeft(2, '0')}/${picked.month.toString().padLeft(2, '0')}/${picked.year}';
       _validateForm();
     }
@@ -210,8 +238,83 @@ class _ProfileCompletionScreenState extends State<ProfileCompletionScreen> {
                     isDark: isDark,
                     keyboardType: TextInputType.emailAddress,
                   ),
+                  SizedBox(height: 16.r),
+                  // Date of Birth
+                  GestureDetector(
+                    onTap: () => _pickDateOfBirth(context),
+                    child: AbsorbPointer(
+                      child: _InputField(
+                        controller: _dobController,
+                        hint: 'DD/MM/YYYY',
+                        label: 'date_of_birth'.tr(),
+                        icon: Icons.calendar_today_outlined,
+                        isDark: isDark,
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 16.r),
+                  // Country Selector
+                  CountrySelectorField(
+                    selectedCountry: _selectedCountry,
+                    onCountrySelected: (country) {
+                      setState(() {
+                        _selectedCountry = country;
+                        _validateForm();
+                      });
+                    },
+                    isDark: isDark,
+                    label: 'country'.tr(),
+                    icon: Icons.public_outlined,
+                  ),
+                  SizedBox(height: 16.r),
+                  // Gender Dropdown
+                  _DropdownField(
+                    value: _selectedGender,
+                    hint: 'select_gender'.tr(),
+                    label: 'gender'.tr(),
+                    icon: Icons.people_outline,
+                    isDark: isDark,
+                    items: _genders,
+                    onChanged: (value) {
+                      setState(() {
+                        _selectedGender = value;
+                        _validateForm();
+                      });
+                    },
+                  ),
 
                   if (widget.isDriver) ...[
+                    SizedBox(height: 28.r),
+
+                    // ── Additional Info ──
+                    _SectionHeader(label: 'section_additional_info'.tr(), isDark: isDark),
+                    SizedBox(height: 14.r),
+                    // Years of Experience
+                    _InputField(
+                      controller: _yearsExperienceController,
+                      hint: 'enter_years_experience'.tr(),
+                      label: 'years_driving_experience'.tr(),
+                      icon: Icons.timer_outlined,
+                      isDark: isDark,
+                      keyboardType: TextInputType.number,
+                    ),
+                    SizedBox(height: 16.r),
+                    // Languages Multi-select
+                    _MultiSelectField(
+                      values: _selectedLanguages,
+                      hint: 'select_languages'.tr(),
+                      label: 'languages_spoken'.tr(),
+                      icon: Icons.language_outlined,
+                      isDark: isDark,
+                      items: _languages,
+                      onChanged: (values) {
+                        setState(() {
+                          _selectedLanguages = values;
+                          _validateForm();
+                        });
+                      },
+                    ),
+
                     SizedBox(height: 28.r),
 
                     // ── License ──
@@ -248,70 +351,43 @@ class _ProfileCompletionScreenState extends State<ProfileCompletionScreen> {
 
                     SizedBox(height: 28.r),
 
-                    // ── Vehicle ──
-                    _SectionHeader(label: 'section_vehicle'.tr(), isDark: isDark),
-                    SizedBox(height: 14.r),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: _InputField(
-                            controller: _vehicleMakeController,
-                            hint: 'eg_toyota'.tr(),
-                            label: 'vehicle_make'.tr(),
-                            icon: Icons.directions_car_outlined,
-                            isDark: isDark,
-                          ),
-                        ),
-                        SizedBox(width: 12.r),
-                        Expanded(
-                          child: _InputField(
-                            controller: _vehicleModelController,
-                            hint: 'eg_camry'.tr(),
-                            label: 'vehicle_model'.tr(),
-                            icon: Icons.car_rental_outlined,
-                            isDark: isDark,
-                          ),
-                        ),
-                      ],
-                    ),
-                    SizedBox(height: 16.r),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: _InputField(
-                            controller: _vehicleYearController,
-                            hint: 'eg_2022'.tr(),
-                            label: 'vehicle_year'.tr(),
-                            icon: Icons.date_range_outlined,
-                            isDark: isDark,
-                            keyboardType: TextInputType.number,
-                          ),
-                        ),
-                        SizedBox(width: 12.r),
-                        Expanded(
-                          child: _InputField(
-                            controller: _vehiclePlateController,
-                            hint: 'eg_ab1234'.tr(),
-                            label: 'vehicle_plate'.tr(),
-                            icon: Icons.confirmation_number_outlined,
-                            isDark: isDark,
-                          ),
-                        ),
-                      ],
-                    ),
-
-                    SizedBox(height: 28.r),
-
                     // ── Documents ──
                     _SectionHeader(label: 'section_documents'.tr(), isDark: isDark),
                     SizedBox(height: 14.r),
                     _DocumentPickerTile(
-                      label: 'insurance_doc'.tr(),
-                      subtitle: 'insurance_doc_hint'.tr(),
-                      icon: Icons.description_outlined,
-                      fileName: _insuranceFileName,
+                      label: 'civil_id_front'.tr(),
+                      subtitle: 'civil_id_front_hint'.tr(),
+                      icon: Icons.badge_outlined,
+                      fileName: _civilIdFrontFileName,
                       isDark: isDark,
-                      onTap: () => setState(() => _insuranceFileName = 'insurance_document.pdf'),
+                      onTap: () => setState(() => _civilIdFrontFileName = 'civil_id_front.pdf'),
+                    ),
+                    SizedBox(height: 12.r),
+                    _DocumentPickerTile(
+                      label: 'civil_id_back'.tr(),
+                      subtitle: 'civil_id_back_hint'.tr(),
+                      icon: Icons.badge_outlined,
+                      fileName: _civilIdBackFileName,
+                      isDark: isDark,
+                      onTap: () => setState(() => _civilIdBackFileName = 'civil_id_back.pdf'),
+                    ),
+                    SizedBox(height: 12.r),
+                    _DocumentPickerTile(
+                      label: 'medical_certificate'.tr(),
+                      subtitle: 'medical_certificate_hint'.tr(),
+                      icon: Icons.medical_services_outlined,
+                      fileName: _medicalCertificateFileName,
+                      isDark: isDark,
+                      onTap: () => setState(() => _medicalCertificateFileName = 'medical_certificate.pdf'),
+                    ),
+                    SizedBox(height: 12.r),
+                    _DocumentPickerTile(
+                      label: 'driving_license'.tr(),
+                      subtitle: 'driving_license_hint'.tr(),
+                      icon: Icons.contact_mail_outlined,
+                      fileName: _drivingLicenseFileName,
+                      isDark: isDark,
+                      onTap: () => setState(() => _drivingLicenseFileName = 'driving_license.pdf'),
                     ),
 
                     SizedBox(height: 20.r),
@@ -411,7 +487,7 @@ class _ProfileCompletionScreenState extends State<ProfileCompletionScreen> {
                         color: isDark ? Colors.white70 : const Color(0xFF555555),
                         height: 1.5,
                       ),
-                    )
+                    ),
                   ),
                 ],
               ),
@@ -464,7 +540,77 @@ class _ProfileCompletionScreenState extends State<ProfileCompletionScreen> {
               isDark: isDark,
               keyboardType: TextInputType.emailAddress,
             ),
+            SizedBox(height: 16.r),
+            // Date of Birth
+            GestureDetector(
+              onTap: () => _pickDateOfBirth(context),
+              child: AbsorbPointer(
+                child: _InputFieldDesktop(
+                  controller: _dobController,
+                  hint: 'DD/MM/YYYY',
+                  label: 'date_of_birth'.tr(),
+                  icon: Icons.calendar_today_outlined,
+                  isDark: isDark,
+                ),
+              ),
+            ),
+            SizedBox(height: 16.r),
+            // Country Selector
+            CountrySelectorField(
+              selectedCountry: _selectedCountry,
+              onCountrySelected: (country) {
+                setState(() {
+                  _selectedCountry = country;
+                  _validateForm();
+                });
+              },
+              isDark: isDark,
+              label: 'country'.tr(),
+              icon: Icons.public_outlined,
+            ),
+            SizedBox(height: 16.r),
+            // Gender Dropdown
+            _DropdownField(
+              value: _selectedGender,
+              hint: 'select_gender'.tr(),
+              label: 'gender'.tr(),
+              icon: Icons.people_outline,
+              isDark: isDark,
+              items: _genders,
+              onChanged: (value) {
+                setState(() {
+                  _selectedGender = value;
+                  _validateForm();
+                });
+              },
+            ),
             if (widget.isDriver) ...[
+              SizedBox(height: 28.r),
+              _SectionHeaderDesktop(label: 'section_additional_info'.tr(), isDark: isDark),
+              SizedBox(height: 14.r),
+              _InputFieldDesktop(
+                controller: _yearsExperienceController,
+                hint: 'enter_years_experience'.tr(),
+                label: 'years_driving_experience'.tr(),
+                icon: Icons.timer_outlined,
+                isDark: isDark,
+                keyboardType: TextInputType.number,
+              ),
+              SizedBox(height: 16.r),
+              _MultiSelectField(
+                values: _selectedLanguages,
+                hint: 'select_languages'.tr(),
+                label: 'languages_spoken'.tr(),
+                icon: Icons.language_outlined,
+                isDark: isDark,
+                items: _languages,
+                onChanged: (values) {
+                  setState(() {
+                    _selectedLanguages = values;
+                    _validateForm();
+                  });
+                },
+              ),
               SizedBox(height: 28.r),
               _SectionHeaderDesktop(label: 'section_license'.tr(), isDark: isDark),
               SizedBox(height: 14.r),
@@ -497,66 +643,42 @@ class _ProfileCompletionScreenState extends State<ProfileCompletionScreen> {
                 isDark: isDark,
               ),
               SizedBox(height: 28.r),
-              _SectionHeaderDesktop(label: 'section_vehicle'.tr(), isDark: isDark),
-              SizedBox(height: 14.r),
-              Row(
-                children: [
-                  Expanded(
-                    child: _InputFieldDesktop(
-                      controller: _vehicleMakeController,
-                      hint: 'eg_toyota'.tr(),
-                      label: 'vehicle_make'.tr(),
-                      icon: Icons.directions_car_outlined,
-                      isDark: isDark,
-                    ),
-                  ),
-                  SizedBox(width: 16.r),
-                  Expanded(
-                    child: _InputFieldDesktop(
-                      controller: _vehicleModelController,
-                      hint: 'eg_camry'.tr(),
-                      label: 'vehicle_model'.tr(),
-                      icon: Icons.car_rental_outlined,
-                      isDark: isDark,
-                    ),
-                  ),
-                ],
-              ),
-              SizedBox(height: 16.r),
-              Row(
-                children: [
-                  Expanded(
-                    child: _InputFieldDesktop(
-                      controller: _vehicleYearController,
-                      hint: 'eg_2022'.tr(),
-                      label: 'vehicle_year'.tr(),
-                      icon: Icons.date_range_outlined,
-                      isDark: isDark,
-                      keyboardType: TextInputType.number,
-                    ),
-                  ),
-                  SizedBox(width: 16.r),
-                  Expanded(
-                    child: _InputFieldDesktop(
-                      controller: _vehiclePlateController,
-                      hint: 'eg_ab1234'.tr(),
-                      label: 'vehicle_plate'.tr(),
-                      icon: Icons.confirmation_number_outlined,
-                      isDark: isDark,
-                    ),
-                  ),
-                ],
-              ),
-              SizedBox(height: 28.r),
               _SectionHeaderDesktop(label: 'section_documents'.tr(), isDark: isDark),
               SizedBox(height: 14.r),
               _DocumentPickerTileDesktop(
-                label: 'insurance_doc'.tr(),
-                subtitle: 'insurance_doc_hint'.tr(),
-                icon: Icons.description_outlined,
-                fileName: _insuranceFileName,
+                label: 'civil_id_front'.tr(),
+                subtitle: 'civil_id_front_hint'.tr(),
+                icon: Icons.badge_outlined,
+                fileName: _civilIdFrontFileName,
                 isDark: isDark,
-                onTap: () => setState(() => _insuranceFileName = 'insurance_document.pdf'),
+                onTap: () => setState(() => _civilIdFrontFileName = 'civil_id_front.pdf'),
+              ),
+              SizedBox(height: 12.r),
+              _DocumentPickerTileDesktop(
+                label: 'civil_id_back'.tr(),
+                subtitle: 'civil_id_back_hint'.tr(),
+                icon: Icons.badge_outlined,
+                fileName: _civilIdBackFileName,
+                isDark: isDark,
+                onTap: () => setState(() => _civilIdBackFileName = 'civil_id_back.pdf'),
+              ),
+              SizedBox(height: 12.r),
+              _DocumentPickerTileDesktop(
+                label: 'medical_certificate'.tr(),
+                subtitle: 'medical_certificate_hint'.tr(),
+                icon: Icons.medical_services_outlined,
+                fileName: _medicalCertificateFileName,
+                isDark: isDark,
+                onTap: () => setState(() => _medicalCertificateFileName = 'medical_certificate.pdf'),
+              ),
+              SizedBox(height: 12.r),
+              _DocumentPickerTileDesktop(
+                label: 'driving_license'.tr(),
+                subtitle: 'driving_license_hint'.tr(),
+                icon: Icons.contact_mail_outlined,
+                fileName: _drivingLicenseFileName,
+                isDark: isDark,
+                onTap: () => setState(() => _drivingLicenseFileName = 'driving_license.pdf'),
               ),
             ],
             SizedBox(height: 36.r),
@@ -1110,6 +1232,164 @@ class _SubmitButtonDesktop extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+class _DropdownField extends StatelessWidget {
+  final String? value;
+  final String hint;
+  final String label;
+  final IconData icon;
+  final bool isDark;
+  final List<String> items;
+  final ValueChanged<String?> onChanged;
+
+  const _DropdownField({
+    required this.value,
+    required this.hint,
+    required this.label,
+    required this.icon,
+    required this.isDark,
+    required this.items,
+    required this.onChanged,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: TextStyle(
+            fontSize: 13.r,
+            fontWeight: FontWeight.w600,
+            color: isDark ? Colors.white70 : const Color(0xFF555555),
+          ),
+        ),
+        SizedBox(height: 8.r),
+        GestureDetector(
+          onTap: () {
+            DropdownBottomSheet.show(
+              context: context,
+              selectedValue: value,
+              items: items,
+              title: label,
+              onSelected: onChanged,
+            );
+          },
+          child: Container(
+            decoration: BoxDecoration(
+              color: isDark ? const Color(0xFF1E1E1E) : const Color(0xFFF5F5F5),
+              borderRadius: BorderRadius.circular(14.r),
+              border: Border.all(color: isDark ? Colors.white12 : const Color(0xFFE0E0E0)),
+            ),
+            padding: EdgeInsets.symmetric(horizontal: 12.r, vertical: 16.r),
+            child: Row(
+              children: [
+                Icon(icon, color: isDark ? Colors.white38 : const Color(0xFF9E9E9E), size: 20.r),
+                SizedBox(width: 12.r),
+                Expanded(
+                  child: Text(
+                    value ?? hint,
+                    style: TextStyle(
+                      fontSize: 15.r,
+                      fontWeight: FontWeight.w500,
+                      color: value == null
+                          ? (isDark ? Colors.white38 : const Color(0xFF9E9E9E))
+                          : (isDark ? Colors.white : const Color(0xFF3D3D3D)),
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+                Icon(Icons.arrow_drop_down, color: isDark ? Colors.white54 : const Color(0xFF9E9E9E)),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _MultiSelectField extends StatelessWidget {
+  final List<String> values;
+  final String hint;
+  final String label;
+  final IconData icon;
+  final bool isDark;
+  final List<String> items;
+  final ValueChanged<List<String>> onChanged;
+
+  const _MultiSelectField({
+    required this.values,
+    required this.hint,
+    required this.label,
+    required this.icon,
+    required this.isDark,
+    required this.items,
+    required this.onChanged,
+  });
+
+  void _showMultiSelectBottomSheet(BuildContext context) {
+    MultiSelectBottomSheet.show(
+      context: context,
+      selectedValues: values,
+      items: items,
+      title: label,
+      onSelectionChanged: onChanged,
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final displayText = values.isEmpty ? hint : values.join(', ');
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: TextStyle(
+            fontSize: 13.r,
+            fontWeight: FontWeight.w600,
+            color: isDark ? Colors.white70 : const Color(0xFF555555),
+          ),
+        ),
+        SizedBox(height: 8.r),
+        GestureDetector(
+          onTap: () => _showMultiSelectBottomSheet(context),
+          child: Container(
+            decoration: BoxDecoration(
+              color: isDark ? const Color(0xFF1E1E1E) : const Color(0xFFF5F5F5),
+              borderRadius: BorderRadius.circular(14.r),
+              border: Border.all(color: isDark ? Colors.white12 : const Color(0xFFE0E0E0)),
+            ),
+            padding: EdgeInsets.symmetric(horizontal: 12.r, vertical: 16.r),
+            child: Row(
+              children: [
+                Icon(icon, color: isDark ? Colors.white38 : const Color(0xFF9E9E9E), size: 20.r),
+                SizedBox(width: 12.r),
+                Expanded(
+                  child: Text(
+                    displayText,
+                    style: TextStyle(
+                      fontSize: 15.r,
+                      fontWeight: FontWeight.w500,
+                      color: values.isEmpty
+                          ? (isDark ? Colors.white38 : const Color(0xFF9E9E9E))
+                          : (isDark ? Colors.white : const Color(0xFF3D3D3D)),
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+                Icon(Icons.arrow_drop_down, color: isDark ? Colors.white54 : const Color(0xFF9E9E9E)),
+              ],
+            ),
+          ),
+        ),
+      ],
     );
   }
 }

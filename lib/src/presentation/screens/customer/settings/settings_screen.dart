@@ -1,5 +1,6 @@
 import 'dart:ui';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
@@ -580,7 +581,7 @@ class _SettingsTile extends StatelessWidget {
                 ],
               ),
             ),
-            if (showChevron) Icon(Iconsax.arrow_right_3, size: 16.r, color: cs.onSurface.withValues(alpha: 0.3)),
+            if (showChevron) Icon(CupertinoIcons.forward, size: 16.r, color: cs.onSurface.withValues(alpha: 0.3)),
           ],
         ),
       ),

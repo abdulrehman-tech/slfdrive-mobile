@@ -4,10 +4,11 @@ import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
-import 'package:easy_localization/easy_localization.dart';
+import 'package:easy_localization/easy_localization.dart' hide TextDirection;
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../../../../../constants/icon_constants.dart';
-import '../../../../../constants/color_constants.dart';
 import '../../../../../constants/breakpoints.dart';
+import '../../../../widgets/custom_phone_field.dart';
 
 class PhoneLoginScreen extends StatefulWidget {
   final bool isDriver;
@@ -19,47 +20,32 @@ class PhoneLoginScreen extends StatefulWidget {
 }
 
 class _PhoneLoginScreenState extends State<PhoneLoginScreen> {
-  final TextEditingController _phoneController = TextEditingController();
-  String _selectedCountryCode = '+968';
+  String _completePhoneNumber = '';
+  String _selectedDeliveryMethod = 'sms';
   bool _isButtonEnabled = false;
-
-  List<Map<String, dynamic>> get countryCodes => [
-    {'code': '+968', 'flag': '🇴🇲', 'country': 'Oman'.tr(), 'digits': 8, 'hint': '9X XXX XXX'},
-    {'code': '+971', 'flag': '🇦🇪', 'country': 'UAE'.tr(), 'digits': 9, 'hint': '5X XXX XXXX'},
-    {'code': '+966', 'flag': '🇸🇦', 'country': 'Saudi Arabia'.tr(), 'digits': 9, 'hint': '5X XXX XXXX'},
-    {'code': '+965', 'flag': '🇰🇼', 'country': 'Kuwait'.tr(), 'digits': 8, 'hint': 'XXXX XXXX'},
-    {'code': '+974', 'flag': '🇶🇦', 'country': 'Qatar'.tr(), 'digits': 8, 'hint': 'XXXX XXXX'},
-    {'code': '+973', 'flag': '🇧🇭', 'country': 'Bahrain'.tr(), 'digits': 8, 'hint': 'XXXX XXXX'},
-  ];
-
-  Map<String, dynamic> get _selectedCountry => countryCodes.firstWhere((c) => c['code'] == _selectedCountryCode);
-
-  int get _maxDigits => _selectedCountry['digits'] as int;
-  String get _hintText => _selectedCountry['hint'] as String;
 
   @override
   void initState() {
     super.initState();
-    _phoneController.addListener(_validatePhone);
   }
 
   @override
   void dispose() {
-    _phoneController.dispose();
     super.dispose();
   }
 
-  void _validatePhone() {
+  void _onPhoneChanged(String completeNumber, String dialCode) {
     setState(() {
-      _isButtonEnabled = _phoneController.text.length == _maxDigits;
+      _completePhoneNumber = completeNumber;
+      _isButtonEnabled = completeNumber.isNotEmpty && completeNumber.length >= (dialCode.length + 8);
     });
   }
 
   void _onContinue() {
-    if (_isButtonEnabled) {
+    if (_isButtonEnabled && _completePhoneNumber.isNotEmpty) {
       context.push(
         '/auth/otp',
-        extra: {'phone': '$_selectedCountryCode${_phoneController.text}', 'isDriver': widget.isDriver},
+        extra: {'phone': _completePhoneNumber, 'isDriver': widget.isDriver, 'deliveryMethod': _selectedDeliveryMethod},
       );
     }
   }
@@ -157,77 +143,40 @@ class _PhoneLoginScreenState extends State<PhoneLoginScreen> {
                       color: isDark ? Colors.white : const Color(0xFF3D3D3D),
                     ),
                   ),
-
                   SizedBox(height: 12.r),
+                  CustomPhoneField(onChanged: _onPhoneChanged, isDark: isDark, initialCountryCode: 'OM'),
 
-                  Container(
-                    decoration: BoxDecoration(
-                      color: isDark ? const Color(0xFF1E1E1E) : const Color(0xFFF5F5F5),
-                      borderRadius: BorderRadius.circular(16.r),
-                      border: Border.all(color: isDark ? Colors.white12 : const Color(0xFFE0E0E0)),
-                    ),
-                    child: Row(
-                      children: [
-                        // Country Code Selector
-                        InkWell(
-                          onTap: () => _showCountryCodePicker(isDark),
-                          borderRadius: BorderRadius.circular(16.r),
-                          child: Container(
-                            padding: EdgeInsets.symmetric(horizontal: 16.r, vertical: 18.r),
-                            child: Row(
-                              children: [
-                                Text(_selectedCountry['flag'] as String, style: TextStyle(fontSize: 24.r)),
-                                SizedBox(width: 8.r),
-                                Text(
-                                  _selectedCountryCode,
-                                  style: TextStyle(
-                                    fontSize: 16.r,
-                                    fontWeight: FontWeight.w600,
-                                    color: isDark ? Colors.white : const Color(0xFF3D3D3D),
-                                  ),
-                                ),
-                                SizedBox(width: 4.r),
-                                Icon(
-                                  Icons.arrow_drop_down,
-                                  color: isDark ? Colors.white70 : const Color(0xFF757575),
-                                  size: 20.r,
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
+                  SizedBox(height: 24.r),
 
-                        Container(width: 1, height: 40.r, color: isDark ? Colors.white12 : const Color(0xFFE0E0E0)),
-
-                        // Phone Number Input
-                        Expanded(
-                          child: TextField(
-                            controller: _phoneController,
-                            keyboardType: TextInputType.phone,
-                            inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                            style: TextStyle(
-                              fontSize: 16.r,
-                              fontWeight: FontWeight.w600,
-                              color: isDark ? Colors.white : const Color(0xFF3D3D3D),
-                            ),
-                            maxLength: _maxDigits,
-                            decoration: InputDecoration(
-                              hintText: _hintText,
-                              hintStyle: TextStyle(
-                                fontSize: 16.r,
-                                color: isDark ? Colors.white38 : const Color(0xFF9E9E9E),
-                              ),
-                              counterText: '',
-                              border: InputBorder.none,
-                              contentPadding: EdgeInsets.symmetric(horizontal: 16.r, vertical: 18.r),
-                            ),
-                          ),
-                        ),
-                      ],
+                  // OTP Delivery Method Selection
+                  Text(
+                    'otp_delivery_method'.tr(),
+                    style: TextStyle(
+                      fontSize: 14.r,
+                      fontWeight: FontWeight.w600,
+                      color: isDark ? Colors.white : const Color(0xFF3D3D3D),
                     ),
                   ),
 
-                  SizedBox(height: 40.r),
+                  SizedBox(height: 12.r),
+
+                  Row(
+                    children: [
+                      Expanded(child: _buildDeliveryChip('sms', 'otp_via_sms'.tr(), Icons.sms_outlined, isDark)),
+                      SizedBox(width: 12.r),
+                      Expanded(
+                        child: _buildDeliveryChip(
+                          'whatsapp',
+                          'otp_via_whatsapp'.tr(),
+                          FontAwesomeIcons.whatsapp,
+                          isDark,
+                          isWhatsApp: true,
+                        ),
+                      ),
+                    ],
+                  ),
+
+                  SizedBox(height: 32.r),
 
                   // Continue Button
                   Container(
@@ -319,54 +268,29 @@ class _PhoneLoginScreenState extends State<PhoneLoginScreen> {
               style: TextStyle(fontSize: 16.r, fontWeight: FontWeight.w600),
             ),
             SizedBox(height: 16.r),
-            Container(
-              decoration: BoxDecoration(
-                color: isDark ? const Color(0xFF1E1E1E) : const Color(0xFFF5F5F5),
-                borderRadius: BorderRadius.circular(16.r),
-                border: Border.all(color: isDark ? Colors.white12 : const Color(0xFFE0E0E0)),
-              ),
-              child: Row(
-                children: [
-                  InkWell(
-                    onTap: () => _showCountryCodePicker(isDark),
-                    borderRadius: BorderRadius.circular(16.r),
-                    child: Container(
-                      padding: EdgeInsets.symmetric(horizontal: 20.r, vertical: 20.r),
-                      child: Row(
-                        children: [
-                          Text(_selectedCountry['flag'] as String, style: const TextStyle(fontSize: 28)),
-                          SizedBox(width: 12.r),
-                          Text(
-                            _selectedCountryCode,
-                            style: TextStyle(fontSize: 18.r, fontWeight: FontWeight.w600),
-                          ),
-                          SizedBox(width: 8.r),
-                          Icon(Icons.arrow_drop_down, size: 24.r),
-                        ],
-                      ),
-                    ),
-                  ),
-                  Container(width: 1.r, height: 50.r, color: isDark ? Colors.white12 : const Color(0xFFE0E0E0)),
-                  Expanded(
-                    child: TextField(
-                      controller: _phoneController,
-                      keyboardType: TextInputType.phone,
-                      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                      style: TextStyle(fontSize: 18.r, fontWeight: FontWeight.w600),
-                      maxLength: _maxDigits,
-                      decoration: InputDecoration(
-                        hintStyle: TextStyle(fontSize: 18.r, fontWeight: FontWeight.w600),
-                        hintText: _hintText,
-                        counterText: '',
-                        border: InputBorder.none,
-                        contentPadding: EdgeInsets.symmetric(horizontal: 20.r, vertical: 20.r),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
+            CustomPhoneField(onChanged: _onPhoneChanged, isDark: isDark, initialCountryCode: 'OM'),
+            SizedBox(height: 24.r),
+            Text(
+              'otp_delivery_method'.tr(),
+              style: TextStyle(fontSize: 16.r, fontWeight: FontWeight.w600),
             ),
-            SizedBox(height: 40.r),
+            SizedBox(height: 16.r),
+            Row(
+              children: [
+                Expanded(child: _buildDeliveryChip('sms', 'otp_via_sms'.tr(), Icons.sms_outlined, isDark)),
+                SizedBox(width: 16.r),
+                Expanded(
+                  child: _buildDeliveryChip(
+                    'whatsapp',
+                    'otp_via_whatsapp'.tr(),
+                    FontAwesomeIcons.whatsapp,
+                    isDark,
+                    isWhatsApp: true,
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(height: 32.r),
             Container(
               width: double.infinity,
               height: 60.r,
@@ -413,49 +337,54 @@ class _PhoneLoginScreenState extends State<PhoneLoginScreen> {
     );
   }
 
-  void _showCountryCodePicker(bool isDark) {
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: isDark ? const Color(0xFF1E1E1E) : Colors.white,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20.r))),
-      builder: (context) => Container(
-        padding: EdgeInsets.symmetric(vertical: 20.r),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
+  Widget _buildDeliveryChip(String method, String label, IconData icon, bool isDark, {bool isWhatsApp = false}) {
+    final isSelected = _selectedDeliveryMethod == method;
+
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          _selectedDeliveryMethod = method;
+        });
+      },
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        padding: EdgeInsets.symmetric(vertical: 16.r, horizontal: 12.r),
+        decoration: BoxDecoration(
+          gradient: isSelected
+              ? const LinearGradient(
+                  colors: [Color(0xFF4D63DD), Color(0xFF677EF0)],
+                  begin: Alignment.centerLeft,
+                  end: Alignment.centerRight,
+                )
+              : null,
+          color: isSelected ? null : (isDark ? const Color(0xFF1E1E1E) : const Color(0xFFF5F5F5)),
+          borderRadius: BorderRadius.circular(12.r),
+          border: Border.all(
+            color: isSelected ? Colors.transparent : (isDark ? Colors.white12 : const Color(0xFFE0E0E0)),
+            width: 1.5,
+          ),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text(
-              'select_country_code'.tr(),
-              style: TextStyle(
-                fontSize: 18.r,
-                fontWeight: FontWeight.bold,
-                color: isDark ? Colors.white : const Color(0xFF3D3D3D),
-              ),
-            ),
-            SizedBox(height: 16.r),
-            ...countryCodes.map(
-              (country) => ListTile(
-                leading: Text(country['flag'] as String, style: TextStyle(fontSize: 28.r)),
-                title: Text(
-                  country['country'] as String,
-                  style: TextStyle(
-                    fontSize: 16.r,
-                    fontWeight: FontWeight.w500,
-                    color: isDark ? Colors.white : const Color(0xFF3D3D3D),
+            isWhatsApp
+                ? FaIcon(
+                    icon,
+                    size: 20.r,
+                    color: isSelected ? Colors.white : (isDark ? Colors.white70 : const Color(0xFF757575)),
+                  )
+                : Icon(
+                    icon,
+                    size: 20.r,
+                    color: isSelected ? Colors.white : (isDark ? Colors.white70 : const Color(0xFF757575)),
                   ),
-                ),
-                trailing: Text(
-                  country['code'] as String,
-                  style: TextStyle(fontSize: 16.r, color: isDark ? Colors.white70 : const Color(0xFF757575)),
-                ),
-                selected: _selectedCountryCode == country['code'] as String,
-                selectedColor: secondaryColor,
-                onTap: () {
-                  setState(() {
-                    _selectedCountryCode = country['code'] as String;
-                    _phoneController.clear();
-                  });
-                  Navigator.pop(context);
-                },
+            SizedBox(width: 8.r),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 15.r,
+                fontWeight: FontWeight.w600,
+                color: isSelected ? Colors.white : (isDark ? Colors.white : const Color(0xFF3D3D3D)),
               ),
             ),
           ],

@@ -1,6 +1,7 @@
 import 'dart:ui';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
@@ -200,7 +201,7 @@ class _CarListingScreenState extends State<CarListingScreen> {
                       color: isDark ? Colors.white.withValues(alpha: 0.1) : Colors.black.withValues(alpha: 0.07),
                     ),
                   ),
-                  child: Icon(Iconsax.arrow_left_2, color: cs.onSurface, size: 18.r),
+                  child: Icon(CupertinoIcons.back, color: cs.onSurface, size: 18.r),
                 ),
               ),
             ),
@@ -353,7 +354,7 @@ class _CarListingScreenState extends State<CarListingScreen> {
                           color: isDark ? Colors.white.withValues(alpha: 0.1) : Colors.black.withValues(alpha: 0.07),
                         ),
                       ),
-                      child: Icon(Iconsax.arrow_left_2, color: cs.onSurface, size: 18.r),
+                      child: Icon(CupertinoIcons.back, color: cs.onSurface, size: 18.r),
                     ),
                   ),
                   SizedBox(width: 12.r),
@@ -756,10 +757,10 @@ class _SortBottomSheet extends StatelessWidget {
 
   const _SortBottomSheet({required this.isDark, required this.cs, required this.current, required this.onSelect});
 
-  static const _options = [
+  static final _options = [
     ('popular', Iconsax.star_1, 'Most Popular'),
-    ('price_low', Iconsax.arrow_down_2, 'Price: Low to High'),
-    ('price_high', Iconsax.arrow_up_1, 'Price: High to Low'),
+    ('price_low', CupertinoIcons.arrow_down, 'Price: Low to High'),
+    ('price_high', CupertinoIcons.arrow_up, 'Price: High to Low'),
     ('rating', Iconsax.like_1, 'Highest Rated'),
   ];
 

@@ -1,6 +1,7 @@
 import 'dart:ui';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
@@ -81,7 +82,7 @@ class _CarDetailScreenState extends State<CarDetailScreen> {
                       color: Colors.white.withValues(alpha: 0.15),
                       borderRadius: BorderRadius.circular(10.r),
                     ),
-                    child: Icon(Iconsax.arrow_left_2, size: 18.r, color: Colors.white),
+                    child: Icon(CupertinoIcons.back, size: 18.r, color: Colors.white),
                   ),
                 ),
               ),
@@ -180,7 +181,7 @@ class _CarDetailScreenState extends State<CarDetailScreen> {
                         color: isDark ? Colors.white.withValues(alpha: 0.08) : Colors.black.withValues(alpha: 0.05),
                         borderRadius: BorderRadius.circular(10.r),
                       ),
-                      child: Icon(Iconsax.arrow_left_2, size: 17.r, color: cs.onSurface),
+                      child: Icon(CupertinoIcons.back, size: 17.r, color: cs.onSurface),
                     ),
                     SizedBox(width: 10.r),
                     Text(
@@ -337,7 +338,7 @@ class _CarDetailScreenState extends State<CarDetailScreen> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                _glassButton(Iconsax.arrow_left_2, isDark, () => Navigator.of(context).pop()),
+                _glassButton(CupertinoIcons.back, isDark, () => Navigator.of(context).pop()),
                 _glassButton(
                   _isFavourite ? Iconsax.heart_copy : Iconsax.heart,
                   isDark,
@@ -531,53 +532,60 @@ class _CarDetailScreenState extends State<CarDetailScreen> {
                 ),
               ],
             ),
-            SizedBox(height: 14.r),
-            Wrap(
-              spacing: 10.r,
-              runSpacing: 10.r,
-              children: specs
-                  .map(
-                    (s) => Container(
-                      width: (MediaQuery.of(context).size.width - 80.r) / 3,
-                      constraints: BoxConstraints(minWidth: 90.r),
-                      padding: EdgeInsets.symmetric(vertical: 10.r, horizontal: 8.r),
-                      decoration: BoxDecoration(
-                        color: isDark ? Colors.white.withValues(alpha: 0.04) : Colors.black.withValues(alpha: 0.025),
-                        borderRadius: BorderRadius.circular(12.r),
-                        border: Border.all(
-                          color: isDark ? Colors.white.withValues(alpha: 0.06) : Colors.black.withValues(alpha: 0.04),
-                        ),
-                      ),
-                      child: Column(
-                        children: [
-                          Container(
-                            width: 28.r,
-                            height: 28.r,
-                            decoration: BoxDecoration(
-                              color: s.$4.withValues(alpha: isDark ? 0.12 : 0.08),
-                              borderRadius: BorderRadius.circular(8.r),
-                            ),
-                            child: Icon(s.$1, size: 14.r, color: s.$4),
-                          ),
-                          SizedBox(height: 6.r),
-                          Text(
-                            s.$3,
-                            style: TextStyle(fontSize: 12.r, fontWeight: FontWeight.w700, color: cs.onSurface),
-                          ),
-                          SizedBox(height: 2.r),
-                          Text(
-                            s.$2,
-                            style: TextStyle(
-                              fontSize: 9.r,
-                              color: cs.onSurface.withValues(alpha: 0.45),
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ],
-                      ),
+            GridView.builder(
+              padding: EdgeInsets.symmetric(vertical: 16.r),
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                crossAxisSpacing: 12.r,
+                mainAxisSpacing: 12.r,
+                childAspectRatio: 1.5,
+              ),
+              itemCount: specs.length,
+              itemBuilder: (context, index) {
+                final s = specs[index];
+                return Container(
+                  padding: EdgeInsets.symmetric(vertical: 12.r, horizontal: 10.r),
+                  decoration: BoxDecoration(
+                    color: isDark ? Colors.white.withValues(alpha: 0.04) : Colors.black.withValues(alpha: 0.025),
+                    borderRadius: BorderRadius.circular(12.r),
+                    border: Border.all(
+                      color: isDark ? Colors.white.withValues(alpha: 0.06) : Colors.black.withValues(alpha: 0.04),
                     ),
-                  )
-                  .toList(),
+                  ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Container(
+                        width: 32.r,
+                        height: 32.r,
+                        decoration: BoxDecoration(
+                          color: s.$4.withValues(alpha: isDark ? 0.12 : 0.08),
+                          borderRadius: BorderRadius.circular(10.r),
+                        ),
+                        child: Icon(s.$1, size: 16.r, color: s.$4),
+                      ),
+                      SizedBox(height: 8.r),
+                      Text(
+                        s.$3,
+                        style: TextStyle(fontSize: 14.r, fontWeight: FontWeight.w700, color: cs.onSurface),
+                        textAlign: TextAlign.center,
+                      ),
+                      SizedBox(height: 3.r),
+                      Text(
+                        s.$2,
+                        style: TextStyle(
+                          fontSize: 10.r,
+                          color: cs.onSurface.withValues(alpha: 0.5),
+                          fontWeight: FontWeight.w500,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ],
+                  ),
+                );
+              },
             ),
           ],
         ),

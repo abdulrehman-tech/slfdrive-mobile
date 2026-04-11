@@ -1,6 +1,7 @@
 import 'dart:ui';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
@@ -96,7 +97,7 @@ class _DriverDetailScreenState extends State<DriverDetailScreen> {
                       color: Colors.white.withValues(alpha: 0.15),
                       borderRadius: BorderRadius.circular(10.r),
                     ),
-                    child: Icon(Iconsax.arrow_left_2, size: 18.r, color: Colors.white),
+                    child: Icon(CupertinoIcons.back, size: 18.r, color: Colors.white),
                   ),
                 ),
               ),
@@ -194,7 +195,7 @@ class _DriverDetailScreenState extends State<DriverDetailScreen> {
                         color: isDark ? Colors.white.withValues(alpha: 0.08) : Colors.black.withValues(alpha: 0.05),
                         borderRadius: BorderRadius.circular(10.r),
                       ),
-                      child: Icon(Iconsax.arrow_left_2, size: 17.r, color: cs.onSurface),
+                      child: Icon(CupertinoIcons.back, size: 17.r, color: cs.onSurface),
                     ),
                     SizedBox(width: 10.r),
                     Text(
@@ -390,7 +391,7 @@ class _DriverDetailScreenState extends State<DriverDetailScreen> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    _headerButton(Iconsax.arrow_left_2, () => Navigator.of(context).pop()),
+                    _headerButton(CupertinoIcons.back, () => Navigator.of(context).pop()),
                     _headerButton(
                       _isFavourite ? Iconsax.heart_copy : Iconsax.heart,
                       () => setState(() => _isFavourite = !_isFavourite),

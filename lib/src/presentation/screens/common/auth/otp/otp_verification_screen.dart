@@ -13,8 +13,14 @@ import '../../../../../constants/breakpoints.dart';
 class OtpVerificationScreen extends StatefulWidget {
   final String phoneNumber;
   final bool isDriver;
+  final String deliveryMethod;
 
-  const OtpVerificationScreen({super.key, required this.phoneNumber, this.isDriver = false});
+  const OtpVerificationScreen({
+    super.key,
+    required this.phoneNumber,
+    this.isDriver = false,
+    this.deliveryMethod = 'sms',
+  });
 
   @override
   State<OtpVerificationScreen> createState() => _OtpVerificationScreenState();
@@ -162,24 +168,40 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                   SizedBox(height: 12.r),
 
                   // Subtitle
-                  RichText(
-                    text: TextSpan(
-                      style: TextStyle(
-                        fontSize: 16.r,
+                  Row(
+                    children: [
+                      Icon(
+                        widget.deliveryMethod == 'whatsapp' ? Icons.chat_bubble_outline : Icons.sms_outlined,
+                        size: 18.r,
                         color: isDark ? Colors.white70 : const Color(0xFF757575),
-                        height: 1.5,
                       ),
-                      children: [
-                        TextSpan(text: 'otp_subtitle'.tr()),
-                        TextSpan(
-                          text: ' ${widget.phoneNumber}',
-                          style: TextStyle(
-                            fontWeight: FontWeight.w600,
-                            color: isDark ? Colors.white : const Color(0xFF3D3D3D),
+                      SizedBox(width: 8.r),
+                      Expanded(
+                        child: RichText(
+                          text: TextSpan(
+                            style: TextStyle(
+                              fontSize: 16.r,
+                              color: isDark ? Colors.white70 : const Color(0xFF757575),
+                              height: 1.5,
+                            ),
+                            children: [
+                              TextSpan(
+                                text: widget.deliveryMethod == 'whatsapp'
+                                    ? 'otp_sent_via_whatsapp'.tr()
+                                    : 'otp_sent_via_sms'.tr(),
+                              ),
+                              TextSpan(
+                                text: ' ${widget.phoneNumber}',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w600,
+                                  color: isDark ? Colors.white : const Color(0xFF3D3D3D),
+                                ),
+                              ),
+                            ],
                           ),
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
 
                   SizedBox(height: 40.r),
@@ -269,9 +291,25 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
             style: TextStyle(fontSize: 48.r, fontWeight: FontWeight.bold),
           ),
           SizedBox(height: 16.r),
-          Text(
-            '${'otp_subtitle'.tr()} ${widget.phoneNumber}',
-            style: TextStyle(fontSize: 18.r, color: isDark ? Colors.white70 : const Color(0xFF757575), height: 1.6),
+          Row(
+            children: [
+              Icon(
+                widget.deliveryMethod == 'whatsapp' ? Icons.chat_bubble_outline : Icons.sms_outlined,
+                size: 20.r,
+                color: isDark ? Colors.white70 : const Color(0xFF757575),
+              ),
+              SizedBox(width: 8.r),
+              Expanded(
+                child: Text(
+                  '${widget.deliveryMethod == 'whatsapp' ? 'otp_sent_via_whatsapp'.tr() : 'otp_sent_via_sms'.tr()} ${widget.phoneNumber}',
+                  style: TextStyle(
+                    fontSize: 18.r,
+                    color: isDark ? Colors.white70 : const Color(0xFF757575),
+                    height: 1.6,
+                  ),
+                ),
+              ),
+            ],
           ),
         ],
       ),
@@ -387,8 +425,8 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
   Widget _buildOtpBox(int index, bool isDark) {
     final isFilled = _otpControllers[index].text.isNotEmpty;
     return SizedBox(
-      width: 46.r,
-      height: 56.r,
+      width: 52.r,
+      height: 68.r,
       child: TextField(
         controller: _otpControllers[index],
         focusNode: _focusNodes[index],
@@ -428,8 +466,8 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
   Widget _buildOtpBoxDesktop(int index, bool isDark) {
     final isFilled = _otpControllers[index].text.isNotEmpty;
     return SizedBox(
-      width: 58,
-      height: 68,
+      width: 60.r,
+      height: 80.r,
       child: TextField(
         controller: _otpControllers[index],
         focusNode: _focusNodes[index],

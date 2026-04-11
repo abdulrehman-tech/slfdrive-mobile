@@ -2,10 +2,11 @@ import 'dart:ui';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 import '../../../widgets/omr_icon.dart';
-import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import '../../../../constants/breakpoints.dart';
 import '../../../../constants/color_constants.dart';
@@ -13,6 +14,7 @@ import '../../../providers/theme_provider.dart';
 import '../favorites/favorites_screen.dart';
 import '../bookings/bookings_screen.dart';
 import '../profile/profile_screen.dart';
+import '../../../widgets/skeletons/home_skeleton.dart';
 
 // ============================================================
 // MOCK DATA MODELS
@@ -159,6 +161,121 @@ final List<_DriverItem> _nearbyDrivers = [
 ];
 
 // ============================================================
+// LOGOUT DIALOG HELPER
+// ============================================================
+
+void _showLogoutDialog(BuildContext context, bool isDark) {
+  showDialog(
+    context: context,
+    builder: (dialogContext) => Dialog(
+      backgroundColor: Colors.transparent,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(24.r),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+          child: Container(
+            padding: EdgeInsets.all(24.r),
+            decoration: BoxDecoration(
+              color: isDark ? Colors.white.withValues(alpha: 0.08) : Colors.white.withValues(alpha: 0.9),
+              borderRadius: BorderRadius.circular(24.r),
+              border: Border.all(
+                color: isDark ? Colors.white.withValues(alpha: 0.1) : Colors.black.withValues(alpha: 0.06),
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: isDark ? 0.3 : 0.08),
+                  blurRadius: 24.r,
+                  offset: Offset(0, 8.r),
+                ),
+              ],
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Icon
+                Container(
+                  padding: EdgeInsets.all(16.r),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFE53935).withValues(alpha: 0.1),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(Iconsax.logout, color: const Color(0xFFE53935), size: 32.r),
+                ),
+                SizedBox(height: 20.r),
+                // Title
+                Text(
+                  'profile_logout_title'.tr(),
+                  style: TextStyle(
+                    fontSize: 20.r,
+                    fontWeight: FontWeight.w700,
+                    color: isDark ? Colors.white : Colors.black87,
+                  ),
+                ),
+                SizedBox(height: 8.r),
+                // Message
+                Text(
+                  'profile_logout_message'.tr(),
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 14.r, color: isDark ? Colors.white70 : Colors.black54, height: 1.4),
+                ),
+                SizedBox(height: 24.r),
+                // Buttons
+                Row(
+                  children: [
+                    // Cancel
+                    Expanded(
+                      child: TextButton(
+                        onPressed: () => Navigator.of(dialogContext).pop(),
+                        style: TextButton.styleFrom(
+                          padding: EdgeInsets.symmetric(vertical: 14.r),
+                          backgroundColor: isDark
+                              ? Colors.white.withValues(alpha: 0.08)
+                              : Colors.black.withValues(alpha: 0.04),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
+                        ),
+                        child: Text(
+                          'profile_logout_cancel'.tr(),
+                          style: TextStyle(
+                            fontSize: 15.r,
+                            fontWeight: FontWeight.w600,
+                            color: isDark ? Colors.white70 : Colors.black54,
+                          ),
+                        ),
+                      ),
+                    ),
+                    SizedBox(width: 12.r),
+                    // Logout
+                    Expanded(
+                      child: TextButton(
+                        onPressed: () {
+                          Navigator.of(dialogContext).pop();
+                          if (context.mounted) {
+                            context.go('/auth');
+                          }
+                        },
+                        style: TextButton.styleFrom(
+                          padding: EdgeInsets.symmetric(vertical: 14.r),
+                          backgroundColor: const Color(0xFFE53935),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
+                        ),
+                        child: Text(
+                          'profile_logout_confirm'.tr(),
+                          style: TextStyle(fontSize: 15.r, fontWeight: FontWeight.w700, color: Colors.white),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    ),
+  );
+}
+
+// ============================================================
 // MAIN SCREEN
 // ============================================================
 
@@ -173,6 +290,7 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> with SingleTick
   final _scaffoldKey = GlobalKey<ScaffoldState>();
   int _selectedBrandIndex = -1;
   int _currentNavIndex = 0;
+  bool _isLoading = true;
   late final List<_CarItem> _cars;
   late AnimationController _bannerAnim;
   late Animation<double> _bannerFade;
@@ -193,6 +311,13 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> with SingleTick
     _bannerAnim = AnimationController(vsync: this, duration: const Duration(milliseconds: 900));
     _bannerFade = CurvedAnimation(parent: _bannerAnim, curve: Curves.easeOut);
     _bannerAnim.forward();
+
+    // Simulate loading for 1.5 seconds then show content
+    Future.delayed(const Duration(milliseconds: 1500), () {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+    });
   }
 
   @override
@@ -207,6 +332,9 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> with SingleTick
   }
 
   Widget _buildScreenBody(bool isDesktop) {
+    if (_isLoading) {
+      return HomeSkeleton(isDesktop: isDesktop);
+    }
     switch (_currentNavIndex) {
       case 0:
         return isDesktop ? _buildDesktopLayout() : _buildMobileLayout();
@@ -391,7 +519,7 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> with SingleTick
                                 style: TextStyle(fontSize: 13.r, fontWeight: FontWeight.w700, color: cs.onSurface),
                               ),
                               SizedBox(width: 3.r),
-                              Icon(Iconsax.arrow_down_1, size: 12.r, color: cs.primary),
+                              Icon(CupertinoIcons.chevron_down, size: 12.r, color: cs.primary),
                             ],
                           ),
                         ],
@@ -2015,7 +2143,10 @@ class _DrawerBottom extends StatelessWidget {
           SizedBox(height: 12.r),
           // Sign in / out button
           GestureDetector(
-            onTap: () {},
+            onTap: () {
+              Navigator.of(context).pop(); // Close drawer first
+              _showLogoutDialog(context, isDark);
+            },
             child: Container(
               width: double.infinity,
               padding: EdgeInsets.symmetric(vertical: 14.r),
@@ -2030,7 +2161,7 @@ class _DrawerBottom extends StatelessWidget {
                   Icon(Iconsax.logout, color: const Color(0xFFE53935), size: 18.r),
                   SizedBox(width: 8.r),
                   Text(
-                    'drawer_sign_in'.tr(),
+                    'drawer_sign_out'.tr(),
                     style: TextStyle(fontSize: 14.r, fontWeight: FontWeight.w700, color: const Color(0xFFE53935)),
                   ),
                 ],
