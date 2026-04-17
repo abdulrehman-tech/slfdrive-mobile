@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 import 'package:provider/provider.dart';
+import 'package:go_router/go_router.dart';
 import '../../../widgets/omr_icon.dart';
 import '../../../../constants/breakpoints.dart';
 import '../../../../constants/color_constants.dart';
@@ -655,7 +656,17 @@ class _BookingCard extends StatelessWidget {
                       children: [
                         Expanded(
                           child: GestureDetector(
-                            onTap: () {},
+                            onTap: () {
+                              if (booking.status == BookingStatus.completed ||
+                                  booking.status == BookingStatus.cancelled) {
+                                context.pushNamed('car-listing');
+                              } else {
+                                context.pushNamed(
+                                  'booking-detail',
+                                  pathParameters: {'id': booking.carName.hashCode.toString()},
+                                );
+                              }
+                            },
                             child: Container(
                               padding: EdgeInsets.symmetric(vertical: 10.r),
                               decoration: BoxDecoration(
@@ -813,7 +824,7 @@ class _BookingEmpty extends StatelessWidget {
           ),
           SizedBox(height: 24.r),
           GestureDetector(
-            onTap: () {},
+            onTap: () => context.pushNamed('car-listing'),
             child: Container(
               padding: EdgeInsets.symmetric(horizontal: 28.r, vertical: 12.r),
               decoration: BoxDecoration(

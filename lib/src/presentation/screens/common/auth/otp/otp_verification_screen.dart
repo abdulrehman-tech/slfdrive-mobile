@@ -439,7 +439,7 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
           fontSize: 22.r,
           fontWeight: FontWeight.bold,
           color: isDark ? Colors.white : const Color(0xFF3D3D3D),
-          height: 1.0,
+          height: 2.0,
         ),
         decoration: InputDecoration(
           counterText: '',

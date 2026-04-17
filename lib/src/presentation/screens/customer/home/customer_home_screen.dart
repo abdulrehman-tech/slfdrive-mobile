@@ -856,7 +856,7 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> with SingleTick
         _SectionHeader(
           title: 'home_all_brands'.tr(),
           cs: cs,
-          onViewAll: () => context.pushNamed('car-listing'),
+          onViewAll: () => context.pushNamed('brands'),
           isDesktop: isDesktop,
         ),
         SizedBox(
@@ -870,9 +870,10 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> with SingleTick
               final brand = _brands[i];
               final selected = _selectedBrandIndex == i;
               return GestureDetector(
-                onTap: () => setState(() {
-                  _selectedBrandIndex = selected ? -1 : i;
-                }),
+                onTap: () {
+                  setState(() => _selectedBrandIndex = selected ? -1 : i);
+                  context.pushNamed('car-listing', extra: {'brand': brand.name});
+                },
                 child: AnimatedContainer(
                   duration: const Duration(milliseconds: 220),
                   margin: EdgeInsets.only(right: 14.r),
@@ -1722,7 +1723,7 @@ class _NotificationBtn extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () {},
+      onTap: () => context.pushNamed('notifications'),
       child: Stack(
         clipBehavior: Clip.none,
         children: [

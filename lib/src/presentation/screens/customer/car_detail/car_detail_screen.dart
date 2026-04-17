@@ -10,6 +10,10 @@ import 'package:provider/provider.dart';
 import '../../../../constants/breakpoints.dart';
 import '../../../../constants/color_constants.dart';
 import '../../../providers/theme_provider.dart';
+import '../../../widgets/customer/oman_plate.dart';
+import '../../../utils/contact_launcher.dart';
+import 'package:go_router/go_router.dart';
+import '../booking/models/booking_data.dart';
 
 // ============================================================
 // CAR DETAIL SCREEN
@@ -112,6 +116,10 @@ class _CarDetailScreenState extends State<CarDetailScreen> {
             // Car info header
             SliverToBoxAdapter(
               child: Padding(padding: EdgeInsets.fromLTRB(16.r, 16.r, 16.r, 0), child: _buildCarInfoHeader(isDark, cs)),
+            ),
+            // Plate
+            SliverToBoxAdapter(
+              child: Padding(padding: EdgeInsets.fromLTRB(16.r, 14.r, 16.r, 0), child: _buildPlateSection(isDark, cs)),
             ),
             // Specs
             SliverToBoxAdapter(
@@ -217,6 +225,8 @@ class _CarDetailScreenState extends State<CarDetailScreen> {
                     child: Column(
                       children: [
                         _buildCarInfoHeader(isDark, cs),
+                        SizedBox(height: 16.r),
+                        _buildPlateSection(isDark, cs),
                         SizedBox(height: 16.r),
                         _buildSpecsSection(isDark, cs),
                         SizedBox(height: 16.r),
@@ -494,6 +504,54 @@ class _CarDetailScreenState extends State<CarDetailScreen> {
   }
 
   // ==========================================================================
+  // PLATE SECTION
+  // ==========================================================================
+
+  Widget _buildPlateSection(bool isDark, ColorScheme cs) {
+    return _GlassCard(
+      isDark: isDark,
+      child: Padding(
+        padding: EdgeInsets.all(16.r),
+        child: Row(
+          children: [
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Row(
+                  children: [
+                    Container(
+                      width: 28.r,
+                      height: 28.r,
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFDD1F26).withValues(alpha: isDark ? 0.18 : 0.1),
+                        borderRadius: BorderRadius.circular(8.r),
+                      ),
+                      child: Icon(Iconsax.card_copy, size: 14.r, color: const Color(0xFFDD1F26)),
+                    ),
+                    SizedBox(width: 8.r),
+                    Text(
+                      'car_detail_plate'.tr(),
+                      style: TextStyle(fontSize: 14.r, fontWeight: FontWeight.w700, color: cs.onSurface),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 6.r),
+                Text(
+                  'car_detail_plate_subtitle'.tr(),
+                  style: TextStyle(fontSize: 11.r, color: cs.onSurface.withValues(alpha: 0.5), height: 1.4),
+                ),
+              ],
+            ),
+            const Spacer(),
+            const OmanPlate(number: '12345', code: 'A', width: 150),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // ==========================================================================
   // SPECS SECTION
   // ==========================================================================
 
@@ -763,14 +821,33 @@ class _CarDetailScreenState extends State<CarDetailScreen> {
                 ],
               ),
             ),
-            Container(
-              width: 36.r,
-              height: 36.r,
-              decoration: BoxDecoration(
-                color: cs.primary.withValues(alpha: isDark ? 0.15 : 0.08),
-                borderRadius: BorderRadius.circular(10.r),
+            GestureDetector(
+              onTap: () => ContactLauncher.openWhatsApp(
+                '+96890000000',
+                message: 'Hi, I am interested in your Mercedes AMG GT listing on SLF Drive.',
               ),
-              child: Icon(Iconsax.message, size: 16.r, color: cs.primary),
+              child: Container(
+                width: 36.r,
+                height: 36.r,
+                decoration: BoxDecoration(
+                  color: const Color(0xFF25D366).withValues(alpha: isDark ? 0.18 : 0.1),
+                  borderRadius: BorderRadius.circular(10.r),
+                ),
+                child: Icon(Iconsax.message_copy, size: 16.r, color: const Color(0xFF25D366)),
+              ),
+            ),
+            SizedBox(width: 8.r),
+            GestureDetector(
+              onTap: () => ContactLauncher.openPhoneCall('+96890000000'),
+              child: Container(
+                width: 36.r,
+                height: 36.r,
+                decoration: BoxDecoration(
+                  color: cs.primary.withValues(alpha: isDark ? 0.18 : 0.1),
+                  borderRadius: BorderRadius.circular(10.r),
+                ),
+                child: Icon(Iconsax.call_copy, size: 16.r, color: cs.primary),
+              ),
             ),
           ],
         ),
@@ -896,7 +973,7 @@ class _CarDetailScreenState extends State<CarDetailScreen> {
               ),
               const Spacer(),
               GestureDetector(
-                onTap: () {},
+                onTap: () => _launchBookingFlow(context),
                 child: Container(
                   padding: EdgeInsets.symmetric(horizontal: 28.r, vertical: 14.r),
                   decoration: BoxDecoration(
@@ -929,7 +1006,7 @@ class _CarDetailScreenState extends State<CarDetailScreen> {
 
   Widget _buildDesktopBookButton(bool isDark, ColorScheme cs) {
     return GestureDetector(
-      onTap: () {},
+      onTap: () => _launchBookingFlow(context),
       child: Container(
         width: double.infinity,
         padding: EdgeInsets.symmetric(vertical: 16.r),
@@ -948,6 +1025,23 @@ class _CarDetailScreenState extends State<CarDetailScreen> {
         ),
       ),
     );
+  }
+
+  // ==========================================================================
+  // BOOKING ENTRY
+  // ==========================================================================
+
+  void _launchBookingFlow(BuildContext context) {
+    const car = BookingCar(
+      id: 'car-1',
+      name: 'Mercedes AMG GT',
+      brand: 'Mercedes',
+      imageUrl: 'https://images.unsplash.com/photo-1617814076367-b759c7d7e738?w=800&q=80',
+      pricePerDay: 250,
+      plateNumber: '12345',
+      plateCode: 'A',
+    );
+    context.pushNamed('booking', extra: {'service': BookingServiceType.rentCar, 'car': car});
   }
 }
 

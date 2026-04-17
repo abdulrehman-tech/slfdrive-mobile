@@ -14,6 +14,12 @@ import '../screens/customer/car_detail/car_detail_screen.dart';
 import '../screens/customer/driver_listing/driver_listing_screen.dart';
 import '../screens/customer/driver_detail/driver_detail_screen.dart';
 import '../screens/customer/search/search_screen.dart';
+import '../screens/customer/brands/brands_screen.dart';
+import '../screens/customer/notifications/notifications_screen.dart';
+import '../screens/customer/booking/booking_flow_screen.dart';
+import '../screens/customer/booking/location_picker_screen.dart';
+import '../screens/customer/booking/models/booking_data.dart';
+import '../screens/customer/booking_detail/booking_detail_screen.dart';
 import '../screens/driver/home/driver_home_screen.dart';
 
 /// Professional page transition with shared axis pattern.
@@ -213,6 +219,54 @@ class AppRouter {
         path: '/search',
         name: 'search',
         pageBuilder: (context, state) => AppModalTransition(child: const SearchScreen(), name: state.name),
+      ),
+      GoRoute(
+        path: '/brands',
+        name: 'brands',
+        pageBuilder: (context, state) => AppPageTransition(child: const BrandsScreen(), name: state.name),
+      ),
+      GoRoute(
+        path: '/notifications',
+        name: 'notifications',
+        pageBuilder: (context, state) => AppModalTransition(child: const NotificationsScreen(), name: state.name),
+      ),
+      GoRoute(
+        path: '/booking',
+        name: 'booking',
+        pageBuilder: (context, state) {
+          final extra = state.extra as Map<String, dynamic>?;
+          final service = extra?['service'] as BookingServiceType?;
+          final car = extra?['car'] as BookingCar?;
+          final driver = extra?['driver'] as BookingDriver?;
+          return AppModalTransition(
+            child: BookingFlowScreen(initialServiceType: service, initialCar: car, initialDriver: driver),
+            name: state.name,
+          );
+        },
+      ),
+      GoRoute(
+        path: '/booking/location',
+        name: 'booking-location-picker',
+        pageBuilder: (context, state) {
+          final extra = state.extra as Map<String, dynamic>?;
+          final initial = extra?['initial'] as BookingLocation?;
+          final forDelivery = extra?['forDelivery'] as bool? ?? false;
+          return AppModalTransition(
+            child: LocationPickerScreen(initial: initial, forDelivery: forDelivery),
+            name: state.name,
+          );
+        },
+      ),
+      GoRoute(
+        path: '/bookings/:id',
+        name: 'booking-detail',
+        pageBuilder: (context, state) {
+          final id = state.pathParameters['id'] ?? '';
+          return AppModalTransition(
+            child: BookingDetailScreen(bookingId: id),
+            name: state.name,
+          );
+        },
       ),
       GoRoute(
         path: '/driver/home',
