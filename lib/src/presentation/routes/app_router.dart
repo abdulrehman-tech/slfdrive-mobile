@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 import 'app_fade_through_transition.dart';
+import '../providers/role_provider.dart';
 import '../screens/splash/splash_screen.dart';
 import '../screens/language/language_selection_screen.dart';
 import '../screens/onboarding/onboarding_screen.dart';
@@ -8,6 +10,7 @@ import '../screens/common/auth/pre_login_screen.dart';
 import '../screens/common/auth/login/phone_login_screen.dart';
 import '../screens/common/auth/otp/otp_verification_screen.dart';
 import '../screens/common/auth/profile_completion_screen.dart';
+import '../screens/common/coming_soon_screen.dart';
 import '../screens/customer/home/customer_home_screen.dart';
 import '../screens/customer/car_listing/car_listing_screen.dart';
 import '../screens/customer/car_detail/car_detail_screen.dart';
@@ -20,7 +23,13 @@ import '../screens/customer/booking/booking_flow_screen.dart';
 import '../screens/customer/booking/location_picker_screen.dart';
 import '../screens/customer/booking/models/booking_data.dart';
 import '../screens/customer/booking_detail/booking_detail_screen.dart';
+import '../screens/customer/bookings/bookings_screen.dart';
+import '../screens/customer/favorites/favorites_screen.dart';
+import '../screens/customer/profile/profile_screen.dart';
 import '../screens/driver/home/driver_home_screen.dart';
+import '../screens/driver/earnings/driver_earnings_screen.dart';
+import '../screens/driver/trips/driver_trips_screen.dart';
+import '../screens/driver/profile/driver_profile_screen.dart';
 
 /// Professional page transition with shared axis pattern.
 /// Uses Material 3 motion principles with elegant easing curves.
@@ -28,28 +37,21 @@ class AppPageTransition extends CustomTransitionPage {
   AppPageTransition({required super.child, super.name, super.arguments, super.restorationId})
     : super(
         transitionsBuilder: (context, animation, secondaryAnimation, child) {
-          // Material 3 emphasized easing for smooth, professional motion
           const enterCurve = Curves.easeOutCubic;
           const exitCurve = Curves.easeInCubic;
 
-          // Primary animation (entering screen)
           final primaryAnimation = CurvedAnimation(parent: animation, curve: enterCurve, reverseCurve: exitCurve);
 
-          // Shared axis Z transition: fade + slide with scale
-          const slideDistance = 0.03; // Very subtle horizontal movement
+          const slideDistance = 0.03;
 
-          // Entering screen: slide from right with fade in
           final enterSlide = Tween<Offset>(
             begin: const Offset(slideDistance, 0),
             end: Offset.zero,
           ).animate(primaryAnimation);
 
           final enterFade = Tween<double>(begin: 0.0, end: 1.0).animate(primaryAnimation);
-
-          // Subtle scale for depth (Material 3 style)
           final enterScale = Tween<double>(begin: 0.95, end: 1.0).animate(primaryAnimation);
 
-          // Single transition - no Stack to avoid GlobalKey conflicts
           return SlideTransition(
             position: enterSlide,
             child: FadeTransition(
@@ -64,29 +66,23 @@ class AppPageTransition extends CustomTransitionPage {
 }
 
 /// Modal-style transition for detail screens that should feel like overlays.
-/// Uses vertical slide with fade and scale for an elegant modal entrance.
 class AppModalTransition extends CustomTransitionPage {
   AppModalTransition({required super.child, super.name, super.arguments, super.restorationId})
     : super(
         transitionsBuilder: (context, animation, secondaryAnimation, child) {
-          // Material 3 emphasized deceleration for modal entrance
           const enterCurve = Curves.easeOutCubic;
           const exitCurve = Curves.easeInCubic;
 
           final primaryAnimation = CurvedAnimation(parent: animation, curve: enterCurve, reverseCurve: exitCurve);
 
-          // Modal slides up from bottom with fade
           final slideAnimation = Tween<Offset>(
             begin: const Offset(0, 0.05),
             end: Offset.zero,
           ).animate(primaryAnimation);
 
           final fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(primaryAnimation);
-
-          // Subtle scale for depth
           final scaleAnimation = Tween<double>(begin: 0.96, end: 1.0).animate(primaryAnimation);
 
-          // Single transition - no Stack to avoid GlobalKey conflicts
           return SlideTransition(
             position: slideAnimation,
             child: FadeTransition(
@@ -100,10 +96,42 @@ class AppModalTransition extends CustomTransitionPage {
       );
 }
 
+/// Pre-auth routes — anyone may visit these regardless of role.
+const _preAuthRoutes = {
+  '/',
+  '/language-selection',
+  '/onboarding',
+  '/auth',
+  '/auth/phone',
+  '/auth/otp',
+  '/auth/profile-completion',
+};
+
 class AppRouter {
   static final GoRouter router = GoRouter(
     initialLocation: '/',
+    redirect: (context, state) {
+      final role = context.read<RoleProvider>().role;
+      final loc = state.matchedLocation;
+
+      if (_preAuthRoutes.contains(loc)) return null;
+
+      // Unauthenticated → send to auth.
+      if (role == null) return '/auth';
+
+      // Role fencing: customers can't enter /driver/*, drivers can't enter
+      // customer-scoped routes. Match '/driver/' (with trailing slash) so
+      // '/drivers' and '/drivers/:id' (customer-facing driver browse) still
+      // resolve as customer routes.
+      final isDriverShellRoute = loc == '/driver' || loc.startsWith('/driver/');
+      if (isDriverShellRoute && role != UserRole.driver) return '/home';
+      if (!isDriverShellRoute && role == UserRole.driver) return '/driver/home';
+
+      return null;
+    },
+    errorBuilder: (context, state) => const ComingSoonScreen(titleKey: 'error_route_not_found'),
     routes: [
+      // ── Pre-auth ─────────────────────────────────────────────
       GoRoute(
         path: '/',
         name: 'splash',
@@ -164,11 +192,41 @@ class AppRouter {
           );
         },
       ),
+
+      // ── Customer shell tabs ─────────────────────────────────
+      // Each tab renders CustomerHomeScreen with a different body so the
+      // drawer + bottom-nav + desktop side-nav chrome persists visually.
       GoRoute(
         path: '/home',
         name: 'home',
         pageBuilder: (context, state) => AppPageTransition(child: const CustomerHomeScreen(), name: state.name),
       ),
+      GoRoute(
+        path: '/favorites',
+        name: 'favorites',
+        pageBuilder: (context, state) => AppPageTransition(
+          child: const CustomerHomeScreen(tabBody: FavoritesScreen()),
+          name: state.name,
+        ),
+      ),
+      GoRoute(
+        path: '/bookings',
+        name: 'bookings',
+        pageBuilder: (context, state) => AppPageTransition(
+          child: const CustomerHomeScreen(tabBody: BookingsScreen()),
+          name: state.name,
+        ),
+      ),
+      GoRoute(
+        path: '/profile',
+        name: 'profile',
+        pageBuilder: (context, state) => AppPageTransition(
+          child: const CustomerHomeScreen(tabBody: ProfileScreen()),
+          name: state.name,
+        ),
+      ),
+
+      // ── Customer detail / flow routes (push on top of shell) ─
       GoRoute(
         path: '/cars',
         name: 'car-listing',
@@ -268,10 +326,83 @@ class AppRouter {
           );
         },
       ),
+
+      // ── ComingSoon placeholders (Phase 2 destinations) ──────
+      GoRoute(
+        path: '/profile/edit',
+        pageBuilder: (context, state) =>
+            AppPageTransition(child: const ComingSoonScreen(titleKey: 'profile_edit_title'), name: state.name),
+      ),
+      GoRoute(
+        path: '/profile/addresses',
+        pageBuilder: (context, state) =>
+            AppPageTransition(child: const ComingSoonScreen(titleKey: 'profile_addresses_title'), name: state.name),
+      ),
+      GoRoute(
+        path: '/profile/payments',
+        pageBuilder: (context, state) =>
+            AppPageTransition(child: const ComingSoonScreen(titleKey: 'profile_payments_title'), name: state.name),
+      ),
+      GoRoute(
+        path: '/profile/kyc',
+        pageBuilder: (context, state) =>
+            AppPageTransition(child: const ComingSoonScreen(titleKey: 'profile_kyc_title'), name: state.name),
+      ),
+      GoRoute(
+        path: '/my-vehicles',
+        pageBuilder: (context, state) =>
+            AppPageTransition(child: const ComingSoonScreen(titleKey: 'drawer_my_vehicles_title'), name: state.name),
+      ),
+      GoRoute(
+        path: '/help',
+        pageBuilder: (context, state) =>
+            AppPageTransition(child: const ComingSoonScreen(titleKey: 'help_center_title'), name: state.name),
+      ),
+      GoRoute(
+        path: '/legal/terms',
+        pageBuilder: (context, state) =>
+            AppPageTransition(child: const ComingSoonScreen(titleKey: 'legal_terms_title'), name: state.name),
+      ),
+      GoRoute(
+        path: '/legal/privacy',
+        pageBuilder: (context, state) =>
+            AppPageTransition(child: const ComingSoonScreen(titleKey: 'legal_privacy_title'), name: state.name),
+      ),
+      GoRoute(
+        path: '/about',
+        pageBuilder: (context, state) =>
+            AppPageTransition(child: const ComingSoonScreen(titleKey: 'about_title'), name: state.name),
+      ),
+
+      // ── Driver shell tabs ───────────────────────────────────
       GoRoute(
         path: '/driver/home',
         name: 'driver-home',
         pageBuilder: (context, state) => AppPageTransition(child: const DriverHomeScreen(), name: state.name),
+      ),
+      GoRoute(
+        path: '/driver/earnings',
+        name: 'driver-earnings',
+        pageBuilder: (context, state) => AppPageTransition(
+          child: const DriverHomeScreen(tabBody: DriverEarningsScreen()),
+          name: state.name,
+        ),
+      ),
+      GoRoute(
+        path: '/driver/trips',
+        name: 'driver-trips',
+        pageBuilder: (context, state) => AppPageTransition(
+          child: const DriverHomeScreen(tabBody: DriverTripsScreen()),
+          name: state.name,
+        ),
+      ),
+      GoRoute(
+        path: '/driver/profile',
+        name: 'driver-profile',
+        pageBuilder: (context, state) => AppPageTransition(
+          child: const DriverHomeScreen(tabBody: DriverProfileScreen()),
+          name: state.name,
+        ),
       ),
     ],
   );

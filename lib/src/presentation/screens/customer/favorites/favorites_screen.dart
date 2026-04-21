@@ -185,7 +185,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                 const Spacer(),
                 // Search icon
                 GestureDetector(
-                  onTap: () {},
+                  onTap: () => context.pushNamed('search'),
                   child: Container(
                     width: 38.r,
                     height: 38.r,
@@ -213,7 +213,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                 final active = _filterIndex == i;
                 final col = _filterColors[i];
                 return Padding(
-                  padding: EdgeInsets.only(right: 10.r),
+                  padding: EdgeInsetsDirectional.only(end: 10.r),
                   child: GestureDetector(
                     onTap: () => setState(() => _filterIndex = i),
                     child: AnimatedContainer(
@@ -359,7 +359,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                     final active = _filterIndex == i;
                     final col = _filterColors[i];
                     return Padding(
-                      padding: EdgeInsets.only(right: 10.r),
+                      padding: EdgeInsetsDirectional.only(end: 10.r),
                       child: GestureDetector(
                         onTap: () => setState(() => _filterIndex = i),
                         child: AnimatedContainer(
@@ -524,7 +524,7 @@ class _EmptyFavorites extends StatelessWidget {
           ),
           SizedBox(height: 24.r),
           GestureDetector(
-            onTap: () {},
+            onTap: () => context.go('/home'),
             child: Container(
               padding: EdgeInsets.symmetric(horizontal: 28.r, vertical: 12.r),
               decoration: BoxDecoration(
@@ -695,7 +695,7 @@ class _FavCarCard extends StatelessWidget {
                                 ],
                               ),
                               GestureDetector(
-                                onTap: () {},
+                                onTap: () => context.pushNamed('car-detail', pathParameters: {'id': car.id}),
                                 child: Container(
                                   padding: EdgeInsets.symmetric(horizontal: 14.r, vertical: 7.r),
                                   decoration: BoxDecoration(

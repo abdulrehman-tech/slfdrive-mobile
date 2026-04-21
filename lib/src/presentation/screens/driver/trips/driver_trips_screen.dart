@@ -336,7 +336,12 @@ class _DriverTripsScreenState extends State<DriverTripsScreen> {
           ),
           SizedBox(height: 16.r),
           GestureDetector(
-            onTap: () {},
+            onTap: () => ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('trips_complete_snack'.tr()),
+                behavior: SnackBarBehavior.floating,
+              ),
+            ),
             child: Container(
               width: double.infinity,
               padding: EdgeInsets.symmetric(vertical: 12.r),

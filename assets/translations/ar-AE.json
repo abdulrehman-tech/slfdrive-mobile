@@ -561,5 +561,45 @@
   "driving_license_hint": "قم بتحميل مستند رخصة القيادة",
   "items_selected": "عناصر محددة",
   "clear_all": "مسح الكل",
-  "select_all": "تحديد الكل"
+  "select_all": "تحديد الكل",
+
+  "coming_soon_title": "قريباً",
+  "coming_soon_heading": "نعمل على هذه الميزة",
+  "coming_soon_message": "هذه الميزة قادمة قريباً. يرجى المحاولة مرة أخرى في تحديث لاحق.",
+  "error_route_not_found": "الصفحة غير موجودة",
+
+  "car_status_available": "متاحة",
+  "car_status_unavailable": "غير متاحة",
+  "car_feature_gps": "نظام الملاحة GPS",
+  "car_feature_bluetooth": "بلوتوث",
+  "car_feature_leather": "مقاعد جلدية",
+  "car_feature_sunroof": "فتحة سقف",
+  "car_feature_heated_seats": "مقاعد مدفأة",
+  "car_feature_cruise": "مثبت السرعة",
+  "car_feature_camera": "كاميرا خلفية",
+  "car_feature_keyless": "دخول بدون مفتاح",
+  "car_detail_description_placeholder": "استمتع بإثارة قيادة هذه السيارة المميزة. مزيج رائع من الأداء والراحة — مثالية للمناسبات الخاصة والرحلات الأسبوعية.",
+
+  "common_sort": "ترتيب",
+  "driver_status_busy": "مشغول",
+
+  "payment_card_number_hint": "0000 0000 0000 0000",
+  "payment_card_expiry_hint": "شهر/سنة",
+  "payment_card_cvv_hint": "123",
+  "payment_card_name_hint": "الاسم كما يظهر على البطاقة",
+
+  "profile_edit_title": "تعديل الملف الشخصي",
+  "profile_addresses_title": "العناوين المحفوظة",
+  "profile_payments_title": "طرق الدفع",
+  "profile_kyc_title": "التحقق من الهوية",
+  "drawer_my_vehicles_title": "مركباتي",
+  "help_center_title": "مركز المساعدة",
+  "legal_terms_title": "الشروط والأحكام",
+  "legal_privacy_title": "سياسة الخصوصية",
+  "about_title": "حول SLF Drive",
+
+  "settings_cache_cleared": "تم مسح ذاكرة التخزين المؤقت",
+  "driver_accept_snack": "تم قبول الرحلة — نراك عند نقطة الاستلام",
+  "trips_complete_snack": "تم تعليم الرحلة كمكتملة",
+  "profile_currency_locked": "الريال العماني هو العملة الوحيدة المدعومة"
 }

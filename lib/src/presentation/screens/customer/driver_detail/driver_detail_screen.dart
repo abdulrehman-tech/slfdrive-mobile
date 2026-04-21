@@ -13,6 +13,7 @@ import '../../../../constants/color_constants.dart';
 import '../../../providers/theme_provider.dart';
 import '../../../utils/contact_launcher.dart';
 import '../../../widgets/omr_icon.dart';
+import '../../common/coming_soon_screen.dart';
 import '../booking/models/booking_data.dart';
 
 // ============================================================
@@ -590,6 +591,7 @@ class _DriverDetailScreenState extends State<DriverDetailScreen> {
             _sectionHeader(cs, Iconsax.security_safe_copy, const Color(0xFF4CAF50), 'driver_detail_trust'.tr(), isDark),
             SizedBox(height: 12.r),
             GridView.count(
+              padding: EdgeInsets.zero,
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
               crossAxisCount: 2,
@@ -653,7 +655,7 @@ class _DriverDetailScreenState extends State<DriverDetailScreen> {
                 final t = e.value;
                 return Expanded(
                   child: Container(
-                    margin: EdgeInsets.only(right: i < tiers.length - 1 ? 8.r : 0),
+                    margin: EdgeInsetsDirectional.only(end: i < tiers.length - 1 ? 8.r : 0),
                     padding: EdgeInsets.symmetric(vertical: 12.r, horizontal: 8.r),
                     decoration: BoxDecoration(
                       color: isDark ? Colors.white.withValues(alpha: 0.04) : Colors.black.withValues(alpha: 0.03),
@@ -732,6 +734,7 @@ class _DriverDetailScreenState extends State<DriverDetailScreen> {
             _sectionHeader(cs, Iconsax.medal_star_copy, const Color(0xFF00BCD4), 'driver_detail_services'.tr(), isDark),
             SizedBox(height: 12.r),
             GridView.count(
+              padding: EdgeInsets.zero,
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
               crossAxisCount: 3,
@@ -1046,7 +1049,11 @@ class _DriverDetailScreenState extends State<DriverDetailScreen> {
             SizedBox(height: 6.r),
             Center(
               child: GestureDetector(
-                onTap: () {},
+                onTap: () => Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) => const ComingSoonScreen(titleKey: 'driver_detail_view_all_reviews'),
+                  ),
+                ),
                 child: Container(
                   padding: EdgeInsets.symmetric(horizontal: 18.r, vertical: 10.r),
                   decoration: BoxDecoration(
@@ -1188,7 +1195,7 @@ class _DriverDetailScreenState extends State<DriverDetailScreen> {
                 child: Container(
                   width: 48.r,
                   height: 48.r,
-                  margin: EdgeInsets.only(right: 8.r),
+                  margin: EdgeInsetsDirectional.only(end: 8.r),
                   decoration: BoxDecoration(
                     color: const Color(0xFF25D366).withValues(alpha: isDark ? 0.2 : 0.12),
                     borderRadius: BorderRadius.circular(13.r),
@@ -1202,7 +1209,7 @@ class _DriverDetailScreenState extends State<DriverDetailScreen> {
                 child: Container(
                   width: 48.r,
                   height: 48.r,
-                  margin: EdgeInsets.only(right: 8.r),
+                  margin: EdgeInsetsDirectional.only(end: 8.r),
                   decoration: BoxDecoration(
                     color: cs.primary.withValues(alpha: isDark ? 0.18 : 0.1),
                     borderRadius: BorderRadius.circular(13.r),

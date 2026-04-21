@@ -206,7 +206,7 @@ class _BrandsScreenState extends State<BrandsScreen> {
       surfaceTintColor: Colors.transparent,
       elevation: 0,
       leading: Padding(
-        padding: EdgeInsets.only(left: 12.r),
+        padding: EdgeInsetsDirectional.only(start: 12.r),
         child: GestureDetector(
           onTap: () => Navigator.of(context).pop(),
           child: Center(

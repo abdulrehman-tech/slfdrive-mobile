@@ -32,8 +32,12 @@
   <title>slfdrive</title>
   <link rel="manifest" href="manifest.json">
 
-  <!-- Google Maps JavaScript API (required by google_maps_flutter on web) -->
-  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAvuCoG_J8ihd2xuexw0Cy6uWBAl8TAHks&libraries=places"></script>
+  <!--
+    Google Maps JavaScript API is loaded dynamically at runtime from Dart
+    (see `lib/src/core/secrets/maps_loader_web.dart`). The API key is supplied
+    to the build via `--dart-define=GOOGLE_MAPS_API_KEY=...`, so it never
+    appears in source control.
+  -->
 </head>
 <body>
   <script src="flutter_bootstrap.js" async></script>

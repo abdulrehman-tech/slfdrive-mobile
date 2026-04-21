@@ -1089,7 +1089,7 @@ class _FilterBottomSheetState extends State<_FilterBottomSheet> {
                           return GestureDetector(
                             onTap: () => setState(() => _rating = _rating == starVal ? 0 : starVal),
                             child: Padding(
-                              padding: EdgeInsets.only(right: 8.r),
+                              padding: EdgeInsetsDirectional.only(end: 8.r),
                               child: Icon(
                                 active ? Iconsax.star_1_copy : Iconsax.star_1,
                                 size: 28.r,

@@ -50,6 +50,9 @@ dependencies:
   google_maps_flutter_web: ^0.5.10
   geolocator: ^13.0.2
   geocoding: ^3.0.0
+  # Used on web to inject the Maps JS SDK at runtime (keeps the API key out
+  # of `web/index.html`).
+  web: ^1.1.0
   
   # Date & Time
   intl: ^0.20.2

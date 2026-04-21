@@ -6,6 +6,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 import 'package:provider/provider.dart';
+import '../../../providers/language_provider.dart';
 import '../../../providers/theme_provider.dart';
 
 class DriverProfileScreen extends StatefulWidget {
@@ -91,7 +92,7 @@ class _DriverProfileScreenState extends State<DriverProfileScreen> {
                 bottom: 0,
                 right: 0,
                 child: GestureDetector(
-                  onTap: () {},
+                  onTap: () => context.push('/profile/edit'),
                   child: Container(
                     padding: EdgeInsets.all(8.r),
                     decoration: BoxDecoration(
@@ -192,7 +193,13 @@ class _DriverProfileScreenState extends State<DriverProfileScreen> {
       icon: Iconsax.user,
       iconColor: const Color(0xFF4D63DD),
       children: [
-        _ActionTile(isDark: isDark, cs: cs, icon: Iconsax.edit, title: 'driver_edit_profile'.tr(), onTap: () {}),
+        _ActionTile(
+          isDark: isDark,
+          cs: cs,
+          icon: Iconsax.edit,
+          title: 'driver_edit_profile'.tr(),
+          onTap: () => context.push('/profile/edit'),
+        ),
         _thinDivider(isDark),
         _ActionTile(
           isDark: isDark,
@@ -200,7 +207,7 @@ class _DriverProfileScreenState extends State<DriverProfileScreen> {
           icon: Iconsax.call,
           title: 'driver_phone'.tr(),
           subtitle: '+968 9123 4567',
-          onTap: () {},
+          onTap: () => context.push('/profile/edit'),
         ),
         _thinDivider(isDark),
         _ActionTile(
@@ -209,10 +216,16 @@ class _DriverProfileScreenState extends State<DriverProfileScreen> {
           icon: Iconsax.sms,
           title: 'driver_email'.tr(),
           subtitle: 'driver@example.com',
-          onTap: () {},
+          onTap: () => context.push('/profile/edit'),
         ),
         _thinDivider(isDark),
-        _ActionTile(isDark: isDark, cs: cs, icon: Iconsax.car, title: 'driver_vehicle_info'.tr(), onTap: () {}),
+        _ActionTile(
+          isDark: isDark,
+          cs: cs,
+          icon: Iconsax.car,
+          title: 'driver_vehicle_info'.tr(),
+          onTap: () => context.push('/profile/edit'),
+        ),
       ],
     );
   }
@@ -231,7 +244,7 @@ class _DriverProfileScreenState extends State<DriverProfileScreen> {
           icon: Iconsax.language_square,
           title: 'driver_language'.tr(),
           subtitle: 'English',
-          onTap: () {},
+          onTap: () => context.read<LanguageProvider>().toggleLanguage(),
         ),
         _thinDivider(isDark),
         _ActionTile(
@@ -240,7 +253,7 @@ class _DriverProfileScreenState extends State<DriverProfileScreen> {
           icon: Iconsax.brush_2,
           title: 'driver_theme'.tr(),
           subtitle: isDark ? 'Dark' : 'Light',
-          onTap: () {},
+          onTap: () => context.read<ThemeProvider>().toggleTheme(),
         ),
       ],
     );
@@ -295,11 +308,29 @@ class _DriverProfileScreenState extends State<DriverProfileScreen> {
       icon: Iconsax.message_question,
       iconColor: const Color(0xFF4CAF50),
       children: [
-        _ActionTile(isDark: isDark, cs: cs, icon: Iconsax.info_circle, title: 'driver_help_center'.tr(), onTap: () {}),
+        _ActionTile(
+          isDark: isDark,
+          cs: cs,
+          icon: Iconsax.info_circle,
+          title: 'driver_help_center'.tr(),
+          onTap: () => context.push('/help'),
+        ),
         _thinDivider(isDark),
-        _ActionTile(isDark: isDark, cs: cs, icon: Iconsax.document_text, title: 'driver_terms'.tr(), onTap: () {}),
+        _ActionTile(
+          isDark: isDark,
+          cs: cs,
+          icon: Iconsax.document_text,
+          title: 'driver_terms'.tr(),
+          onTap: () => context.push('/legal/terms'),
+        ),
         _thinDivider(isDark),
-        _ActionTile(isDark: isDark, cs: cs, icon: Iconsax.shield_tick, title: 'driver_privacy'.tr(), onTap: () {}),
+        _ActionTile(
+          isDark: isDark,
+          cs: cs,
+          icon: Iconsax.shield_tick,
+          title: 'driver_privacy'.tr(),
+          onTap: () => context.push('/legal/privacy'),
+        ),
       ],
     );
   }
@@ -330,7 +361,7 @@ class _DriverProfileScreenState extends State<DriverProfileScreen> {
           subtitle: 'driver_delete_warning'.tr(),
           color: const Color(0xFFE53935),
           titleColor: const Color(0xFFE53935),
-          onTap: () {},
+          onTap: () => context.push('/profile/edit'),
         ),
       ],
     );
@@ -680,7 +711,7 @@ class _MiniSwitch extends StatelessWidget {
         ),
         child: AnimatedAlign(
           duration: const Duration(milliseconds: 200),
-          alignment: value ? Alignment.centerRight : Alignment.centerLeft,
+          alignment: value ? AlignmentDirectional.centerEnd : AlignmentDirectional.centerStart,
           child: Container(
             margin: EdgeInsets.all(3.r),
             width: 22.r,

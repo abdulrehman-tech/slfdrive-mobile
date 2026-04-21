@@ -279,7 +279,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
       surfaceTintColor: Colors.transparent,
       elevation: 0,
       leading: Padding(
-        padding: EdgeInsets.only(left: 12.r),
+        padding: EdgeInsetsDirectional.only(start: 12.r),
         child: GestureDetector(
           onTap: () => Navigator.of(context).pop(),
           child: Center(
@@ -330,7 +330,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
         GestureDetector(
           onTap: _unreadCount > 0 ? _markAllRead : null,
           child: Padding(
-            padding: EdgeInsets.only(right: 8.r),
+            padding: EdgeInsetsDirectional.only(end: 8.r),
             child: Container(
               width: 38.r,
               height: 38.r,
@@ -347,7 +347,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
           ),
         ),
         Padding(
-          padding: EdgeInsets.only(right: 12.r),
+          padding: EdgeInsetsDirectional.only(end: 12.r),
           child: GestureDetector(
             onTap: _items.isEmpty ? null : _clearAll,
             child: Container(
@@ -386,7 +386,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
               ? _items.length
               : _items.where((n) => n.category == _categoryMap[i]).length;
           return Padding(
-            padding: EdgeInsets.only(right: 8.r),
+            padding: EdgeInsetsDirectional.only(end: 8.r),
             child: GestureDetector(
               onTap: () => setState(() => _tab = i),
               child: AnimatedContainer(
@@ -541,7 +541,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
       background: Container(
         margin: EdgeInsets.symmetric(vertical: 2.r),
         padding: EdgeInsets.symmetric(horizontal: 20.r),
-        alignment: Alignment.centerRight,
+        alignment: AlignmentDirectional.centerEnd,
         decoration: BoxDecoration(
           color: const Color(0xFFE53935).withValues(alpha: 0.15),
           borderRadius: BorderRadius.circular(16.r),
@@ -603,7 +603,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                               Container(
                                 width: 7.r,
                                 height: 7.r,
-                                margin: EdgeInsets.only(top: 5.r, left: 6.r),
+                                margin: EdgeInsetsDirectional.only(top: 5.r, start: 6.r),
                                 decoration: BoxDecoration(color: cs.primary, shape: BoxShape.circle),
                               ),
                           ],

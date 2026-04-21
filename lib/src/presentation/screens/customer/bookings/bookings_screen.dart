@@ -301,7 +301,7 @@ class _BookingsScreenState extends State<BookingsScreen> {
             final count = _mockBookings.where((b) => b.status == _statusMap[i]).length;
 
             return Padding(
-              padding: EdgeInsets.only(right: 10.r),
+              padding: EdgeInsetsDirectional.only(end: 10.r),
               child: GestureDetector(
                 onTap: () => setState(() => _tabIndex = i),
                 child: AnimatedContainer(
@@ -694,7 +694,7 @@ class _BookingCard extends StatelessWidget {
                         if (booking.status == BookingStatus.confirmed) ...[
                           SizedBox(width: 10.r),
                           GestureDetector(
-                            onTap: () {},
+                            onTap: () => context.pushNamed('booking-detail', pathParameters: {'id': 'mock'}),
                             child: Container(
                               padding: EdgeInsets.symmetric(vertical: 10.r, horizontal: 16.r),
                               decoration: BoxDecoration(

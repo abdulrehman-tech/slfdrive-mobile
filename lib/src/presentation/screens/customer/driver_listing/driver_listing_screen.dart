@@ -191,7 +191,7 @@ class _DriverListingScreenState extends State<DriverListingScreen> {
           surfaceTintColor: Colors.transparent,
           elevation: 0,
           leading: Padding(
-            padding: EdgeInsets.only(left: 12.r),
+            padding: EdgeInsetsDirectional.only(start: 12.r),
             child: GestureDetector(
               onTap: () => Navigator.of(context).pop(),
               child: Center(
@@ -232,7 +232,7 @@ class _DriverListingScreenState extends State<DriverListingScreen> {
           ),
           actions: [
             Padding(
-              padding: EdgeInsets.only(right: 16.r),
+              padding: EdgeInsetsDirectional.only(end: 16.r),
               child: GestureDetector(
                 onTap: () => _showSortSheet(isDark, cs),
                 child: Container(
@@ -253,42 +253,45 @@ class _DriverListingScreenState extends State<DriverListingScreen> {
         ),
         // Speciality filter chips
         SliverToBoxAdapter(
-          child: SizedBox(
-            height: 44.r,
-            child: ListView.builder(
-              scrollDirection: Axis.horizontal,
-              padding: EdgeInsets.symmetric(horizontal: 16.r),
-              itemCount: _specialities.length,
-              itemBuilder: (_, i) {
-                final active = _selectedSpeciality == _specialities[i];
-                return Padding(
-                  padding: EdgeInsets.only(right: 8.r),
-                  child: GestureDetector(
-                    onTap: () => setState(() => _selectedSpeciality = _specialities[i]),
-                    child: AnimatedContainer(
-                      duration: const Duration(milliseconds: 200),
-                      padding: EdgeInsets.symmetric(horizontal: 16.r, vertical: 8.r),
-                      decoration: BoxDecoration(
-                        color: active
-                            ? cs.primary.withValues(alpha: isDark ? 0.2 : 0.12)
-                            : (isDark ? Colors.white.withValues(alpha: 0.06) : Colors.black.withValues(alpha: 0.04)),
-                        borderRadius: BorderRadius.circular(12.r),
-                        border: active ? Border.all(color: cs.primary.withValues(alpha: 0.3)) : null,
-                      ),
-                      child: Center(
-                        child: Text(
-                          _specialities[i],
-                          style: TextStyle(
-                            fontSize: 12.r,
-                            fontWeight: active ? FontWeight.w700 : FontWeight.w500,
-                            color: active ? cs.primary : cs.onSurface.withValues(alpha: 0.6),
+          child: Container(
+            margin: EdgeInsets.only(top: 12.r),
+            child: SizedBox(
+              height: 44.r,
+              child: ListView.builder(
+                scrollDirection: Axis.horizontal,
+                padding: EdgeInsets.symmetric(horizontal: 16.r),
+                itemCount: _specialities.length,
+                itemBuilder: (_, i) {
+                  final active = _selectedSpeciality == _specialities[i];
+                  return Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 8.r),
+                    child: GestureDetector(
+                      onTap: () => setState(() => _selectedSpeciality = _specialities[i]),
+                      child: AnimatedContainer(
+                        duration: const Duration(milliseconds: 200),
+                        padding: EdgeInsets.symmetric(horizontal: 16.r, vertical: 8.r),
+                        decoration: BoxDecoration(
+                          color: active
+                              ? cs.primary.withValues(alpha: isDark ? 0.2 : 0.12)
+                              : (isDark ? Colors.white.withValues(alpha: 0.06) : Colors.black.withValues(alpha: 0.04)),
+                          borderRadius: BorderRadius.circular(12.r),
+                          border: active ? Border.all(color: cs.primary.withValues(alpha: 0.3)) : null,
+                        ),
+                        child: Center(
+                          child: Text(
+                            _specialities[i],
+                            style: TextStyle(
+                              fontSize: 12.r,
+                              fontWeight: active ? FontWeight.w700 : FontWeight.w500,
+                              color: active ? cs.primary : cs.onSurface.withValues(alpha: 0.6),
+                            ),
                           ),
                         ),
                       ),
                     ),
-                  ),
-                );
-              },
+                  );
+                },
+              ),
             ),
           ),
         ),
@@ -389,7 +392,7 @@ class _DriverListingScreenState extends State<DriverListingScreen> {
                           Icon(Iconsax.sort, size: 16.r, color: cs.onSurface.withValues(alpha: 0.6)),
                           SizedBox(width: 6.r),
                           Text(
-                            'Sort',
+                            'common_sort'.tr(),
                             style: TextStyle(
                               fontSize: 12.r,
                               fontWeight: FontWeight.w600,
@@ -632,7 +635,7 @@ class _DriverListCard extends StatelessWidget {
                                 borderRadius: BorderRadius.circular(5.r),
                               ),
                               child: Text(
-                                'Busy',
+                                'driver_status_busy'.tr(),
                                 style: TextStyle(
                                   fontSize: 9.r,
                                   fontWeight: FontWeight.w700,

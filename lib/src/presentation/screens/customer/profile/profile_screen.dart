@@ -264,10 +264,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       ],
                     ),
                   ),
-                  IconButton(
-                    icon: Icon(Iconsax.setting_2_copy, size: 18.r, color: cs.onSurface.withValues(alpha: 0.7)),
-                    onPressed: () {},
-                  ),
                 ],
               ),
             ),
@@ -385,7 +381,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
           ),
           GestureDetector(
-            onTap: () {},
+            onTap: () => context.push('/profile/edit'),
             child: Container(
               width: 36.r,
               height: 36.r,
@@ -417,7 +413,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           title: 'profile_phone'.tr(),
           value: '+968 9000 0000',
           isDark: isDark,
-          onTap: () {},
+          onTap: () => context.push('/profile/edit'),
         ),
         _Tile(
           icon: Iconsax.sms_copy,
@@ -425,7 +421,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           title: 'profile_email_address'.tr(),
           value: 'guest@slfdrive.com',
           isDark: isDark,
-          onTap: () {},
+          onTap: () => context.push('/profile/edit'),
         ),
         _Tile(
           icon: Iconsax.shield_tick_copy,
@@ -434,7 +430,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           value: 'profile_verified'.tr(),
           valueColor: const Color(0xFF4CAF50),
           isDark: isDark,
-          onTap: () {},
+          onTap: () => context.push('/profile/kyc'),
         ),
       ],
     );
@@ -467,7 +463,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
           title: 'profile_currency'.tr(),
           value: 'OMR',
           isDark: isDark,
-          onTap: () {},
+          onTap: () => ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('profile_currency_locked'.tr()),
+              behavior: SnackBarBehavior.floating,
+            ),
+          ),
         ),
         _ToggleTile(
           icon: Iconsax.notification_copy,
@@ -492,7 +493,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           title: 'profile_section_addresses'.tr(),
           value: '2',
           isDark: isDark,
-          onTap: () {},
+          onTap: () => context.push('/profile/addresses'),
         ),
         _Tile(
           icon: Iconsax.card_copy,
@@ -500,7 +501,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           title: 'profile_section_payments'.tr(),
           value: '2',
           isDark: isDark,
-          onTap: () {},
+          onTap: () => context.push('/profile/payments'),
         ),
         _Tile(
           icon: Iconsax.personalcard_copy,
@@ -509,7 +510,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           value: 'profile_pending'.tr(),
           valueColor: const Color(0xFFFF6D00),
           isDark: isDark,
-          onTap: () {},
+          onTap: () => context.push('/profile/kyc'),
         ),
       ],
     );
@@ -525,35 +526,35 @@ class _ProfileScreenState extends State<ProfileScreen> {
           iconColor: const Color(0xFF3D5AFE),
           title: 'profile_help_center'.tr(),
           isDark: isDark,
-          onTap: () {},
+          onTap: () => context.push('/help'),
         ),
         _Tile(
           icon: Iconsax.star_1_copy,
           iconColor: const Color(0xFFFFC107),
           title: 'profile_rate_app'.tr(),
           isDark: isDark,
-          onTap: () {},
+          onTap: () => context.push('/about'),
         ),
         _Tile(
           icon: Iconsax.document_text_copy,
           iconColor: const Color(0xFF7C4DFF),
           title: 'profile_terms'.tr(),
           isDark: isDark,
-          onTap: () {},
+          onTap: () => context.push('/legal/terms'),
         ),
         _Tile(
           icon: Iconsax.security_safe_copy,
           iconColor: const Color(0xFF00BCD4),
           title: 'profile_privacy_policy'.tr(),
           isDark: isDark,
-          onTap: () {},
+          onTap: () => context.push('/legal/privacy'),
         ),
         _Tile(
           icon: Iconsax.info_circle_copy,
           iconColor: const Color(0xFF4CAF50),
           title: 'profile_about'.tr(),
           isDark: isDark,
-          onTap: () {},
+          onTap: () => context.push('/about'),
         ),
       ],
     );
@@ -919,7 +920,7 @@ class _Tile extends StatelessWidget {
               ),
               if (value != null)
                 Padding(
-                  padding: EdgeInsets.only(right: 6.r),
+                  padding: EdgeInsetsDirectional.only(end: 6.r),
                   child: Text(
                     value!,
                     style: TextStyle(
@@ -992,7 +993,7 @@ class _ToggleTile extends StatelessWidget {
               child: AnimatedAlign(
                 duration: const Duration(milliseconds: 220),
                 curve: Curves.easeOutCubic,
-                alignment: value ? Alignment.centerRight : Alignment.centerLeft,
+                alignment: value ? AlignmentDirectional.centerEnd : AlignmentDirectional.centerStart,
                 child: Container(
                   width: 18.r,
                   height: 18.r,

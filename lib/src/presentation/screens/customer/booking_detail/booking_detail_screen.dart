@@ -4,6 +4,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 import 'package:provider/provider.dart';
 
@@ -140,7 +141,7 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
               surfaceTintColor: Colors.transparent,
               elevation: 0,
               leading: Padding(
-                padding: EdgeInsets.only(left: 12.r),
+                padding: EdgeInsetsDirectional.only(start: 12.r),
                 child: GestureDetector(
                   onTap: () => Navigator.of(context).pop(),
                   child: Center(
@@ -442,7 +443,7 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
                       if (i < stages.length - 1)
                         Expanded(
                           child: Padding(
-                            padding: EdgeInsets.only(bottom: 22.r, left: 4.r, right: 4.r),
+                            padding: EdgeInsetsDirectional.only(bottom: 22.r, start: 4.r, end: 4.r),
                             child: Container(
                               height: 2,
                               color: completed
@@ -596,7 +597,7 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
               child: Container(
                 width: 40.r,
                 height: 40.r,
-                margin: EdgeInsets.only(right: 8.r),
+                margin: EdgeInsetsDirectional.only(end: 8.r),
                 decoration: BoxDecoration(
                   color: const Color(0xFF25D366).withValues(alpha: isDark ? 0.2 : 0.12),
                   borderRadius: BorderRadius.circular(11.r),
@@ -828,7 +829,7 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
       children: [
         Expanded(
           child: GestureDetector(
-            onTap: () {},
+            onTap: () => context.push('/profile/edit'),
             child: Container(
               padding: EdgeInsets.symmetric(vertical: 14.r),
               decoration: BoxDecoration(

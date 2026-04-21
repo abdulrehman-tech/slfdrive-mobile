@@ -93,7 +93,9 @@ class _BookingFlowScreenState extends State<BookingFlowScreen> {
     ids.add(_StepId.dates);
     if (service != BookingServiceType.driverOnly) ids.add(_StepId.pickup);
     if (service != BookingServiceType.driverOnly) ids.add(_StepId.extras);
-    if (service == BookingServiceType.carWithDriver) ids.add(_StepId.driver);
+    if (service == BookingServiceType.carWithDriver || service == BookingServiceType.driverOnly) {
+      ids.add(_StepId.driver);
+    }
     ids.add(_StepId.summary);
     ids.add(_StepId.payment);
     return ids;

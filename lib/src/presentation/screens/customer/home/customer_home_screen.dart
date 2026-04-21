@@ -11,9 +11,6 @@ import 'package:provider/provider.dart';
 import '../../../../constants/breakpoints.dart';
 import '../../../../constants/color_constants.dart';
 import '../../../providers/theme_provider.dart';
-import '../favorites/favorites_screen.dart';
-import '../bookings/bookings_screen.dart';
-import '../profile/profile_screen.dart';
 import '../../../widgets/skeletons/home_skeleton.dart';
 
 // ============================================================
@@ -280,7 +277,12 @@ void _showLogoutDialog(BuildContext context, bool isDark) {
 // ============================================================
 
 class CustomerHomeScreen extends StatefulWidget {
-  const CustomerHomeScreen({super.key});
+  /// When provided, renders this widget in place of the home body — used by
+  /// the router so /favorites, /bookings, /profile all reuse the same shell
+  /// chrome (drawer + bottom-nav + desktop side-nav) while swapping the body.
+  final Widget? tabBody;
+
+  const CustomerHomeScreen({super.key, this.tabBody});
 
   @override
   State<CustomerHomeScreen> createState() => _CustomerHomeScreenState();
@@ -289,7 +291,6 @@ class CustomerHomeScreen extends StatefulWidget {
 class _CustomerHomeScreenState extends State<CustomerHomeScreen> with SingleTickerProviderStateMixin {
   final _scaffoldKey = GlobalKey<ScaffoldState>();
   int _selectedBrandIndex = -1;
-  int _currentNavIndex = 0;
   bool _isLoading = true;
   late final List<_CarItem> _cars;
   late AnimationController _bannerAnim;
@@ -303,6 +304,33 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> with SingleTick
   ];
 
   static const _navKeys = ['home', 'favorites', 'bookings', 'profile'];
+  static const _navPaths = ['/home', '/favorites', '/bookings', '/profile'];
+
+  int get _currentNavIndex {
+    final loc = GoRouterState.of(context).matchedLocation;
+    final i = _navPaths.indexOf(loc);
+    return i >= 0 ? i : 0;
+  }
+
+  int get _drawerNavIndex {
+    final loc = GoRouterState.of(context).matchedLocation;
+    switch (loc) {
+      case '/home':
+        return 0;
+      case '/favorites':
+        return 1;
+      case '/bookings':
+        return 2;
+      case '/my-vehicles':
+        return 3;
+      case '/profile':
+        return 4;
+      default:
+        return -1;
+    }
+  }
+
+  void _goToTab(int i) => context.go(_navPaths[i]);
 
   @override
   void initState() {
@@ -332,26 +360,14 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> with SingleTick
   }
 
   Widget _buildScreenBody(bool isDesktop) {
+    // When the router hands us a tab body (e.g. FavoritesScreen for /favorites),
+    // render that instead of the home content. The home-only skeleton and
+    // banner animation stay tied to the home body only.
+    if (widget.tabBody != null) return widget.tabBody!;
     if (_isLoading) {
       return HomeSkeleton(isDesktop: isDesktop);
     }
-    switch (_currentNavIndex) {
-      case 0:
-        return isDesktop ? _buildDesktopLayout() : _buildMobileLayout();
-      case 1:
-        return const FavoritesScreen();
-      case 2:
-        return const BookingsScreen();
-      case 3:
-        // From bottom nav = Profile; from drawer = My Vehicles (placeholder)
-        return const ProfileScreen();
-      case 4: // Profile from drawer
-        return const ProfileScreen();
-      case 5: // Settings from drawer → now merged into Profile
-        return const ProfileScreen();
-      default:
-        return isDesktop ? _buildDesktopLayout() : _buildMobileLayout();
-    }
+    return isDesktop ? _buildDesktopLayout() : _buildMobileLayout();
   }
 
   @override
@@ -362,10 +378,28 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> with SingleTick
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       drawer: _AppDrawer(
         isDark: _isDark,
-        currentNavIndex: _currentNavIndex,
+        currentNavIndex: _drawerNavIndex,
         onNavTap: (i) {
-          setState(() => _currentNavIndex = i);
           _scaffoldKey.currentState?.closeDrawer();
+          // Drawer has 5 items: home, favorites, bookings, my_vehicles, profile.
+          // All but my_vehicles are shell tabs; my_vehicles pushes a placeholder.
+          switch (i) {
+            case 0:
+              context.go('/home');
+              break;
+            case 1:
+              context.go('/favorites');
+              break;
+            case 2:
+              context.go('/bookings');
+              break;
+            case 3:
+              context.push('/my-vehicles');
+              break;
+            case 4:
+              context.go('/profile');
+              break;
+          }
         },
       ),
       drawerEnableOpenDragGesture: true,
@@ -486,7 +520,7 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> with SingleTick
             // Location
             Expanded(
               child: GestureDetector(
-                onTap: () {},
+                onTap: () => context.push('/profile/addresses'),
                 child: Row(
                   children: [
                     Container(
@@ -797,7 +831,7 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> with SingleTick
 
           return Expanded(
             child: Padding(
-              padding: EdgeInsets.only(right: i < services.length - 1 ? 10.r : 0),
+              padding: EdgeInsetsDirectional.only(end: i < services.length - 1 ? 10.r : 0),
               child: GestureDetector(
                 onTap: () {
                   if (i == 0) {
@@ -876,7 +910,7 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> with SingleTick
                 },
                 child: AnimatedContainer(
                   duration: const Duration(milliseconds: 220),
-                  margin: EdgeInsets.only(right: 14.r),
+                  margin: EdgeInsetsDirectional.only(end: 14.r),
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
@@ -988,7 +1022,7 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> with SingleTick
               padding: EdgeInsets.symmetric(horizontal: 16.r),
               itemCount: _cars.length,
               itemBuilder: (_, i) => Padding(
-                padding: EdgeInsets.only(right: 16.r),
+                padding: EdgeInsetsDirectional.only(end: 16.r),
                 child: SizedBox(
                   width: 220.r,
                   child: _CarCard(
@@ -1044,7 +1078,7 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> with SingleTick
               padding: EdgeInsets.symmetric(horizontal: 16.r),
               itemCount: _nearbyDrivers.length,
               itemBuilder: (_, i) => Padding(
-                padding: EdgeInsets.only(right: 12.r),
+                padding: EdgeInsetsDirectional.only(end: 12.r),
                 child: _DriverCard(
                   driver: _nearbyDrivers[i],
                   isDark: _isDark,
@@ -1096,7 +1130,7 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> with SingleTick
           ...List.generate(_navItems.length, (i) {
             final active = _currentNavIndex == i;
             return GestureDetector(
-              onTap: () => setState(() => _currentNavIndex = i),
+              onTap: () => _goToTab(i),
               child: AnimatedContainer(
                 duration: const Duration(milliseconds: 200),
                 width: double.infinity,
@@ -1179,7 +1213,7 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> with SingleTick
               return Expanded(
                 child: GestureDetector(
                   behavior: HitTestBehavior.opaque,
-                  onTap: () => setState(() => _currentNavIndex = i),
+                  onTap: () => _goToTab(i),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -1776,7 +1810,6 @@ class _AppDrawer extends StatelessWidget {
     (Iconsax.calendar_2_copy, Iconsax.calendar_2, 'bookings'),
     (Iconsax.car_copy, Iconsax.car, 'my_vehicles'),
     (Iconsax.user_copy, Iconsax.user, 'profile'),
-    (Iconsax.setting_copy, Iconsax.setting, 'settings'),
   ];
 
   static const _navColors = [
@@ -1785,7 +1818,6 @@ class _AppDrawer extends StatelessWidget {
     Color(0xFF00BCD4),
     Color(0xFF4CAF50),
     Color(0xFF7C4DFF),
-    Color(0xFFFF6D00),
   ];
 
   @override

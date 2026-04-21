@@ -94,7 +94,7 @@ class _CarDetailScreenState extends State<CarDetailScreen> {
                 GestureDetector(
                   onTap: () => setState(() => _isFavourite = !_isFavourite),
                   child: Padding(
-                    padding: EdgeInsets.only(right: 12.r),
+                    padding: EdgeInsetsDirectional.only(end: 12.r),
                     child: Container(
                       width: 40.r,
                       height: 40.r,
@@ -435,7 +435,7 @@ class _CarDetailScreenState extends State<CarDetailScreen> {
                     borderRadius: BorderRadius.circular(8.r),
                   ),
                   child: Text(
-                    'Available',
+                    'car_status_available'.tr(),
                     style: TextStyle(fontSize: 10.r, fontWeight: FontWeight.w700, color: const Color(0xFF4CAF50)),
                   ),
                 ),
@@ -657,14 +657,14 @@ class _CarDetailScreenState extends State<CarDetailScreen> {
 
   Widget _buildFeaturesSection(bool isDark, ColorScheme cs) {
     final features = [
-      'GPS Navigation',
-      'Bluetooth',
-      'Leather Seats',
-      'Sunroof',
-      'Heated Seats',
-      'Cruise Control',
-      'Backup Camera',
-      'Keyless Entry',
+      'car_feature_gps'.tr(),
+      'car_feature_bluetooth'.tr(),
+      'car_feature_leather'.tr(),
+      'car_feature_sunroof'.tr(),
+      'car_feature_heated_seats'.tr(),
+      'car_feature_cruise'.tr(),
+      'car_feature_camera'.tr(),
+      'car_feature_keyless'.tr(),
     ];
 
     return _GlassCard(
@@ -764,7 +764,7 @@ class _CarDetailScreenState extends State<CarDetailScreen> {
             ),
             SizedBox(height: 10.r),
             Text(
-              'Experience the thrill of driving the iconic Mercedes AMG GT. This stunning sports car combines breathtaking performance with luxurious comfort. Perfect for special occasions, weekend adventures, or simply making a statement on the road.',
+              'car_detail_description_placeholder'.tr(),
               style: TextStyle(fontSize: 12.r, color: cs.onSurface.withValues(alpha: 0.6), height: 1.6),
             ),
           ],

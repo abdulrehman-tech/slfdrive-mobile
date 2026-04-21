@@ -187,7 +187,7 @@ class _CarListingScreenState extends State<CarListingScreen> {
           surfaceTintColor: Colors.transparent,
           elevation: 0,
           leading: Padding(
-            padding: EdgeInsets.only(left: 12.r),
+            padding: EdgeInsetsDirectional.only(start: 12.r),
             child: GestureDetector(
               onTap: () => Navigator.of(context).pop(),
               child: Center(
@@ -228,7 +228,7 @@ class _CarListingScreenState extends State<CarListingScreen> {
           ),
           actions: [
             Padding(
-              padding: EdgeInsets.only(right: 16.r),
+              padding: EdgeInsetsDirectional.only(end: 16.r),
               child: GestureDetector(
                 onTap: () => _showSortSheet(isDark, cs),
                 child: Container(
@@ -249,42 +249,45 @@ class _CarListingScreenState extends State<CarListingScreen> {
         ),
         // Brand filter chips
         SliverToBoxAdapter(
-          child: SizedBox(
-            height: 44.r,
-            child: ListView.builder(
-              scrollDirection: Axis.horizontal,
-              padding: EdgeInsets.symmetric(horizontal: 16.r),
-              itemCount: _brands.length,
-              itemBuilder: (_, i) {
-                final active = _selectedBrand == _brands[i];
-                return Padding(
-                  padding: EdgeInsets.only(right: 8.r),
-                  child: GestureDetector(
-                    onTap: () => setState(() => _selectedBrand = _brands[i]),
-                    child: AnimatedContainer(
-                      duration: const Duration(milliseconds: 200),
-                      padding: EdgeInsets.symmetric(horizontal: 16.r, vertical: 8.r),
-                      decoration: BoxDecoration(
-                        color: active
-                            ? cs.primary.withValues(alpha: isDark ? 0.2 : 0.12)
-                            : (isDark ? Colors.white.withValues(alpha: 0.06) : Colors.black.withValues(alpha: 0.04)),
-                        borderRadius: BorderRadius.circular(12.r),
-                        border: active ? Border.all(color: cs.primary.withValues(alpha: 0.3)) : null,
-                      ),
-                      child: Center(
-                        child: Text(
-                          _brands[i],
-                          style: TextStyle(
-                            fontSize: 12.r,
-                            fontWeight: active ? FontWeight.w700 : FontWeight.w500,
-                            color: active ? cs.primary : cs.onSurface.withValues(alpha: 0.6),
+          child: Container(
+            margin: EdgeInsets.only(top: 12.r),
+            child: SizedBox(
+              height: 44.r,
+              child: ListView.builder(
+                scrollDirection: Axis.horizontal,
+                padding: EdgeInsets.symmetric(horizontal: 16.r),
+                itemCount: _brands.length,
+                itemBuilder: (_, i) {
+                  final active = _selectedBrand == _brands[i];
+                  return Padding(
+                    padding: EdgeInsetsDirectional.only(end: 8.r),
+                    child: GestureDetector(
+                      onTap: () => setState(() => _selectedBrand = _brands[i]),
+                      child: AnimatedContainer(
+                        duration: const Duration(milliseconds: 200),
+                        padding: EdgeInsets.symmetric(horizontal: 16.r, vertical: 8.r),
+                        decoration: BoxDecoration(
+                          color: active
+                              ? cs.primary.withValues(alpha: isDark ? 0.2 : 0.12)
+                              : (isDark ? Colors.white.withValues(alpha: 0.06) : Colors.black.withValues(alpha: 0.04)),
+                          borderRadius: BorderRadius.circular(12.r),
+                          border: active ? Border.all(color: cs.primary.withValues(alpha: 0.3)) : null,
+                        ),
+                        child: Center(
+                          child: Text(
+                            _brands[i],
+                            style: TextStyle(
+                              fontSize: 12.r,
+                              fontWeight: active ? FontWeight.w700 : FontWeight.w500,
+                              color: active ? cs.primary : cs.onSurface.withValues(alpha: 0.6),
+                            ),
                           ),
                         ),
                       ),
                     ),
-                  ),
-                );
-              },
+                  );
+                },
+              ),
             ),
           ),
         ),

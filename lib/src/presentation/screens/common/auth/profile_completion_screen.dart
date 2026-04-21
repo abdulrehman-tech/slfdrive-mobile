@@ -5,9 +5,11 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:intl_phone_field/countries.dart';
+import 'package:provider/provider.dart';
 import '../../../../constants/icon_constants.dart';
 import '../../../../constants/color_constants.dart';
 import '../../../../constants/breakpoints.dart';
+import '../../../providers/role_provider.dart';
 import '../../../widgets/bottom_sheets/dropdown_bottom_sheet.dart';
 import '../../../widgets/bottom_sheets/multi_select_bottom_sheet.dart';
 import '../../../widgets/country_selector_field.dart';
@@ -107,8 +109,10 @@ class _ProfileCompletionScreenState extends State<ProfileCompletionScreen> {
     setState(() => _isButtonEnabled = driverOk);
   }
 
-  void _onComplete() {
+  Future<void> _onComplete() async {
     if (!_isButtonEnabled) return;
+    await context.read<RoleProvider>().setRole(widget.isDriver ? UserRole.driver : UserRole.customer);
+    if (!mounted) return;
     if (widget.isDriver) {
       context.go('/driver/home');
     } else {
@@ -426,7 +430,7 @@ class _ProfileCompletionScreenState extends State<ProfileCompletionScreen> {
                   _SubmitButton(
                     label: widget.isDriver ? 'submit_for_approval'.tr() : 'get_started'.tr(),
                     enabled: _isButtonEnabled,
-                    onTap: _onComplete,
+                    onTap: () => _onComplete(),
                   ),
 
                   SizedBox(height: 32.r),
@@ -685,7 +689,7 @@ class _ProfileCompletionScreenState extends State<ProfileCompletionScreen> {
             _SubmitButtonDesktop(
               label: widget.isDriver ? 'submit_for_approval'.tr() : 'get_started'.tr(),
               enabled: _isButtonEnabled,
-              onTap: _onComplete,
+              onTap: () => _onComplete(),
             ),
             SizedBox(height: 40.r),
           ],

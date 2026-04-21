@@ -7,9 +7,6 @@ import 'package:iconsax_flutter/iconsax_flutter.dart';
 import 'package:provider/provider.dart';
 import '../../../../constants/breakpoints.dart';
 import '../../../providers/theme_provider.dart';
-import '../earnings/driver_earnings_screen.dart';
-import '../profile/driver_profile_screen.dart';
-import '../trips/driver_trips_screen.dart';
 
 // ============================================================
 // MOCK DATA
@@ -145,18 +142,50 @@ void _showDriverLogoutDialog(BuildContext context, bool isDark) {
 // ============================================================
 
 class DriverHomeScreen extends StatefulWidget {
-  const DriverHomeScreen({super.key});
+  /// When provided, renders this widget in place of the home body — used by
+  /// the router so /driver/earnings, /driver/trips, /driver/profile reuse the
+  /// same shell chrome while swapping the body.
+  final Widget? tabBody;
+
+  const DriverHomeScreen({super.key, this.tabBody});
 
   @override
   State<DriverHomeScreen> createState() => _DriverHomeScreenState();
 }
 
 class _DriverHomeScreenState extends State<DriverHomeScreen> {
-  int _selectedIndex = 0;
   bool _isOnline = true;
   final double _todayEarnings = 145.50;
   final int _totalTrips = 12;
   final double _rating = 4.8;
+
+  static const _navPaths = ['/driver/home', '/driver/earnings', '/driver/trips', '/driver/profile'];
+
+  int get _selectedIndex {
+    final loc = GoRouterState.of(context).matchedLocation;
+    final i = _navPaths.indexOf(loc);
+    return i >= 0 ? i : 0;
+  }
+
+  int get _drawerSelectedIndex {
+    final loc = GoRouterState.of(context).matchedLocation;
+    switch (loc) {
+      case '/driver/home':
+        return 0;
+      case '/driver/earnings':
+        return 1;
+      case '/driver/trips':
+        return 2;
+      case '/driver/profile':
+        return 3;
+      case '/help':
+        return 4;
+      default:
+        return -1;
+    }
+  }
+
+  void _goToTab(int i) => context.go(_navPaths[i]);
 
   @override
   Widget build(BuildContext context) {
@@ -186,18 +215,8 @@ class _DriverHomeScreenState extends State<DriverHomeScreen> {
   }
 
   Widget _buildScreenBody(bool isDark, bool isDesktop) {
-    switch (_selectedIndex) {
-      case 0:
-        return _buildHomeContent(isDark, isDesktop);
-      case 1:
-        return const DriverEarningsScreen();
-      case 2:
-        return const DriverTripsScreen();
-      case 3:
-        return const DriverProfileScreen();
-      default:
-        return _buildHomeContent(isDark, isDesktop);
-    }
+    if (widget.tabBody != null) return widget.tabBody!;
+    return _buildHomeContent(isDark, isDesktop);
   }
 
   Widget _buildHomeContent(bool isDark, bool isDesktop) {
@@ -561,7 +580,7 @@ class _DriverHomeScreenState extends State<DriverHomeScreen> {
             children: [
               Expanded(
                 child: GestureDetector(
-                  onTap: () {},
+                  onTap: () => setState(() => _mockRequests.remove(trip)),
                   child: Container(
                     padding: EdgeInsets.symmetric(vertical: 12.r),
                     decoration: BoxDecoration(
@@ -579,7 +598,15 @@ class _DriverHomeScreenState extends State<DriverHomeScreen> {
               SizedBox(width: 12.r),
               Expanded(
                 child: GestureDetector(
-                  onTap: () {},
+                  onTap: () {
+                    setState(() => _mockRequests.remove(trip));
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text('driver_accept_snack'.tr()),
+                        behavior: SnackBarBehavior.floating,
+                      ),
+                    );
+                  },
                   child: Container(
                     padding: EdgeInsets.symmetric(vertical: 12.r),
                     decoration: BoxDecoration(
@@ -628,7 +655,7 @@ class _DriverHomeScreenState extends State<DriverHomeScreen> {
   Widget _buildNavItem(IconData icon, String label, int index, bool isDark) {
     final isActive = _selectedIndex == index;
     return GestureDetector(
-      onTap: () => setState(() => _selectedIndex = index),
+      onTap: () => _goToTab(index),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -774,18 +801,22 @@ class _DriverHomeScreenState extends State<DriverHomeScreen> {
         _buildDrawerItem(Iconsax.car, 'driver_trips'.tr(), 2, isDark),
         _buildDrawerItem(Iconsax.user, 'driver_profile'.tr(), 3, isDark),
         Divider(height: 32.r, color: borderCol),
-        _buildDrawerItem(Iconsax.setting_2, 'driver_settings'.tr(), 4, isDark),
-        _buildDrawerItem(Iconsax.message_question, 'driver_help'.tr(), 5, isDark),
+        _buildDrawerItem(Iconsax.message_question, 'driver_help'.tr(), 4, isDark),
       ],
     );
   }
 
   Widget _buildDrawerItem(IconData icon, String title, int index, bool isDark) {
-    final isSelected = _selectedIndex == index;
+    final isSelected = _drawerSelectedIndex == index;
     return GestureDetector(
       onTap: () {
-        setState(() => _selectedIndex = index);
         Navigator.of(context).pop();
+        // Drawer has 5 items: 0-3 match the shell tabs; 4 → /help.
+        if (index <= 3) {
+          _goToTab(index);
+        } else if (index == 4) {
+          context.push('/help');
+        }
       },
       child: Container(
         margin: EdgeInsets.only(bottom: 4.r),

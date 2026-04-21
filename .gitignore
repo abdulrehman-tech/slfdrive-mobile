@@ -43,3 +43,8 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# Secrets — see SECRETS.md for setup. Only `.example` files are committed.
+.env
+android/secrets.properties
+ios/Flutter/Secrets.xcconfig

@@ -335,7 +335,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                           _pages.length,
                           (index) => AnimatedContainer(
                             duration: const Duration(milliseconds: 300),
-                            margin: const EdgeInsets.only(right: 8),
+                            margin: const EdgeInsetsDirectional.only(end: 8),
                             width: index == _currentPage ? 40 : 10,
                             height: 10,
                             decoration: BoxDecoration(

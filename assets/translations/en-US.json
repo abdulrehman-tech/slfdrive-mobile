@@ -667,5 +667,45 @@
   "driver_privacy": "Privacy Policy",
   "driver_section_danger": "Account Actions",
   "driver_delete_account": "Delete Account",
-  "driver_delete_warning": "This action cannot be undone"
+  "driver_delete_warning": "This action cannot be undone",
+
+  "coming_soon_title": "Coming Soon",
+  "coming_soon_heading": "We're working on it",
+  "coming_soon_message": "This feature is on the way. Check back in a future update.",
+  "error_route_not_found": "Page not found",
+
+  "car_status_available": "Available",
+  "car_status_unavailable": "Unavailable",
+  "car_feature_gps": "GPS Navigation",
+  "car_feature_bluetooth": "Bluetooth",
+  "car_feature_leather": "Leather Seats",
+  "car_feature_sunroof": "Sunroof",
+  "car_feature_heated_seats": "Heated Seats",
+  "car_feature_cruise": "Cruise Control",
+  "car_feature_camera": "Backup Camera",
+  "car_feature_keyless": "Keyless Entry",
+  "car_detail_description_placeholder": "Experience the thrill of driving this iconic car. A stunning combination of performance and comfort — perfect for special occasions, weekend adventures, or making a statement on the road.",
+
+  "common_sort": "Sort",
+  "driver_status_busy": "Busy",
+
+  "payment_card_number_hint": "0000 0000 0000 0000",
+  "payment_card_expiry_hint": "MM/YY",
+  "payment_card_cvv_hint": "123",
+  "payment_card_name_hint": "Full name as on card",
+
+  "profile_edit_title": "Edit Profile",
+  "profile_addresses_title": "Saved Addresses",
+  "profile_payments_title": "Payment Methods",
+  "profile_kyc_title": "Identity Verification",
+  "drawer_my_vehicles_title": "My Vehicles",
+  "help_center_title": "Help Center",
+  "legal_terms_title": "Terms & Conditions",
+  "legal_privacy_title": "Privacy Policy",
+  "about_title": "About SLF Drive",
+
+  "settings_cache_cleared": "Cache cleared",
+  "driver_accept_snack": "Trip accepted — see you at pickup",
+  "trips_complete_snack": "Trip marked as complete",
+  "profile_currency_locked": "OMR is the only supported currency"
 }

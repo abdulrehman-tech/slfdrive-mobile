@@ -4,9 +4,19 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:provider/provider.dart';
 import '../../../../constants/icon_constants.dart';
 import '../../../../constants/image_constants.dart';
 import '../../../../constants/breakpoints.dart';
+import '../../../providers/role_provider.dart';
+
+/// "Skip & explore" grants a guest customer session so the role guard lets
+/// the user into `/home` without completing OTP. Signed-up customers overwrite
+/// this in the profile-completion step.
+Future<void> _continueAsGuest(BuildContext context) async {
+  await context.read<RoleProvider>().setRole(UserRole.customer);
+  if (context.mounted) context.go('/home');
+}
 
 class PreLoginScreen extends StatelessWidget {
   const PreLoginScreen({super.key});
@@ -124,7 +134,7 @@ class PreLoginScreen extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     TextButton(
-                      onPressed: () => context.go('/home'),
+                      onPressed: () => _continueAsGuest(context),
                       style: TextButton.styleFrom(
                         padding: EdgeInsets.symmetric(horizontal: 4.r, vertical: 8.r),
                       ),
@@ -269,7 +279,7 @@ class PreLoginScreen extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       TextButton(
-                        onPressed: () => context.go('/home'),
+                        onPressed: () => _continueAsGuest(context),
                         child: Text(
                           'skip'.tr(),
                           style: TextStyle(
