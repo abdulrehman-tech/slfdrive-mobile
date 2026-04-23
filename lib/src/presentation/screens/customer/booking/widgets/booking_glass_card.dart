@@ -91,7 +91,7 @@ class BookingSectionHeader extends StatelessWidget {
             style: TextStyle(fontSize: 14.r, fontWeight: FontWeight.w700, color: cs.onSurface),
           ),
         ),
-        if (trailing != null) trailing!,
+        ?trailing,
       ],
     );
   }

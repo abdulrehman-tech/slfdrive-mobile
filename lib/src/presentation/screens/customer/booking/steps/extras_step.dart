@@ -158,7 +158,7 @@ class _ExtraTile extends StatelessWidget {
                   OmrIcon(size: 12.r, color: _color),
                   SizedBox(width: 3.r),
                   Text(
-                    '${extra.pricePerDay.toStringAsFixed(0)}',
+                    extra.pricePerDay.toStringAsFixed(0),
                     style: TextStyle(fontSize: 14.r, fontWeight: FontWeight.w800, color: _color),
                   ),
                 ],

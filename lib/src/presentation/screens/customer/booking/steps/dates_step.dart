@@ -47,7 +47,7 @@ class _DatesStepState extends State<DatesStep> {
     final picked = await showTimePicker(
       context: context,
       initialTime: _pickupTime,
-      builder: (ctx, child) => Theme(data: Theme.of(ctx).copyWith(useMaterial3: true), child: child!),
+      builder: (ctx, child) => Theme(data: Theme.of(ctx), child: child!),
     );
     if (picked != null) {
       setState(() => _pickupTime = picked);

@@ -128,7 +128,7 @@ class HomeSkeleton extends StatelessWidget {
                       width: 50.r,
                       height: 50.r,
                       decoration: BoxDecoration(
-                        color: baseColor.withOpacity(0.5),
+                        color: baseColor.withValues(alpha: 0.5),
                         borderRadius: BorderRadius.circular(15.r),
                       ),
                     ),
@@ -137,7 +137,7 @@ class HomeSkeleton extends StatelessWidget {
                       width: 60.r,
                       height: 12.r,
                       decoration: BoxDecoration(
-                        color: baseColor.withOpacity(0.5),
+                        color: baseColor.withValues(alpha: 0.5),
                         borderRadius: BorderRadius.circular(4.r),
                       ),
                     ),
@@ -319,7 +319,7 @@ class _CarCardSkeleton extends StatelessWidget {
             Container(
               width: 80.r,
               height: 80.r,
-              decoration: BoxDecoration(color: baseColor.withOpacity(0.5), borderRadius: BorderRadius.circular(12.r)),
+              decoration: BoxDecoration(color: baseColor.withValues(alpha: 0.5), borderRadius: BorderRadius.circular(12.r)),
             ),
             SizedBox(width: 16.r),
             Expanded(
@@ -330,7 +330,7 @@ class _CarCardSkeleton extends StatelessWidget {
                     width: 120.r,
                     height: 16.r,
                     decoration: BoxDecoration(
-                      color: baseColor.withOpacity(0.5),
+                      color: baseColor.withValues(alpha: 0.5),
                       borderRadius: BorderRadius.circular(4.r),
                     ),
                   ),
@@ -339,7 +339,7 @@ class _CarCardSkeleton extends StatelessWidget {
                     width: 80.r,
                     height: 12.r,
                     decoration: BoxDecoration(
-                      color: baseColor.withOpacity(0.5),
+                      color: baseColor.withValues(alpha: 0.5),
                       borderRadius: BorderRadius.circular(4.r),
                     ),
                   ),
@@ -348,7 +348,7 @@ class _CarCardSkeleton extends StatelessWidget {
                     width: 60.r,
                     height: 16.r,
                     decoration: BoxDecoration(
-                      color: baseColor.withOpacity(0.5),
+                      color: baseColor.withValues(alpha: 0.5),
                       borderRadius: BorderRadius.circular(4.r),
                     ),
                   ),
@@ -368,20 +368,20 @@ class _CarCardSkeleton extends StatelessWidget {
         children: [
           Expanded(
             child: Container(
-              decoration: BoxDecoration(color: baseColor.withOpacity(0.5), borderRadius: BorderRadius.circular(12.r)),
+              decoration: BoxDecoration(color: baseColor.withValues(alpha: 0.5), borderRadius: BorderRadius.circular(12.r)),
             ),
           ),
           SizedBox(height: 12.r),
           Container(
             width: 120.r,
             height: 16.r,
-            decoration: BoxDecoration(color: baseColor.withOpacity(0.5), borderRadius: BorderRadius.circular(4.r)),
+            decoration: BoxDecoration(color: baseColor.withValues(alpha: 0.5), borderRadius: BorderRadius.circular(4.r)),
           ),
           SizedBox(height: 8.r),
           Container(
             width: 80.r,
             height: 12.r,
-            decoration: BoxDecoration(color: baseColor.withOpacity(0.5), borderRadius: BorderRadius.circular(4.r)),
+            decoration: BoxDecoration(color: baseColor.withValues(alpha: 0.5), borderRadius: BorderRadius.circular(4.r)),
           ),
           SizedBox(height: 12.r),
           Row(
@@ -389,13 +389,13 @@ class _CarCardSkeleton extends StatelessWidget {
               Container(
                 width: 60.r,
                 height: 16.r,
-                decoration: BoxDecoration(color: baseColor.withOpacity(0.5), borderRadius: BorderRadius.circular(4.r)),
+                decoration: BoxDecoration(color: baseColor.withValues(alpha: 0.5), borderRadius: BorderRadius.circular(4.r)),
               ),
               const Spacer(),
               Container(
                 width: 32.r,
                 height: 32.r,
-                decoration: BoxDecoration(color: baseColor.withOpacity(0.5), shape: BoxShape.circle),
+                decoration: BoxDecoration(color: baseColor.withValues(alpha: 0.5), shape: BoxShape.circle),
               ),
             ],
           ),
@@ -422,7 +422,7 @@ class _DriverCardSkeleton extends StatelessWidget {
             Container(
               width: 48.r,
               height: 48.r,
-              decoration: BoxDecoration(color: baseColor.withOpacity(0.5), shape: BoxShape.circle),
+              decoration: BoxDecoration(color: baseColor.withValues(alpha: 0.5), shape: BoxShape.circle),
             ),
             SizedBox(width: 12.r),
             Expanded(
@@ -434,7 +434,7 @@ class _DriverCardSkeleton extends StatelessWidget {
                     width: 100.r,
                     height: 14.r,
                     decoration: BoxDecoration(
-                      color: baseColor.withOpacity(0.5),
+                      color: baseColor.withValues(alpha: 0.5),
                       borderRadius: BorderRadius.circular(4.r),
                     ),
                   ),
@@ -443,7 +443,7 @@ class _DriverCardSkeleton extends StatelessWidget {
                     width: 60.r,
                     height: 10.r,
                     decoration: BoxDecoration(
-                      color: baseColor.withOpacity(0.5),
+                      color: baseColor.withValues(alpha: 0.5),
                       borderRadius: BorderRadius.circular(4.r),
                     ),
                   ),
@@ -465,19 +465,19 @@ class _DriverCardSkeleton extends StatelessWidget {
           Container(
             width: 56.r,
             height: 56.r,
-            decoration: BoxDecoration(color: baseColor.withOpacity(0.5), shape: BoxShape.circle),
+            decoration: BoxDecoration(color: baseColor.withValues(alpha: 0.5), shape: BoxShape.circle),
           ),
           SizedBox(height: 12.r),
           Container(
             width: 80.r,
             height: 14.r,
-            decoration: BoxDecoration(color: baseColor.withOpacity(0.5), borderRadius: BorderRadius.circular(4.r)),
+            decoration: BoxDecoration(color: baseColor.withValues(alpha: 0.5), borderRadius: BorderRadius.circular(4.r)),
           ),
           SizedBox(height: 8.r),
           Container(
             width: 50.r,
             height: 10.r,
-            decoration: BoxDecoration(color: baseColor.withOpacity(0.5), borderRadius: BorderRadius.circular(4.r)),
+            decoration: BoxDecoration(color: baseColor.withValues(alpha: 0.5), borderRadius: BorderRadius.circular(4.r)),
           ),
         ],
       ),

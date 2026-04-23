@@ -184,7 +184,7 @@ class _DriverCard extends StatelessWidget {
                   OmrIcon(size: 12.r, color: cs.primary),
                   SizedBox(width: 3.r),
                   Text(
-                    '${driver.pricePerDay.toStringAsFixed(0)}',
+                    driver.pricePerDay.toStringAsFixed(0),
                     style: TextStyle(fontSize: 15.r, fontWeight: FontWeight.w800, color: cs.primary),
                   ),
                 ],

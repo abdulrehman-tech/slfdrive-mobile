@@ -62,11 +62,11 @@ class AppTheme {
 
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: lightGrayColor.withOpacity(0.1),
+        fillColor: lightGrayColor.withValues(alpha: 0.1),
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(12.r), borderSide: BorderSide.none),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12.r),
-          borderSide: BorderSide(color: lightGrayColor.withOpacity(0.3)),
+          borderSide: BorderSide(color: lightGrayColor.withValues(alpha: 0.3)),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12.r),
@@ -81,14 +81,14 @@ class AppTheme {
           borderSide: BorderSide(color: errorColor, width: 2.w),
         ),
         contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
-        hintStyle: TextStyle(color: grayColor.withOpacity(0.6), fontSize: 16.sp),
+        hintStyle: TextStyle(color: grayColor.withValues(alpha: 0.6), fontSize: 16.sp),
       ),
 
       cardTheme: CardThemeData(
         elevation: 2,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.r)),
         color: whiteColor,
-        shadowColor: blackColor.withOpacity(0.1),
+        shadowColor: blackColor.withValues(alpha: 0.1),
       ),
 
       bottomNavigationBarTheme: BottomNavigationBarThemeData(
@@ -108,7 +108,7 @@ class AppTheme {
       ),
 
       chipTheme: ChipThemeData(
-        backgroundColor: lightGrayColor.withOpacity(0.3),
+        backgroundColor: lightGrayColor.withValues(alpha: 0.3),
         selectedColor: primaryColor,
         labelStyle: TextStyle(color: blackColor, fontSize: 14.sp),
         secondaryLabelStyle: TextStyle(color: whiteColor, fontSize: 14.sp),
@@ -116,7 +116,7 @@ class AppTheme {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.r)),
       ),
 
-      dividerTheme: DividerThemeData(color: lightGrayColor.withOpacity(0.5), thickness: 1, space: 1),
+      dividerTheme: DividerThemeData(color: lightGrayColor.withValues(alpha: 0.5), thickness: 1, space: 1),
 
       iconTheme: IconThemeData(color: blackColor, size: 24.sp),
 
@@ -213,7 +213,7 @@ class AppTheme {
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(12.r), borderSide: BorderSide.none),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12.r),
-          borderSide: BorderSide(color: darkGrayColor.withOpacity(0.3)),
+          borderSide: BorderSide(color: darkGrayColor.withValues(alpha: 0.3)),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12.r),
@@ -228,14 +228,14 @@ class AppTheme {
           borderSide: BorderSide(color: errorColor, width: 2.w),
         ),
         contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
-        hintStyle: TextStyle(color: grayColor.withOpacity(0.6), fontSize: 16.sp),
+        hintStyle: TextStyle(color: grayColor.withValues(alpha: 0.6), fontSize: 16.sp),
       ),
 
       cardTheme: CardThemeData(
         elevation: 2,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.r)),
         color: const Color(0xFF1E1E1E),
-        shadowColor: blackColor.withOpacity(0.3),
+        shadowColor: blackColor.withValues(alpha: 0.3),
       ),
 
       bottomNavigationBarTheme: BottomNavigationBarThemeData(
@@ -263,7 +263,7 @@ class AppTheme {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.r)),
       ),
 
-      dividerTheme: DividerThemeData(color: darkGrayColor.withOpacity(0.3), thickness: 1, space: 1),
+      dividerTheme: DividerThemeData(color: darkGrayColor.withValues(alpha: 0.3), thickness: 1, space: 1),
 
       iconTheme: IconThemeData(color: whiteColor, size: 24.sp),
 
