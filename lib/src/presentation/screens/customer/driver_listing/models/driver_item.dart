@@ -1,0 +1,25 @@
+class DriverItem {
+  final String id;
+  final String name;
+  final String avatarUrl;
+  final double rating;
+  final int trips;
+  final String speciality;
+  final double pricePerDay;
+  final List<String> languages;
+  final int yearsExperience;
+  final bool isAvailable;
+
+  const DriverItem({
+    required this.id,
+    required this.name,
+    required this.avatarUrl,
+    required this.rating,
+    required this.trips,
+    required this.speciality,
+    required this.pricePerDay,
+    required this.languages,
+    required this.yearsExperience,
+    this.isAvailable = true,
+  });
+}
