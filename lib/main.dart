@@ -11,6 +11,7 @@ import 'src/core/secrets/maps_loader.dart';
 import 'src/presentation/providers/language_provider.dart';
 import 'src/presentation/providers/role_provider.dart';
 import 'src/presentation/providers/theme_provider.dart';
+import 'src/presentation/screens/customer/profile/corporate/provider/corporate_provider.dart';
 import 'src/presentation/theme/app_theme.dart';
 import 'src/presentation/routes/app_router.dart';
 
@@ -51,6 +52,7 @@ void main() async {
           ChangeNotifierProvider(create: (_) => ThemeProvider()),
           ChangeNotifierProvider(create: (_) => LanguageProvider()),
           ChangeNotifierProvider.value(value: roleProvider),
+          ChangeNotifierProvider(create: (_) => CorporateProvider()),
         ],
         child: const MyApp(),
       ),

@@ -14,11 +14,13 @@ class PaymentMethodGrid extends StatelessWidget {
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
 
-    const methods = <(PaymentMethod, IconData, String, Color)>[
-      (PaymentMethod.card, Iconsax.card_copy, 'booking_payment_card', Color(0xFF3D5AFE)),
-      (PaymentMethod.applePay, Iconsax.mobile_copy, 'booking_payment_apple', Color(0xFF7C4DFF)),
-      (PaymentMethod.wallet, Iconsax.wallet_3_copy, 'booking_payment_wallet', Color(0xFF00BCD4)),
-      (PaymentMethod.cashOnDelivery, Iconsax.money_copy, 'booking_payment_cash', Color(0xFF4CAF50)),
+    final methods = <(PaymentMethod, IconData, String, Color)>[
+      if (data.isCorporate && data.organization != null)
+        (PaymentMethod.billToCompany, Iconsax.briefcase_copy, 'booking_payment_bill_to_company', const Color(0xFF7C4DFF)),
+      (PaymentMethod.card, Iconsax.card_copy, 'booking_payment_card', const Color(0xFF3D5AFE)),
+      (PaymentMethod.applePay, Iconsax.mobile_copy, 'booking_payment_apple', const Color(0xFF7C4DFF)),
+      (PaymentMethod.wallet, Iconsax.wallet_3_copy, 'booking_payment_wallet', const Color(0xFF00BCD4)),
+      (PaymentMethod.cashOnDelivery, Iconsax.money_copy, 'booking_payment_cash', const Color(0xFF4CAF50)),
     ];
 
     return GridView.count(

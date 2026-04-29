@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../models/booking_data.dart';
 import '../models/booking_step_id.dart';
+import '../steps/corporate_step.dart';
 import '../steps/dates_step.dart';
 import '../steps/driver_select_step.dart';
 import '../steps/extras_step.dart';
@@ -28,6 +29,8 @@ class BookingFlowStepContent extends StatelessWidget {
     switch (step) {
       case BookingStepId.service:
         return ServiceTypeStep(data: data, isDark: isDark);
+      case BookingStepId.corporate:
+        return CorporateStep(data: data, isDark: isDark);
       case BookingStepId.dates:
         return DatesStep(data: data, isDark: isDark);
       case BookingStepId.pickup:

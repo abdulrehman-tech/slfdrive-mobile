@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../models/booking_data.dart';
+import 'summary_widgets/summary_corporate_card.dart';
 import 'summary_widgets/summary_extras_card.dart';
 import 'summary_widgets/summary_header.dart';
 import 'summary_widgets/summary_logistics_card.dart';
@@ -30,6 +31,11 @@ class _SummaryStepState extends State<SummaryStep> {
       children: [
         const SummaryHeader(),
         SizedBox(height: 18.r),
+
+        if (d.isCorporate && d.organization != null) ...[
+          SummaryCorporateCard(data: d, isDark: isDark),
+          SizedBox(height: 12.r),
+        ],
 
         // Service subject summary card (car, driver, both)
         SummarySubjectCard(data: d, isDark: isDark),

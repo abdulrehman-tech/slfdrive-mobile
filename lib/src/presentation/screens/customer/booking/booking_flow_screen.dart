@@ -94,6 +94,7 @@ class _BookingFlowView extends StatelessWidget {
           totalSteps: steps.length,
           isDark: isDark,
           onBack: () => _handleBack(context),
+          data: provider.data,
         ),
         Expanded(
           child: AnimatedSwitcher(

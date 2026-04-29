@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../models/booking_data.dart';
 import 'payment_widgets/payment_apple_hint.dart';
+import 'payment_widgets/payment_bill_to_company_card.dart';
 import 'payment_widgets/payment_card_form.dart';
 import 'payment_widgets/payment_cash_hint.dart';
 import 'payment_widgets/payment_header.dart';
@@ -61,6 +62,8 @@ class _PaymentStepState extends State<PaymentStep> {
         if (d.paymentMethod == PaymentMethod.applePay) PaymentAppleHint(isDark: isDark),
         if (d.paymentMethod == PaymentMethod.wallet) PaymentWalletHint(isDark: isDark),
         if (d.paymentMethod == PaymentMethod.cashOnDelivery) PaymentCashHint(isDark: isDark),
+        if (d.paymentMethod == PaymentMethod.billToCompany && d.organization != null)
+          PaymentBillToCompanyCard(organization: d.organization!, isDark: isDark),
 
         SizedBox(height: 14.r),
         PaymentSecurityNote(isDark: isDark),

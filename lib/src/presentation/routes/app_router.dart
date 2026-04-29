@@ -25,6 +25,8 @@ import '../screens/customer/booking/models/booking_data.dart';
 import '../screens/customer/booking_detail/booking_detail_screen.dart';
 import '../screens/customer/bookings/bookings_screen.dart';
 import '../screens/customer/favorites/favorites_screen.dart';
+import '../screens/customer/profile/corporate/corporate_membership_apply_screen.dart';
+import '../screens/customer/profile/corporate/corporate_membership_screen.dart';
 import '../screens/customer/profile/profile_screen.dart';
 import '../screens/driver/home/driver_home_screen.dart';
 import '../screens/driver/earnings/driver_earnings_screen.dart';
@@ -347,6 +349,18 @@ class AppRouter {
         path: '/profile/kyc',
         pageBuilder: (context, state) =>
             AppPageTransition(child: const ComingSoonScreen(titleKey: 'profile_kyc_title'), name: state.name),
+      ),
+      GoRoute(
+        path: '/profile/corporate',
+        name: 'profile-corporate',
+        pageBuilder: (context, state) =>
+            AppPageTransition(child: const CorporateMembershipScreen(), name: state.name),
+      ),
+      GoRoute(
+        path: '/profile/corporate/apply',
+        name: 'profile-corporate-apply',
+        pageBuilder: (context, state) =>
+            AppModalTransition(child: const CorporateMembershipApplyScreen(), name: state.name),
       ),
       GoRoute(
         path: '/my-vehicles',

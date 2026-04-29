@@ -1,5 +1,7 @@
 import 'package:flutter/foundation.dart';
 
+import '../../profile/corporate/models/organization.dart';
+
 // ============================================================
 // ENUMS
 // ============================================================
@@ -17,7 +19,7 @@ enum BookingServiceType {
 
 enum PickupMode { selfPickup, delivery }
 
-enum PaymentMethod { card, applePay, wallet, cashOnDelivery }
+enum PaymentMethod { card, applePay, wallet, cashOnDelivery, billToCompany }
 
 extension BookingServiceTypeX on BookingServiceType {
   String get titleKey {
@@ -208,6 +210,11 @@ class BookingData extends ChangeNotifier {
   BookingCar? _car;
   BookingDriver? _driver;
 
+  // Corporate booking — null = personal/not-yet-decided. When `_isCorporate`
+  // is true the user must also pick an `_organization` they're approved for.
+  bool _isCorporate = false;
+  Organization? _organization;
+
   DateTime? _startAt;
   DateTime? _endAt;
 
@@ -237,6 +244,8 @@ class BookingData extends ChangeNotifier {
   BookingServiceType? get serviceType => _serviceType;
   BookingCar? get car => _car;
   BookingDriver? get driver => _driver;
+  bool get isCorporate => _isCorporate;
+  Organization? get organization => _organization;
   DateTime? get startAt => _startAt;
   DateTime? get endAt => _endAt;
   PickupMode get pickupMode => _pickupMode;
@@ -308,6 +317,20 @@ class BookingData extends ChangeNotifier {
 
   void setDriver(BookingDriver? d) {
     _driver = d;
+    notifyListeners();
+  }
+
+  void setCorporate(bool isCorporate, {Organization? organization}) {
+    _isCorporate = isCorporate;
+    _organization = isCorporate ? organization : null;
+    if (!isCorporate && _paymentMethod == PaymentMethod.billToCompany) {
+      _paymentMethod = PaymentMethod.card;
+    }
+    notifyListeners();
+  }
+
+  void setOrganization(Organization? organization) {
+    _organization = organization;
     notifyListeners();
   }
 

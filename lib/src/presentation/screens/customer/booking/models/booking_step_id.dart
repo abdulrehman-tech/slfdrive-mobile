@@ -6,7 +6,7 @@ import 'package:iconsax_flutter/iconsax_flutter.dart';
 /// The orchestrator derives the visible subset from the currently selected
 /// [BookingServiceType] plus whether the flow was entered with a pre-selected
 /// subject (car/driver), in which case the service selector is skipped.
-enum BookingStepId { service, dates, pickup, extras, driver, summary, payment }
+enum BookingStepId { service, corporate, dates, pickup, extras, driver, summary, payment }
 
 extension BookingStepIdX on BookingStepId {
   /// Localization key for the step's title (used by both the compact mobile
@@ -15,6 +15,8 @@ extension BookingStepIdX on BookingStepId {
     switch (this) {
       case BookingStepId.service:
         return 'booking_step_service';
+      case BookingStepId.corporate:
+        return 'booking_step_corporate';
       case BookingStepId.dates:
         return 'booking_step_dates';
       case BookingStepId.pickup:
@@ -35,6 +37,8 @@ extension BookingStepIdX on BookingStepId {
     switch (this) {
       case BookingStepId.service:
         return Iconsax.setting_4_copy;
+      case BookingStepId.corporate:
+        return Iconsax.briefcase_copy;
       case BookingStepId.dates:
         return Iconsax.calendar_2_copy;
       case BookingStepId.pickup:

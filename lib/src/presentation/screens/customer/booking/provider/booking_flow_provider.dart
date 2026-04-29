@@ -54,6 +54,7 @@ class BookingFlowProvider extends ChangeNotifier {
     final skipService =
         _initialServiceType != null && (_initialCar != null || _initialDriver != null);
     if (!skipService) ids.add(BookingStepId.service);
+    ids.add(BookingStepId.corporate);
     ids.add(BookingStepId.dates);
     if (service != BookingServiceType.driverOnly) ids.add(BookingStepId.pickup);
     if (service != BookingServiceType.driverOnly) ids.add(BookingStepId.extras);
@@ -75,6 +76,9 @@ class BookingFlowProvider extends ChangeNotifier {
     switch (currentStep) {
       case BookingStepId.service:
         return data.serviceType != null;
+      case BookingStepId.corporate:
+        // Personal is always valid; Corporate requires an approved org pick.
+        return !data.isCorporate || data.organization != null;
       case BookingStepId.dates:
         return data.startAt != null && data.endAt != null;
       case BookingStepId.pickup:
