@@ -180,6 +180,10 @@
   "Bahrain":"Bahrain",
 
   "home_greeting": "Good morning, Guest 👋",
+  "home_greeting_morning": "Good morning, {name} 👋",
+  "home_greeting_afternoon": "Good afternoon, {name} 👋",
+  "home_greeting_evening": "Good evening, {name} 👋",
+  "home_guest_name": "Guest",
   "home_headline": "Discover Rides\nin Ultimate Comfort",
   "home_search_hint": "Search cars, drivers...",
   "home_all_brands": "All Brands",
@@ -192,6 +196,7 @@
 
   "home_location_label": "Your Location",
   "home_location": "Muscat, Oman",
+  "home_location_loading": "Locating…",
   "home_available_now": "Available Now",
   "day": "day",
 
@@ -693,7 +698,7 @@
   "driver_help_center": "Help Center",
   "driver_terms": "Terms & Conditions",
   "driver_privacy": "Privacy Policy",
-  "driver_section_danger": "Account Actions",
+  "driver_section_danger": "Danger Zone",
   "driver_delete_account": "Delete Account",
   "driver_delete_warning": "This action cannot be undone",
 

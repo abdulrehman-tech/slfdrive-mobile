@@ -21,10 +21,7 @@ class DriverProfileScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (_) => DriverProfileProvider(),
-      child: const _DriverProfileView(),
-    );
+    return ChangeNotifierProvider(create: (_) => DriverProfileProvider(), child: const _DriverProfileView());
   }
 }
 
@@ -98,24 +95,21 @@ class _DriverProfileView extends StatelessWidget {
               title: 'driver_section_danger'.tr(),
               isDark: isDark,
               children: [
-                ProfileTile(
-                  icon: Iconsax.logout_copy,
-                  iconColor: const Color(0xFFE53935),
-                  title: 'profile_sign_out'.tr(),
-                  valueColor: const Color(0xFFE53935),
-                  isDark: isDark,
-                  onTap: () => showProfileLogoutDialog(context, isDark: isDark),
-                ),
+                // ProfileTile(
+                //   icon: Iconsax.logout_copy,
+                //   iconColor: const Color(0xFFE53935),
+                //   title: 'profile_sign_out'.tr(),
+                //   valueColor: const Color(0xFFE53935),
+                //   isDark: isDark,
+                //   onTap: () => showProfileLogoutDialog(context, isDark: isDark),
+                // ),
                 ProfileTile(
                   icon: Iconsax.trash_copy,
                   iconColor: const Color(0xFFE53935),
                   title: 'driver_delete_account'.tr(),
                   isDark: isDark,
                   onTap: () => ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text('coming_soon_message'.tr()),
-                      behavior: SnackBarBehavior.floating,
-                    ),
+                    SnackBar(content: Text('coming_soon_message'.tr()), behavior: SnackBarBehavior.floating),
                   ),
                 ),
               ],
@@ -144,10 +138,7 @@ class _StatusChip extends StatelessWidget {
 
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 9.r, vertical: 3.r),
-      decoration: BoxDecoration(
-        color: bg,
-        borderRadius: BorderRadius.circular(20.r),
-      ),
+      decoration: BoxDecoration(color: bg, borderRadius: BorderRadius.circular(20.r)),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [

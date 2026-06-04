@@ -179,6 +179,10 @@
   "Bahrain": "البحرين",
 
   "home_greeting": "صباح الخير، ضيف 👋",
+  "home_greeting_morning": "صباح الخير، {name} 👋",
+  "home_greeting_afternoon": "مساء الخير، {name} 👋",
+  "home_greeting_evening": "مساء الخير، {name} 👋",
+  "home_guest_name": "ضيف",
   "home_headline": "اكتشف رحلاتك\nبأقصى راحة",
   "home_search_hint": "ابحث عن سيارات، سائقين...",
   "home_all_brands": "جميع الماركات",
@@ -191,6 +195,7 @@
 
   "home_location_label": "موقعك",
   "home_location": "مسقط، عُمان",
+  "home_location_loading": "جارٍ تحديد الموقع…",
   "home_available_now": "متاح الآن",
   "day": "يوم",
 
@@ -643,6 +648,7 @@
   "legal_terms_title": "الشروط والأحكام",
   "legal_privacy_title": "سياسة الخصوصية",
   "about_title": "حول SLF Drive",
+  "driver_section_danger": "منطقة الخطر",
 
   "settings_cache_cleared": "تم مسح ذاكرة التخزين المؤقت",
   "driver_accept_snack": "تم قبول الرحلة — نراك عند نقطة الاستلام",

@@ -4,6 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 import 'package:provider/provider.dart';
 
+import '../../../../providers/auth_provider.dart';
 import '../provider/driver_home_provider.dart';
 
 class DriverHeader extends StatelessWidget {
@@ -15,6 +16,10 @@ class DriverHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     final provider = context.watch<DriverHomeProvider>();
     final isOnline = provider.isOnline;
+    final auth = context.watch<AuthProvider>();
+    final name = (auth.displayName?.trim().isNotEmpty ?? false)
+        ? auth.displayName!.trim()
+        : 'driver_name'.tr();
 
     return Padding(
       padding: EdgeInsets.all(20.r),
@@ -45,12 +50,14 @@ class DriverHeader extends StatelessWidget {
                 ),
                 SizedBox(height: 2.r),
                 Text(
-                  'driver_name'.tr(),
+                  name,
                   style: TextStyle(
                     fontSize: 18.r,
                     fontWeight: FontWeight.bold,
                     color: isDark ? Colors.white : Colors.black87,
                   ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
               ],
             ),

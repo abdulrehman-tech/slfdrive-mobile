@@ -7,7 +7,6 @@ import 'package:provider/provider.dart';
 
 import '../../../../providers/auth_provider.dart';
 import '../../../../providers/theme_provider.dart';
-import '../provider/driver_home_provider.dart';
 import 'logout_dialog.dart';
 import 'theme_pill.dart';
 
@@ -106,11 +105,13 @@ class _DrawerHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final provider = context.watch<DriverHomeProvider>();
     final auth = context.watch<AuthProvider>();
     final name = (auth.displayName?.trim().isNotEmpty ?? false)
         ? auth.displayName!.trim()
         : 'driver_name'.tr();
+    final email = (auth.displayEmail?.trim().isNotEmpty ?? false)
+        ? auth.displayEmail!.trim()
+        : '';
     final avatarUrl = auth.avatarUrl;
 
     return Container(
@@ -161,54 +162,24 @@ class _DrawerHeader extends StatelessWidget {
               fontWeight: FontWeight.w700,
               color: isDark ? Colors.white : Colors.black87,
             ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
           ),
-          SizedBox(height: 4.r),
-          Container(
-            padding: EdgeInsets.symmetric(horizontal: 12.r, vertical: 4.r),
-            decoration: BoxDecoration(
-              color: const Color(0xFF4D63DD).withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(12.r),
+          if (email.isNotEmpty) ...[
+            SizedBox(height: 4.r),
+            Text(
+              email,
+              style: TextStyle(
+                fontSize: 12.r,
+                fontWeight: FontWeight.w500,
+                color: isDark ? Colors.white60 : Colors.black54,
+              ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
             ),
-            child: Text(
-              'driver_badge'.tr(),
-              style: TextStyle(fontSize: 12.r, fontWeight: FontWeight.w600, color: const Color(0xFF4D63DD)),
-            ),
-          ),
-          SizedBox(height: 16.r),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              _StatChip(value: '${provider.totalTrips}', label: 'driver_trips'.tr(), isDark: isDark),
-              _StatChip(value: provider.rating.toString(), label: 'driver_rating'.tr(), isDark: isDark),
-            ],
-          ),
+          ],
         ],
       ),
-    );
-  }
-}
-
-class _StatChip extends StatelessWidget {
-  final String value;
-  final String label;
-  final bool isDark;
-
-  const _StatChip({required this.value, required this.label, required this.isDark});
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Text(
-          value,
-          style: TextStyle(fontSize: 18.r, fontWeight: FontWeight.w700, color: isDark ? Colors.white : Colors.black87),
-        ),
-        SizedBox(height: 2.r),
-        Text(
-          label,
-          style: TextStyle(fontSize: 11.r, color: isDark ? Colors.white60 : Colors.black54),
-        ),
-      ],
     );
   }
 }
@@ -231,19 +202,20 @@ class _DrawerItems extends StatelessWidget {
     return ListView(
       padding: EdgeInsets.symmetric(horizontal: 12.r),
       children: [
-        _DrawerItem(icon: Iconsax.home_2, title: 'driver_home'.tr(), index: 0, isDark: isDark, drawerSelectedIndex: drawerSelectedIndex, onTabSelect: onTabSelect),
-        _DrawerItem(icon: Iconsax.wallet_3, title: 'driver_earnings'.tr(), index: 1, isDark: isDark, drawerSelectedIndex: drawerSelectedIndex, onTabSelect: onTabSelect),
-        _DrawerItem(icon: Iconsax.car, title: 'driver_trips'.tr(), index: 2, isDark: isDark, drawerSelectedIndex: drawerSelectedIndex, onTabSelect: onTabSelect),
-        _DrawerItem(icon: Iconsax.user, title: 'driver_profile'.tr(), index: 3, isDark: isDark, drawerSelectedIndex: drawerSelectedIndex, onTabSelect: onTabSelect),
+        _DrawerItem(activeIcon: Iconsax.home_2, inactiveIcon: Iconsax.home_2_copy, title: 'driver_home'.tr(), index: 0, isDark: isDark, drawerSelectedIndex: drawerSelectedIndex, onTabSelect: onTabSelect),
+        _DrawerItem(activeIcon: Iconsax.wallet_3, inactiveIcon: Iconsax.wallet_3_copy, title: 'driver_earnings'.tr(), index: 1, isDark: isDark, drawerSelectedIndex: drawerSelectedIndex, onTabSelect: onTabSelect),
+        _DrawerItem(activeIcon: Iconsax.car, inactiveIcon: Iconsax.car_copy, title: 'driver_trips'.tr(), index: 2, isDark: isDark, drawerSelectedIndex: drawerSelectedIndex, onTabSelect: onTabSelect),
+        _DrawerItem(activeIcon: Iconsax.user, inactiveIcon: Iconsax.user_copy, title: 'driver_profile'.tr(), index: 3, isDark: isDark, drawerSelectedIndex: drawerSelectedIndex, onTabSelect: onTabSelect),
         Divider(height: 32.r, color: borderCol),
-        _DrawerItem(icon: Iconsax.message_question, title: 'driver_help'.tr(), index: 4, isDark: isDark, drawerSelectedIndex: drawerSelectedIndex, onTabSelect: onTabSelect),
+        _DrawerItem(activeIcon: Iconsax.message_question, inactiveIcon: Iconsax.message_question_copy, title: 'driver_help'.tr(), index: 4, isDark: isDark, drawerSelectedIndex: drawerSelectedIndex, onTabSelect: onTabSelect),
       ],
     );
   }
 }
 
 class _DrawerItem extends StatelessWidget {
-  final IconData icon;
+  final IconData activeIcon;
+  final IconData inactiveIcon;
   final String title;
   final int index;
   final bool isDark;
@@ -251,7 +223,8 @@ class _DrawerItem extends StatelessWidget {
   final ValueChanged<int> onTabSelect;
 
   const _DrawerItem({
-    required this.icon,
+    required this.activeIcon,
+    required this.inactiveIcon,
     required this.title,
     required this.index,
     required this.isDark,
@@ -286,7 +259,7 @@ class _DrawerItem extends StatelessWidget {
         child: Row(
           children: [
             Icon(
-              icon,
+              isSelected ? activeIcon : inactiveIcon,
               size: 20.r,
               color: isSelected ? const Color(0xFF4D63DD) : (isDark ? Colors.white70 : Colors.black54),
             ),

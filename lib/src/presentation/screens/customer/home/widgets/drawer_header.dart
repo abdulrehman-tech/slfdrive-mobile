@@ -1,7 +1,9 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:iconsax_flutter/iconsax_flutter.dart';
+import 'package:provider/provider.dart';
+
+import '../../../../providers/auth_provider.dart';
 
 class DrawerHeaderSection extends StatelessWidget {
   final bool isDark;
@@ -10,6 +12,12 @@ class DrawerHeaderSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final auth = context.watch<AuthProvider>();
+    final name = (auth.displayName?.trim().isNotEmpty ?? false) ? auth.displayName!.trim() : 'profile_guest_name'.tr();
+    final email = (auth.displayEmail?.trim().isNotEmpty ?? false) ? auth.displayEmail!.trim() : 'guest@slfdrive.com';
+    final avatarUrl = auth.avatarUrl;
+    final initial = name.isNotEmpty ? name.characters.first.toUpperCase() : 'G';
+
     return Container(
       width: double.infinity,
       padding: EdgeInsets.fromLTRB(20.r, 56.r, 20.r, 20.r),
@@ -65,12 +73,17 @@ class DrawerHeaderSection extends StatelessWidget {
                         ),
                       ],
                     ),
-                    child: Center(
-                      child: Text(
-                        'G',
-                        style: TextStyle(fontSize: 22.r, fontWeight: FontWeight.bold, color: const Color(0xFF0C2485)),
-                      ),
-                    ),
+                    child: avatarUrl != null
+                        ? ClipOval(
+                            child: Image.network(
+                              avatarUrl,
+                              width: 58.r,
+                              height: 58.r,
+                              fit: BoxFit.cover,
+                              errorBuilder: (_, _, _) => _initialBadge(initial),
+                            ),
+                          )
+                        : _initialBadge(initial),
                   ),
                   Positioned(
                     bottom: 2.r,
@@ -92,34 +105,27 @@ class DrawerHeaderSection extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    // Text(
+                    //   'home_greeting'.tr(),
+                    //   style: TextStyle(fontSize: 11.r, color: Colors.white60, fontWeight: FontWeight.w500),
+                    // ),
+                    // SizedBox(height: 3.r),
                     Text(
-                      'home_greeting'.tr(),
-                      style: TextStyle(fontSize: 11.r, color: Colors.white60, fontWeight: FontWeight.w500),
+                      name,
+                      style: TextStyle(fontSize: 17.r, fontWeight: FontWeight.bold, color: Colors.white),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
                     SizedBox(height: 3.r),
                     Text(
-                      'Guest User',
-                      style: TextStyle(fontSize: 17.r, fontWeight: FontWeight.bold, color: Colors.white),
-                    ),
-                    SizedBox(height: 5.r),
-                    Container(
-                      padding: EdgeInsets.symmetric(horizontal: 8.r, vertical: 3.r),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.15),
-                        borderRadius: BorderRadius.circular(20.r),
-                        border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
+                      email,
+                      style: TextStyle(
+                        fontSize: 11.r,
+                        color: Colors.white.withValues(alpha: 0.75),
+                        fontWeight: FontWeight.w500,
                       ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(Iconsax.medal_star_copy, color: const Color(0xFFFFC107), size: 12.r),
-                          SizedBox(width: 4.r),
-                          Text(
-                            'drawer_guest_badge'.tr(),
-                            style: TextStyle(fontSize: 9.r, color: Colors.white, fontWeight: FontWeight.w700),
-                          ),
-                        ],
-                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ],
                 ),
@@ -127,6 +133,15 @@ class DrawerHeaderSection extends StatelessWidget {
             ],
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _initialBadge(String initial) {
+    return Center(
+      child: Text(
+        initial,
+        style: TextStyle(fontSize: 22.r, fontWeight: FontWeight.bold, color: const Color(0xFF0C2485)),
       ),
     );
   }

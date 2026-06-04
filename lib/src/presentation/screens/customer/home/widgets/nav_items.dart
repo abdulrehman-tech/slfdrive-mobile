@@ -9,9 +9,10 @@ class HomeNavItem {
   const HomeNavItem(this.inactiveIcon, this.activeIcon, this.key, this.path);
 }
 
+// Outline (`_copy`) when inactive, bold (base) when active.
 const kHomeNavItems = <HomeNavItem>[
-  HomeNavItem(Iconsax.home_2, Iconsax.home_2_copy, 'home', '/home'),
-  HomeNavItem(Iconsax.heart, Iconsax.heart_copy, 'favorites', '/favorites'),
-  HomeNavItem(Iconsax.calendar_2, Iconsax.calendar_2_copy, 'bookings', '/bookings'),
-  HomeNavItem(Iconsax.user, Iconsax.user_copy, 'profile', '/profile'),
+  HomeNavItem(Iconsax.home_2_copy, Iconsax.home_2, 'home', '/home'),
+  HomeNavItem(Iconsax.heart_copy, Iconsax.heart, 'favorites', '/favorites'),
+  HomeNavItem(Iconsax.calendar_2_copy, Iconsax.calendar_2, 'bookings', '/bookings'),
+  HomeNavItem(Iconsax.user_copy, Iconsax.user, 'profile', '/profile'),
 ];

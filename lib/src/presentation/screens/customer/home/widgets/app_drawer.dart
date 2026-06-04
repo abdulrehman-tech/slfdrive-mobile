@@ -5,7 +5,6 @@ import 'package:iconsax_flutter/iconsax_flutter.dart';
 
 import 'drawer_bottom.dart';
 import 'drawer_header.dart';
-import 'drawer_stats.dart';
 
 class AppDrawer extends StatelessWidget {
   final bool isDark;
@@ -19,12 +18,13 @@ class AppDrawer extends StatelessWidget {
     required this.onNavTap,
   });
 
+  // ($1, $2) = (active bold, inactive outline)
   static const _navItems = [
-    (Iconsax.home_2_copy, Iconsax.home_2, 'home'),
-    (Iconsax.heart_copy, Iconsax.heart, 'favorites'),
-    (Iconsax.calendar_2_copy, Iconsax.calendar_2, 'bookings'),
-    (Iconsax.car_copy, Iconsax.car, 'my_vehicles'),
-    (Iconsax.user_copy, Iconsax.user, 'profile'),
+    (Iconsax.home_2, Iconsax.home_2_copy, 'home'),
+    (Iconsax.heart, Iconsax.heart_copy, 'favorites'),
+    (Iconsax.calendar_2, Iconsax.calendar_2_copy, 'bookings'),
+    (Iconsax.car, Iconsax.car_copy, 'my_vehicles'),
+    (Iconsax.user, Iconsax.user_copy, 'profile'),
   ];
 
   static const _navColors = [
@@ -39,7 +39,6 @@ class AppDrawer extends StatelessWidget {
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
     final surfaceBg = isDark ? const Color(0xFF0F0F18) : const Color(0xFFF7F8FC);
-    final cardBg = isDark ? const Color(0xFF1A1A28) : Colors.white;
     final borderCol = isDark ? Colors.white.withValues(alpha: 0.07) : Colors.black.withValues(alpha: 0.06);
 
     return Drawer(
@@ -51,8 +50,7 @@ class AppDrawer extends StatelessWidget {
       child: Column(
         children: [
           DrawerHeaderSection(isDark: isDark),
-          DrawerStats(isDark: isDark, cardBg: cardBg, borderCol: borderCol),
-          SizedBox(height: 8.r),
+          SizedBox(height: 12.r),
           Expanded(
             child: ListView.builder(
               physics: const NeverScrollableScrollPhysics(),

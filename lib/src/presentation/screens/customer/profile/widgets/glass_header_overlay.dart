@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 
+import '../../../../providers/auth_provider.dart';
 import '../provider/profile_provider.dart';
 
 class GlassHeaderOverlay extends StatelessWidget {
@@ -16,6 +17,15 @@ class GlassHeaderOverlay extends StatelessWidget {
     final cs = Theme.of(context).colorScheme;
     final topPad = MediaQuery.of(context).padding.top;
     final scrollOffset = context.watch<ProfileProvider>().scrollOffset;
+
+    final auth = context.watch<AuthProvider>();
+    final name = (auth.displayName?.trim().isNotEmpty ?? false)
+        ? auth.displayName!.trim()
+        : 'profile_guest_name'.tr();
+    final email = (auth.displayEmail?.trim().isNotEmpty ?? false)
+        ? auth.displayEmail!.trim()
+        : 'guest@slfdrive.com';
+    final initial = name.isNotEmpty ? name.characters.first.toUpperCase() : 'G';
 
     // Don't start fading in until most of the gradient card has scrolled away.
     const triggerStart = 120.0;
@@ -41,7 +51,7 @@ class GlassHeaderOverlay extends StatelessWidget {
               ),
               child: Row(
                 children: [
-                  _SmallAvatar(),
+                  _SmallAvatar(initial: initial, avatarUrl: auth.avatarUrl),
                   SizedBox(width: 10.r),
                   Expanded(
                     child: Column(
@@ -49,12 +59,20 @@ class GlassHeaderOverlay extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(
-                          'profile_guest_name'.tr(),
+                          name,
                           style: TextStyle(fontSize: 14.r, fontWeight: FontWeight.w700, color: cs.onSurface),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                         ),
                         Text(
-                          'profile_tier_gold'.tr(),
-                          style: TextStyle(fontSize: 10.r, color: const Color(0xFFFFC107), fontWeight: FontWeight.w700),
+                          email,
+                          style: TextStyle(
+                            fontSize: 10.r,
+                            color: cs.onSurface.withValues(alpha: 0.55),
+                            fontWeight: FontWeight.w500,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ],
                     ),
@@ -70,6 +88,10 @@ class GlassHeaderOverlay extends StatelessWidget {
 }
 
 class _SmallAvatar extends StatelessWidget {
+  final String initial;
+  final String? avatarUrl;
+  const _SmallAvatar({required this.initial, this.avatarUrl});
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -83,11 +105,25 @@ class _SmallAvatar extends StatelessWidget {
           end: Alignment.bottomRight,
         ),
       ),
-      child: Center(
-        child: Text(
-          'G',
-          style: TextStyle(fontSize: 15.r, fontWeight: FontWeight.w900, color: const Color(0xFF0C2485)),
-        ),
+      child: avatarUrl != null
+          ? ClipOval(
+              child: Image.network(
+                avatarUrl!,
+                width: 36.r,
+                height: 36.r,
+                fit: BoxFit.cover,
+                errorBuilder: (_, _, _) => _initial(),
+              ),
+            )
+          : _initial(),
+    );
+  }
+
+  Widget _initial() {
+    return Center(
+      child: Text(
+        initial,
+        style: TextStyle(fontSize: 15.r, fontWeight: FontWeight.w900, color: const Color(0xFF0C2485)),
       ),
     );
   }

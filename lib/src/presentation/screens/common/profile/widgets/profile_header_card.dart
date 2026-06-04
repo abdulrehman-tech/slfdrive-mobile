@@ -93,8 +93,10 @@ class ProfileHeaderCard extends StatelessWidget {
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
-                SizedBox(height: 4.r),
-                statusChip ?? _tierBadge(),
+                if (statusChip != null) ...[
+                  SizedBox(height: 5.r),
+                  statusChip!,
+                ],
                 SizedBox(height: 4.r),
                 Text(
                   email,
@@ -117,27 +119,6 @@ class ProfileHeaderCard extends StatelessWidget {
               ),
               child: Icon(Iconsax.edit_copy, size: 16.r, color: Colors.white),
             ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _tierBadge() {
-    return Container(
-      padding: EdgeInsets.symmetric(horizontal: 9.r, vertical: 3.r),
-      decoration: BoxDecoration(
-        gradient: const LinearGradient(colors: [Color(0xFFFFC107), Color(0xFFFFD54F)]),
-        borderRadius: BorderRadius.circular(20.r),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(Iconsax.medal_star_copy, size: 11.r, color: const Color(0xFF8B5A00)),
-          SizedBox(width: 4.r),
-          Text(
-            'profile_tier_gold'.tr(),
-            style: TextStyle(fontSize: 10.r, color: const Color(0xFF5D3A00), fontWeight: FontWeight.w800),
           ),
         ],
       ),

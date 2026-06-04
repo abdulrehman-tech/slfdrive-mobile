@@ -10,6 +10,7 @@ import 'src/core/di/injection_container.dart';
 import 'src/core/network/media_http_override.dart';
 import 'src/core/secrets/maps_loader.dart';
 import 'src/presentation/providers/auth_provider.dart';
+import 'src/presentation/providers/location_provider.dart';
 import 'src/presentation/providers/role_provider.dart';
 import 'src/presentation/providers/theme_provider.dart';
 import 'src/presentation/screens/customer/profile/corporate/provider/corporate_provider.dart';
@@ -58,6 +59,7 @@ void main() async {
           ChangeNotifierProvider.value(value: roleProvider),
           ChangeNotifierProvider(create: (_) => getIt<AuthProvider>()),
           ChangeNotifierProvider(create: (_) => CorporateProvider()),
+          ChangeNotifierProvider(create: (_) => LocationProvider()),
         ],
         child: const MyApp(),
       ),
