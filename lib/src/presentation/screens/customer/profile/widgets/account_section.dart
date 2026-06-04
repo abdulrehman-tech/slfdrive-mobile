@@ -2,9 +2,11 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
+import 'package:provider/provider.dart';
 
-import 'profile_section.dart';
-import 'profile_tile.dart';
+import '../../../../providers/auth_provider.dart';
+import '../../../common/profile/widgets/profile_section.dart';
+import '../../../common/profile/widgets/profile_tile.dart';
 
 class AccountSection extends StatelessWidget {
   final bool isDark;
@@ -12,6 +14,7 @@ class AccountSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final auth = context.watch<AuthProvider>();
     return ProfileSection(
       title: 'profile_section_account'.tr(),
       isDark: isDark,
@@ -20,7 +23,7 @@ class AccountSection extends StatelessWidget {
           icon: Iconsax.call_copy,
           iconColor: const Color(0xFF4CAF50),
           title: 'profile_phone'.tr(),
-          value: '+968 9000 0000',
+          value: auth.displayPhone ?? '',
           isDark: isDark,
           onTap: () => context.push('/profile/edit'),
         ),
@@ -28,7 +31,7 @@ class AccountSection extends StatelessWidget {
           icon: Iconsax.sms_copy,
           iconColor: const Color(0xFF00BCD4),
           title: 'profile_email_address'.tr(),
-          value: 'guest@slfdrive.com',
+          value: auth.displayEmail ?? '',
           isDark: isDark,
           onTap: () => context.push('/profile/edit'),
         ),

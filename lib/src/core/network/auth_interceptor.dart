@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import '../../constants/endpoints.dart';
 import '../../constants/storage_keys.dart';
 
 class AuthInterceptor extends Interceptor {
@@ -8,10 +9,11 @@ class AuthInterceptor extends Interceptor {
 
   AuthInterceptor(this._dio, this._secureStorage);
 
+  // Paths are relative to ApiEndpoints.baseUrl (which already ends in `/api`).
   static const List<String> _authEndpoints = [
-    '/api/Auth/login-mobile',
-    '/api/Auth/refresh',
-    '/api/Auth/verify-otp',
+    ApiEndpoints.loginMobile,
+    ApiEndpoints.refresh,
+    ApiEndpoints.verifyOtp,
   ];
 
   @override
@@ -64,7 +66,7 @@ class AuthInterceptor extends Interceptor {
     }
 
     try {
-      final response = await _dio.post('/api/Auth/refresh', data: {'refreshToken': refreshToken});
+      final response = await _dio.post(ApiEndpoints.refresh, data: {'refreshToken': refreshToken});
 
       if (response.statusCode == 200 && response.data is Map && response.data['isSuccess'] == true) {
         final data = response.data['data'];

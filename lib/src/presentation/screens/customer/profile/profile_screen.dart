@@ -5,14 +5,14 @@ import 'package:provider/provider.dart';
 
 import '../../../../constants/breakpoints.dart';
 import '../../../providers/theme_provider.dart';
+import '../../common/profile/sections/preferences_section.dart';
+import '../../common/profile/sections/sign_out_button.dart';
+import '../../common/profile/sections/support_section.dart';
+import '../../common/profile/widgets/profile_header_card.dart';
 import 'provider/profile_provider.dart';
 import 'widgets/account_section.dart';
 import 'widgets/glass_header_overlay.dart';
 import 'widgets/my_data_section.dart';
-import 'widgets/preferences_section.dart';
-import 'widgets/profile_header_card.dart';
-import 'widgets/sign_out_button.dart';
-import 'widgets/support_section.dart';
 
 // ============================================================
 // PROFILE — simplified
@@ -79,7 +79,7 @@ class _ProfileView extends StatelessWidget {
                 children: [
                   AccountSection(isDark: isDark),
                   SizedBox(height: 16.r),
-                  PreferencesSection(isDark: isDark),
+                  _PreferencesSection(isDark: isDark),
                   SizedBox(height: 16.r),
                   MyDataSection(isDark: isDark),
                   SizedBox(height: 16.r),
@@ -153,7 +153,7 @@ class _ProfileView extends StatelessWidget {
                     flex: 2,
                     child: Column(
                       children: [
-                        PreferencesSection(isDark: isDark),
+                        _PreferencesSection(isDark: isDark),
                         SizedBox(height: 16.r),
                         SignOutButton(isDark: isDark),
                       ],
@@ -165,6 +165,23 @@ class _ProfileView extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+/// Binds the customer [ProfileProvider]'s push-notification state to the shared
+/// [PreferencesSection].
+class _PreferencesSection extends StatelessWidget {
+  final bool isDark;
+  const _PreferencesSection({required this.isDark});
+
+  @override
+  Widget build(BuildContext context) {
+    final provider = context.watch<ProfileProvider>();
+    return PreferencesSection(
+      isDark: isDark,
+      pushNotifications: provider.pushNotifications,
+      onPushChanged: provider.setPushNotifications,
     );
   }
 }

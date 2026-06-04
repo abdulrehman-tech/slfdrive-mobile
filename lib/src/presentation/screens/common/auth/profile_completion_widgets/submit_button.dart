@@ -6,39 +6,53 @@ class SubmitButton extends StatelessWidget {
   final String label;
   final bool enabled;
   final VoidCallback onTap;
+  final bool loading;
 
-  const SubmitButton({super.key, required this.label, required this.enabled, required this.onTap});
+  const SubmitButton({
+    super.key,
+    required this.label,
+    required this.enabled,
+    required this.onTap,
+    this.loading = false,
+  });
 
   @override
   Widget build(BuildContext context) {
+    final active = enabled && !loading;
     return Container(
       width: double.infinity,
       height: 56.r,
       decoration: BoxDecoration(
-        gradient: enabled
+        gradient: active || loading
             ? const LinearGradient(
                 colors: [Color(0xFF4D63DD), Color(0xFF677EF0)],
                 begin: Alignment.centerLeft,
                 end: Alignment.centerRight,
               )
             : null,
-        color: enabled ? null : Colors.grey[300],
+        color: active || loading ? null : Colors.grey[300],
         borderRadius: BorderRadius.circular(16.r),
       ),
       child: Material(
         color: Colors.transparent,
         child: InkWell(
-          onTap: enabled ? onTap : null,
+          onTap: active ? onTap : null,
           borderRadius: BorderRadius.circular(16.r),
           child: Center(
-            child: Text(
-              label,
-              style: TextStyle(
-                fontSize: 17.r,
-                fontWeight: FontWeight.w600,
-                color: enabled ? Colors.white : Colors.grey[600],
-              ),
-            ),
+            child: loading
+                ? SizedBox(
+                    width: 22.r,
+                    height: 22.r,
+                    child: const CircularProgressIndicator(strokeWidth: 2.5, color: Colors.white),
+                  )
+                : Text(
+                    label,
+                    style: TextStyle(
+                      fontSize: 17.r,
+                      fontWeight: FontWeight.w600,
+                      color: enabled ? Colors.white : Colors.grey[600],
+                    ),
+                  ),
           ),
         ),
       ),
@@ -51,39 +65,53 @@ class SubmitButtonDesktop extends StatelessWidget {
   final String label;
   final bool enabled;
   final VoidCallback onTap;
+  final bool loading;
 
-  const SubmitButtonDesktop({super.key, required this.label, required this.enabled, required this.onTap});
+  const SubmitButtonDesktop({
+    super.key,
+    required this.label,
+    required this.enabled,
+    required this.onTap,
+    this.loading = false,
+  });
 
   @override
   Widget build(BuildContext context) {
+    final active = enabled && !loading;
     return Container(
       width: double.infinity,
       height: 60.r,
       decoration: BoxDecoration(
-        gradient: enabled
+        gradient: active || loading
             ? const LinearGradient(
                 colors: [Color(0xFF4D63DD), Color(0xFF677EF0)],
                 begin: Alignment.centerLeft,
                 end: Alignment.centerRight,
               )
             : null,
-        color: enabled ? null : Colors.grey[300],
+        color: active || loading ? null : Colors.grey[300],
         borderRadius: BorderRadius.circular(16.r),
       ),
       child: Material(
         color: Colors.transparent,
         child: InkWell(
-          onTap: enabled ? onTap : null,
+          onTap: active ? onTap : null,
           borderRadius: BorderRadius.circular(16.r),
           child: Center(
-            child: Text(
-              label,
-              style: TextStyle(
-                fontSize: 18.r,
-                fontWeight: FontWeight.w600,
-                color: enabled ? Colors.white : Colors.grey[600],
-              ),
-            ),
+            child: loading
+                ? SizedBox(
+                    width: 24.r,
+                    height: 24.r,
+                    child: const CircularProgressIndicator(strokeWidth: 2.5, color: Colors.white),
+                  )
+                : Text(
+                    label,
+                    style: TextStyle(
+                      fontSize: 18.r,
+                      fontWeight: FontWeight.w600,
+                      color: enabled ? Colors.white : Colors.grey[600],
+                    ),
+                  ),
           ),
         ),
       ),

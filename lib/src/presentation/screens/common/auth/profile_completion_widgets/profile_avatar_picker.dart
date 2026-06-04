@@ -1,4 +1,5 @@
 import 'package:easy_localization/easy_localization.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
@@ -10,12 +11,21 @@ class ProfileAvatarPicker extends StatelessWidget {
   final double size;
   final VoidCallback onTap;
 
+  /// Bytes of the picked image, rendered as a live preview when present.
+  final Uint8List? imageBytes;
+
+  /// Absolute URL of the user's current photo, shown when no new image has been
+  /// picked (used by the edit-profile flow to display the existing avatar).
+  final String? networkImageUrl;
+
   const ProfileAvatarPicker({
     super.key,
     required this.picked,
     required this.isDark,
     required this.size,
     required this.onTap,
+    this.imageBytes,
+    this.networkImageUrl,
   });
 
   @override
@@ -46,7 +56,33 @@ class ProfileAvatarPicker extends StatelessWidget {
                       shape: BoxShape.circle,
                       color: isDark ? const Color(0xFF1E1E1E) : Colors.white,
                     ),
-                    child: picked
+                    child: imageBytes != null
+                        ? ClipOval(
+                            child: Image.memory(
+                              imageBytes!,
+                              width: size,
+                              height: size,
+                              fit: BoxFit.cover,
+                            ),
+                          )
+                        : (networkImageUrl != null && networkImageUrl!.isNotEmpty)
+                        ? ClipOval(
+                            child: Image.network(
+                              networkImageUrl!,
+                              width: size,
+                              height: size,
+                              fit: BoxFit.cover,
+                              errorBuilder: (_, _, _) => Container(
+                                color: isDark ? const Color(0xFF2A2A2A) : const Color(0xFFF0F2FF),
+                                child: Icon(
+                                  Icons.person_outline,
+                                  size: size * 0.5,
+                                  color: isDark ? Colors.white38 : const Color(0xFFB0BAE8),
+                                ),
+                              ),
+                            ),
+                          )
+                        : picked
                         ? ClipOval(
                             child: Container(
                               color: secondaryColor.withValues(alpha:0.12),

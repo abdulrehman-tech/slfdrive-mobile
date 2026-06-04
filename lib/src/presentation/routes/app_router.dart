@@ -11,6 +11,9 @@ import '../screens/common/auth/login/phone_login_screen.dart';
 import '../screens/common/auth/otp/otp_verification_screen.dart';
 import '../screens/common/auth/profile_completion_screen.dart';
 import '../screens/common/coming_soon_screen.dart';
+import '../screens/common/profile_edit/edit_hub_screen.dart';
+import '../screens/common/profile_edit/edit_profile_screen.dart';
+import '../screens/common/profile_edit/provider/edit_profile_provider.dart';
 import '../screens/customer/home/customer_home_screen.dart';
 import '../screens/customer/car_listing/car_listing_screen.dart';
 import '../screens/customer/car_detail/car_detail_screen.dart';
@@ -109,6 +112,19 @@ const _preAuthRoutes = {
   '/auth/profile-completion',
 };
 
+/// Routes shared by both roles once authenticated (profile management, help,
+/// legal, vehicles). These are NOT under `/driver/` yet drivers must reach them,
+/// so they're exempt from role fencing. Matched as exact path or `<prefix>/...`.
+const _sharedAuthedRoutes = {
+  '/profile',
+  '/help',
+  '/legal',
+  '/my-vehicles',
+};
+
+bool _isSharedAuthedRoute(String loc) =>
+    _sharedAuthedRoutes.any((p) => loc == p || loc.startsWith('$p/'));
+
 class AppRouter {
   static final GoRouter router = GoRouter(
     initialLocation: '/',
@@ -120,6 +136,11 @@ class AppRouter {
 
       // Unauthenticated → send to auth.
       if (role == null) return '/auth';
+
+      // Shared post-auth routes (profile, help, legal, vehicles) bypass role
+      // fencing so drivers can reach them even though they live outside
+      // '/driver/*'.
+      if (_isSharedAuthedRoute(loc)) return null;
 
       // Role fencing: customers can't enter /driver/*, drivers can't enter
       // customer-scoped routes. Match '/driver/' (with trailing slash) so
@@ -175,8 +196,14 @@ class AppRouter {
           final phone = extra?['phone'] as String? ?? '';
           final isDriver = extra?['isDriver'] as bool? ?? false;
           final deliveryMethod = extra?['deliveryMethod'] as String? ?? 'sms';
+          final userId = extra?['userId'] as int? ?? 0;
           return AppPageTransition(
-            child: OtpVerificationScreen(phoneNumber: phone, isDriver: isDriver, deliveryMethod: deliveryMethod),
+            child: OtpVerificationScreen(
+              phoneNumber: phone,
+              isDriver: isDriver,
+              deliveryMethod: deliveryMethod,
+              userId: userId,
+            ),
             name: state.name,
           );
         },
@@ -188,8 +215,13 @@ class AppRouter {
           final extra = state.extra as Map<String, dynamic>?;
           final phone = extra?['phone'] as String? ?? '';
           final isDriver = extra?['isDriver'] as bool? ?? false;
+          final userId = extra?['userId'] as int? ?? 0;
           return AppPageTransition(
-            child: ProfileCompletionScreen(phoneNumber: phone, isDriver: isDriver),
+            child: ProfileCompletionScreen(
+              phoneNumber: phone,
+              userId: userId,
+              isDriver: isDriver,
+            ),
             name: state.name,
           );
         },
@@ -330,10 +362,45 @@ class AppRouter {
       ),
 
       // ── ComingSoon placeholders (Phase 2 destinations) ──────
+      // Edit entry: drivers get the multi-editor hub, customers go straight to
+      // the personal editor.
       GoRoute(
         path: '/profile/edit',
-        pageBuilder: (context, state) =>
-            AppPageTransition(child: const ComingSoonScreen(titleKey: 'profile_edit_title'), name: state.name),
+        pageBuilder: (context, state) {
+          final isDriver = context.read<RoleProvider>().role == UserRole.driver;
+          return AppPageTransition(
+            child: isDriver ? const ProfileEditHubScreen() : const EditProfileScreen(),
+            name: state.name,
+          );
+        },
+      ),
+      GoRoute(
+        path: '/profile/edit/personal',
+        pageBuilder: (context, state) => AppPageTransition(
+          child: const EditProfileScreen(),
+          name: state.name,
+        ),
+      ),
+      GoRoute(
+        path: '/profile/edit/vehicle',
+        pageBuilder: (context, state) => AppPageTransition(
+          child: const EditProfileScreen(section: EditProfileSection.vehicle),
+          name: state.name,
+        ),
+      ),
+      GoRoute(
+        path: '/profile/edit/professional',
+        pageBuilder: (context, state) => AppPageTransition(
+          child: const EditProfileScreen(section: EditProfileSection.professional),
+          name: state.name,
+        ),
+      ),
+      GoRoute(
+        path: '/profile/edit/documents',
+        pageBuilder: (context, state) => AppPageTransition(
+          child: const EditProfileScreen(section: EditProfileSection.documents),
+          name: state.name,
+        ),
       ),
       GoRoute(
         path: '/profile/addresses',
@@ -345,10 +412,13 @@ class AppRouter {
         pageBuilder: (context, state) =>
             AppPageTransition(child: const ComingSoonScreen(titleKey: 'profile_payments_title'), name: state.name),
       ),
+      // Customer KYC = the documents editor (civil-ID front/back).
       GoRoute(
         path: '/profile/kyc',
-        pageBuilder: (context, state) =>
-            AppPageTransition(child: const ComingSoonScreen(titleKey: 'profile_kyc_title'), name: state.name),
+        pageBuilder: (context, state) => AppPageTransition(
+          child: const EditProfileScreen(section: EditProfileSection.documents),
+          name: state.name,
+        ),
       ),
       GoRoute(
         path: '/profile/corporate',

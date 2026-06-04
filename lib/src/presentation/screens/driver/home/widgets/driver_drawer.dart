@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 import 'package:provider/provider.dart';
 
+import '../../../../providers/auth_provider.dart';
 import '../../../../providers/theme_provider.dart';
 import '../provider/driver_home_provider.dart';
 import 'logout_dialog.dart';
@@ -106,6 +107,11 @@ class _DrawerHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final provider = context.watch<DriverHomeProvider>();
+    final auth = context.watch<AuthProvider>();
+    final name = (auth.displayName?.trim().isNotEmpty ?? false)
+        ? auth.displayName!.trim()
+        : 'driver_name'.tr();
+    final avatarUrl = auth.avatarUrl;
 
     return Container(
       padding: EdgeInsets.all(20.r),
@@ -132,13 +138,24 @@ class _DrawerHeader extends StatelessWidget {
                   shape: BoxShape.circle,
                   color: isDark ? const Color(0xFF1E1E1E) : Colors.white,
                 ),
-                child: Icon(Icons.person, size: 40.r, color: const Color(0xFF4D63DD)),
+                child: avatarUrl != null
+                    ? ClipOval(
+                        child: Image.network(
+                          avatarUrl,
+                          width: 74.r,
+                          height: 74.r,
+                          fit: BoxFit.cover,
+                          errorBuilder: (_, _, _) =>
+                              Icon(Icons.person, size: 40.r, color: const Color(0xFF4D63DD)),
+                        ),
+                      )
+                    : Icon(Icons.person, size: 40.r, color: const Color(0xFF4D63DD)),
               ),
             ),
           ),
           SizedBox(height: 12.r),
           Text(
-            'driver_name'.tr(),
+            name,
             style: TextStyle(
               fontSize: 18.r,
               fontWeight: FontWeight.w700,

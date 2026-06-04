@@ -111,6 +111,7 @@ class ProfileCompletionDesktopLayout extends StatelessWidget {
             Center(
               child: ProfileAvatarPicker(
                 picked: provider.avatarPicked,
+                imageBytes: provider.avatarBytes,
                 isDark: isDark,
                 size: 110.r,
                 onTap: provider.pickAvatar,
@@ -130,6 +131,7 @@ class ProfileCompletionDesktopLayout extends StatelessWidget {
             SubmitButtonDesktop(
               label: isDriver ? 'submit_for_approval'.tr() : 'get_started'.tr(),
               enabled: provider.isButtonEnabled,
+              loading: provider.isSubmitting,
               onTap: onSubmit,
             ),
             SizedBox(height: 40.r),

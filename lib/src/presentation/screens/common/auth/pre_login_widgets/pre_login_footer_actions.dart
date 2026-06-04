@@ -3,12 +3,19 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:provider/provider.dart';
+import '../../../../providers/auth_provider.dart';
 import '../../../../providers/role_provider.dart';
 
 /// "Skip & explore" grants a guest customer session so the role guard lets
 /// the user into `/home` without completing OTP. Signed-up customers overwrite
 /// this in the profile-completion step.
+///
+/// Clears any stale persisted session first so the guest is genuinely
+/// unauthenticated — otherwise leftover `isLoggedIn` from a previous signup
+/// would make the auth gate think the guest is logged in.
 Future<void> _continueAsGuest(BuildContext context) async {
+  await context.read<AuthProvider>().enterGuestMode();
+  if (!context.mounted) return;
   await context.read<RoleProvider>().setRole(UserRole.customer);
   if (context.mounted) context.go('/home');
 }

@@ -18,7 +18,7 @@ class OtpResendControl extends StatelessWidget {
     return Center(
       child: provider.resendTimer > 0
           ? Text(
-              'resend_in'.tr(args: [provider.resendTimer.toString()]),
+              'resend_in'.tr(args: [provider.resendTimerLabel]),
               style: TextStyle(fontSize: fontSize, color: isDark ? Colors.white54 : const Color(0xFF9E9E9E)),
             )
           : TextButton(

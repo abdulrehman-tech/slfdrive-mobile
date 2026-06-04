@@ -4,10 +4,12 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../constants/breakpoints.dart';
+import '../../../providers/auth_provider.dart';
 import 'provider/driver_home_provider.dart';
 import 'widgets/driver_bottom_nav.dart';
 import 'widgets/driver_drawer.dart';
 import 'widgets/driver_header.dart';
+import 'widgets/driver_verification_banner.dart';
 import 'widgets/earnings_card.dart';
 import 'widgets/quick_stats_row.dart';
 import 'widgets/trip_requests_section.dart';
@@ -88,10 +90,10 @@ class _DriverHomeView extends StatelessWidget {
                     drawerSelectedIndex: drawerSelectedIndex,
                     onTabSelect: (i) => _goToTab(context, i),
                   ),
-                  Expanded(child: _buildBody(isDark)),
+                  Expanded(child: _buildBody(context, isDark)),
                 ],
               )
-            : _buildBody(isDark),
+            : _buildBody(context, isDark),
       ),
       bottomNavigationBar: isDesktop
           ? null
@@ -103,17 +105,21 @@ class _DriverHomeView extends StatelessWidget {
     );
   }
 
-  Widget _buildBody(bool isDark) {
+  Widget _buildBody(BuildContext context, bool isDark) {
     if (tabBody != null) return tabBody!;
-    return CustomScrollView(
-      physics: const BouncingScrollPhysics(),
-      slivers: [
-        SliverToBoxAdapter(child: DriverHeader(isDark: isDark)),
-        SliverToBoxAdapter(child: EarningsCard(isDark: isDark)),
-        SliverToBoxAdapter(child: QuickStatsRow(isDark: isDark)),
-        SliverToBoxAdapter(child: TripRequestsSection(isDark: isDark)),
-        SliverToBoxAdapter(child: SizedBox(height: 100.r)),
-      ],
+    return RefreshIndicator(
+      onRefresh: () => context.read<AuthProvider>().refreshDriverStatus(),
+      child: CustomScrollView(
+        physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
+        slivers: [
+          SliverToBoxAdapter(child: DriverHeader(isDark: isDark)),
+          SliverToBoxAdapter(child: DriverVerificationBanner(isDark: isDark)),
+          SliverToBoxAdapter(child: EarningsCard(isDark: isDark)),
+          SliverToBoxAdapter(child: QuickStatsRow(isDark: isDark)),
+          SliverToBoxAdapter(child: TripRequestsSection(isDark: isDark)),
+          SliverToBoxAdapter(child: SizedBox(height: 100.r)),
+        ],
+      ),
     );
   }
 }

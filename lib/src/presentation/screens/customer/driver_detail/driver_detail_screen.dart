@@ -7,6 +7,7 @@ import 'package:provider/provider.dart';
 
 import '../../../../constants/breakpoints.dart';
 import '../../../providers/theme_provider.dart';
+import '../../../widgets/auth_gate.dart';
 import '../booking/models/booking_data.dart';
 import 'models/driver_profile.dart';
 import 'provider/driver_detail_provider.dart';
@@ -45,7 +46,10 @@ class _DriverDetailView extends StatelessWidget {
     return tp.isDarkMode || (tp.isSystemMode && MediaQuery.of(context).platformBrightness == Brightness.dark);
   }
 
-  void _launchHireFlow(BuildContext context, DriverProfile profile) {
+  Future<void> _launchHireFlow(BuildContext context, DriverProfile profile) async {
+    // Hiring a driver is a gated action — prompt guests to log in first.
+    if (!await requireLogin(context)) return;
+    if (!context.mounted) return;
     final driver = BookingDriver(
       id: profile.id,
       name: profile.name,

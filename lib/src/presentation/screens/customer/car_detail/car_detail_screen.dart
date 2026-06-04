@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 
 import '../../../../constants/breakpoints.dart';
 import '../../../providers/theme_provider.dart';
+import '../../../widgets/auth_gate.dart';
 import '../booking/models/booking_data.dart';
 import 'data/car_detail_mock_data.dart';
 import 'provider/car_detail_provider.dart';
@@ -46,7 +47,10 @@ class _CarDetailView extends StatelessWidget {
     return tp.isDarkMode || (tp.isSystemMode && MediaQuery.of(context).platformBrightness == Brightness.dark);
   }
 
-  void _launchBookingFlow(BuildContext context) {
+  Future<void> _launchBookingFlow(BuildContext context) async {
+    // Booking is a gated action — prompt guests to log in first.
+    if (!await requireLogin(context)) return;
+    if (!context.mounted) return;
     const car = BookingCar(
       id: kCarDetailId,
       name: kCarDetailName,

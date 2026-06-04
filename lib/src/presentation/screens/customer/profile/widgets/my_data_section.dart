@@ -6,8 +6,8 @@ import 'package:provider/provider.dart';
 
 import '../corporate/models/membership_status.dart';
 import '../corporate/provider/corporate_provider.dart';
-import 'profile_section.dart';
-import 'profile_tile.dart';
+import '../../../common/profile/widgets/profile_section.dart';
+import '../../../common/profile/widgets/profile_tile.dart';
 
 class MyDataSection extends StatelessWidget {
   final bool isDark;
@@ -25,7 +25,6 @@ class MyDataSection extends StatelessWidget {
           icon: Iconsax.location_copy,
           iconColor: const Color(0xFF3D5AFE),
           title: 'profile_section_addresses'.tr(),
-          value: '2',
           isDark: isDark,
           onTap: () => context.push('/profile/addresses'),
         ),
@@ -33,7 +32,6 @@ class MyDataSection extends StatelessWidget {
           icon: Iconsax.card_copy,
           iconColor: const Color(0xFF4CAF50),
           title: 'profile_section_payments'.tr(),
-          value: '2',
           isDark: isDark,
           onTap: () => context.push('/profile/payments'),
         ),

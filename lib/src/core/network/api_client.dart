@@ -1,3 +1,4 @@
+// ignore_for_file: avoid_print
 import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:dio/io.dart';
@@ -22,20 +23,23 @@ class ApiClient {
       ),
     );
 
-    // Bypass SSL certificate verification for development only
-    if (kDebugMode) {
-      (_dio.httpClientAdapter as IOHttpClientAdapter).createHttpClient = () {
-        final client = HttpClient();
-        client.badCertificateCallback = (X509Certificate cert, String host, int port) {
-          if (kDebugMode) {
-            print('⚠️ WARNING: Bypassing SSL certificate verification for $host:$port');
-            return true;
-          }
-          return false;
-        };
-        return client;
+    // The backend is served over HTTPS on a raw IP with a self-signed cert, so
+    // its TLS handshake would fail in every build mode. Accept the bad cert for
+    // that single host only (every other host stays fully verified). Applied in
+    // all modes — not just debug — so release builds on device can connect.
+    // TODO: remove this host bypass once the backend has a valid TLS cert.
+    const trustedSelfSignedHost = '161.97.144.112';
+    (_dio.httpClientAdapter as IOHttpClientAdapter).createHttpClient = () {
+      final client = HttpClient();
+      client.badCertificateCallback = (X509Certificate cert, String host, int port) {
+        final allow = host == trustedSelfSignedHost;
+        if (allow && kDebugMode) {
+          print('⚠️ WARNING: Bypassing SSL certificate verification for $host:$port');
+        }
+        return allow;
       };
-    }
+      return client;
+    };
 
     // Add interceptors
     _dio.interceptors.add(ApiInterceptor());
@@ -67,6 +71,16 @@ class ApiClient {
   /// POST request with multipart/form-data for file uploads
   Future<Response> postMultipart(String path, {required FormData data, Map<String, dynamic>? queryParameters}) async {
     return await _dio.post(
+      path,
+      data: data,
+      queryParameters: queryParameters,
+      options: Options(contentType: 'multipart/form-data', headers: {'Accept': 'application/json'}),
+    );
+  }
+
+  /// PUT request with multipart/form-data for file uploads (profile updates)
+  Future<Response> putMultipart(String path, {required FormData data, Map<String, dynamic>? queryParameters}) async {
+    return await _dio.put(
       path,
       data: data,
       queryParameters: queryParameters,

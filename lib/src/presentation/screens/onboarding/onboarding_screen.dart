@@ -1,8 +1,13 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 import '../../../constants/breakpoints.dart';
+import '../../../constants/storage_keys.dart';
+import '../../../core/di/injection_container.dart';
 import 'provider/onboarding_provider.dart';
 import 'widgets/onboarding_desktop_layout.dart';
 import 'widgets/onboarding_mobile_layout.dart';
@@ -34,6 +39,11 @@ class _OnboardingView extends StatelessWidget {
   }
 
   void _onGetStarted(BuildContext context) {
+    // Remember onboarding was seen so the splash gate skips it next launch.
+    unawaited(getIt<FlutterSecureStorage>().write(
+      key: StorageKeys.hasCompletedOnboarding,
+      value: 'true',
+    ));
     context.go('/auth');
   }
 

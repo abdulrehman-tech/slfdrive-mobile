@@ -12,6 +12,12 @@ class DocumentPickerTile extends StatelessWidget {
   final bool isDark;
   final VoidCallback onTap;
 
+  /// Whether a document is already stored server-side (edit flow). When true and
+  /// no new [fileName] was picked, the tile renders the "on file" filled state
+  /// using [existingLabel] as its subtitle.
+  final bool hasExisting;
+  final String? existingLabel;
+
   const DocumentPickerTile({
     super.key,
     required this.label,
@@ -20,11 +26,14 @@ class DocumentPickerTile extends StatelessWidget {
     required this.fileName,
     required this.isDark,
     required this.onTap,
+    this.hasExisting = false,
+    this.existingLabel,
   });
 
   @override
   Widget build(BuildContext context) {
-    final hasFile = fileName != null;
+    final hasFile = fileName != null || hasExisting;
+    final detail = fileName ?? (hasExisting ? (existingLabel ?? subtitle) : subtitle);
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -67,7 +76,7 @@ class DocumentPickerTile extends StatelessWidget {
                   ),
                   SizedBox(height: 2.r),
                   Text(
-                    hasFile ? fileName! : subtitle,
+                    detail,
                     style: TextStyle(
                       fontSize: 12.r,
                       color: hasFile ? secondaryColor : (isDark ? Colors.white38 : const Color(0xFF9E9E9E)),
@@ -96,6 +105,8 @@ class DocumentPickerTileDesktop extends StatelessWidget {
   final String? fileName;
   final bool isDark;
   final VoidCallback onTap;
+  final bool hasExisting;
+  final String? existingLabel;
 
   const DocumentPickerTileDesktop({
     super.key,
@@ -105,11 +116,14 @@ class DocumentPickerTileDesktop extends StatelessWidget {
     required this.fileName,
     required this.isDark,
     required this.onTap,
+    this.hasExisting = false,
+    this.existingLabel,
   });
 
   @override
   Widget build(BuildContext context) {
-    final hasFile = fileName != null;
+    final hasFile = fileName != null || hasExisting;
+    final detail = fileName ?? (hasExisting ? (existingLabel ?? subtitle) : subtitle);
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -152,7 +166,7 @@ class DocumentPickerTileDesktop extends StatelessWidget {
                   ),
                   SizedBox(height: 3.r),
                   Text(
-                    hasFile ? fileName! : subtitle,
+                    detail,
                     style: TextStyle(
                       fontSize: 13.r,
                       color: hasFile ? secondaryColor : (isDark ? Colors.white38 : const Color(0xFF9E9E9E)),

@@ -3,8 +3,11 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import '../../../constants/icon_constants.dart';
 import '../../../constants/breakpoints.dart';
+import '../../../constants/storage_keys.dart';
+import '../../../core/di/injection_container.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -53,10 +56,29 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
     }).then((_) {
       Future.delayed(const Duration(milliseconds: 800), () {
         if (mounted) {
-          context.go('/language-selection');
+          _navigateNext();
         }
       });
     });
+  }
+
+  /// Decide where to go after the splash animation based on persisted state:
+  /// returning logged-in user → home (role-aware); already onboarded →
+  /// auth; first launch → language selection.
+  Future<void> _navigateNext() async {
+    final storage = getIt<FlutterSecureStorage>();
+    final accessToken = await storage.read(key: StorageKeys.accessToken);
+    final role = await storage.read(key: StorageKeys.userRole);
+    final onboarded = await storage.read(key: StorageKeys.hasCompletedOnboarding);
+    if (!mounted) return;
+
+    if (accessToken != null && accessToken.isNotEmpty) {
+      context.go(role == 'driver' ? '/driver/home' : '/home');
+    } else if (onboarded == 'true') {
+      context.go('/auth');
+    } else {
+      context.go('/language-selection');
+    }
   }
 
   @override

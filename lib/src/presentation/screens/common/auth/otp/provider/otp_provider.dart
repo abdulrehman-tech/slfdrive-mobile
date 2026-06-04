@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 class OtpProvider extends ChangeNotifier {
-  OtpProvider({required this.phoneNumber, required this.isDriver, required this.deliveryMethod}) {
+  OtpProvider({required this.phoneNumber, required this.isDriver, required this.deliveryMethod, required this.userId}) {
     for (int i = 0; i < _length; i++) {
       _controllers[i].addListener(_validate);
     }
@@ -15,6 +15,10 @@ class OtpProvider extends ChangeNotifier {
   final String phoneNumber;
   final bool isDriver;
   final String deliveryMethod;
+  final int userId;
+
+  /// Set by the screen to re-request an OTP via the auth API on resend.
+  Future<void> Function()? onResend;
 
   final List<TextEditingController> _controllers = List.generate(_length, (_) => TextEditingController());
   final List<FocusNode> _focusNodes = List.generate(_length, (_) => FocusNode());
@@ -26,9 +30,19 @@ class OtpProvider extends ChangeNotifier {
   bool _isButtonEnabled = false;
   bool get isButtonEnabled => _isButtonEnabled;
 
-  int _resendTimer = 60;
+  // Seconds the user must wait before requesting a new OTP (2 minutes).
+  static const int _resendCooldown = 120;
+
+  int _resendTimer = _resendCooldown;
   int get resendTimer => _resendTimer;
   bool get canResend => _resendTimer == 0;
+
+  /// Remaining cooldown as `m:ss` (e.g. `2:00`, `0:45`).
+  String get resendTimerLabel {
+    final m = _resendTimer ~/ 60;
+    final s = (_resendTimer % 60).toString().padLeft(2, '0');
+    return '$m:$s';
+  }
 
   Timer? _timer;
 
@@ -43,7 +57,7 @@ class OtpProvider extends ChangeNotifier {
   }
 
   void _startResendTimer() {
-    _resendTimer = 60;
+    _resendTimer = _resendCooldown;
     _timer?.cancel();
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
       if (_resendTimer > 0) {
@@ -84,7 +98,7 @@ class OtpProvider extends ChangeNotifier {
 
   bool resend() {
     if (!canResend) return false;
-    // TODO: Resend OTP
+    onResend?.call();
     _startResendTimer();
     notifyListeners();
     return true;

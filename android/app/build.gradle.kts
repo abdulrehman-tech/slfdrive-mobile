@@ -26,6 +26,21 @@ val secretsProps = Properties().apply {
 fun secret(key: String, default: String = ""): String =
     (secretsProps.getProperty(key) ?: System.getenv(key) ?: default)
 
+// ---------------------------------------------------------------------------
+// Release keystore loader
+// ---------------------------------------------------------------------------
+// Reads `android/key.properties` (gitignored). When present, the release build
+// is signed with the real keystore (AOT, Play-Store-ready). When absent (fresh
+// clone / CI), release falls back to debug keys so `flutter run --release`
+// still works locally. See SECRETS.md.
+val keystoreProps = Properties().apply {
+    val f = rootProject.file("key.properties")
+    if (f.exists()) {
+        f.inputStream().use { load(it) }
+    }
+}
+val hasReleaseKeystore = keystoreProps.getProperty("storeFile") != null
+
 android {
     namespace = "com.gmq.slfdrive"
     compileSdk = flutter.compileSdkVersion
@@ -55,11 +70,28 @@ android {
         manifestPlaceholders["MAPS_API_KEY"] = secret("MAPS_API_KEY")
     }
 
+    signingConfigs {
+        if (hasReleaseKeystore) {
+            create("release") {
+                storeFile = rootProject.file(keystoreProps.getProperty("storeFile"))
+                storePassword = keystoreProps.getProperty("storePassword")
+                keyAlias = keystoreProps.getProperty("keyAlias")
+                keyPassword = keystoreProps.getProperty("keyPassword")
+            }
+        }
+    }
+
     buildTypes {
         release {
-            // TODO: Add your own signing config for the release build.
-            // Signing with the debug keys for now, so `flutter run --release` works.
-            signingConfig = signingConfigs.getByName("debug")
+            // Use the real release keystore when key.properties is present;
+            // otherwise fall back to debug keys so `flutter run --release` still
+            // works on a fresh clone. See SECRETS.md.
+            signingConfig = if (hasReleaseKeystore) {
+                signingConfigs.getByName("release")
+            } else {
+                logger.warn("⚠️ android/key.properties missing — release build signed with DEBUG keys. Not for Play Store.")
+                signingConfigs.getByName("debug")
+            }
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"

@@ -1,0 +1,14 @@
+# Android release signing — copy to `android/key.properties` (gitignored) and
+# fill in real values. When this file is absent, release builds fall back to
+# debug keys (fine for local `flutter run --release`, NOT for the Play Store).
+#
+# Generate a keystore once:
+#   keytool -genkey -v -keystore ~/slfdrive-release.jks \
+#     -keyalg RSA -keysize 2048 -validity 10000 -alias slfdrive
+#
+# storeFile is resolved relative to the `android/` directory.
+
+storeFile=../slfdrive-release.jks
+storePassword=changeme
+keyAlias=slfdrive
+keyPassword=changeme

@@ -20,11 +20,15 @@ class OtpInputCell extends StatelessWidget {
     final focusNode = provider.focusNodes[index];
     final isFilled = controller.text.isNotEmpty;
 
-    final double width = desktop ? 60.r : 52.r;
-    final double height = desktop ? 80.r : 68.r;
-    final double fontSize = desktop ? 26 : 22.r;
-    final double borderRadius = desktop ? 12 : 12.r;
-    final double textHeight = desktop ? 1.0 : 2.0;
+    final bool isFocused = focusNode.hasFocus;
+    final double width = desktop ? 56.r : 46.r;
+    final double height = desktop ? 84.r : 62.r;
+    final double fontSize = desktop ? 28 : 24.r;
+    final double borderRadius = desktop ? 16 : 14.r;
+    final double textHeight = desktop ? 1.0 : 1.0;
+
+    final Color idleFill = isDark ? const Color(0xFF1E1E1E) : const Color(0xFFF5F5F5);
+    final Color activeFill = secondaryColor.withValues(alpha: isDark ? 0.18 : 0.10);
 
     return SizedBox(
       width: width,
@@ -36,6 +40,8 @@ class OtpInputCell extends StatelessWidget {
         textAlign: TextAlign.center,
         textAlignVertical: TextAlignVertical.center,
         maxLength: 1,
+        cursorColor: secondaryColor,
+        showCursor: true,
         inputFormatters: [FilteringTextInputFormatter.digitsOnly],
         style: TextStyle(
           fontSize: fontSize,
@@ -47,7 +53,7 @@ class OtpInputCell extends StatelessWidget {
           counterText: '',
           contentPadding: EdgeInsets.zero,
           filled: true,
-          fillColor: isDark ? const Color(0xFF1E1E1E) : const Color(0xFFF5F5F5),
+          fillColor: (isFilled || isFocused) ? activeFill : idleFill,
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(borderRadius),
             borderSide: BorderSide(

@@ -44,6 +44,13 @@ class PersonalInfoSection extends StatelessWidget {
         ),
         SizedBox(height: 16.r),
         _textField(
+          controller: provider.nameArController,
+          hint: 'enter_name_ar'.tr(),
+          label: 'full_name_ar'.tr(),
+          icon: Icons.person_outline,
+        ),
+        SizedBox(height: 16.r),
+        _textField(
           controller: provider.emailController,
           hint: 'enter_email'.tr(),
           label: 'email'.tr(),

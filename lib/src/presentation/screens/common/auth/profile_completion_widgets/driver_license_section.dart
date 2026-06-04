@@ -50,10 +50,10 @@ class DriverLicenseSection extends StatelessWidget {
         ),
         SizedBox(height: 16.r),
         _field(
-          controller: provider.nationalIdController,
-          hint: 'enter_national_id'.tr(),
-          label: 'national_id'.tr(),
-          icon: Icons.credit_card_outlined,
+          controller: provider.carPlateController,
+          hint: 'enter_car_plate'.tr(),
+          label: 'car_plate_number'.tr(),
+          icon: Icons.directions_car_outlined,
         ),
       ],
     );

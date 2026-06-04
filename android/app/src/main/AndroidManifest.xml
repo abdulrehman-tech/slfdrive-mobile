@@ -1,4 +1,10 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Foreground ("while in use") location only — used to capture the user's
+         coordinates during profile completion and for the booking location
+         picker. No ACCESS_BACKGROUND_LOCATION: it isn't needed and would trigger
+         extra Play Store review. -->
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
     <application
         android:label="slfdrive"
         android:name="${applicationName}"

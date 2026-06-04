@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 
+import '../../../../../providers/auth_provider.dart';
 import '../provider/otp_provider.dart';
 
 class OtpVerifyButton extends StatelessWidget {
@@ -15,30 +16,40 @@ class OtpVerifyButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final enabled = context.watch<OtpProvider>().isButtonEnabled;
+    // Reflect the in-flight verifyOtp call: spinner + blocked repeat taps.
+    final loading = context.watch<AuthProvider>().isLoading;
+    final active = enabled && !loading;
+    final filled = active || loading;
     return Container(
       width: double.infinity,
       height: height,
       decoration: BoxDecoration(
-        gradient: enabled
+        gradient: filled
             ? const LinearGradient(
                 colors: [Color(0xFF4D63DD), Color(0xFF677EF0)],
                 begin: Alignment.centerLeft,
                 end: Alignment.centerRight,
               )
             : null,
-        color: enabled ? null : (isDark ? Colors.grey[800] : const Color(0xFFE0E0E0)),
+        color: filled ? null : (isDark ? Colors.grey[800] : const Color(0xFFE0E0E0)),
         borderRadius: BorderRadius.circular(16.r),
       ),
       child: Material(
         color: Colors.transparent,
         child: InkWell(
-          onTap: enabled ? onVerify : null,
+          onTap: active ? onVerify : null,
           borderRadius: BorderRadius.circular(16.r),
           child: Center(
-            child: Text(
-              'verify'.tr(),
-              style: TextStyle(fontSize: 18.r, fontWeight: FontWeight.w600, color: Colors.white),
-            ),
+            child: loading
+                ? SizedBox(
+                    width: 22.r,
+                    height: 22.r,
+                    child: const CircularProgressIndicator(strokeWidth: 2.5, color: Colors.white),
+                  )
+                : Text(
+                    'verify'.tr(),
+                    style: TextStyle(fontSize: 18.r, fontWeight: FontWeight.w600, color: Colors.white),
+                  ),
           ),
         ),
       ),

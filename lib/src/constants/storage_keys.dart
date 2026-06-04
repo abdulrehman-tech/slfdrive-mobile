@@ -8,6 +8,8 @@ class StorageKeys {
   static const String userName = 'user_name';
   static const String userProfileImage = 'user_profile_image';
   static const String isLoggedIn = 'is_logged_in';
+  static const String isVerified = 'is_verified';
+  static const String verifiedBadgeDismissed = 'verified_badge_dismissed';
   
   static const String themeMode = 'theme_mode';
   static const String languageCode = 'language_code';

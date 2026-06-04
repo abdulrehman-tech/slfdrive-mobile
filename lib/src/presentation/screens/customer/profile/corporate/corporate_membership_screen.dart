@@ -11,7 +11,7 @@ import '../../../../../constants/color_constants.dart';
 import '../../../../providers/theme_provider.dart';
 import '../../../common/auth/profile_completion_widgets/section_header.dart';
 import '../../../common/auth/profile_completion_widgets/submit_button.dart';
-import '../widgets/profile_section.dart';
+import '../../../common/profile/widgets/profile_section.dart';
 import 'models/corporate_membership.dart';
 import 'models/membership_status.dart';
 import 'models/organization.dart';

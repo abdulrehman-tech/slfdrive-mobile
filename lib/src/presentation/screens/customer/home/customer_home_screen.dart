@@ -4,7 +4,9 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../constants/breakpoints.dart';
+import '../../../providers/auth_provider.dart';
 import '../../../providers/theme_provider.dart';
+import '../../../widgets/auth_gate.dart';
 import '../../../widgets/skeletons/home_skeleton.dart';
 import 'provider/home_provider.dart';
 import 'widgets/ads_carousel.dart';
@@ -95,10 +97,18 @@ class _CustomerHomeShellState extends State<_CustomerHomeShell> with SingleTicke
     }
   }
 
-  void _goToTab(int i) => context.go(kHomeNavItems[i].path);
+  // Tab 0 (home) is open to guests; favorites/bookings/profile require login.
+  Future<void> _goToTab(int i) async {
+    if (i != 0 && !await requireLogin(context)) return;
+    if (!mounted) return;
+    context.go(kHomeNavItems[i].path);
+  }
 
-  void _onDrawerNav(int i) {
+  Future<void> _onDrawerNav(int i) async {
     _scaffoldKey.currentState?.closeDrawer();
+    // Case 0 (home) is open; everything else is a personal area → gate it.
+    if (i != 0 && !await requireLogin(context)) return;
+    if (!mounted) return;
     switch (i) {
       case 0:
         context.go('/home');
@@ -173,10 +183,12 @@ class _CustomerHomeShellState extends State<_CustomerHomeShell> with SingleTicke
 
   Widget _buildMobileLayout() {
     final isDark = _isDark;
-    return CustomScrollView(
-      physics: const BouncingScrollPhysics(),
-      slivers: [
-        MobileAppBar(isDark: isDark),
+    return RefreshIndicator(
+      onRefresh: () => context.read<AuthProvider>().refreshCustomerStatus(),
+      child: CustomScrollView(
+        physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
+        slivers: [
+          MobileAppBar(isDark: isDark),
         SliverToBoxAdapter(child: MobileGreeting(fade: _bannerFade)),
         SliverToBoxAdapter(child: CompactSearchBar(isDark: isDark)),
         SliverToBoxAdapter(child: AdsCarousel(isDark: isDark)),
@@ -185,7 +197,8 @@ class _CustomerHomeShellState extends State<_CustomerHomeShell> with SingleTicke
         SliverToBoxAdapter(child: FeaturedCarsSection(isDark: isDark)),
         SliverToBoxAdapter(child: NearbyDriversSection(isDark: isDark)),
         SliverToBoxAdapter(child: SizedBox(height: 110.r)),
-      ],
+        ],
+      ),
     );
   }
 

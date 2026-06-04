@@ -1,0 +1,15 @@
+{
+  "id": "session-1780419781817",
+  "startedAt": "2026-06-02T17:03:01.817Z",
+  "cwd": "/Users/abdul/projects/slfdrive",
+  "context": {},
+  "metrics": {
+    "edits": 4,
+    "commands": 0,
+    "tasks": 0,
+    "errors": 0
+  },
+  "restoredAt": "2026-06-02T17:47:43.921Z",
+  "endedAt": "2026-06-02T17:47:45.059Z",
+  "duration": 2683242
+}

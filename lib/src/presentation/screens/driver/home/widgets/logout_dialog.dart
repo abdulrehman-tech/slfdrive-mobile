@@ -2,8 +2,9 @@ import 'dart:ui';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:go_router/go_router.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
+
+import '../../../../widgets/logout_action.dart';
 
 void showDriverLogoutDialog(BuildContext context, bool isDark) {
   showDialog(
@@ -84,9 +85,7 @@ void showDriverLogoutDialog(BuildContext context, bool isDark) {
                       child: TextButton(
                         onPressed: () {
                           Navigator.of(dialogContext).pop();
-                          if (context.mounted) {
-                            context.go('/auth');
-                          }
+                          logoutWithLoading(context);
                         },
                         style: TextButton.styleFrom(
                           padding: EdgeInsets.symmetric(vertical: 14.r),

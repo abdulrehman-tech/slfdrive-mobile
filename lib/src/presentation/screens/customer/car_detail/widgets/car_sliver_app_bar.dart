@@ -4,6 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 import 'package:provider/provider.dart';
 
+import '../../../../widgets/auth_gate.dart';
 import '../data/car_detail_mock_data.dart';
 import '../provider/car_detail_provider.dart';
 import 'sliver_image_gallery.dart';
@@ -46,7 +47,10 @@ class CarSliverAppBar extends StatelessWidget {
       ),
       actions: [
         GestureDetector(
-          onTap: provider.toggleFavourite,
+          onTap: () async {
+            if (!await requireLogin(context)) return;
+            provider.toggleFavourite();
+          },
           child: Padding(
             padding: EdgeInsetsDirectional.only(end: 12.r),
             child: Container(

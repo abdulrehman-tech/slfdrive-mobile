@@ -3,16 +3,11 @@ import 'dart:ui';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:go_router/go_router.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
-import 'package:provider/provider.dart';
 
-import '../../../../providers/role_provider.dart';
+import '../../../../widgets/logout_action.dart';
 
 void showLogoutDialog(BuildContext context, bool isDark) {
-  final router = GoRouter.of(context);
-  final roleProvider = context.read<RoleProvider>();
-
   showDialog(
     context: context,
     builder: (dialogContext) => Dialog(
@@ -89,10 +84,9 @@ void showLogoutDialog(BuildContext context, bool isDark) {
                     SizedBox(width: 12.r),
                     Expanded(
                       child: TextButton(
-                        onPressed: () async {
+                        onPressed: () {
                           Navigator.of(dialogContext).pop();
-                          await roleProvider.clear();
-                          router.go('/auth');
+                          logoutWithLoading(context);
                         },
                         style: TextButton.styleFrom(
                           padding: EdgeInsets.symmetric(vertical: 14.r),

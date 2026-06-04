@@ -4,6 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
+import '../../../../widgets/auth_gate.dart';
 import '../provider/home_provider.dart';
 import 'car_card.dart';
 import 'section_header.dart';
@@ -12,6 +13,12 @@ class FeaturedCarsSection extends StatelessWidget {
   final bool isDesktop;
   final bool isDark;
   const FeaturedCarsSection({super.key, this.isDesktop = false, required this.isDark});
+
+  // Saving a favourite is a gated action — guests are prompted to log in.
+  Future<void> _onFavourite(BuildContext context, HomeProvider home, String id) async {
+    if (!await requireLogin(context)) return;
+    home.toggleFavourite(id);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -37,7 +44,7 @@ class FeaturedCarsSection extends StatelessWidget {
                 car: cars[i],
                 isDark: isDark,
                 cs: cs,
-                onFavourite: () => home.toggleFavourite(cars[i].id),
+                onFavourite: () => _onFavourite(context, home, cars[i].id),
                 onTap: () => context.pushNamed('car-detail', pathParameters: {'id': cars[i].id}),
               ),
             ),
@@ -58,7 +65,7 @@ class FeaturedCarsSection extends StatelessWidget {
                     car: cars[i],
                     isDark: isDark,
                     cs: cs,
-                    onFavourite: () => home.toggleFavourite(cars[i].id),
+                    onFavourite: () => _onFavourite(context, home, cars[i].id),
                     onTap: () => context.pushNamed('car-detail', pathParameters: {'id': cars[i].id}),
                   ),
                 ),

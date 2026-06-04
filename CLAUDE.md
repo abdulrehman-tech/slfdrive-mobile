@@ -21,12 +21,24 @@ Dart-side secrets (currently `GOOGLE_MAPS_API_KEY`) are compile-time defines loa
 ```sh
 flutter pub get
 flutter run -d chrome --dart-define-from-file=.env     # web
-flutter run                                            # iOS/Android (reads native secrets)
+flutter run                                            # iOS/Android debug (reads native secrets)
 flutter build web --dart-define-from-file=.env
 flutter analyze
 flutter test
 flutter test test/path/to/file_test.dart --plain-name "name of test"
 ```
+
+Release / profile builds (AOT — use these on physical devices; a plain `flutter run` is debug JIT and runs slow / can stall on device):
+
+```sh
+flutter run --release --dart-define-from-file=.env     # device, AOT (fixes slow/stuck)
+flutter run --profile --dart-define-from-file=.env     # device, AOT + profiling
+flutter build apk --release --dart-define-from-file=.env
+flutter build appbundle --release --dart-define-from-file=.env
+flutter build ios --release --dart-define-from-file=.env
+```
+
+In VSCode, the `Run and Debug` panel has **SLF Drive (Debug / Profile / Release)** configs (`.vscode/launch.json`) — pick Release to test AOT performance on a device. Android release signing reads `android/key.properties` (gitignored; falls back to debug keys when absent — see `SECRETS.md`).
 
 ## Architecture
 

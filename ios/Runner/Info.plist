@@ -49,5 +49,12 @@
 	     `AppDelegate.swift` at startup to init GoogleMaps. -->
 	<key>GMSApiKey</key>
 	<string>$(MAPS_API_KEY)</string>
+	<!-- Foreground location: captured during profile completion and used by the
+	     booking location picker. App Store requires a non-empty purpose string. -->
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>SLF Drive uses your location to set your pickup point and show nearby cars and drivers.</string>
+	<!-- Avatar selection uses the photo library. -->
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>SLF Drive needs access to your photos so you can set a profile picture.</string>
 </dict>
 </plist>
