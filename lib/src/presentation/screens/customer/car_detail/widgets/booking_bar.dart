@@ -3,10 +3,11 @@ import 'dart:ui';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:provider/provider.dart';
 
 import '../../../../../constants/color_constants.dart';
 import '../../../../widgets/omr_icon.dart';
-import '../data/car_detail_mock_data.dart';
+import '../provider/car_detail_provider.dart';
 
 /// Sticky bottom booking bar shown on mobile with total price + Book button.
 class BookingBar extends StatelessWidget {
@@ -23,6 +24,12 @@ class BookingBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final vehicle = context.watch<CarDetailProvider>().vehicle;
+    final price = vehicle?.pricePerDay;
+    final priceLabel = price != null
+        ? price.toStringAsFixed(price.truncateToDouble() == price ? 0 : 2)
+        : '-';
+
     return ClipRRect(
       child: BackdropFilter(
         filter: ImageFilter.blur(sigmaX: 24, sigmaY: 24),
@@ -43,7 +50,7 @@ class BookingBar extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Total Price',
+                    'car_detail_total_price'.tr(),
                     style: TextStyle(
                       fontSize: 10.r,
                       color: cs.onSurface.withValues(alpha: 0.45),
@@ -58,7 +65,7 @@ class BookingBar extends StatelessWidget {
                       OmrIcon(size: 15.r, color: cs.primary),
                       SizedBox(width: 3.r),
                       Text(
-                        kCarDetailPricePerDayLabel,
+                        priceLabel,
                         style: TextStyle(fontSize: 20.r, fontWeight: FontWeight.bold, color: cs.primary),
                       ),
                       Text(

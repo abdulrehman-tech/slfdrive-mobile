@@ -149,16 +149,26 @@ class CarListCard extends StatelessWidget {
                 ),
               ),
               SizedBox(width: 8.r),
-              Icon(Iconsax.star_1_copy, color: const Color(0xFFFFC107), size: 12.r),
-              SizedBox(width: 3.r),
-              Text(
-                car.rating.toString(),
-                style: TextStyle(
-                  fontSize: 11.r,
-                  fontWeight: FontWeight.w600,
-                  color: cs.onSurface.withValues(alpha: 0.65),
+              if (car.rating != null) ...[
+                Icon(Iconsax.star_1_copy, color: const Color(0xFFFFC107), size: 12.r),
+                SizedBox(width: 3.r),
+                Text(
+                  car.rating!.toStringAsFixed(1),
+                  style: TextStyle(
+                    fontSize: 11.r,
+                    fontWeight: FontWeight.w600,
+                    color: cs.onSurface.withValues(alpha: 0.65),
+                  ),
                 ),
-              ),
+              ] else
+                Text(
+                  'listing_new'.tr(),
+                  style: TextStyle(
+                    fontSize: 10.r,
+                    fontWeight: FontWeight.w600,
+                    color: cs.primary.withValues(alpha: 0.8),
+                  ),
+                ),
             ],
           ),
           SizedBox(height: 8.r),

@@ -36,6 +36,7 @@ class _PhoneLoginView extends StatelessWidget {
     final session = await auth.sendOtp(
       phoneNumber: provider.completePhoneNumber,
       preferredLang: context.locale.languageCode,
+      channel: provider.selectedDeliveryMethod,
     );
     if (!context.mounted) return;
 

@@ -75,21 +75,31 @@ class DriverCard extends StatelessWidget {
                 ),
               ),
               SizedBox(height: 4.r),
-              Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(Iconsax.star_1_copy, color: const Color(0xFFFFC107), size: 11.r),
-                  SizedBox(width: 2.r),
-                  Text(
-                    driver.rating.toString(),
-                    style: TextStyle(
-                      fontSize: 11.r,
-                      fontWeight: FontWeight.w700,
-                      color: cs.onSurface.withValues(alpha: 0.8),
+              if (driver.rating != null)
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Iconsax.star_1_copy, color: const Color(0xFFFFC107), size: 11.r),
+                    SizedBox(width: 2.r),
+                    Text(
+                      driver.rating!.toStringAsFixed(1),
+                      style: TextStyle(
+                        fontSize: 11.r,
+                        fontWeight: FontWeight.w700,
+                        color: cs.onSurface.withValues(alpha: 0.8),
+                      ),
                     ),
+                  ],
+                )
+              else
+                Text(
+                  'listing_new'.tr(),
+                  style: TextStyle(
+                    fontSize: 10.r,
+                    fontWeight: FontWeight.w600,
+                    color: cs.primary.withValues(alpha: 0.8),
                   ),
-                ],
-              ),
+                ),
             ],
           ),
         ),
@@ -133,16 +143,26 @@ class DriverCard extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                   ),
                   SizedBox(height: 3.r),
-                  Row(
-                    children: [
-                      Icon(Iconsax.star_1_copy, color: const Color(0xFFFFC107), size: 11.r),
-                      SizedBox(width: 2.r),
-                      Text(
-                        '${driver.rating}  ·  ${driver.trips} trips',
-                        style: TextStyle(fontSize: 10.r, color: cs.onSurface.withValues(alpha: 0.55)),
+                  if (driver.rating != null)
+                    Row(
+                      children: [
+                        Icon(Iconsax.star_1_copy, color: const Color(0xFFFFC107), size: 11.r),
+                        SizedBox(width: 2.r),
+                        Text(
+                          '${driver.rating!.toStringAsFixed(1)}  ·  ${driver.trips} trips',
+                          style: TextStyle(fontSize: 10.r, color: cs.onSurface.withValues(alpha: 0.55)),
+                        ),
+                      ],
+                    )
+                  else
+                    Text(
+                      'listing_new'.tr(),
+                      style: TextStyle(
+                        fontSize: 10.r,
+                        fontWeight: FontWeight.w600,
+                        color: cs.primary.withValues(alpha: 0.8),
                       ),
-                    ],
-                  ),
+                    ),
                 ],
               ),
             ),

@@ -39,6 +39,20 @@ class ApiEndpoints {
 
   // Lookups
   static const String activeLocations = '/api/Location/active';
+  static const String activeVehicleBrands = '/api/VehicleBrand/active';
+  static const String activeVehicleModels = '/api/VehicleModel/active';
+  static String vehicleModelsByBrand(int brandId) => '/api/VehicleModel/brand/$brandId';
+  static const String activeOfferedServices = '/api/OfferedServices/active';
+
+  // Vehicles (listings)
+  static const String vehiclePaginated = '/api/Vehicle/paginated';
+  static const String vehicleNearestPaginated = '/api/Vehicle/nearest/paginated';
+  static String vehicleById(int id) => '/api/Vehicle/$id';
+  static String vehiclesByBrand(int brandId) => '/api/Vehicle/brand/$brandId';
+
+  // Drivers (listings)
+  static const String driverPaginated = '/api/Driver/paginated';
+  static const String driverNearestPaginated = '/api/Driver/nearest/paginated';
 
   // Profile completion (post-OTP, multipart/form-data)
   static const String completeIndividualProfile = '/api/User/complete-individual-profile';

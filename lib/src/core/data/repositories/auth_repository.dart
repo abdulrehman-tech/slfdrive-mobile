@@ -18,6 +18,7 @@ abstract class AuthRepository {
   Future<AuthSession> sendOtp({
     required String phoneNumber,
     required String preferredLang,
+    String channel,
   });
 
   /// Verifies the OTP, persists tokens + user, and returns the user.
@@ -67,6 +68,14 @@ abstract class AuthRepository {
     double? lon,
   });
 
+  /// Persists the user's chosen location server-side
+  /// (`POST /api/User/set-location`). Used by the home location picker.
+  Future<void> setUserLocation({
+    required int userId,
+    required double lat,
+    required double lon,
+  });
+
   Future<void> logout();
 }
 
@@ -80,10 +89,12 @@ class AuthRepositoryImpl implements AuthRepository {
   Future<AuthSession> sendOtp({
     required String phoneNumber,
     required String preferredLang,
+    String channel = 'sms',
   }) async {
     final res = await remote.loginMobile(
       phoneNumber: phoneNumber,
       preferredLang: preferredLang,
+      channel: channel,
     );
     if (!res.isSuccess || res.data == null) {
       throw AppException(
@@ -241,6 +252,15 @@ class AuthRepositoryImpl implements AuthRepository {
 
   /// Revokes the refresh token server-side (best-effort) then clears all auth +
   /// user-identity keys. Deliberately leaves app prefs (theme, language,
+  @override
+  Future<void> setUserLocation({
+    required int userId,
+    required double lat,
+    required double lon,
+  }) {
+    return remote.setLocation(userId: userId, lat: lat, lon: lon);
+  }
+
   /// onboarding-seen) so logout doesn't reset the intro flow.
   @override
   Future<void> logout() async {

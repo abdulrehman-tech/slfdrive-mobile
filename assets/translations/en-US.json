@@ -29,13 +29,10 @@
   "app_name": "SLF Drive",
   "welcome": "Welcome to SLF Drive",
   "get_started": "Get Started",
-  
   "splash_tagline": "DRIVE. HIRE. TRUST.",
-  
   "choose_language": "Choose the language",
   "choose_language_subtitle": "Please Choose your Preferred language to\ncontinue to SLF-Drive",
   "continue": "Continue",
-  
   "onboarding_1_title": "Find and rent\ncar in easy\nsteps",
   "onboarding_1_desc": "Browse a wide selection of vehicles from trusted fleet owners. Book instantly and hit the road in minutes.",
   "onboarding_2_title": "Hire\nProfessional\nDrivers",
@@ -44,11 +41,9 @@
   "onboarding_3_desc": "Every driver is verified. Every vehicle is inspected. Your safety and satisfaction are our priority.",
   "skip": "Skip",
   "next": "Next",
-  
   "login": "Login",
   "register": "Register",
   "logout": "Logout",
-  
   "pre_login_title": "SLF DRIVE",
   "pre_login_subtitle": "Your trusted platform for car rentals and professional drivers",
   "pre_login_passenger": "I'm a Passenger",
@@ -57,7 +52,6 @@
   "sign_in": "Sign In",
   "become_driver": "Become a Driver",
   "skip_explore": "Skip & Explore Platform",
-  
   "phone_title": "Enter Your Phone",
   "driver_phone_title": "Join as a Driver",
   "phone_subtitle": "We'll send you a verification code",
@@ -69,7 +63,6 @@
   "otp_delivery_method": "Choose delivery method",
   "otp_via_sms": "SMS",
   "otp_via_whatsapp": "WhatsApp",
-  
   "otp_title": "Verify Your Number",
   "otp_subtitle": "Enter the 6-digit code sent to",
   "otp_sent_via_sms": "Enter the 6-digit code sent via SMS to",
@@ -78,7 +71,6 @@
   "resend_in": "Resend code in {}",
   "resend_otp": "Resend OTP",
   "verify": "Verify",
-  
   "profile_title": "Complete Your Profile",
   "driver_profile_title": "Complete Driver Profile",
   "profile_subtitle": "Just a few more details to get started",
@@ -88,12 +80,10 @@
   "enter_email": "Enter your email",
   "start_driving": "Start Driving",
   "submit_for_approval": "Submit for Approval",
-
   "section_personal_info": "Personal Information",
   "section_license": "License & Identity",
   "section_vehicle": "Vehicle Information",
   "section_documents": "Documents",
-
   "license_number": "Driver's License Number",
   "enter_license_number": "e.g. OM123456",
   "license_expiry": "License Expiry Date",
@@ -114,51 +104,42 @@
   "tap_to_add_photo": "Tap to add photo",
   "photo_added": "Photo added",
   "pending_approval_note": "Your account will be reviewed by our team. You'll be notified once approved and can start accepting rides.",
-  
   "password": "Password",
   "confirm_password": "Confirm Password",
   "forgot_password": "Forgot Password?",
   "enter_otp": "Enter OTP",
-  
   "role_selection": "Select Your Role",
   "customer": "Customer",
   "driver": "Driver",
   "customer_desc": "Rent cars and hire drivers",
   "driver_desc": "Offer your driving services",
-  
   "home": "Home",
   "bookings": "Bookings",
   "profile": "Profile",
   "notifications": "Notifications",
   "settings": "Settings",
-  
   "explore_cars": "Explore Cars",
   "find_drivers": "Find Drivers",
   "my_bookings": "My Bookings",
   "favorites": "Favorites",
-  
   "car_details": "Car Details",
   "book_now": "Book Now",
   "price_per_day": "Price per day",
   "available": "Available",
   "not_available": "Not Available",
-  
   "pickup_date": "Pickup Date",
   "dropoff_date": "Dropoff Date",
   "pickup_location": "Pickup Location",
   "dropoff_location": "Dropoff Location",
-  
   "driver_details": "Driver Details",
   "rating": "Rating",
   "total_trips": "Total Trips",
   "price_per_hour": "Price per hour",
   "hire_driver": "Hire Driver",
-  
   "booking_confirmed": "Booking Confirmed",
   "booking_cancelled": "Booking Cancelled",
   "payment_successful": "Payment Successful",
   "payment_failed": "Payment Failed",
-  
   "search": "Search",
   "filter": "Filter",
   "sort_by": "Sort By",
@@ -167,18 +148,16 @@
   "save": "Save",
   "delete": "Delete",
   "edit": "Edit",
-  
   "error_occurred": "An error occurred",
   "try_again": "Try Again",
   "no_results": "No results found",
   "loading": "Loading...",
-  "Oman":"Oman",
-  "UAE":"UAE",
-  "Saudi Arabia":"Saudi Arabia",
-  "Kuwait":"Kuwait",
-  "Qatar":"Qatar",
-  "Bahrain":"Bahrain",
-
+  "Oman": "Oman",
+  "UAE": "UAE",
+  "Saudi Arabia": "Saudi Arabia",
+  "Kuwait": "Kuwait",
+  "Qatar": "Qatar",
+  "Bahrain": "Bahrain",
   "home_greeting": "Good morning, Guest 👋",
   "home_greeting_morning": "Good morning, {name} 👋",
   "home_greeting_afternoon": "Good afternoon, {name} 👋",
@@ -193,13 +172,11 @@
   "service_rent_car": "Rent a Car",
   "service_car_driver": "Car + Driver",
   "service_hire_driver": "Hire Driver",
-
   "home_location_label": "Your Location",
   "home_location": "Muscat, Oman",
   "home_location_loading": "Locating…",
   "home_available_now": "Available Now",
   "day": "day",
-
   "my_vehicles": "My Vehicles",
   "drawer_guest_badge": "Free Member",
   "drawer_trips": "Trips",
@@ -209,7 +186,6 @@
   "drawer_sign_out": "Sign Out",
   "theme_light": "Light",
   "theme_dark": "Dark",
-
   "profile_screen_title": "Profile",
   "profile_guest_name": "Guest User",
   "profile_member_since": "Member since 2024",
@@ -242,7 +218,6 @@
   "profile_logout_message": "Are you sure you want to sign out of your account?",
   "profile_logout_cancel": "Cancel",
   "profile_logout_confirm": "Sign Out",
-
   "favorites_title": "Favorites",
   "favorites_filter_all": "All",
   "favorites_filter_cars": "Cars",
@@ -253,7 +228,6 @@
   "favorites_remove": "Remove",
   "favorites_removed": "Removed from favorites",
   "favorites_search_hint": "Search favorites...",
-
   "bookings_title": "My Bookings",
   "bookings_tab_upcoming": "Upcoming",
   "bookings_tab_active": "Active",
@@ -278,7 +252,6 @@
   "bookings_status_completed": "Completed",
   "bookings_status_cancelled": "Cancelled",
   "bookings_with_driver": "With Driver",
-
   "settings_title": "Settings",
   "settings_appearance": "Appearance",
   "settings_theme_mode": "Theme Mode",
@@ -309,13 +282,11 @@
   "settings_data": "Data & Storage",
   "settings_auto_download": "Auto-Download Images",
   "settings_auto_download_desc": "Download images on Wi-Fi only",
-
   "car_listing_title": "Browse Cars",
   "car_listing_results": "cars found",
   "car_listing_empty": "No Cars Found",
   "car_listing_empty_subtitle": "Try adjusting your filters",
   "car_listing_sort": "Sort By",
-
   "car_detail_specs": "Specifications",
   "car_detail_features": "Features",
   "car_detail_description": "Description",
@@ -333,14 +304,12 @@
   "car_detail_location": "Pickup Location",
   "car_detail_plate": "Plate Number",
   "car_detail_plate_subtitle": "Verified Omani plate",
-
   "brands_title": "All Brands",
   "brands_search_hint": "Search brands...",
   "brands_count": "brands available",
   "brands_cars": "cars",
   "brands_empty_title": "No brands match your search",
   "brands_empty_subtitle": "Try a different keyword",
-
   "notif_title": "Notifications",
   "notif_tab_all": "All",
   "notif_tab_bookings": "Bookings",
@@ -356,9 +325,7 @@
   "notif_clear_all": "Clear all",
   "notif_empty_title": "You're all caught up",
   "notif_empty_subtitle": "Booking updates, promotions and system messages will show up here.",
-
   "driver_detail_rate": "Rate",
-
   "booking_title": "Booking",
   "booking_next": "Continue",
   "booking_confirm_review": "Review Order",
@@ -366,7 +333,6 @@
   "booking_bar_total": "Total",
   "booking_per_day": "per day",
   "booking_step_label": "Step {current} of {total}",
-
   "booking_step_service": "Service",
   "booking_step_dates": "Dates",
   "booking_step_pickup": "Pickup",
@@ -374,7 +340,6 @@
   "booking_step_driver": "Driver",
   "booking_step_summary": "Review",
   "booking_step_payment": "Payment",
-
   "booking_service_title": "What do you need?",
   "booking_service_subtitle": "Pick the service that fits your trip best.",
   "booking_service_rent_car": "Rent a Car",
@@ -383,7 +348,6 @@
   "booking_service_car_with_driver_desc": "Rent a vehicle with a professional driver included.",
   "booking_service_driver_only": "Hire a Driver",
   "booking_service_driver_only_desc": "Keep your car, hire a professional to drive it for you.",
-
   "booking_dates_title": "When do you need it?",
   "booking_dates_subtitle": "Select your pickup and return dates plus a preferred pickup time.",
   "booking_dates_range": "Rental dates",
@@ -394,7 +358,6 @@
   "booking_time_afternoon": "Afternoon",
   "booking_time_evening": "Evening",
   "booking_time_custom": "Custom",
-
   "booking_pickup_title": "How should we deliver?",
   "booking_pickup_subtitle": "Choose self-pickup or have the car delivered to you.",
   "booking_pickup_self": "Self Pickup",
@@ -411,7 +374,6 @@
   "booking_delivery_pick_on_map": "Pick on Map",
   "booking_delivery_notes": "Delivery notes",
   "booking_delivery_notes_hint": "Building number, gate code, landmarks...",
-
   "booking_extras_title": "Add-ons & extras",
   "booking_extras_subtitle": "Tap to add any optional upgrade to your booking.",
   "booking_extras_hint": "Extras are billed per day for your rental duration.",
@@ -427,10 +389,8 @@
   "booking_extra_airport_delivery_desc": "Meet-and-greet at Muscat International.",
   "booking_extra_full_tank": "Full Tank Return",
   "booking_extra_full_tank_desc": "We refill for you — no fuel worries.",
-
   "booking_driver_title": "Pick your driver",
   "booking_driver_subtitle": "Available professionals for your selected dates.",
-
   "booking_summary_title": "Review your booking",
   "booking_summary_subtitle": "Double-check everything before you pay.",
   "booking_summary_schedule": "Schedule",
@@ -453,7 +413,6 @@
   "booking_summary_vat": "VAT (5%)",
   "booking_summary_discount": "Discount",
   "booking_summary_total": "Total to pay",
-
   "booking_payment_title": "How will you pay?",
   "booking_payment_subtitle": "All transactions are secured end-to-end.",
   "booking_payment_card": "Credit / Debit",
@@ -472,20 +431,17 @@
   "booking_payment_cash_title": "Pay in cash at handover",
   "booking_payment_cash_desc": "Driver will collect payment when delivering the vehicle.",
   "booking_payment_security": "Your payment info is encrypted and never shared with third parties.",
-
   "booking_success_title": "Booking confirmed",
   "booking_success_subtitle": "We've sent a confirmation to your email and notifications.",
   "booking_success_ref": "Booking reference",
   "booking_success_copied": "Reference copied to clipboard",
   "booking_success_home": "Back to Home",
   "booking_success_view_booking": "View booking details",
-
   "booking_location_search_hint": "Search for an address",
   "booking_location_label": "Label",
   "booking_location_label_hint": "Home, Work, Friend's place...",
   "booking_location_selected": "Selected location",
   "booking_location_confirm": "Confirm location",
-
   "profile_theme_system": "System",
   "profile_completion_label": "Profile completion",
   "profile_completion_hint": "Complete your profile to unlock premium perks and faster booking.",
@@ -514,7 +470,6 @@
   "profile_doc_license_desc": "Valid license required for self-drive",
   "profile_doc_passport": "Passport",
   "profile_doc_passport_desc": "For foreign visitors (optional)",
-
   "driver_detail_title": "Driver Profile",
   "driver_detail_verified_id": "ID verified",
   "driver_detail_verified_license": "License verified",
@@ -539,7 +494,6 @@
   "driver_detail_from": "Starting from",
   "driver_detail_reviews_count": "reviews",
   "driver_detail_view_all_reviews": "View all reviews",
-
   "booking_detail_title": "Booking Details",
   "booking_detail_ref": "Reference",
   "booking_detail_timeline": "Booking timeline",
@@ -559,7 +513,6 @@
   "booking_detail_cancel_title": "Cancel this booking?",
   "booking_detail_cancel_body": "You may receive a partial refund depending on the cancellation policy.",
   "booking_detail_cancel_confirm": "Yes, cancel",
-
   "driver_listing_title": "Browse Drivers",
   "driver_listing_results": "drivers found",
   "driver_listing_empty": "No Drivers Found",
@@ -569,7 +522,6 @@
   "driver_listing_filter_chauffeur": "Chauffeur",
   "driver_listing_filter_airport": "Airport",
   "driver_listing_filter_daily": "Daily",
-
   "driver_detail_about": "About",
   "driver_detail_experience": "Experience",
   "driver_detail_languages": "Languages",
@@ -583,7 +535,6 @@
   "driver_detail_availability": "Availability",
   "driver_detail_available": "Available Now",
   "driver_detail_unavailable": "Currently Unavailable",
-
   "search_hint": "Search cars, drivers...",
   "search_filters": "Filters",
   "search_filter_all": "All",
@@ -608,7 +559,6 @@
   "search_initial_title": "Search Cars & Drivers",
   "search_initial_subtitle": "Find your perfect ride or hire a professional driver",
   "search_drivers_section": "Drivers",
-
   "date_of_birth": "Date of Birth",
   "country": "Country",
   "select_country": "Select your country",
@@ -630,7 +580,6 @@
   "items_selected": "items selected",
   "clear_all": "Clear All",
   "select_all": "Select All",
-
   "driver_welcome": "Welcome back,",
   "driver_name": "Driver Name",
   "driver_online": "Online",
@@ -653,7 +602,6 @@
   "driver_logout_message": "Are you sure you want to sign out of your account?",
   "driver_logout_cancel": "Cancel",
   "driver_logout_confirm": "Sign Out",
-
   "earnings_today": "Today",
   "earnings_week": "Week",
   "earnings_month": "Month",
@@ -663,7 +611,6 @@
   "earnings_hours": "Hours Driven",
   "earnings_avg_trip": "Avg per Trip",
   "earnings_recent": "Recent Earnings",
-
   "trips_active": "Active",
   "trips_completed": "Completed",
   "trips_cancelled": "Cancelled",
@@ -675,7 +622,6 @@
   "trips_no_cancelled_desc": "Good — nothing has been cancelled!",
   "trips_in_progress": "In Progress",
   "trips_complete": "Complete Trip",
-
   "driver_stat_trips": "Trips",
   "driver_stat_rating": "Rating",
   "driver_stat_earnings": "Earnings",
@@ -701,12 +647,10 @@
   "driver_section_danger": "Danger Zone",
   "driver_delete_account": "Delete Account",
   "driver_delete_warning": "This action cannot be undone",
-
   "coming_soon_title": "Coming Soon",
   "coming_soon_heading": "We're working on it",
   "coming_soon_message": "This feature is on the way. Check back in a future update.",
   "error_route_not_found": "Page not found",
-
   "car_status_available": "Available",
   "car_status_unavailable": "Unavailable",
   "car_feature_gps": "GPS Navigation",
@@ -718,15 +662,12 @@
   "car_feature_camera": "Backup Camera",
   "car_feature_keyless": "Keyless Entry",
   "car_detail_description_placeholder": "Experience the thrill of driving this iconic car. A stunning combination of performance and comfort — perfect for special occasions, weekend adventures, or making a statement on the road.",
-
   "common_sort": "Sort",
   "driver_status_busy": "Busy",
-
   "payment_card_number_hint": "0000 0000 0000 0000",
   "payment_card_expiry_hint": "MM/YY",
   "payment_card_cvv_hint": "123",
   "payment_card_name_hint": "Full name as on card",
-
   "profile_edit_title": "Edit Profile",
   "profile_edit_hub_title": "Edit Profile",
   "profile_edit_personal": "Personal Information",
@@ -750,12 +691,10 @@
   "legal_terms_title": "Terms & Conditions",
   "legal_privacy_title": "Privacy Policy",
   "about_title": "About SLF Drive",
-
   "settings_cache_cleared": "Cache cleared",
   "driver_accept_snack": "Trip accepted — see you at pickup",
   "trips_complete_snack": "Trip marked as complete",
   "profile_currency_locked": "OMR is the only supported currency",
-
   "profile_corporate_membership": "Corporate Membership",
   "corporate_status_not_applied": "Not applied",
   "corporate_status_pending": "Pending review",
@@ -812,5 +751,15 @@
   "booking_corporate_personal_desc": "A trip just for me",
   "booking_corporate_employee_desc": "On behalf of my employer",
   "booking_corporate_choose_mode": "Booking type",
-  "booking_corporate_selected_org": "Booking on behalf of"
+  "booking_corporate_selected_org": "Booking on behalf of",
+  "common_retry": "Retry",
+  "listing_new": "New",
+  "sort_popular": "Most Popular",
+  "sort_price_low": "Price: Low to High",
+  "sort_price_high": "Price: High to Low",
+  "car_detail_mileage": "Mileage",
+  "car_detail_total_price": "Total Price",
+  "driver_filter_has_vehicle": "Has Vehicle",
+  "home_no_cars": "No cars available",
+  "home_no_drivers": "No drivers nearby"
 }

@@ -30,13 +30,10 @@
   "app_name": "SLF Drive",
   "welcome": "Добро пожаловать в SLF Drive",
   "get_started": "Начать",
-  
   "splash_tagline": "ВОДИТЬ. НАНИМАТЬ. ДОВЕРЯТЬ.",
-  
   "choose_language": "Выберите язык",
   "choose_language_subtitle": "Пожалуйста, выберите предпочитаемый язык,\nчтобы продолжить работу с SLF-Drive",
   "continue": "Продолжить",
-  
   "onboarding_1_title": "Добро пожаловать в SLF Drive",
   "onboarding_1_desc": "Ваша надежная платформа для аренды автомобилей и услуг водителя",
   "onboarding_2_title": "Найдите свою идеальную поездку",
@@ -45,7 +42,6 @@
   "onboarding_3_desc": "Наймите опытных и проверенных водителей для безопасного путешествия",
   "skip": "Пропустить",
   "next": "Далее",
-  
   "pre_login_title": "Водить.\nАрендовать.\nДоверять.",
   "pre_login_subtitle": "Ваша надёжная платформа для аренды автомобилей и профессиональных водителей",
   "pre_login_passenger": "Я пассажир",
@@ -54,7 +50,6 @@
   "sign_in": "Войти",
   "become_driver": "Стать водителем",
   "skip_explore": "Пропустить и исследовать платформу",
-
   "phone_title": "Введите номер телефона",
   "driver_phone_title": "Присоединиться как водитель",
   "phone_subtitle": "Мы отправим вам код подтверждения",
@@ -66,7 +61,6 @@
   "otp_delivery_method": "Выберите способ доставки",
   "otp_via_sms": "СМС",
   "otp_via_whatsapp": "WhatsApp",
-
   "otp_title": "Подтвердите номер",
   "otp_subtitle": "Введите код, отправленный на {}",
   "otp_sent_via_sms": "Введите 6-значный код, отправленный по СМС на",
@@ -75,7 +69,6 @@
   "resend_in": "Отправить код повторно через {}",
   "resend_otp": "Отправить код повторно",
   "verify": "Подтвердить",
-
   "profile_title": "Завершите профиль",
   "driver_profile_title": "Завершите профиль водителя",
   "profile_subtitle": "Ещё несколько деталей для начала работы",
@@ -83,15 +76,12 @@
   "enter_name": "Введите ваше полное имя",
   "email": "Электронная почта",
   "enter_email": "Введите ваш email",
-  "get_started": "Начать",
   "start_driving": "Начать вождение",
   "submit_for_approval": "Отправить на одобрение",
-
   "section_personal_info": "Личная информация",
   "section_license": "Лицензия и удостоверение",
   "section_vehicle": "Информация об автомобиле",
   "section_documents": "Документы",
-
   "license_number": "Номер водительского удостоверения",
   "enter_license_number": "напр. OM123456",
   "license_expiry": "Дата истечения срока ВУ",
@@ -112,7 +102,6 @@
   "tap_to_add_photo": "Нажмите, чтобы добавить фото",
   "photo_added": "Фото добавлено",
   "pending_approval_note": "Ваш аккаунт будет проверен нашей командой. Вы получите уведомление после одобрения и сможете начать принимать поездки.",
-
   "login": "Войти",
   "register": "Регистрация",
   "logout": "Выйти",
@@ -120,7 +109,6 @@
   "filter": "Фильтр",
   "cancel": "Отмена",
   "save": "Сохранить",
-
   "coming_soon_title": "Скоро",
   "coming_soon_heading": "Мы работаем над этим",
   "coming_soon_message": "Эта функция скоро появится. Загляните позже.",
@@ -193,7 +181,6 @@
   "driver_accept_snack": "Поездка принята",
   "trips_complete_snack": "Поездка завершена",
   "profile_currency_locked": "OMR — единственная поддерживаемая валюта",
-
   "profile_corporate_membership": "Корпоративное членство",
   "corporate_status_not_applied": "Заявка не подана",
   "corporate_status_pending": "На рассмотрении",
@@ -250,5 +237,15 @@
   "booking_corporate_personal_desc": "Поездка только для меня",
   "booking_corporate_employee_desc": "От имени работодателя",
   "booking_corporate_choose_mode": "Тип бронирования",
-  "booking_corporate_selected_org": "Бронирование от имени"
+  "booking_corporate_selected_org": "Бронирование от имени",
+  "common_retry": "Повторить",
+  "listing_new": "Новое",
+  "sort_popular": "Популярные",
+  "sort_price_low": "Цена: по возрастанию",
+  "sort_price_high": "Цена: по убыванию",
+  "car_detail_mileage": "Пробег",
+  "car_detail_total_price": "Итоговая цена",
+  "driver_filter_has_vehicle": "С автомобилем",
+  "home_no_cars": "Нет доступных автомобилей",
+  "home_no_drivers": "Нет водителей поблизости"
 }

@@ -137,14 +137,46 @@ class CarCard extends StatelessWidget {
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
-                  SizedBox(height: 8.r),
+                  SizedBox(height: 4.r),
+                  // Rating row — null rating shows 'listing_new' placeholder.
+                  if (car.rating != null)
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(Iconsax.star_1_copy, color: const Color(0xFFFFC107), size: 12.r),
+                        SizedBox(width: 3.r),
+                        Text(
+                          car.rating!.toStringAsFixed(1),
+                          style: TextStyle(
+                            fontSize: 11.r,
+                            fontWeight: FontWeight.w600,
+                            color: cs.onSurface.withValues(alpha: 0.65),
+                          ),
+                        ),
+                      ],
+                    )
+                  else
+                    Text(
+                      'listing_new'.tr(),
+                      style: TextStyle(
+                        fontSize: 10.r,
+                        fontWeight: FontWeight.w600,
+                        color: cs.primary.withValues(alpha: 0.8),
+                      ),
+                    ),
+                  SizedBox(height: 6.r),
                   Row(
                     children: [
-                      SpecPill(icon: Iconsax.flash_1_copy, label: '${car.horsepower}hp', isDark: isDark, cs: cs),
-                      SizedBox(width: 6.r),
-                      SpecPill(icon: Iconsax.setting_copy, label: car.transmission, isDark: isDark, cs: cs),
-                      SizedBox(width: 6.r),
-                      SpecPill(icon: Iconsax.people_copy, label: '${car.seats}', isDark: isDark, cs: cs),
+                      if (car.horsepower > 0) ...[
+                        SpecPill(icon: Iconsax.flash_1_copy, label: '${car.horsepower}hp', isDark: isDark, cs: cs),
+                        SizedBox(width: 6.r),
+                      ],
+                      if (car.transmission.isNotEmpty && car.transmission != '—') ...[
+                        SpecPill(icon: Iconsax.setting_copy, label: car.transmission, isDark: isDark, cs: cs),
+                        SizedBox(width: 6.r),
+                      ],
+                      if (car.seats > 0)
+                        SpecPill(icon: Iconsax.people_copy, label: '${car.seats}', isDark: isDark, cs: cs),
                     ],
                   ),
                 ],

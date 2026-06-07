@@ -28,12 +28,7 @@ class AuthProvider extends ChangeNotifier {
   final DriverRepository _driverRepository;
   final CustomerRepository _customerRepository;
 
-  AuthProvider(
-    this._repository,
-    this._storage,
-    this._driverRepository,
-    this._customerRepository,
-  ) {
+  AuthProvider(this._repository, this._storage, this._driverRepository, this._customerRepository) {
     loadPersistedSession();
   }
 
@@ -84,8 +79,7 @@ class AuthProvider extends ChangeNotifier {
     _displayEmail = await _storage.read(key: StorageKeys.userEmail);
     _displayPhone = await _storage.read(key: StorageKeys.userPhone);
     _photoPath = await _storage.read(key: StorageKeys.userProfileImage);
-    _isAuthenticated =
-        (await _storage.read(key: StorageKeys.isLoggedIn)) == 'true';
+    _isAuthenticated = (await _storage.read(key: StorageKeys.isLoggedIn)) == 'true';
     _isVerified = (await _storage.read(key: StorageKeys.isVerified)) == 'true';
     notifyListeners();
   }
@@ -191,6 +185,7 @@ class AuthProvider extends ChangeNotifier {
   Future<AuthSession?> sendOtp({
     required String phoneNumber,
     required String preferredLang,
+    String channel = 'sms',
   }) async {
     _setLoading(true);
     _error = null;
@@ -198,6 +193,7 @@ class AuthProvider extends ChangeNotifier {
       final session = await _repository.sendOtp(
         phoneNumber: phoneNumber,
         preferredLang: preferredLang,
+        channel: channel,
       );
       _pendingUserId = session.user?.id;
       _requiresOtp = session.requiresOtp;

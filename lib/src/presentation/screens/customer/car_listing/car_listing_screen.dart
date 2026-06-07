@@ -6,6 +6,9 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../constants/breakpoints.dart';
+import '../../../../core/data/repositories/lookup_repository.dart';
+import '../../../../core/data/repositories/vehicle_repository.dart';
+import '../../../../core/di/injection_container.dart';
 import '../../../providers/theme_provider.dart';
 import 'models/car_item.dart';
 import 'provider/car_listing_provider.dart';
@@ -30,7 +33,12 @@ class CarListingScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (_) => CarListingProvider(initialBrand: initialBrand),
+      create: (_) => CarListingProvider(
+        vehicleRepository: getIt<VehicleRepository>(),
+        lookupRepository: getIt<LookupRepository>(),
+        ar: context.locale.languageCode == 'ar',
+        initialBrand: initialBrand,
+      ),
       child: const _CarListingView(),
     );
   }
@@ -81,7 +89,8 @@ class _CarListingView extends StatelessWidget {
   // ==========================================================================
 
   Widget _buildMobile(BuildContext context, bool isDark, ColorScheme cs) {
-    final cars = context.watch<CarListingProvider>().filteredCars;
+    final provider = context.watch<CarListingProvider>();
+    final cars = provider.filteredCars;
     return CustomScrollView(
       physics: const BouncingScrollPhysics(),
       slivers: [
@@ -99,7 +108,13 @@ class _CarListingView extends StatelessWidget {
           ),
         ),
         SliverToBoxAdapter(child: SizedBox(height: 12.r)),
-        if (cars.isEmpty)
+        if (provider.isLoading)
+          SliverFillRemaining(child: Center(child: CircularProgressIndicator(color: cs.primary)))
+        else if (provider.error != null)
+          SliverFillRemaining(
+            child: _ErrorRetry(message: provider.error!, cs: cs, onRetry: provider.refresh),
+          )
+        else if (cars.isEmpty)
           SliverFillRemaining(child: EmptyState(isDark: isDark, cs: cs))
         else
           SliverPadding(
@@ -129,7 +144,8 @@ class _CarListingView extends StatelessWidget {
   // ==========================================================================
 
   Widget _buildDesktop(BuildContext context, bool isDark, ColorScheme cs) {
-    final cars = context.watch<CarListingProvider>().filteredCars;
+    final provider = context.watch<CarListingProvider>();
+    final cars = provider.filteredCars;
     return SingleChildScrollView(
       physics: const BouncingScrollPhysics(),
       padding: EdgeInsets.symmetric(horizontal: 40.r, vertical: 28.r),
@@ -165,7 +181,14 @@ class _CarListingView extends StatelessWidget {
               SizedBox(height: 16.r),
               ResultsCount(count: cars.length, cs: cs),
               SizedBox(height: 16.r),
-              if (cars.isEmpty)
+              if (provider.isLoading)
+                SizedBox(height: 300.r, child: Center(child: CircularProgressIndicator(color: cs.primary)))
+              else if (provider.error != null)
+                SizedBox(
+                  height: 300.r,
+                  child: _ErrorRetry(message: provider.error!, cs: cs, onRetry: provider.refresh),
+                )
+              else if (cars.isEmpty)
                 SizedBox(height: 300.r, child: EmptyState(isDark: isDark, cs: cs))
               else
                 Wrap(
@@ -188,6 +211,42 @@ class _CarListingView extends StatelessWidget {
               SizedBox(height: 40.r),
             ],
           ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Centered error message with a retry button, shared by the listing layouts.
+class _ErrorRetry extends StatelessWidget {
+  final String message;
+  final ColorScheme cs;
+  final VoidCallback onRetry;
+
+  const _ErrorRetry({required this.message, required this.cs, required this.onRetry});
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Padding(
+        padding: EdgeInsets.all(24.r),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(CupertinoIcons.exclamationmark_circle, size: 40.r, color: cs.primary.withValues(alpha: 0.6)),
+            SizedBox(height: 12.r),
+            Text(
+              message,
+              textAlign: TextAlign.center,
+              style: TextStyle(fontSize: 14.r, color: cs.onSurface.withValues(alpha: 0.7)),
+            ),
+            SizedBox(height: 16.r),
+            FilledButton(
+              onPressed: onRetry,
+              style: FilledButton.styleFrom(backgroundColor: cs.primary),
+              child: Text('common_retry'.tr()),
+            ),
+          ],
         ),
       ),
     );

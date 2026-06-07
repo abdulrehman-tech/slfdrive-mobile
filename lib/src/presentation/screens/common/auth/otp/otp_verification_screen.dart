@@ -38,6 +38,7 @@ class OtpVerificationScreen extends StatelessWidget {
           await ctx.read<AuthProvider>().sendOtp(
                 phoneNumber: phoneNumber,
                 preferredLang: ctx.locale.languageCode,
+                channel: deliveryMethod,
               );
         }),
       child: const _OtpVerificationView(),

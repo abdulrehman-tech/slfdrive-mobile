@@ -20,6 +20,7 @@ abstract class AuthRemoteDataSource {
   Future<ApiResponse<AuthSession>> loginMobile({
     required String phoneNumber,
     required String preferredLang,
+    String channel = 'sms',
   });
 
   /// Verify [otpCode] for [userId]; on success the response carries tokens.
@@ -98,11 +99,12 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   Future<ApiResponse<AuthSession>> loginMobile({
     required String phoneNumber,
     required String preferredLang,
+    String channel = 'sms',
   }) async {
     try {
       final res = await apiClient.post(
         ApiEndpoints.loginMobile,
-        data: {'phoneNumber': phoneNumber, 'preferredLang': preferredLang},
+        data: {'phoneNumber': phoneNumber, 'preferredLang': preferredLang, 'channel': channel},
       );
       return ApiResponse<AuthSession>.fromJson(
         res.data as Map<String, dynamic>,

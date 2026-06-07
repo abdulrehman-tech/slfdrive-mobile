@@ -4,10 +4,12 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../providers/location_provider.dart';
+import '../../booking/models/booking_data.dart';
 import 'notification_btn.dart';
 import 'theme_toggle_btn.dart';
 
@@ -72,8 +74,35 @@ class _LocationChipState extends State<_LocationChip> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) context.read<LocationProvider>().resolve();
+      if (!mounted) return;
+      // Only auto-detect when nothing was picked/persisted yet.
+      final loc = context.read<LocationProvider>();
+      if (loc.locationName == null && !loc.hasCoordinates) loc.resolve();
     });
+  }
+
+  /// Opens the full-screen map picker, then saves the chosen point via the
+  /// set-location API and updates the chip.
+  Future<void> _openPicker(BuildContext context) async {
+    final loc = context.read<LocationProvider>();
+    final initial = loc.hasCoordinates
+        ? BookingLocation(
+            latitude: loc.lat!,
+            longitude: loc.lon!,
+            address: loc.locationName ?? '',
+            label: loc.locationName,
+          )
+        : null;
+    final result = await context.pushNamed<BookingLocation>(
+      'booking-location-picker',
+      extra: {'initial': initial},
+    );
+    if (result == null) return;
+    await loc.applyPickedLocation(
+      lat: result.latitude,
+      lon: result.longitude,
+      address: result.address,
+    );
   }
 
   @override
@@ -85,7 +114,7 @@ class _LocationChipState extends State<_LocationChip> {
 
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
-      onTap: () => context.read<LocationProvider>().resolve(),
+      onTap: () => _openPicker(context),
       child: Row(
         children: [
           Container(

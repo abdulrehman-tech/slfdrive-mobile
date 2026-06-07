@@ -2,12 +2,13 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
+import 'package:provider/provider.dart';
 
 import '../../../../widgets/customer/oman_plate.dart';
-import '../data/car_detail_mock_data.dart';
+import '../provider/car_detail_provider.dart';
 import 'car_glass_card.dart';
 
-/// Card displaying the Oman-style license plate number and code.
+/// Card displaying the Oman-style license plate number.
 class PlateSection extends StatelessWidget {
   final bool isDark;
   final ColorScheme cs;
@@ -16,6 +17,11 @@ class PlateSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final vehicle = context.watch<CarDetailProvider>().vehicle;
+    if (vehicle == null) return const SizedBox.shrink();
+
+    final plateNumber = vehicle.plateNumber ?? '';
+
     return CarGlassCard(
       isDark: isDark,
       child: Padding(
@@ -52,7 +58,7 @@ class PlateSection extends StatelessWidget {
               ],
             ),
             const Spacer(),
-            const OmanPlate(number: kCarDetailPlateNumber, code: kCarDetailPlateCode, width: 150),
+            OmanPlate(number: plateNumber, code: '', width: 150),
           ],
         ),
       ),

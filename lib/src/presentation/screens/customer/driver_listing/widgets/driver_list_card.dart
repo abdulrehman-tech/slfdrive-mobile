@@ -61,26 +61,30 @@ class DriverListCard extends StatelessWidget {
   }
 
   Widget _buildAvatar() {
+    final url = driver.imageUrl;
     return Stack(
       alignment: Alignment.bottomRight,
       children: [
-        CachedNetworkImage(
-          imageUrl: driver.avatarUrl,
-          imageBuilder: (_, img) => Container(
-            width: 56.r,
-            height: 56.r,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(16.r),
-              image: DecorationImage(image: img, fit: BoxFit.cover),
-              border: Border.all(
-                color: isDark ? Colors.white.withValues(alpha: 0.1) : Colors.black.withValues(alpha: 0.06),
-                width: 2,
+        if (url != null && url.isNotEmpty)
+          CachedNetworkImage(
+            imageUrl: url,
+            imageBuilder: (_, img) => Container(
+              width: 56.r,
+              height: 56.r,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(16.r),
+                image: DecorationImage(image: img, fit: BoxFit.cover),
+                border: Border.all(
+                  color: isDark ? Colors.white.withValues(alpha: 0.1) : Colors.black.withValues(alpha: 0.06),
+                  width: 2,
+                ),
               ),
             ),
-          ),
-          placeholder: (_, _) => _avatarFallback(),
-          errorWidget: (_, _, _) => _avatarFallback(),
-        ),
+            placeholder: (_, _) => _avatarFallback(),
+            errorWidget: (_, _, _) => _avatarFallback(),
+          )
+        else
+          _avatarFallback(),
         if (driver.isAvailable)
           Positioned(
             bottom: 0,
@@ -91,7 +95,10 @@ class DriverListCard extends StatelessWidget {
               decoration: BoxDecoration(
                 color: const Color(0xFF4CAF50),
                 shape: BoxShape.circle,
-                border: Border.all(color: isDark ? const Color(0xFF1A1A2A) : Colors.white, width: 2),
+                border: Border.all(
+                  color: isDark ? const Color(0xFF1A1A2A) : Colors.white,
+                  width: 2,
+                ),
               ),
             ),
           ),
@@ -146,66 +153,66 @@ class DriverListCard extends StatelessWidget {
         SizedBox(height: 4.r),
         Row(
           children: [
-            Icon(Iconsax.star_1_copy, color: const Color(0xFFFFC107), size: 12.r),
-            SizedBox(width: 3.r),
-            Text(
-              '${driver.rating}',
-              style: TextStyle(
-                fontSize: 11.r,
-                fontWeight: FontWeight.w700,
-                color: cs.onSurface.withValues(alpha: 0.7),
-              ),
-            ),
-            SizedBox(width: 8.r),
-            Icon(Iconsax.car, size: 11.r, color: cs.onSurface.withValues(alpha: 0.4)),
-            SizedBox(width: 3.r),
-            Text(
-              '${driver.trips} trips',
-              style: TextStyle(fontSize: 11.r, color: cs.onSurface.withValues(alpha: 0.5)),
-            ),
-            SizedBox(width: 8.r),
-            Container(
-              padding: EdgeInsets.symmetric(horizontal: 6.r, vertical: 2.r),
-              decoration: BoxDecoration(
-                color: const Color(0xFF00BCD4).withValues(alpha: isDark ? 0.15 : 0.1),
-                borderRadius: BorderRadius.circular(5.r),
-              ),
-              child: Text(
-                driver.speciality,
+            if (driver.rating != null) ...[
+              Icon(Iconsax.star_1_copy, color: const Color(0xFFFFC107), size: 12.r),
+              SizedBox(width: 3.r),
+              Text(
+                driver.rating!.toStringAsFixed(1),
                 style: TextStyle(
-                  fontSize: 9.r,
-                  color: const Color(0xFF00BCD4),
-                  fontWeight: FontWeight.w600,
+                  fontSize: 11.r,
+                  fontWeight: FontWeight.w700,
+                  color: cs.onSurface.withValues(alpha: 0.7),
                 ),
               ),
-            ),
+            ] else
+              Text(
+                'listing_new'.tr(),
+                style: TextStyle(
+                  fontSize: 10.r,
+                  fontWeight: FontWeight.w600,
+                  color: cs.primary.withValues(alpha: 0.8),
+                ),
+              ),
+            if (driver.yearsExperience != null) ...[
+              SizedBox(width: 8.r),
+              Icon(Iconsax.medal_star, size: 11.r, color: cs.onSurface.withValues(alpha: 0.4)),
+              SizedBox(width: 3.r),
+              Text(
+                '${driver.yearsExperience} yr',
+                style: TextStyle(fontSize: 11.r, color: cs.onSurface.withValues(alpha: 0.5)),
+              ),
+            ],
           ],
         ),
         SizedBox(height: 8.r),
         Row(
           children: [
-            Icon(Iconsax.language_circle, size: 11.r, color: cs.onSurface.withValues(alpha: 0.35)),
-            SizedBox(width: 3.r),
-            Expanded(
-              child: Text(
-                driver.languages.join(', '),
-                style: TextStyle(fontSize: 10.r, color: cs.onSurface.withValues(alpha: 0.45)),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-            ),
-            Row(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                OmrIcon(size: 12.r, color: cs.primary),
-                SizedBox(width: 3.r),
-                Text(
-                  '${driver.pricePerDay.toInt()}${'driver_detail_per_day'.tr()}',
-                  style: TextStyle(fontSize: 15.r, fontWeight: FontWeight.bold, color: cs.primary),
+            if (driver.languages.isNotEmpty) ...[
+              Icon(Iconsax.language_circle, size: 11.r, color: cs.onSurface.withValues(alpha: 0.35)),
+              SizedBox(width: 3.r),
+              Expanded(
+                child: Text(
+                  driver.languages.join(', '),
+                  style: TextStyle(fontSize: 10.r, color: cs.onSurface.withValues(alpha: 0.45)),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
-              ],
-            ),
+              ),
+            ] else
+              const Spacer(),
+            if (driver.pricePerDay != null)
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  OmrIcon(size: 12.r, color: cs.primary),
+                  SizedBox(width: 3.r),
+                  Text(
+                    '${driver.pricePerDay!.toInt()}${'driver_detail_per_day'.tr()}',
+                    style: TextStyle(fontSize: 15.r, fontWeight: FontWeight.bold, color: cs.primary),
+                  ),
+                ],
+              ),
           ],
         ),
       ],

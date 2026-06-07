@@ -21,11 +21,12 @@ class SortBottomSheet extends StatelessWidget {
     required this.onSelect,
   });
 
+  // `rating` sort is omitted until the backend exposes a vehicle rating
+  // aggregate (reviews are booking-scoped only).
   static final List<(String, IconData, String)> _options = [
-    ('popular', Iconsax.star_1, 'Most Popular'),
-    ('price_low', CupertinoIcons.arrow_down, 'Price: Low to High'),
-    ('price_high', CupertinoIcons.arrow_up, 'Price: High to Low'),
-    ('rating', Iconsax.like_1, 'Highest Rated'),
+    ('popular', Iconsax.star_1, 'sort_popular'),
+    ('price_low', CupertinoIcons.arrow_down, 'sort_price_low'),
+    ('price_high', CupertinoIcons.arrow_up, 'sort_price_high'),
   ];
 
   @override
@@ -95,7 +96,7 @@ class SortBottomSheet extends StatelessWidget {
               SizedBox(width: 12.r),
               Expanded(
                 child: Text(
-                  o.$3,
+                  o.$3.tr(),
                   style: TextStyle(
                     fontSize: 13.r,
                     fontWeight: active ? FontWeight.w700 : FontWeight.w500,

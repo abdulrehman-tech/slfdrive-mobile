@@ -30,13 +30,10 @@
   "app_name": "SLF ड्राइव",
   "welcome": "SLF ड्राइव में आपका स्वागत है",
   "get_started": "शुरू करें",
-  
   "splash_tagline": "ड्राइव करें। किराए पर लें। भरोसा करें।",
-  
   "choose_language": "भाषा चुनें",
   "choose_language_subtitle": "कृपया SLF-Drive जारी रखने के लिए\nअपनी पसंदीदा भाषा चुनें",
   "continue": "जारी रखें",
-  
   "onboarding_1_title": "SLF ड्राइव में आपका स्वागत है",
   "onboarding_1_desc": "कार किराए और ड्राइवर सेवाओं के लिए आपका विश्वसनीय मंच",
   "onboarding_2_title": "अपनी परफेक्ट राइड खोजें",
@@ -45,7 +42,6 @@
   "onboarding_3_desc": "सुरक्षित यात्रा के लिए अनुभवी और सत्यापित ड्राइवरों को किराए पर लें",
   "skip": "छोड़ें",
   "next": "अगला",
-  
   "pre_login_title": "चलाएं।\nकिराए पर लें।\nविश्वास करें।",
   "pre_login_subtitle": "कार रेंटल और पेशेवर ड्राइवरों के लिए आपका विश्वसनीय प्लेटफॉर्म",
   "pre_login_passenger": "मैं यात्री हूं",
@@ -54,7 +50,6 @@
   "sign_in": "साइन इन",
   "become_driver": "ड्राइवर बनें",
   "skip_explore": "छोड़ें और प्लेटफॉर्म एक्सप्लोर करें",
-
   "phone_title": "फ़ोन नंबर दर्ज करें",
   "driver_phone_title": "ड्राइवर के रूप में जुड़ें",
   "phone_subtitle": "हम आपको एक सत्यापन कोड भेजेंगे",
@@ -66,7 +61,6 @@
   "otp_delivery_method": "डिलीवरी विधि चुनें",
   "otp_via_sms": "एसएमएस",
   "otp_via_whatsapp": "व्हाट्सएप",
-
   "otp_title": "अपना नंबर सत्यापित करें",
   "otp_subtitle": "{} पर भेजा गया कोड दर्ज करें",
   "otp_sent_via_sms": "एसएमएस के माध्यम से भेजा गया 6 अंकों का कोड दर्ज करें",
@@ -75,7 +69,6 @@
   "resend_in": "{} में कोड पुनः भेजें",
   "resend_otp": "कोड पुनः भेजें",
   "verify": "सत्यापित करें",
-
   "profile_title": "अपनी प्रोफ़ाइल पूर्ण करें",
   "driver_profile_title": "ड्राइवर प्रोफ़ाइल पूर्ण करें",
   "profile_subtitle": "शुरू करने के लिए कुछ और विवरण",
@@ -83,15 +76,12 @@
   "enter_name": "अपना पूरा नाम दर्ज करें",
   "email": "ईमेल",
   "enter_email": "अपना ईमेल दर्ज करें",
-  "get_started": "शुरू करें",
   "start_driving": "ड्राइविंग शुरू करें",
   "submit_for_approval": "अनुमोदन के लिए जमा करें",
-
   "section_personal_info": "व्यक्तिगत जानकारी",
   "section_license": "लाइसेंस और पहचान",
   "section_vehicle": "वाहन जानकारी",
   "section_documents": "दस्तावेज़",
-
   "license_number": "ड्राइविंग लाइसेंस नंबर",
   "enter_license_number": "जैसे: OM123456",
   "license_expiry": "लाइसेंस समाप्ति तिथि",
@@ -112,7 +102,6 @@
   "tap_to_add_photo": "फोटो जोड़ने के लिए टैप करें",
   "photo_added": "फोटो जोड़ी गई",
   "pending_approval_note": "आपके खाते की हमारी टीम द्वारा समीक्षा की जाएगी। स्वीकृत होने पर आपको सूचित किया जाएगा।",
-
   "login": "लॉगिन",
   "register": "रजिस्टर",
   "logout": "लॉगआउट",
@@ -120,7 +109,6 @@
   "filter": "फ़िल्टर",
   "cancel": "रद्द करें",
   "save": "सहेजें",
-
   "coming_soon_title": "जल्द आ रहा है",
   "coming_soon_heading": "हम इस पर काम कर रहे हैं",
   "coming_soon_message": "यह सुविधा जल्द ही उपलब्ध होगी। भविष्य के अपडेट में फिर से देखें।",
@@ -193,7 +181,6 @@
   "driver_accept_snack": "यात्रा स्वीकृत",
   "trips_complete_snack": "यात्रा पूर्ण के रूप में चिह्नित",
   "profile_currency_locked": "केवल OMR मुद्रा समर्थित है",
-
   "profile_corporate_membership": "कॉर्पोरेट सदस्यता",
   "corporate_status_not_applied": "आवेदन नहीं किया",
   "corporate_status_pending": "समीक्षाधीन",
@@ -250,5 +237,15 @@
   "booking_corporate_personal_desc": "केवल मेरे लिए यात्रा",
   "booking_corporate_employee_desc": "मेरे नियोक्ता की ओर से",
   "booking_corporate_choose_mode": "बुकिंग प्रकार",
-  "booking_corporate_selected_org": "बुकिंग की ओर से"
+  "booking_corporate_selected_org": "बुकिंग की ओर से",
+  "common_retry": "पुनः प्रयास करें",
+  "listing_new": "नया",
+  "sort_popular": "सर्वाधिक लोकप्रिय",
+  "sort_price_low": "कीमत: कम से अधिक",
+  "sort_price_high": "कीमत: अधिक से कम",
+  "car_detail_mileage": "माइलेज",
+  "car_detail_total_price": "कुल कीमत",
+  "driver_filter_has_vehicle": "वाहन सहित",
+  "home_no_cars": "कोई कार उपलब्ध नहीं",
+  "home_no_drivers": "पास में कोई ड्राइवर नहीं"
 }

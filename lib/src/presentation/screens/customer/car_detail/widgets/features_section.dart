@@ -2,12 +2,14 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
+import 'package:provider/provider.dart';
 
-import '../data/car_detail_mock_data.dart';
+import '../provider/car_detail_provider.dart';
 import 'car_glass_card.dart';
 import 'section_header.dart';
 
-/// Wrap of feature chips (GPS, Bluetooth, etc).
+/// Wrap of feature chips from the vehicle's features list.
+/// Hidden when the feature list is empty.
 class FeaturesSection extends StatelessWidget {
   final bool isDark;
   final ColorScheme cs;
@@ -16,7 +18,14 @@ class FeaturesSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final features = buildCarFeatures();
+    final provider = context.watch<CarDetailProvider>();
+    final vehicle = provider.vehicle;
+    if (vehicle == null) return const SizedBox.shrink();
+
+    final features = vehicle.features;
+    if (features.isEmpty) return const SizedBox.shrink();
+
+    final ar = provider.ar;
 
     return CarGlassCard(
       isDark: isDark,
@@ -36,7 +45,10 @@ class FeaturesSection extends StatelessWidget {
             Wrap(
               spacing: 8.r,
               runSpacing: 8.r,
-              children: features.map((f) => _FeatureChip(label: f, isDark: isDark, cs: cs)).toList(),
+              children: features.map((f) {
+                final label = (ar ? f.serviceNameAr : f.serviceName) ?? f.serviceName ?? '';
+                return _FeatureChip(label: label, isDark: isDark, cs: cs);
+              }).toList(),
             ),
           ],
         ),

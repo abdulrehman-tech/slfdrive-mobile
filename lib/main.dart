@@ -6,6 +6,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:provider/provider.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'src/core/data/repositories/auth_repository.dart';
 import 'src/core/di/injection_container.dart';
 import 'src/core/network/media_http_override.dart';
 import 'src/core/secrets/maps_loader.dart';
@@ -16,8 +17,7 @@ import 'src/presentation/providers/theme_provider.dart';
 import 'src/presentation/screens/customer/profile/corporate/provider/corporate_provider.dart';
 import 'src/presentation/theme/app_theme.dart';
 import 'src/presentation/routes/app_router.dart';
-
-void main() async {
+ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await EasyLocalization.ensureInitialized();
 
@@ -59,7 +59,9 @@ void main() async {
           ChangeNotifierProvider.value(value: roleProvider),
           ChangeNotifierProvider(create: (_) => getIt<AuthProvider>()),
           ChangeNotifierProvider(create: (_) => CorporateProvider()),
-          ChangeNotifierProvider(create: (_) => LocationProvider()),
+          ChangeNotifierProvider(
+            create: (_) => LocationProvider(getIt<AuthRepository>(), getIt<FlutterSecureStorage>()),
+          ),
         ],
         child: const MyApp(),
       ),

@@ -2,6 +2,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
+import 'package:iconsax_flutter/iconsax_flutter.dart';
 import 'package:provider/provider.dart';
 
 import '../provider/home_provider.dart';
@@ -16,7 +17,7 @@ class NearbyDriversSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
-    final drivers = context.watch<HomeProvider>().nearbyDrivers;
+    final home = context.watch<HomeProvider>();
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -27,8 +28,19 @@ class NearbyDriversSection extends StatelessWidget {
           onViewAll: () => context.pushNamed('driver-listing'),
           isDesktop: isDesktop,
         ),
-        if (isDesktop)
-          ...drivers.map(
+        if (home.driversLoading)
+          _SectionSpinner(isDark: isDark)
+        else if (home.driversError != null)
+          _SectionError(
+            message: home.driversError!,
+            isDark: isDark,
+            cs: cs,
+            onRetry: home.load,
+          )
+        else if (home.nearbyDrivers.isEmpty)
+          _SectionEmpty(label: 'home_no_drivers'.tr(), isDark: isDark, cs: cs)
+        else if (isDesktop)
+          ...home.nearbyDrivers.map(
             (d) => Padding(
               padding: EdgeInsets.only(bottom: 12.r),
               child: DriverCard(
@@ -47,19 +59,102 @@ class NearbyDriversSection extends StatelessWidget {
               scrollDirection: Axis.horizontal,
               physics: const BouncingScrollPhysics(),
               padding: EdgeInsets.symmetric(horizontal: 16.r),
-              itemCount: drivers.length,
+              itemCount: home.nearbyDrivers.length,
               itemBuilder: (_, i) => Padding(
                 padding: EdgeInsetsDirectional.only(end: 12.r),
                 child: DriverCard(
-                  driver: drivers[i],
+                  driver: home.nearbyDrivers[i],
                   isDark: isDark,
                   cs: cs,
-                  onTap: () => context.pushNamed('driver-detail', pathParameters: {'id': drivers[i].id}),
+                  onTap: () => context.pushNamed('driver-detail', pathParameters: {'id': home.nearbyDrivers[i].id}),
                 ),
               ),
             ),
           ),
       ],
+    );
+  }
+}
+
+// ── Shared section-level state widgets ─────────────────────────────────────
+
+class _SectionSpinner extends StatelessWidget {
+  final bool isDark;
+  const _SectionSpinner({required this.isDark});
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: 100.r,
+      child: Center(
+        child: CircularProgressIndicator.adaptive(
+          valueColor: AlwaysStoppedAnimation<Color>(
+            Theme.of(context).colorScheme.primary,
+          ),
+          strokeWidth: 2.5,
+        ),
+      ),
+    );
+  }
+}
+
+class _SectionError extends StatelessWidget {
+  final String message;
+  final bool isDark;
+  final ColorScheme cs;
+  final VoidCallback onRetry;
+
+  const _SectionError({
+    required this.message,
+    required this.isDark,
+    required this.cs,
+    required this.onRetry,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: 90.r,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(Iconsax.warning_2_copy, color: cs.error, size: 22.r),
+          SizedBox(height: 6.r),
+          Text(
+            message,
+            style: TextStyle(fontSize: 12.r, color: cs.onSurface.withValues(alpha: 0.6)),
+            textAlign: TextAlign.center,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+          ),
+          SizedBox(height: 8.r),
+          TextButton(
+            onPressed: onRetry,
+            child: Text('retry'.tr(), style: TextStyle(fontSize: 12.r, color: cs.primary)),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _SectionEmpty extends StatelessWidget {
+  final String label;
+  final bool isDark;
+  final ColorScheme cs;
+
+  const _SectionEmpty({required this.label, required this.isDark, required this.cs});
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: 80.r,
+      child: Center(
+        child: Text(
+          label,
+          style: TextStyle(fontSize: 13.r, color: cs.onSurface.withValues(alpha: 0.45)),
+        ),
+      ),
     );
   }
 }

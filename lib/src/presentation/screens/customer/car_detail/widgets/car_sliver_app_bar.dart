@@ -5,7 +5,6 @@ import 'package:iconsax_flutter/iconsax_flutter.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../widgets/auth_gate.dart';
-import '../data/car_detail_mock_data.dart';
 import '../provider/car_detail_provider.dart';
 import 'sliver_image_gallery.dart';
 
@@ -20,6 +19,8 @@ class CarSliverAppBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final provider = context.watch<CarDetailProvider>();
+    final vehicle = provider.vehicle;
+    final title = vehicle?.displayTitle(ar: provider.ar) ?? '';
 
     return SliverAppBar(
       pinned: true,
@@ -29,7 +30,7 @@ class CarSliverAppBar extends StatelessWidget {
       backgroundColor: const Color(0xFF0C2485),
       surfaceTintColor: Colors.transparent,
       title: Text(
-        kCarDetailName,
+        title,
         style: TextStyle(fontSize: 16.r, fontWeight: FontWeight.w700, color: Colors.white),
       ),
       leading: GestureDetector(

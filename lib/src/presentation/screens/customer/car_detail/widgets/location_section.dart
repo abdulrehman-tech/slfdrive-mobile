@@ -2,12 +2,13 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
+import 'package:provider/provider.dart';
 
-import '../data/car_detail_mock_data.dart';
+import '../provider/car_detail_provider.dart';
 import 'car_glass_card.dart';
 import 'section_header.dart';
 
-/// Card showing the car pickup location (map placeholder for now).
+/// Card showing the car pickup location name.
 class LocationSection extends StatelessWidget {
   final bool isDark;
   final ColorScheme cs;
@@ -16,6 +17,13 @@ class LocationSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final provider = context.watch<CarDetailProvider>();
+    final vehicle = provider.vehicle;
+    if (vehicle == null) return const SizedBox.shrink();
+
+    final locationLabel = (provider.ar ? vehicle.locationNameAr : vehicle.locationName) ?? vehicle.locationName;
+    if (locationLabel == null || locationLabel.isEmpty) return const SizedBox.shrink();
+
     return CarGlassCard(
       isDark: isDark,
       child: Padding(
@@ -50,7 +58,7 @@ class LocationSection extends StatelessWidget {
                       Icon(Iconsax.map, size: 28.r, color: cs.onSurface.withValues(alpha: 0.2)),
                       SizedBox(height: 6.r),
                       Text(
-                        kCarDetailLocation,
+                        locationLabel,
                         style: TextStyle(fontSize: 11.r, color: cs.onSurface.withValues(alpha: 0.4)),
                       ),
                     ],

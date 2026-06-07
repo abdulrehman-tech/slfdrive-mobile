@@ -13,6 +13,5 @@ const kDriverSortOptions = <SortOption>[
   SortOption(id: 'popular', icon: Iconsax.star_1, label: 'Most Popular'),
   SortOption(id: 'price_low', icon: CupertinoIcons.arrow_down, label: 'Price: Low to High'),
   SortOption(id: 'price_high', icon: CupertinoIcons.arrow_up, label: 'Price: High to Low'),
-  SortOption(id: 'rating', icon: Iconsax.like_1, label: 'Highest Rated'),
   SortOption(id: 'experience', icon: Iconsax.medal_star, label: 'Most Experienced'),
 ];

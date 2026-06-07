@@ -30,13 +30,10 @@
   "app_name": "SLF Drive",
   "welcome": "Bienvenido a SLF Drive",
   "get_started": "Empezar",
-  
   "splash_tagline": "CONDUCE. ALQUILA. CONFÍA.",
-  
   "choose_language": "Elegir idioma",
   "choose_language_subtitle": "Por favor, elija su idioma preferido\npara continuar con SLF-Drive",
   "continue": "Continuar",
-  
   "onboarding_1_title": "Bienvenido a SLF Drive",
   "onboarding_1_desc": "Tu plataforma de confianza para alquiler de coches y servicios de conductor",
   "onboarding_2_title": "Encuentra tu viaje perfecto",
@@ -45,7 +42,6 @@
   "onboarding_3_desc": "Contrata conductores experimentados y verificados para un viaje seguro",
   "skip": "Saltar",
   "next": "Siguiente",
-  
   "pre_login_title": "Conduce.\nAlquila.\nConfía.",
   "pre_login_subtitle": "Tu plataforma de confianza para alquiler de coches y conductores profesionales",
   "pre_login_passenger": "Soy pasajero",
@@ -54,7 +50,6 @@
   "sign_in": "Iniciar sesión",
   "become_driver": "Ser conductor",
   "skip_explore": "Saltar y explorar la plataforma",
-
   "phone_title": "Ingresa tu teléfono",
   "driver_phone_title": "Únete como conductor",
   "phone_subtitle": "Te enviaremos un código de verificación",
@@ -66,7 +61,6 @@
   "otp_delivery_method": "Elige el método de entrega",
   "otp_via_sms": "SMS",
   "otp_via_whatsapp": "WhatsApp",
-
   "otp_title": "Verifica tu número",
   "otp_subtitle": "Ingresa el código enviado a {}",
   "otp_sent_via_sms": "Ingresa el código de 6 dígitos enviado por SMS a",
@@ -75,7 +69,6 @@
   "resend_in": "Reenviar código en {}",
   "resend_otp": "Reenviar código",
   "verify": "Verificar",
-
   "profile_title": "Completa tu perfil",
   "driver_profile_title": "Completa el perfil de conductor",
   "profile_subtitle": "Solo unos detalles más para comenzar",
@@ -83,15 +76,12 @@
   "enter_name": "Ingresa tu nombre completo",
   "email": "Correo electrónico",
   "enter_email": "Ingresa tu correo electrónico",
-  "get_started": "Empezar",
   "start_driving": "Empezar a conducir",
   "submit_for_approval": "Enviar para aprobación",
-
   "section_personal_info": "Información personal",
   "section_license": "Licencia e identidad",
   "section_vehicle": "Información del vehículo",
   "section_documents": "Documentos",
-
   "license_number": "Número de licencia de conducir",
   "enter_license_number": "ej. OM123456",
   "license_expiry": "Fecha de vencimiento de la licencia",
@@ -112,7 +102,6 @@
   "tap_to_add_photo": "Toca para añadir foto",
   "photo_added": "Foto añadida",
   "pending_approval_note": "Tu cuenta será revisada por nuestro equipo. Se te notificará una vez aprobada y podrás comenzar a aceptar viajes.",
-
   "login": "Iniciar sesión",
   "register": "Registrarse",
   "logout": "Cerrar sesión",
@@ -120,7 +109,6 @@
   "filter": "Filtrar",
   "cancel": "Cancelar",
   "save": "Guardar",
-
   "coming_soon_title": "Próximamente",
   "coming_soon_heading": "Estamos trabajando en ello",
   "coming_soon_message": "Esta función estará disponible pronto. Vuelve en una actualización futura.",
@@ -193,7 +181,6 @@
   "driver_accept_snack": "Viaje aceptado",
   "trips_complete_snack": "Viaje marcado como completado",
   "profile_currency_locked": "OMR es la única moneda admitida",
-
   "profile_corporate_membership": "Membresía corporativa",
   "corporate_status_not_applied": "No solicitado",
   "corporate_status_pending": "En revisión",
@@ -250,5 +237,15 @@
   "booking_corporate_personal_desc": "Un viaje solo para mí",
   "booking_corporate_employee_desc": "En nombre de mi empleador",
   "booking_corporate_choose_mode": "Tipo de reserva",
-  "booking_corporate_selected_org": "Reserva en nombre de"
+  "booking_corporate_selected_org": "Reserva en nombre de",
+  "common_retry": "Reintentar",
+  "listing_new": "Nuevo",
+  "sort_popular": "Más popular",
+  "sort_price_low": "Precio: de menor a mayor",
+  "sort_price_high": "Precio: de mayor a menor",
+  "car_detail_mileage": "Kilometraje",
+  "car_detail_total_price": "Precio total",
+  "driver_filter_has_vehicle": "Con vehículo",
+  "home_no_cars": "No hay autos disponibles",
+  "home_no_drivers": "No hay conductores cercanos"
 }

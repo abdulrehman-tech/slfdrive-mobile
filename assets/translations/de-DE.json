@@ -30,13 +30,10 @@
   "app_name": "SLF Drive",
   "welcome": "Willkommen bei SLF Drive",
   "get_started": "Loslegen",
-  
   "splash_tagline": "FAHREN. MIETEN. VERTRAUEN.",
-  
   "choose_language": "Sprache wählen",
   "choose_language_subtitle": "Bitte wählen Sie Ihre bevorzugte Sprache,\num mit SLF-Drive fortzufahren",
   "continue": "Weiter",
-  
   "onboarding_1_title": "Willkommen bei SLF Drive",
   "onboarding_1_desc": "Ihre vertrauenswürdige Plattform für Autovermietung und Fahrerservices",
   "onboarding_2_title": "Finden Sie Ihre perfekte Fahrt",
@@ -45,7 +42,6 @@
   "onboarding_3_desc": "Stellen Sie erfahrene und verifizierte Fahrer für eine sichere Reise ein",
   "skip": "Überspringen",
   "next": "Weiter",
-  
   "pre_login_title": "Fahren.\nMieten.\nVertrauen.",
   "pre_login_subtitle": "Ihre vertrauenswürdige Plattform für Autovermietung und professionelle Fahrer",
   "pre_login_passenger": "Ich bin Fahrgast",
@@ -54,7 +50,6 @@
   "sign_in": "Anmelden",
   "become_driver": "Fahrer werden",
   "skip_explore": "Überspringen & Plattform erkunden",
-
   "phone_title": "Telefonnummer eingeben",
   "driver_phone_title": "Als Fahrer beitreten",
   "phone_subtitle": "Wir senden Ihnen einen Bestätigungscode",
@@ -66,7 +61,6 @@
   "otp_delivery_method": "Zustellmethode wählen",
   "otp_via_sms": "SMS",
   "otp_via_whatsapp": "WhatsApp",
-  
   "otp_title": "Nummer verifizieren",
   "otp_subtitle": "Geben Sie den 6-stelligen Code ein, der an {} gesendet wurde",
   "otp_sent_via_sms": "Geben Sie den 6-stelligen Code ein, der per SMS an",
@@ -75,7 +69,6 @@
   "resend_in": "Code in {} erneut senden",
   "resend_otp": "Code erneut senden",
   "verify": "Verifizieren",
-
   "profile_title": "Profil vervollständigen",
   "driver_profile_title": "Fahrerprofil vervollständigen",
   "profile_subtitle": "Noch ein paar Details zum Starten",
@@ -83,15 +76,12 @@
   "enter_name": "Geben Sie Ihren vollständigen Namen ein",
   "email": "E-Mail",
   "enter_email": "Geben Sie Ihre E-Mail ein",
-  "get_started": "Loslegen",
   "start_driving": "Fahren beginnen",
   "submit_for_approval": "Zur Genehmigung einreichen",
-
   "section_personal_info": "Persönliche Informationen",
   "section_license": "Führerschein & Identität",
   "section_vehicle": "Fahrzeuginformationen",
   "section_documents": "Dokumente",
-
   "license_number": "Führerscheinnummer",
   "enter_license_number": "z.B. OM123456",
   "license_expiry": "Ablaufdatum des Führerscheins",
@@ -112,7 +102,6 @@
   "tap_to_add_photo": "Tippen Sie, um ein Foto hinzuzufügen",
   "photo_added": "Foto hinzugefügt",
   "pending_approval_note": "Ihr Konto wird von unserem Team überprüft. Sie werden benachrichtigt, sobald es genehmigt ist.",
-
   "login": "Anmelden",
   "register": "Registrieren",
   "logout": "Abmelden",
@@ -120,7 +109,6 @@
   "filter": "Filter",
   "cancel": "Abbrechen",
   "save": "Speichern",
-
   "coming_soon_title": "Bald verfügbar",
   "coming_soon_heading": "Wir arbeiten daran",
   "coming_soon_message": "Diese Funktion ist in Arbeit. Schauen Sie bei einem zukünftigen Update wieder vorbei.",
@@ -193,7 +181,6 @@
   "driver_accept_snack": "Fahrt angenommen — bis zur Abholung",
   "trips_complete_snack": "Fahrt als abgeschlossen markiert",
   "profile_currency_locked": "OMR ist die einzige unterstützte Währung",
-
   "profile_corporate_membership": "Firmenmitgliedschaft",
   "corporate_status_not_applied": "Nicht beantragt",
   "corporate_status_pending": "In Prüfung",
@@ -250,5 +237,15 @@
   "booking_corporate_personal_desc": "Eine Reise nur für mich",
   "booking_corporate_employee_desc": "Im Namen meines Arbeitgebers",
   "booking_corporate_choose_mode": "Buchungsart",
-  "booking_corporate_selected_org": "Buchung im Auftrag von"
+  "booking_corporate_selected_org": "Buchung im Auftrag von",
+  "common_retry": "Wiederholen",
+  "listing_new": "Neu",
+  "sort_popular": "Beliebteste",
+  "sort_price_low": "Preis: aufsteigend",
+  "sort_price_high": "Preis: absteigend",
+  "car_detail_mileage": "Kilometerstand",
+  "car_detail_total_price": "Gesamtpreis",
+  "driver_filter_has_vehicle": "Mit Fahrzeug",
+  "home_no_cars": "Keine Autos verfügbar",
+  "home_no_drivers": "Keine Fahrer in der Nähe"
 }

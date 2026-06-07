@@ -1,9 +1,13 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../constants/breakpoints.dart';
+import '../../../../core/data/repositories/driver_listing_repository.dart';
+import '../../../../core/data/repositories/vehicle_repository.dart';
+import '../../../../core/di/injection_container.dart';
 import '../../../providers/auth_provider.dart';
 import '../../../providers/theme_provider.dart';
 import '../../../widgets/auth_gate.dart';
@@ -34,8 +38,13 @@ class CustomerHomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final ar = context.locale.languageCode == 'ar';
     return ChangeNotifierProvider(
-      create: (_) => HomeProvider(),
+      create: (_) => HomeProvider(
+        vehicleRepository: getIt<VehicleRepository>(),
+        driverRepository: getIt<DriverListingRepository>(),
+        ar: ar,
+      ),
       child: _CustomerHomeShell(tabBody: tabBody),
     );
   }
@@ -184,7 +193,12 @@ class _CustomerHomeShellState extends State<_CustomerHomeShell> with SingleTicke
   Widget _buildMobileLayout() {
     final isDark = _isDark;
     return RefreshIndicator(
-      onRefresh: () => context.read<AuthProvider>().refreshCustomerStatus(),
+      onRefresh: () async {
+        await Future.wait([
+          context.read<AuthProvider>().refreshCustomerStatus(),
+          context.read<HomeProvider>().load(),
+        ]);
+      },
       child: CustomScrollView(
         physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
         slivers: [
