@@ -32,7 +32,7 @@ class DriverDetailScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (_) => DriverDetailProvider(),
+      create: (_) => DriverDetailProvider(driverId: int.tryParse(driverId) ?? 0),
       child: const _DriverDetailView(),
     );
   }
@@ -66,15 +66,31 @@ class _DriverDetailView extends StatelessWidget {
     final isDesktop = Breakpoints.isDesktop(MediaQuery.of(context).size.width);
     final isDark = _isDark(context);
     final cs = Theme.of(context).colorScheme;
+    final provider = context.watch<DriverDetailProvider>();
+
+    Widget body;
+    if (provider.profile == null && provider.isLoading) {
+      body = const Center(child: CircularProgressIndicator());
+    } else if (provider.profile == null) {
+      body = _ErrorState(
+        message: provider.error ?? 'driver_not_found'.tr(),
+        onRetry: () => context.read<DriverDetailProvider>().load(),
+      );
+    } else {
+      body = isDesktop
+          ? _buildDesktop(context, isDark, cs)
+          : _buildMobile(context, isDark, cs);
+    }
+
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      body: isDesktop ? _buildDesktop(context, isDark, cs) : _buildMobile(context, isDark, cs),
+      body: body,
     );
   }
 
   Widget _buildMobile(BuildContext context, bool isDark, ColorScheme cs) {
     final provider = context.read<DriverDetailProvider>();
-    final profile = provider.profile;
+    final profile = provider.profile!;
     return Stack(
       children: [
         CustomScrollView(
@@ -125,7 +141,7 @@ class _DriverDetailView extends StatelessWidget {
   }
 
   Widget _buildDesktop(BuildContext context, bool isDark, ColorScheme cs) {
-    final profile = context.read<DriverDetailProvider>().profile;
+    final profile = context.read<DriverDetailProvider>().profile!;
     return SingleChildScrollView(
       physics: const BouncingScrollPhysics(),
       padding: EdgeInsets.symmetric(horizontal: 40.r, vertical: 28.r),
@@ -205,6 +221,50 @@ class _DriverDetailView extends StatelessWidget {
             ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+class _ErrorState extends StatelessWidget {
+  final String message;
+  final VoidCallback onRetry;
+  const _ErrorState({required this.message, required this.onRetry});
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    return SafeArea(
+      child: Stack(
+        children: [
+          Positioned(
+            top: 8.r,
+            left: 8.r,
+            child: IconButton(
+              icon: Icon(CupertinoIcons.back, color: cs.onSurface),
+              onPressed: () => Navigator.of(context).pop(),
+            ),
+          ),
+          Center(
+            child: Padding(
+              padding: EdgeInsets.all(24.r),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(CupertinoIcons.exclamationmark_circle, size: 44.r, color: cs.error),
+                  SizedBox(height: 12.r),
+                  Text(
+                    message,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontSize: 14.r, color: cs.onSurface.withValues(alpha: 0.7)),
+                  ),
+                  SizedBox(height: 16.r),
+                  FilledButton(onPressed: onRetry, child: Text('retry'.tr())),
+                ],
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

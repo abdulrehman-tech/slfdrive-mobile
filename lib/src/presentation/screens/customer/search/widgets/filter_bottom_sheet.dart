@@ -6,7 +6,6 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 
 import '../../../../widgets/omr_icon.dart';
-import '../data/search_mock_data.dart';
 import '../provider/search_provider.dart';
 
 typedef FilterApplyCallback = void Function(
@@ -25,6 +24,7 @@ class FilterBottomSheet extends StatefulWidget {
   final RangeValues priceRange;
   final Set<String> selectedBrands;
   final double minRating;
+  final List<String> brands;
   final FilterApplyCallback onApply;
 
   const FilterBottomSheet({
@@ -36,6 +36,7 @@ class FilterBottomSheet extends StatefulWidget {
     required this.priceRange,
     required this.selectedBrands,
     required this.minRating,
+    required this.brands,
     required this.onApply,
   });
 
@@ -211,7 +212,7 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
                         Wrap(
                           spacing: 8.r,
                           runSpacing: 8.r,
-                          children: kSearchBrands.map((b) {
+                          children: widget.brands.map((b) {
                             final active = _brands.contains(b);
                             return GestureDetector(
                               onTap: () => setState(() {

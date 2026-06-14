@@ -1,29 +1,131 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
-import '../data/search_mock_data.dart';
+import '../../../../../core/data/repositories/driver_listing_repository.dart';
+import '../../../../../core/data/repositories/vehicle_repository.dart';
+import '../../../../../core/di/injection_container.dart';
+import '../../../../../core/errors/app_exception.dart';
+import '../../../../../core/models/common/pagination_params.dart';
+import '../../../../../core/models/driver/driver_listing_item.dart';
+import '../../../../../core/models/vehicle/vehicle.dart';
 import '../models/search_result_car.dart';
 import '../models/search_result_driver.dart';
 
-/// Owns search query + filter state and exposes filtered result lists.
+/// Owns search query + filter state and the server-backed result lists.
+///
+/// Free-text search is delegated to the backend via `searchFilter` on the
+/// `Vehicle/paginated` and `Driver/paginated` endpoints (debounced). Price,
+/// brand and rating filters the backend can't express are applied client-side
+/// over the fetched page.
 class SearchProvider extends ChangeNotifier {
+  SearchProvider({
+    VehicleRepository? vehicleRepository,
+    DriverListingRepository? driverRepository,
+  })  : _vehicles = vehicleRepository ?? getIt<VehicleRepository>(),
+        _drivers = driverRepository ?? getIt<DriverListingRepository>() {
+    _fetch();
+  }
+
   static const defaultPriceRange = RangeValues(0, 500);
+  static const _pageSize = 30;
+
+  final VehicleRepository _vehicles;
+  final DriverListingRepository _drivers;
 
   // ── Query ────────────────────────────────────────
   final TextEditingController searchController = TextEditingController();
   final FocusNode focusNode = FocusNode();
   String _query = '';
   String get query => _query;
+  Timer? _debounce;
 
   void setQuery(String v) {
     _query = v;
     notifyListeners();
+    _debounce?.cancel();
+    _debounce = Timer(const Duration(milliseconds: 350), _fetch);
   }
 
   void clearQuery() {
     searchController.clear();
     _query = '';
     notifyListeners();
+    _debounce?.cancel();
+    _fetch();
   }
+
+  // ── Fetched data ─────────────────────────────────
+  List<SearchResultCar> _carResults = const [];
+  List<SearchResultDriver> _driverResults = const [];
+
+  bool _isLoading = false;
+  bool get isLoading => _isLoading;
+
+  /// Distinct, sorted brand names present in the current car results — drives
+  /// the brand chips in the filter sheet.
+  List<String> get availableBrands {
+    final set = <String>{
+      for (final c in _carResults)
+        if (c.brand.trim().isNotEmpty) c.brand.trim(),
+    };
+    final list = set.toList()..sort();
+    return list;
+  }
+
+  String? _error;
+  String? get error => _error;
+
+  Future<void> _fetch() async {
+    _isLoading = true;
+    _error = null;
+    notifyListeners();
+    final params = PaginationParams(
+      pageNumber: 1,
+      pageSize: _pageSize,
+      searchFilter: _query.trim().isEmpty ? null : _query.trim(),
+    );
+    try {
+      // Kick off both requests concurrently, keep their generic types.
+      final vehiclesFuture = _vehicles.getPaginated(params);
+      final driversFuture = _drivers.getPaginated(params);
+      final vehiclePage = await vehiclesFuture;
+      final driverPage = await driversFuture;
+      _carResults = vehiclePage.items.map(_mapCar).toList();
+      _driverResults = driverPage.items.map(_mapDriver).toList();
+    } on AppException catch (e) {
+      _error = e.message;
+    } catch (e) {
+      _error = e.toString();
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<void> retry() => _fetch();
+
+  SearchResultCar _mapCar(Vehicle v) => SearchResultCar(
+        id: v.id.toString(),
+        name: v.displayTitle(),
+        imageUrl: v.primaryPhoto ?? '',
+        pricePerDay: v.pricePerDay ?? 0,
+        brand: v.brandName ?? '',
+        rating: v.rating ?? 0,
+        transmission: v.transmissionTypeName ?? '',
+        seats: v.seats ?? 0,
+        fuelType: v.fuelTypeName ?? '',
+      );
+
+  SearchResultDriver _mapDriver(DriverListingItem d) => SearchResultDriver(
+        id: d.id.toString(),
+        name: d.displayName(),
+        avatarUrl: d.resolvedPhotoUrl ?? '',
+        rating: d.rating ?? 0,
+        trips: 0,
+        speciality: d.locationName ?? '',
+        pricePerDay: d.amountPerDay ?? 0,
+      );
 
   // ── Filters ──────────────────────────────────────
   int _typeFilter = 0; // 0=All, 1=Cars, 2=Drivers
@@ -81,36 +183,30 @@ class SearchProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  // ── Filtered results ─────────────────────────────
+  // ── Filtered results (client-side over fetched page) ──
   List<SearchResultCar> get filteredCars {
     if (_typeFilter == 2) return const [];
-    final q = _query.toLowerCase();
-    return kSearchAllCars.where((c) {
-      if (q.isNotEmpty && !c.name.toLowerCase().contains(q) && !c.brand.toLowerCase().contains(q)) {
-        return false;
-      }
+    return _carResults.where((c) {
       if (_selectedBrands.isNotEmpty && !_selectedBrands.contains(c.brand)) return false;
       if (c.pricePerDay < _priceRange.start || c.pricePerDay > _priceRange.end) return false;
-      if (c.rating < _minRating) return false;
+      // Ratings aren't yet served per-vehicle; only filter when a rating exists.
+      if (_minRating > 0 && c.rating > 0 && c.rating < _minRating) return false;
       return true;
     }).toList();
   }
 
   List<SearchResultDriver> get filteredDrivers {
     if (_typeFilter == 1) return const [];
-    final q = _query.toLowerCase();
-    return kSearchAllDrivers.where((d) {
-      if (q.isNotEmpty && !d.name.toLowerCase().contains(q) && !d.speciality.toLowerCase().contains(q)) {
-        return false;
-      }
+    return _driverResults.where((d) {
       if (d.pricePerDay < _priceRange.start || d.pricePerDay > _priceRange.end) return false;
-      if (d.rating < _minRating) return false;
+      if (_minRating > 0 && d.rating > 0 && d.rating < _minRating) return false;
       return true;
     }).toList();
   }
 
   @override
   void dispose() {
+    _debounce?.cancel();
     searchController.dispose();
     focusNode.dispose();
     super.dispose();

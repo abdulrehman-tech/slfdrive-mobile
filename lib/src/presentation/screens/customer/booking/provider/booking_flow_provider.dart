@@ -1,7 +1,13 @@
-import 'dart:math';
-
 import 'package:flutter/foundation.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:url_launcher/url_launcher.dart';
 
+import '../../../../../constants/storage_keys.dart';
+import '../../../../../core/data/repositories/booking_repository.dart';
+import '../../../../../core/di/injection_container.dart';
+import '../../../../../core/errors/app_exception.dart';
+import '../../../../../core/models/booking/booking_creation_request.dart';
+import '../../../../../core/services/booking_lookups.dart';
 import '../models/booking_data.dart';
 import '../models/booking_step_id.dart';
 
@@ -137,23 +143,117 @@ class BookingFlowProvider extends ChangeNotifier {
     return true;
   }
 
-  /// Simulates payment submission. Resolves once a booking reference has been
-  /// assigned to the underlying [BookingData]; the caller is then responsible
-  /// for navigating to the success screen.
-  Future<void> submitPayment() async {
+  String? _error;
+  String? get error => _error;
+
+  /// Submits the booking to the backend and, for gateway payment methods,
+  /// starts the OmPay checkout. Returns `true` once a real booking reference
+  /// has been assigned to [data]; the caller then navigates to success. On
+  /// failure returns `false` and exposes [error].
+  Future<bool> submitPayment() async {
     _submitting = true;
+    _error = null;
     notifyListeners();
-    await Future<void>.delayed(const Duration(milliseconds: 1200));
-    data.assignBookingRef(_generateRef());
-    _submitting = false;
-    notifyListeners();
+    try {
+      final repo = getIt<BookingRepository>();
+      final lookups = getIt<BookingLookups>();
+      final storage = getIt<FlutterSecureStorage>();
+      await lookups.ensureLoaded();
+
+      final userId = int.tryParse(await storage.read(key: StorageKeys.userId) ?? '');
+      if (userId == null) {
+        _error = 'not_signed_in';
+        return false;
+      }
+
+      final service = data.serviceType ?? BookingServiceType.rentCar;
+      final serviceTypeId = lookups.serviceTypeId(service);
+      final paymentTypeId = lookups.paymentTypeId(data.paymentMethod);
+      final bookingTypeId = lookups.bookingTypeId(corporate: data.isCorporate);
+      final statusId = lookups.initialStatusId();
+      if (serviceTypeId == null ||
+          paymentTypeId == null ||
+          bookingTypeId == null ||
+          statusId == null) {
+        _error = 'booking_config_unavailable';
+        return false;
+      }
+
+      final start = data.startAt ?? DateTime.now();
+      final end = data.endAt ?? start;
+      final pickup = data.pickupMode == PickupMode.delivery
+          ? data.deliveryLocation
+          : data.pickupLocation;
+      final detail = BookingDetailsCreationRequest(
+        fromDateTime: start.toIso8601String(),
+        toDateTime: end.toIso8601String(),
+        pickUpLat: pickup?.latitude,
+        pickUpLon: pickup?.longitude,
+        dropOffLat: data.deliveryLocation?.latitude,
+        dropOffLon: data.deliveryLocation?.longitude,
+        amount: data.totalPrice,
+      );
+
+      final request = BookingCreationRequest(
+        userId: userId,
+        vehicleId: int.tryParse(data.car?.id ?? ''),
+        driverId: int.tryParse(data.driver?.id ?? ''),
+        corporateCompanyId:
+            data.isCorporate ? int.tryParse(data.organization?.id ?? '') : null,
+        totalAmount: data.totalPrice,
+        statusId: statusId,
+        bookingTypeId: bookingTypeId,
+        serviceTypeId: serviceTypeId,
+        paymentTypeId: paymentTypeId,
+        bookingDetails: [detail],
+      );
+
+      final created = await repo.create(request);
+      final bookingId = created.bookingId;
+      if (bookingId == null) {
+        _error = 'booking_failed';
+        return false;
+      }
+
+      // Gateway payment methods kick off an OmPay checkout. The redirect is
+      // opened externally; final reconciliation happens via the backend webhook,
+      // so verify here is best-effort and never blocks success.
+      if (_usesGateway(data.paymentMethod)) {
+        final init = await repo.omPayInit(bookingId, kIsWeb ? 'web' : 'mobile');
+        final url = init.redirectUrl ?? init.checkoutJsUrl;
+        if (url != null && url.isNotEmpty) {
+          final uri = Uri.tryParse(url);
+          if (uri != null) {
+            await launchUrl(uri, mode: LaunchMode.externalApplication);
+          }
+        }
+        if (init.orderId != null) {
+          try {
+            await repo.omPayVerify(bookingId, init.orderId!);
+          } catch (_) {
+            // pending/failed verification is non-fatal here
+          }
+        }
+      }
+
+      data.assignBookingRef(created.bookingNo ?? 'SLF$bookingId');
+      return true;
+    } on AppException catch (e) {
+      _error = e.message;
+      return false;
+    } catch (e) {
+      _error = e.toString();
+      return false;
+    } finally {
+      _submitting = false;
+      notifyListeners();
+    }
   }
 
-  String _generateRef() {
-    final rand = Random();
-    final code = List.generate(6, (_) => rand.nextInt(10)).join();
-    return 'SLF$code';
-  }
+  bool _usesGateway(PaymentMethod m) =>
+      m == PaymentMethod.card ||
+      m == PaymentMethod.applePay ||
+      m == PaymentMethod.wallet;
 
   void _onDataChange() => notifyListeners();
 

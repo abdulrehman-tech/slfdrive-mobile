@@ -18,7 +18,7 @@ class GlassHeaderOverlay extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final provider = context.watch<DriverDetailProvider>();
-    final profile = provider.profile;
+    final profile = provider.profile!;
     final topPad = MediaQuery.of(context).padding.top;
     final t = (provider.scrollOffset / 180).clamp(0.0, 1.0);
 

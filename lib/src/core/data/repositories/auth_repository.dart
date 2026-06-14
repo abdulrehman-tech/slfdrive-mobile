@@ -15,11 +15,7 @@ import '../datasources/auth_remote_data_source.dart';
 abstract class AuthRepository {
   /// Sends an OTP and returns the session (read `user.id` for verify,
   /// `requiresOtp`/`otpId` for flow control).
-  Future<AuthSession> sendOtp({
-    required String phoneNumber,
-    required String preferredLang,
-    String channel,
-  });
+  Future<AuthSession> sendOtp({required String phoneNumber, required String preferredLang, String channel});
 
   /// Verifies the OTP, persists tokens + user, and returns the user.
   Future<User> verifyOtp({required int userId, required String otpCode});
@@ -70,11 +66,7 @@ abstract class AuthRepository {
 
   /// Persists the user's chosen location server-side
   /// (`POST /api/User/set-location`). Used by the home location picker.
-  Future<void> setUserLocation({
-    required int userId,
-    required double lat,
-    required double lon,
-  });
+  Future<void> setUserLocation({required int userId, required double lat, required double lon});
 
   Future<void> logout();
 }
@@ -91,17 +83,9 @@ class AuthRepositoryImpl implements AuthRepository {
     required String preferredLang,
     String channel = 'sms',
   }) async {
-    final res = await remote.loginMobile(
-      phoneNumber: phoneNumber,
-      preferredLang: preferredLang,
-      channel: channel,
-    );
+    final res = await remote.loginMobile(phoneNumber: phoneNumber, preferredLang: preferredLang, channel: channel);
     if (!res.isSuccess || res.data == null) {
-      throw AppException(
-        message: res.message ?? 'Failed to send OTP',
-        messageAr: res.messageAr,
-        errors: res.errors,
-      );
+      throw AppException(message: res.message ?? 'Failed to send OTP', messageAr: res.messageAr, errors: res.errors);
     }
     return res.data!;
   }
@@ -138,7 +122,9 @@ class AuthRepositoryImpl implements AuthRepository {
     // set it, so without this the user has no role on the next login.
     try {
       await remote.setRole(userId: userId, roleId: 3);
-    } catch (_) {/* non-fatal — completion still proceeds */}
+    } catch (_) {
+      /* non-fatal — completion still proceeds */
+    }
     final res = await remote.completeIndividualProfile(
       userId: userId,
       fullName: fullName,
@@ -158,15 +144,16 @@ class AuthRepositoryImpl implements AuthRepository {
     }
     // The endpoint returns no body on success — fall back to what we submitted
     // so the session/UI still has a name + role to show.
-    final user = res.data ??
-        User(id: userId, fullName: fullName, email: email, roleId: 3);
+    final user = res.data ?? User(id: userId, fullName: fullName, email: email, roleId: 3);
     await _persistProfileUser(user, isDriver: false);
     // The individual-profile endpoint has no lat/lon — persist the captured
     // location separately (best-effort, never fails the signup).
     if (lat != null && lon != null) {
       try {
         await remote.setLocation(userId: userId, lat: lat, lon: lon);
-      } catch (_) {/* location is optional */}
+      } catch (_) {
+        /* location is optional */
+      }
     }
     return user;
   }
@@ -202,7 +189,9 @@ class AuthRepositoryImpl implements AuthRepository {
     // it, so without this the user lands on the customer home on the next login.
     try {
       await remote.setRole(userId: userId, roleId: 2);
-    } catch (_) {/* non-fatal — completion still proceeds */}
+    } catch (_) {
+      /* non-fatal — completion still proceeds */
+    }
     final res = await remote.completeDriverProfile(
       userId: userId,
       fullName: fullName,
@@ -238,14 +227,7 @@ class AuthRepositoryImpl implements AuthRepository {
     }
     // The endpoint returns no body on success — synthesize from the submitted
     // fields. A freshly completed driver is unverified (pending admin review).
-    final user = res.data ??
-        User(
-          id: userId,
-          fullName: fullName,
-          email: email,
-          roleId: 2,
-          isVerified: false,
-        );
+    final user = res.data ?? User(id: userId, fullName: fullName, email: email, roleId: 2, isVerified: false);
     await _persistProfileUser(user, isDriver: true);
     return user;
   }
@@ -253,11 +235,7 @@ class AuthRepositoryImpl implements AuthRepository {
   /// Revokes the refresh token server-side (best-effort) then clears all auth +
   /// user-identity keys. Deliberately leaves app prefs (theme, language,
   @override
-  Future<void> setUserLocation({
-    required int userId,
-    required double lat,
-    required double lon,
-  }) {
+  Future<void> setUserLocation({required int userId, required double lat, required double lon}) {
     return remote.setLocation(userId: userId, lat: lat, lon: lon);
   }
 
@@ -310,10 +288,7 @@ class AuthRepositoryImpl implements AuthRepository {
   /// completion responses don't always echo the role back.
   Future<void> _persistProfileUser(User user, {required bool isDriver}) async {
     await storage.write(key: StorageKeys.userId, value: user.id.toString());
-    await storage.write(
-      key: StorageKeys.userRole,
-      value: isDriver ? 'driver' : 'customer',
-    );
+    await storage.write(key: StorageKeys.userRole, value: isDriver ? 'driver' : 'customer');
     if (user.email != null) {
       await storage.write(key: StorageKeys.userEmail, value: user.email);
     }
@@ -326,10 +301,7 @@ class AuthRepositoryImpl implements AuthRepository {
     if (user.photoUrl != null) {
       await storage.write(key: StorageKeys.userProfileImage, value: user.photoUrl);
     }
-    await storage.write(
-      key: StorageKeys.isVerified,
-      value: (user.isVerified ?? false).toString(),
-    );
+    await storage.write(key: StorageKeys.isVerified, value: (user.isVerified ?? false).toString());
     await storage.write(key: StorageKeys.isLoggedIn, value: 'true');
   }
 }

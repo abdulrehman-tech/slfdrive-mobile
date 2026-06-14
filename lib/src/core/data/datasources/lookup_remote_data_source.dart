@@ -1,5 +1,6 @@
 import '../../../constants/endpoints.dart';
 import '../../errors/error_handler.dart';
+import '../../models/common/general_lookup.dart';
 import '../../models/lookup/location_option.dart';
 import '../../models/lookup/offered_service.dart';
 import '../../models/vehicle/vehicle_brand.dart';
@@ -23,6 +24,12 @@ abstract class LookupRemoteDataSource {
 
   /// Active offered services from `/api/OfferedServices/active`.
   Future<List<OfferedService>> getActiveOfferedServices();
+
+  /// All active general types from `/api/GeneralType/active`.
+  Future<List<GeneralLookup>> getActiveGeneralTypes();
+
+  /// All active general statuses from `/api/GeneralStatus/active`.
+  Future<List<GeneralLookup>> getActiveGeneralStatuses();
 }
 
 class LookupRemoteDataSourceImpl implements LookupRemoteDataSource {
@@ -49,6 +56,14 @@ class LookupRemoteDataSourceImpl implements LookupRemoteDataSource {
   @override
   Future<List<OfferedService>> getActiveOfferedServices() =>
       _getList(ApiEndpoints.activeOfferedServices, OfferedService.fromJson);
+
+  @override
+  Future<List<GeneralLookup>> getActiveGeneralTypes() =>
+      _getList(ApiEndpoints.activeGeneralTypes, GeneralLookup.fromJson);
+
+  @override
+  Future<List<GeneralLookup>> getActiveGeneralStatuses() =>
+      _getList(ApiEndpoints.activeGeneralStatuses, GeneralLookup.fromJson);
 
   /// Shared GET → unwrap `data` list → map helper for the lookup endpoints.
   Future<List<T>> _getList<T>(String path, T Function(Map<String, dynamic>) fromJson) async {

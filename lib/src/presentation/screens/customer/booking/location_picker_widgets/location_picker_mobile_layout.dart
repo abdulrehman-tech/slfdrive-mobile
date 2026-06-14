@@ -42,6 +42,7 @@ class LocationPickerMobileLayout extends StatelessWidget {
             child: Padding(
               padding: EdgeInsets.all(14.r),
               child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   LocationPickerGlassCircle(
                     icon: CupertinoIcons.back,

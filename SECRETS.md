@@ -66,12 +66,50 @@ Any Dart-side use of a secret goes through `AppSecrets` in
 `lib/src/core/secrets/app_secrets.dart`, which reads compile-time defines
 supplied via `--dart-define-from-file=.env`.
 
+### Places API (`PLACES_API_KEY`)
+
+The location-picker search bar calls the **Places API (New)** over plain HTTPS
+from Dart (`lib/src/core/services/places_service.dart`), reading
+`AppSecrets.placesApiKey`. This is a **separate** key from the Maps SDK keys —
+it must NOT carry an HTTP-referrer or Android/iOS application restriction:
+
+- REST requests send an empty referer and no app signature, so a referrer- or
+  app-restricted key returns `403 API_KEY_HTTP_REFERRER_BLOCKED` /
+  `API_KEY_ANDROID_APP_BLOCKED`.
+- The native Maps SDK keys in `secrets.properties` / `Secrets.xcconfig` are
+  **not** usable here — Dart cannot read them, and their restrictions block REST.
+
+Create a dedicated key, set **Application restrictions = None** and
+**API restrictions = Places API (New)** only, then put it in `.env`:
+
+```
+PLACES_API_KEY=AIza...   # leave blank to fall back to GOOGLE_MAPS_API_KEY
+```
+
+Because it has no app restriction, cap abuse with a Cloud Console **quota
+limit** on the Places API. The key is supplied via the same
+`--dart-define-from-file=.env`, so a device run that needs Places must pass it:
+
+```sh
+flutter run --dart-define-from-file=.env
+```
+
+Validate a key the way the app calls it (no referer):
+
+```sh
+curl -s -X POST "https://places.googleapis.com/v1/places:autocomplete" \
+  -H "Content-Type: application/json" -H "X-Goog-Api-Key: $PLACES_API_KEY" \
+  -d '{"input":"Muscat"}'
+```
+
 ## Recommended practice
 
 1. **Restrict keys in Google Cloud** — bundle id / SHA-1 (Android), bundle id
    (iOS), HTTP referrer (web). A leaked but restricted key is near-useless.
 2. **Separate keys per platform** when possible (Android key, iOS key, web
-   key). Each can be restricted to its own bundle/referrer.
+   key). Each can be restricted to its own bundle/referrer. The Places REST key
+   (`PLACES_API_KEY`) is a fourth, app-restriction-free key — limit it by API +
+   quota instead (see above).
 3. **Never commit real values** — the `.gitignore` is already set up; just
    don't disable it.
 4. **CI** — store secrets as masked env vars and write them into

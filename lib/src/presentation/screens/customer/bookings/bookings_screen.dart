@@ -56,7 +56,9 @@ class _MobileLayout extends StatelessWidget {
       slivers: [
         BookingsAppBar(isDark: isDark, cs: cs),
         SliverToBoxAdapter(child: BookingsTabBar(isDark: isDark, cs: cs)),
-        if (bookings.isEmpty)
+        if (provider.isLoading && provider.bookings.isEmpty)
+          const SliverFillRemaining(child: Center(child: CircularProgressIndicator()))
+        else if (bookings.isEmpty)
           SliverFillRemaining(
             child: BookingsEmpty(
               isDark: isDark,
@@ -124,7 +126,9 @@ class _DesktopLayout extends StatelessWidget {
                 ],
               ),
               SizedBox(height: 24.r),
-              if (bookings.isEmpty)
+              if (provider.isLoading && provider.bookings.isEmpty)
+                SizedBox(height: 400.r, child: const Center(child: CircularProgressIndicator()))
+              else if (bookings.isEmpty)
                 SizedBox(
                   height: 400.r,
                   child: BookingsEmpty(

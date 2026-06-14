@@ -54,6 +54,7 @@ class _SearchView extends StatelessWidget {
         priceRange: provider.priceRange,
         selectedBrands: Set.from(provider.selectedBrands),
         minRating: provider.minRating,
+        brands: provider.availableBrands,
         onApply: (type, duration, price, brands, rating) {
           provider.applyFilters(
             type: type,
@@ -106,7 +107,9 @@ class _SearchView extends StatelessWidget {
           onFilterTap: () => _showFilterSheet(context, isDark, cs),
         ),
         Expanded(
-          child: !hasResults
+          child: provider.isLoading && !hasResults
+              ? const Center(child: CircularProgressIndicator())
+              : !hasResults
               ? EmptyResults(
                   isDark: isDark,
                   cs: cs,
@@ -203,9 +206,11 @@ class _SearchView extends StatelessWidget {
             child: Container(
               constraints: BoxConstraints(maxWidth: 1100.r),
               padding: EdgeInsets.symmetric(horizontal: 24.r),
-              child: provider.query.isEmpty && !provider.hasActiveFilters
+              child: provider.query.isEmpty && !provider.hasActiveFilters && !hasResults
                   ? InitialState(isDark: isDark, cs: cs)
-                  : !hasResults
+                  : provider.isLoading && !hasResults
+                      ? const Center(child: CircularProgressIndicator())
+                      : !hasResults
                       ? EmptyResults(
                           isDark: isDark,
                           cs: cs,

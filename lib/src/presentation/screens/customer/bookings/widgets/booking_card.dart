@@ -284,7 +284,7 @@ class BookingCard extends StatelessWidget {
               } else {
                 context.pushNamed(
                   'booking-detail',
-                  pathParameters: {'id': booking.carName.hashCode.toString()},
+                  pathParameters: {'id': booking.id.toString()},
                 );
               }
             },
@@ -320,7 +320,7 @@ class BookingCard extends StatelessWidget {
           SizedBox(width: 10.r),
           GestureDetector(
             onTap: () => context
-                .pushNamed('booking-detail', pathParameters: {'id': 'mock'}),
+                .pushNamed('booking-detail', pathParameters: {'id': booking.id.toString()}),
             child: Container(
               padding: EdgeInsets.symmetric(vertical: 10.r, horizontal: 16.r),
               decoration: BoxDecoration(

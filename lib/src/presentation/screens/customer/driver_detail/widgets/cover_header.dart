@@ -25,7 +25,7 @@ class CoverHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final provider = context.watch<DriverDetailProvider>();
-    final profile = provider.profile;
+    final profile = provider.profile!;
     return Stack(
       clipBehavior: Clip.none,
       children: [

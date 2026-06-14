@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
@@ -56,8 +57,13 @@ class _BookingFlowView extends StatelessWidget {
     final provider = context.read<BookingFlowProvider>();
     final shouldSubmit = provider.advance();
     if (!shouldSubmit) return;
-    await provider.submitPayment();
+    final ok = await provider.submitPayment();
     if (!context.mounted) return;
+    if (!ok) {
+      final msg = provider.error == null ? 'booking_failed'.tr() : provider.error!.tr();
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
+      return;
+    }
     Navigator.of(context).pushReplacement(
       PageRouteBuilder(
         transitionDuration: const Duration(milliseconds: 350),

@@ -14,6 +14,7 @@ import 'widgets/booking_app_bar.dart';
 import 'widgets/cancel_button.dart';
 import 'widgets/car_card.dart';
 import 'widgets/driver_card.dart';
+import 'widgets/leave_review_sheet.dart';
 import 'widgets/location_map_card.dart';
 import 'widgets/price_card.dart';
 import 'widgets/qr_card.dart';
@@ -28,7 +29,7 @@ class BookingDetailScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (_) => BookingDetailProvider(),
+      create: (_) => BookingDetailProvider(bookingId: int.tryParse(bookingId) ?? 0),
       child: const _BookingDetailView(),
     );
   }
@@ -41,6 +42,17 @@ class _BookingDetailView extends StatelessWidget {
     final tp = context.watch<ThemeProvider>();
     return tp.isDarkMode ||
         (tp.isSystemMode && MediaQuery.of(context).platformBrightness == Brightness.dark);
+  }
+
+  Widget _reviewButton(BuildContext context, BookingDetail b, bool isDark) {
+    return SizedBox(
+      width: double.infinity,
+      child: FilledButton.icon(
+        onPressed: () => LeaveReviewSheet.show(context, bookingId: b.id, isDark: isDark),
+        icon: const Icon(CupertinoIcons.star_fill, size: 18),
+        label: Text('review_leave'.tr()),
+      ),
+    );
   }
 
   void _confirmCancel(BuildContext context) {
@@ -69,13 +81,26 @@ class _BookingDetailView extends StatelessWidget {
     final isDesktop = Breakpoints.isDesktop(MediaQuery.of(context).size.width);
     final isDark = _isDark(context);
     final cs = Theme.of(context).colorScheme;
-    final booking = context.read<BookingDetailProvider>().booking;
+    final provider = context.watch<BookingDetailProvider>();
+    final booking = provider.booking;
+
+    Widget body;
+    if (booking == null && provider.isLoading) {
+      body = const Center(child: CircularProgressIndicator());
+    } else if (booking == null) {
+      body = _BookingErrorState(
+        message: provider.error ?? 'booking_not_found'.tr(),
+        onRetry: () => context.read<BookingDetailProvider>().load(),
+      );
+    } else {
+      body = isDesktop
+          ? _buildDesktop(context, isDark, cs, booking)
+          : _buildMobile(context, isDark, cs, booking);
+    }
 
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      body: isDesktop
-          ? _buildDesktop(context, isDark, cs, booking)
-          : _buildMobile(context, isDark, cs, booking),
+      body: body,
     );
   }
 
@@ -108,6 +133,10 @@ class _BookingDetailView extends StatelessWidget {
                   SizedBox(height: 14.r),
                   BookingQrCard(booking: b, isDark: isDark, cs: cs),
                   SizedBox(height: 14.r),
+                  if (b.isCompleted) ...[
+                    _reviewButton(context, b, isDark),
+                    SizedBox(height: 14.r),
+                  ],
                   BookingCancelButton(isDark: isDark, onTap: () => _confirmCancel(context)),
                 ],
               ),
@@ -196,6 +225,10 @@ class _BookingDetailView extends StatelessWidget {
                         SizedBox(height: 16.r),
                         BookingActionRow(booking: b, isDark: isDark, cs: cs),
                         SizedBox(height: 12.r),
+                        if (b.isCompleted) ...[
+                          _reviewButton(context, b, isDark),
+                          SizedBox(height: 12.r),
+                        ],
                         BookingCancelButton(isDark: isDark, onTap: () => _confirmCancel(context)),
                       ],
                     ),
@@ -206,6 +239,50 @@ class _BookingDetailView extends StatelessWidget {
             ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+class _BookingErrorState extends StatelessWidget {
+  final String message;
+  final VoidCallback onRetry;
+  const _BookingErrorState({required this.message, required this.onRetry});
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    return SafeArea(
+      child: Stack(
+        children: [
+          Positioned(
+            top: 8.r,
+            left: 8.r,
+            child: IconButton(
+              icon: Icon(CupertinoIcons.back, color: cs.onSurface),
+              onPressed: () => Navigator.of(context).pop(),
+            ),
+          ),
+          Center(
+            child: Padding(
+              padding: EdgeInsets.all(24.r),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(CupertinoIcons.exclamationmark_circle, size: 44.r, color: cs.error),
+                  SizedBox(height: 12.r),
+                  Text(
+                    message,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontSize: 14.r, color: cs.onSurface.withValues(alpha: 0.7)),
+                  ),
+                  SizedBox(height: 16.r),
+                  FilledButton(onPressed: onRetry, child: Text('retry'.tr())),
+                ],
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

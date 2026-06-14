@@ -6,6 +6,7 @@ import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
+import '../../../../../core/services/places_service.dart';
 import '../models/booking_data.dart';
 
 /// State for the full-screen location picker.
@@ -30,19 +31,28 @@ class LocationPickerProvider extends ChangeNotifier {
   final Completer<GoogleMapController> mapController = Completer();
   final TextEditingController addressController = TextEditingController();
   final TextEditingController labelController = TextEditingController();
+  final PlacesService _places = PlacesService();
 
   LatLng _center = muscat;
   String _address = 'Muscat, Oman';
   String _label = '';
   bool _resolving = false;
 
+  // Places autocomplete state.
+  List<PlacePrediction> _predictions = const [];
+  bool _searching = false;
+  Timer? _debounce;
+
   LatLng get center => _center;
   String get address => _address;
   String get label => _label;
   bool get resolving => _resolving;
+  List<PlacePrediction> get predictions => _predictions;
+  bool get searching => _searching;
 
   @override
   void dispose() {
+    _debounce?.cancel();
     addressController.dispose();
     labelController.dispose();
     super.dispose();
@@ -54,6 +64,63 @@ class LocationPickerProvider extends ChangeNotifier {
 
   void onAddressChanged(String value) {
     _address = value;
+  }
+
+  /// Called as the user types in the search bar: keeps the typed text and
+  /// debounces a Places autocomplete request (350ms).
+  void onSearchChanged(String value) {
+    _address = value;
+    _debounce?.cancel();
+    if (value.trim().length < 2) {
+      if (_predictions.isNotEmpty) {
+        _predictions = const [];
+        notifyListeners();
+      }
+      return;
+    }
+    _debounce = Timer(const Duration(milliseconds: 350), () => _runAutocomplete(value));
+  }
+
+  Future<void> _runAutocomplete(String query) async {
+    _searching = true;
+    notifyListeners();
+    final results = await _places.autocomplete(query);
+    _predictions = results;
+    _searching = false;
+    notifyListeners();
+  }
+
+  void clearPredictions() {
+    if (_predictions.isEmpty) return;
+    _predictions = const [];
+    notifyListeners();
+  }
+
+  /// Resolves a tapped suggestion to coordinates, moves the map there, and sets
+  /// the address. Falls back silently if details can't be fetched.
+  Future<void> selectPrediction(PlacePrediction prediction) async {
+    _predictions = const [];
+    _searching = true;
+    notifyListeners();
+    final details = await _places.details(prediction.placeId);
+    _searching = false;
+    if (details == null) {
+      // Keep the typed label as the address; leave the map where it is.
+      _address = prediction.fullText;
+      addressController.text = prediction.fullText;
+      notifyListeners();
+      return;
+    }
+    _center = LatLng(details.lat, details.lon);
+    _address = details.address.isNotEmpty ? details.address : prediction.fullText;
+    addressController.text = _address;
+    notifyListeners();
+    try {
+      final controller = await mapController.future;
+      await controller.animateCamera(CameraUpdate.newLatLngZoom(_center, 15));
+    } catch (e) {
+      if (kDebugMode) debugPrint('Camera move failed: $e');
+    }
   }
 
   Future<void> resolveAddressFromCenter() async {

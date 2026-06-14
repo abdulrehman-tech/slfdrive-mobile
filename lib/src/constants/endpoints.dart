@@ -44,6 +44,25 @@ class ApiEndpoints {
   static String vehicleModelsByBrand(int brandId) => '/api/VehicleModel/brand/$brandId';
   static const String activeOfferedServices = '/api/OfferedServices/active';
 
+  // General types / statuses (drive serviceType/paymentType/bookingType/status ids)
+  static const String activeGeneralTypes = '/api/GeneralType/active';
+  static const String activeGeneralStatuses = '/api/GeneralStatus/active';
+  static String generalTypesByType(String type) => '/api/GeneralType/type/$type';
+  static String generalStatusesByType(String type) => '/api/GeneralStatus/type/$type';
+
+  // Bookings
+  static const String bookingCreate = '/api/Booking/create';
+  static const String bookingMyPaginated = '/api/Booking/my/paginated';
+  static String bookingById(int id) => '/api/Booking/$id';
+  static String bookingOmPayInit(int id) => '/api/Booking/$id/pay/ompay/init';
+  static String bookingOmPayVerify(int id) => '/api/Booking/$id/pay/ompay/verify';
+
+  // Reviews
+  static const String review = '/api/Review';
+  static String reviewsByBooking(int bookingId) => '/api/Review/booking/$bookingId';
+  static String reviewAverageByBooking(int bookingId) =>
+      '/api/Review/booking/$bookingId/average';
+
   // Vehicles (listings)
   static const String vehiclePaginated = '/api/Vehicle/paginated';
   static const String vehicleNearestPaginated = '/api/Vehicle/nearest/paginated';

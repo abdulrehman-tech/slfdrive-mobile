@@ -2,9 +2,12 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 
+import '../../../../../core/models/booking/booking.dart';
+
 enum BookingStatus { confirmed, inProgress, completed, cancelled }
 
 class BookingItem {
+  final int id;
   final String carName;
   final String carImageUrl;
   final String pickupDate;
@@ -16,6 +19,7 @@ class BookingItem {
   final String? driverAvatarUrl;
 
   const BookingItem({
+    required this.id,
     required this.carName,
     required this.carImageUrl,
     required this.pickupDate,
@@ -26,6 +30,42 @@ class BookingItem {
     this.driverName,
     this.driverAvatarUrl,
   });
+
+  /// Maps a backend [Booking] (from `Booking/my/paginated`) to the list item.
+  /// `BookingResponseDto` doesn't carry a vehicle display name, so the title
+  /// falls back to the service type / booking number.
+  factory BookingItem.fromBooking(Booking b) {
+    String date(String? iso) => (iso == null || iso.length < 10) ? '' : iso.substring(0, 10);
+    return BookingItem(
+      id: b.id,
+      carName: b.serviceType?.trim().isNotEmpty == true
+          ? b.serviceType!
+          : (b.bookingNo ?? 'Booking #${b.id}'),
+      carImageUrl: '',
+      pickupDate: date(b.fromDateTime),
+      dropoffDate: date(b.toDateTime),
+      pickupLocation: '',
+      totalPrice: b.totalAmount ?? 0,
+      status: bookingStatusFromApi(b),
+      driverName: b.driverFullName,
+      driverAvatarUrl: null,
+    );
+  }
+}
+
+/// Resolves the backend status string onto the UI's [BookingStatus] tabs.
+BookingStatus bookingStatusFromApi(Booking b) {
+  final s = '${b.status ?? ''} ${b.statusType ?? ''}'.toLowerCase();
+  if (s.contains('cancel') || s.contains('reject')) return BookingStatus.cancelled;
+  if (b.completedAt != null || s.contains('complete')) return BookingStatus.completed;
+  if (s.contains('progress') ||
+      s.contains('active') ||
+      s.contains('ongoing') ||
+      s.contains('trip') ||
+      s.contains('picked')) {
+    return BookingStatus.inProgress;
+  }
+  return BookingStatus.confirmed;
 }
 
 extension BookingStatusX on BookingStatus {
