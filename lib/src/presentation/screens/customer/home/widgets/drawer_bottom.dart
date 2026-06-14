@@ -2,6 +2,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../providers/theme_provider.dart';
@@ -75,8 +76,43 @@ class DrawerBottom extends StatelessWidget {
               ),
             ),
           ),
+          SizedBox(height: 14.r),
+          const _DrawerVersionFooter(),
         ],
       ),
+    );
+  }
+}
+
+/// App name + version/build + copyright shown at the very bottom of the drawer.
+class _DrawerVersionFooter extends StatelessWidget {
+  const _DrawerVersionFooter();
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    final muted = cs.onSurface.withValues(alpha: 0.4);
+    final year = DateTime.now().year;
+    return Column(
+      children: [
+        FutureBuilder<PackageInfo>(
+          future: PackageInfo.fromPlatform(),
+          builder: (context, snap) {
+            final info = snap.data;
+            final version = info == null ? '' : 'v${info.version} (${info.buildNumber})';
+            return Text(
+              version.isEmpty ? 'SLF Drive' : 'SLF Drive · $version',
+              style: TextStyle(fontSize: 11.r, fontWeight: FontWeight.w600, color: muted),
+            );
+          },
+        ),
+        SizedBox(height: 3.r),
+        Text(
+          'drawer_copyright'.tr(namedArgs: {'year': '$year'}),
+          textAlign: TextAlign.center,
+          style: TextStyle(fontSize: 10.r, color: cs.onSurface.withValues(alpha: 0.3)),
+        ),
+      ],
     );
   }
 }

@@ -88,23 +88,8 @@ class _CustomerHomeShellState extends State<_CustomerHomeShell> with SingleTicke
     return i >= 0 ? i : 0;
   }
 
-  int get _drawerNavIndex {
-    final loc = GoRouterState.of(context).matchedLocation;
-    switch (loc) {
-      case '/home':
-        return 0;
-      case '/favorites':
-        return 1;
-      case '/bookings':
-        return 2;
-      case '/my-vehicles':
-        return 3;
-      case '/profile':
-        return 4;
-      default:
-        return -1;
-    }
-  }
+  // Drawer primary items align 1:1 with kHomeNavItems.
+  int get _drawerNavIndex => _currentNavIndex;
 
   // Tab 0 (home) is open to guests; favorites/bookings/profile require login.
   Future<void> _goToTab(int i) async {
@@ -118,23 +103,7 @@ class _CustomerHomeShellState extends State<_CustomerHomeShell> with SingleTicke
     // Case 0 (home) is open; everything else is a personal area → gate it.
     if (i != 0 && !await requireLogin(context)) return;
     if (!mounted) return;
-    switch (i) {
-      case 0:
-        context.go('/home');
-        break;
-      case 1:
-        context.go('/favorites');
-        break;
-      case 2:
-        context.go('/bookings');
-        break;
-      case 3:
-        context.push('/my-vehicles');
-        break;
-      case 4:
-        context.go('/profile');
-        break;
-    }
+    context.go(kHomeNavItems[i].path);
   }
 
   @override

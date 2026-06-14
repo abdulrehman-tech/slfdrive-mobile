@@ -70,8 +70,15 @@ class LookupRemoteDataSourceImpl implements LookupRemoteDataSource {
       _getList(ApiEndpoints.activeGeneralStatuses, GeneralLookup.fromJson);
 
   @override
-  Future<List<AllCompany>> getActiveCompanies() =>
-      _getList(ApiEndpoints.activeAllCompanies, AllCompany.fromJson);
+  Future<List<AllCompany>> getActiveCompanies() async {
+    // AllCompanies/active mixes corporate companies and rental companies; the
+    // booking corporate picker only wants corporate ones (companyType ==
+    // "Corporate"). Rental companies are excluded here.
+    final all = await _getList(ApiEndpoints.activeAllCompanies, AllCompany.fromJson);
+    return all
+        .where((c) => (c.companyType ?? '').toLowerCase() == 'corporate')
+        .toList();
+  }
 
   /// Shared GET → unwrap `data` list → map helper for the lookup endpoints.
   Future<List<T>> _getList<T>(String path, T Function(Map<String, dynamic>) fromJson) async {

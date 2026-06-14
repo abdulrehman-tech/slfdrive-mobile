@@ -58,7 +58,7 @@ class BookingFlowBottomBar extends StatelessWidget {
           ),
           child: Row(
             children: [
-              if (showBack) _buildBackButton(cs),
+              // if (showBack) _buildBackButton(cs),
               if (showPrice) ...[
                 if (showBack) SizedBox(width: 14.r),
                 Expanded(child: _buildPriceBlock(cs)),
