@@ -30,7 +30,7 @@ class BookingFlowTopBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
-    final showChip = data.isCorporate && data.organization != null;
+    final showChip = data.isCorporate && data.company != null;
     return Container(
       padding: EdgeInsets.fromLTRB(16.r, MediaQuery.of(context).padding.top + 8.r, 16.r, 14.r),
       decoration: BoxDecoration(
@@ -75,7 +75,7 @@ class BookingFlowTopBar extends StatelessWidget {
             SizedBox(height: 10.r),
             Align(
               alignment: AlignmentDirectional.centerStart,
-              child: CorporateChip(organization: data.organization!, isDark: isDark),
+              child: CorporateChip(company: data.company!, isDark: isDark),
             ),
           ],
         ],

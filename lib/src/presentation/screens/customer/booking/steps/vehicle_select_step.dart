@@ -4,29 +4,29 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 
-import '../../../../../core/data/repositories/driver_listing_repository.dart';
+import '../../../../../core/data/repositories/vehicle_repository.dart';
 import '../../../../../core/di/injection_container.dart';
 import '../../../../../core/errors/app_exception.dart';
 import '../../../../../core/models/common/pagination_params.dart';
-import '../../../../../core/models/driver/driver_listing_item.dart';
+import '../../../../../core/models/vehicle/vehicle.dart';
 import '../../../../widgets/omr_icon.dart';
 import '../models/booking_data.dart';
 import '../widgets/booking_glass_card.dart';
 
-/// Driver picker shown for "Car + driver" and "Hire driver" when no driver was
-/// pre-selected. Loads real drivers from the backend.
-class DriverSelectStep extends StatefulWidget {
+/// Vehicle picker shown when the service needs a car and none was pre-selected
+/// (e.g. the "Car + driver" flow). Loads real vehicles from the backend.
+class VehicleSelectStep extends StatefulWidget {
   final BookingData data;
   final bool isDark;
-  const DriverSelectStep({super.key, required this.data, required this.isDark});
+  const VehicleSelectStep({super.key, required this.data, required this.isDark});
 
   @override
-  State<DriverSelectStep> createState() => _DriverSelectStepState();
+  State<VehicleSelectStep> createState() => _VehicleSelectStepState();
 }
 
-class _DriverSelectStepState extends State<DriverSelectStep> {
-  final _repo = getIt<DriverListingRepository>();
-  List<DriverListingItem> _drivers = const [];
+class _VehicleSelectStepState extends State<VehicleSelectStep> {
+  final _repo = getIt<VehicleRepository>();
+  List<Vehicle> _vehicles = const [];
   bool _loading = false;
   String? _error;
 
@@ -44,7 +44,7 @@ class _DriverSelectStepState extends State<DriverSelectStep> {
     try {
       final page = await _repo.getPaginated(const PaginationParams(pageNumber: 1, pageSize: 50));
       if (!mounted) return;
-      setState(() => _drivers = page.items);
+      setState(() => _vehicles = page.items);
     } on AppException catch (e) {
       if (!mounted) return;
       setState(() => _error = e.message);
@@ -56,14 +56,17 @@ class _DriverSelectStepState extends State<DriverSelectStep> {
     }
   }
 
-  void _select(DriverListingItem d) {
-    widget.data.setDriver(BookingDriver(
-      id: d.id.toString(),
-      name: d.displayName(),
-      avatarUrl: d.resolvedPhotoUrl ?? '',
-      rating: d.rating ?? 0,
-      pricePerDay: d.amountPerDay ?? 0,
-      speciality: d.locationName ?? '',
+  void _select(Vehicle v) {
+    widget.data.setCar(BookingCar(
+      id: v.id.toString(),
+      name: v.displayTitle(),
+      brand: v.brandName ?? '',
+      imageUrl: v.primaryPhoto ?? '',
+      pricePerDay: v.pricePerDay ?? 0,
+      plateNumber: v.plateNumber ?? '',
+      lat: v.lat,
+      lon: v.lon,
+      locationName: v.locationName,
     ));
   }
 
@@ -74,12 +77,12 @@ class _DriverSelectStepState extends State<DriverSelectStep> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'booking_driver_title'.tr(),
+          'booking_vehicle_title'.tr(),
           style: TextStyle(fontSize: 22.r, fontWeight: FontWeight.bold, color: cs.onSurface, height: 1.2),
         ),
         SizedBox(height: 6.r),
         Text(
-          'booking_driver_subtitle'.tr(),
+          'booking_vehicle_subtitle'.tr(),
           style: TextStyle(fontSize: 13.r, color: cs.onSurface.withValues(alpha: 0.55), height: 1.4),
         ),
         SizedBox(height: 18.r),
@@ -90,7 +93,7 @@ class _DriverSelectStepState extends State<DriverSelectStep> {
           )
         else if (_error != null)
           _ErrorRetry(message: _error!, onRetry: _load)
-        else if (_drivers.isEmpty)
+        else if (_vehicles.isEmpty)
           Padding(
             padding: EdgeInsets.symmetric(vertical: 30.r),
             child: Center(
@@ -101,13 +104,13 @@ class _DriverSelectStepState extends State<DriverSelectStep> {
             ),
           )
         else
-          ..._drivers.map(
-            (d) => Padding(
+          ..._vehicles.map(
+            (v) => Padding(
               padding: EdgeInsets.only(bottom: 10.r),
-              child: _DriverCard(
-                driver: d,
-                isSelected: widget.data.driver?.id == d.id.toString(),
-                onTap: () => _select(d),
+              child: _VehicleCard(
+                vehicle: v,
+                isSelected: widget.data.car?.id == v.id.toString(),
+                onTap: () => _select(v),
                 isDark: widget.isDark,
               ),
             ),
@@ -138,14 +141,14 @@ class _ErrorRetry extends StatelessWidget {
   }
 }
 
-class _DriverCard extends StatelessWidget {
-  final DriverListingItem driver;
+class _VehicleCard extends StatelessWidget {
+  final Vehicle vehicle;
   final bool isSelected;
   final bool isDark;
   final VoidCallback onTap;
 
-  const _DriverCard({
-    required this.driver,
+  const _VehicleCard({
+    required this.vehicle,
     required this.isSelected,
     required this.isDark,
     required this.onTap,
@@ -154,94 +157,73 @@ class _DriverCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
-    final photo = driver.resolvedPhotoUrl;
-    final speciality = driver.locationName ?? '';
+    final photo = vehicle.primaryPhoto;
     return BookingGlassCard(
       isDark: isDark,
       onTap: onTap,
       borderColor: isSelected ? cs.primary.withValues(alpha: 0.5) : null,
-      padding: EdgeInsets.all(14.r),
+      padding: EdgeInsets.all(12.r),
       child: Row(
         children: [
           Container(
-            width: 56.r,
+            width: 76.r,
             height: 56.r,
             decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              border: Border.all(color: cs.primary.withValues(alpha: 0.3), width: 2),
               color: isDark ? const Color(0xFF2A2A3A) : const Color(0xFFEEEEEE),
+              borderRadius: BorderRadius.circular(12.r),
             ),
             clipBehavior: Clip.antiAlias,
             child: photo != null
                 ? CachedNetworkImage(
                     imageUrl: photo,
                     fit: BoxFit.cover,
-                    errorWidget: (c, u, e) => Icon(Iconsax.user_copy, size: 22.r, color: cs.primary),
+                    errorWidget: (c, u, e) => Icon(Iconsax.car_copy, size: 24.r, color: cs.primary),
                   )
-                : Icon(Iconsax.user_copy, size: 22.r, color: cs.primary),
+                : Icon(Iconsax.car_copy, size: 24.r, color: cs.primary),
           ),
-          SizedBox(width: 14.r),
+          SizedBox(width: 12.r),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  driver.displayName(),
+                  vehicle.displayTitle(),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(fontSize: 14.r, fontWeight: FontWeight.w700, color: cs.onSurface),
                 ),
                 SizedBox(height: 4.r),
-                if (speciality.isNotEmpty)
-                  Container(
-                    padding: EdgeInsets.symmetric(horizontal: 7.r, vertical: 2.r),
-                    decoration: BoxDecoration(
-                      color: cs.primary.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(6.r),
+                Row(
+                  children: [
+                    OmrIcon(size: 12.r, color: cs.primary),
+                    SizedBox(width: 3.r),
+                    Text(
+                      (vehicle.pricePerDay ?? 0).toStringAsFixed(0),
+                      style: TextStyle(fontSize: 14.r, fontWeight: FontWeight.w800, color: cs.primary),
                     ),
-                    child: Text(
-                      speciality,
-                      style: TextStyle(fontSize: 9.r, color: cs.primary, fontWeight: FontWeight.w700),
+                    SizedBox(width: 3.r),
+                    Text(
+                      'booking_per_day'.tr(),
+                      style: TextStyle(fontSize: 10.r, color: cs.onSurface.withValues(alpha: 0.45)),
                     ),
-                  ),
+                  ],
+                ),
               ],
             ),
           ),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  OmrIcon(size: 12.r, color: cs.primary),
-                  SizedBox(width: 3.r),
-                  Text(
-                    (driver.amountPerDay ?? 0).toStringAsFixed(0),
-                    style: TextStyle(fontSize: 15.r, fontWeight: FontWeight.w800, color: cs.primary),
-                  ),
-                ],
+          AnimatedContainer(
+            duration: const Duration(milliseconds: 220),
+            width: 22.r,
+            height: 22.r,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: isSelected ? cs.primary : Colors.transparent,
+              border: Border.all(
+                color: isSelected ? cs.primary : cs.onSurface.withValues(alpha: 0.2),
+                width: 2,
               ),
-              SizedBox(height: 2.r),
-              Text(
-                'booking_per_day'.tr(),
-                style: TextStyle(fontSize: 9.r, color: cs.onSurface.withValues(alpha: 0.45)),
-              ),
-              SizedBox(height: 6.r),
-              AnimatedContainer(
-                duration: const Duration(milliseconds: 220),
-                width: 22.r,
-                height: 22.r,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: isSelected ? cs.primary : Colors.transparent,
-                  border: Border.all(
-                    color: isSelected ? cs.primary : cs.onSurface.withValues(alpha: 0.2),
-                    width: 2,
-                  ),
-                ),
-                child: isSelected ? Icon(Icons.check, color: Colors.white, size: 13.r) : null,
-              ),
-            ],
+            ),
+            child: isSelected ? Icon(Icons.check, color: Colors.white, size: 13.r) : null,
           ),
         ],
       ),

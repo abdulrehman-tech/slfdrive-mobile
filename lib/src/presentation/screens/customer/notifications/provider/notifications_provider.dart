@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
 
-import '../data/notifications_mock_data.dart';
 import '../models/notif_item.dart';
 
 class NotificationsProvider extends ChangeNotifier {
-  NotificationsProvider() {
-    _items = seedNotifs();
-  }
+  NotificationsProvider();
 
-  late List<NotifItem> _items;
+  // No notifications backend yet — starts empty (screen shows an empty state).
+  // Wire to a real endpoint when one exists.
+  final List<NotifItem> _items = [];
   int _tab = 0; // 0=All, 1=Bookings, 2=Promotions, 3=System
 
   static const List<NotifCategory?> categoryMap = [

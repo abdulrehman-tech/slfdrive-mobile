@@ -1,6 +1,5 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 import '../../../../../constants/storage_keys.dart';
 import '../../../../../core/data/repositories/booking_repository.dart';
@@ -15,8 +14,9 @@ import '../models/booking_step_id.dart';
 ///
 /// Owns the wrapped [BookingData] `ChangeNotifier`, the active step index, the
 /// submission flag, and the validation gates that drive the bottom action bar.
-/// The screen becomes a thin composer that simply reads from here and rebuilds
-/// on notification.
+/// Booking creation no longer charges the customer — the booking is created in
+/// the backend's default (pending) state; payment happens later from the booking
+/// detail screen once an admin approves it.
 class BookingFlowProvider extends ChangeNotifier {
   BookingFlowProvider({
     BookingServiceType? initialServiceType,
@@ -52,67 +52,64 @@ class BookingFlowProvider extends ChangeNotifier {
   bool get submitting => _submitting;
 
   /// Visible steps filtered by service type & entry context.
+  ///
+  /// The vehicle / driver picker steps appear only when that subject is needed
+  /// by the service AND wasn't pre-selected (deep-linking from a car/driver
+  /// detail screen presets it, so the picker is skipped).
   List<BookingStepId> get steps {
     final service = data.serviceType;
+    final needsCar = service?.needsCar == true;
+    final needsDriver = service?.needsDriver == true;
     final ids = <BookingStepId>[];
-    // Service selector: skipped if the flow was entered with a preset service
-    // + subject (typical when entering from car or driver detail).
-    final skipService =
-        _initialServiceType != null && (_initialCar != null || _initialDriver != null);
-    if (!skipService) ids.add(BookingStepId.service);
+    // Service selector: skipped whenever the flow was entered with a preset
+    // service (from a service card, or a car/driver detail screen).
+    if (_initialServiceType == null) ids.add(BookingStepId.service);
     ids.add(BookingStepId.corporate);
     ids.add(BookingStepId.dates);
-    if (service != BookingServiceType.driverOnly) ids.add(BookingStepId.pickup);
-    if (service != BookingServiceType.driverOnly) ids.add(BookingStepId.extras);
-    if (service == BookingServiceType.carWithDriver || service == BookingServiceType.driverOnly) {
-      ids.add(BookingStepId.driver);
-    }
+    if (needsCar && _initialCar == null) ids.add(BookingStepId.vehicle);
+    if (needsCar) ids.add(BookingStepId.pickup);
+    if (needsDriver && _initialDriver == null) ids.add(BookingStepId.driver);
     ids.add(BookingStepId.summary);
-    ids.add(BookingStepId.payment);
     return ids;
   }
 
   BookingStepId get currentStep => steps[_currentIndex];
 
   bool get isFirstStep => _currentIndex == 0;
-  bool get isLastStep => currentStep == BookingStepId.payment;
+  bool get isLastStep => currentStep == BookingStepId.summary;
 
-  /// Whether the next/confirm/pay action should be enabled for the current step.
+  /// Whether the next/confirm action should be enabled for the current step.
   bool get canGoNext {
     switch (currentStep) {
       case BookingStepId.service:
         return data.serviceType != null;
       case BookingStepId.corporate:
-        // Personal is always valid; Corporate requires an approved org pick.
-        return !data.isCorporate || data.organization != null;
+        // Personal is always valid; Corporate requires a company pick.
+        return !data.isCorporate || data.company != null;
       case BookingStepId.dates:
         return data.startAt != null && data.endAt != null;
+      case BookingStepId.vehicle:
+        return data.car != null;
       case BookingStepId.pickup:
         if (data.pickupMode == PickupMode.delivery) {
           return data.deliveryLocation != null;
         }
         return true;
-      case BookingStepId.extras:
-        return true;
       case BookingStepId.driver:
         return data.driver != null;
       case BookingStepId.summary:
-        return true;
-      case BookingStepId.payment:
         return !_submitting;
     }
   }
 
   /// Localization key for the primary action button label.
   String get nextLabelKey {
-    if (currentStep == BookingStepId.payment) return 'booking_pay_now';
-    if (currentStep == BookingStepId.summary) return 'booking_confirm_review';
+    if (currentStep == BookingStepId.summary) return 'booking_confirm';
     return 'booking_next';
   }
 
   /// Whether the bottom bar should surface the total price summary.
-  bool get showPrice =>
-      currentStep == BookingStepId.summary || currentStep == BookingStepId.payment;
+  bool get showPrice => currentStep == BookingStepId.summary;
 
   void goToStep(int index) {
     if (index < 0 || index >= steps.length || index == _currentIndex) return;
@@ -121,10 +118,10 @@ class BookingFlowProvider extends ChangeNotifier {
   }
 
   /// Advances to the next step. Returns `true` when the caller should trigger
-  /// the payment submission flow (i.e. we're on the final step).
+  /// booking submission (i.e. we're on the final summary step).
   bool advance() {
     if (!canGoNext) return false;
-    if (currentStep == BookingStepId.payment) return true;
+    if (currentStep == BookingStepId.summary) return true;
     if (_currentIndex < steps.length - 1) {
       _currentIndex++;
       notifyListeners();
@@ -146,11 +143,11 @@ class BookingFlowProvider extends ChangeNotifier {
   String? _error;
   String? get error => _error;
 
-  /// Submits the booking to the backend and, for gateway payment methods,
-  /// starts the OmPay checkout. Returns `true` once a real booking reference
-  /// has been assigned to [data]; the caller then navigates to success. On
-  /// failure returns `false` and exposes [error].
-  Future<bool> submitPayment() async {
+  /// Creates the booking in the backend's default (pending) state. No payment
+  /// is taken here. Returns `true` once a booking reference has been assigned to
+  /// [data]; the caller then navigates to success. On failure returns `false`
+  /// and exposes [error].
+  Future<bool> submitBooking() async {
     _submitting = true;
     _error = null;
     notifyListeners();
@@ -168,43 +165,38 @@ class BookingFlowProvider extends ChangeNotifier {
 
       final service = data.serviceType ?? BookingServiceType.rentCar;
       final serviceTypeId = lookups.serviceTypeId(service);
-      final paymentTypeId = lookups.paymentTypeId(data.paymentMethod);
       final bookingTypeId = lookups.bookingTypeId(corporate: data.isCorporate);
-      final statusId = lookups.initialStatusId();
-      if (serviceTypeId == null ||
-          paymentTypeId == null ||
-          bookingTypeId == null ||
-          statusId == null) {
+      if (serviceTypeId == null || bookingTypeId == null) {
         _error = 'booking_config_unavailable';
         return false;
       }
 
       final start = data.startAt ?? DateTime.now();
       final end = data.endAt ?? start;
-      final pickup = data.pickupMode == PickupMode.delivery
-          ? data.deliveryLocation
-          : data.pickupLocation;
+      // Pickup point = where the vehicle is (its own location). Drop-off is set
+      // only when the customer chose delivery.
+      final car = data.car;
+      final dropOff =
+          data.pickupMode == PickupMode.delivery ? data.deliveryLocation : null;
       final detail = BookingDetailsCreationRequest(
         fromDateTime: start.toIso8601String(),
         toDateTime: end.toIso8601String(),
-        pickUpLat: pickup?.latitude,
-        pickUpLon: pickup?.longitude,
-        dropOffLat: data.deliveryLocation?.latitude,
-        dropOffLon: data.deliveryLocation?.longitude,
-        amount: data.totalPrice,
+        pickUpLat: car?.lat,
+        pickUpLon: car?.lon,
+        dropOffLat: dropOff?.latitude,
+        dropOffLon: dropOff?.longitude,
       );
 
+      // No statusId / paymentTypeId / totalAmount: the backend defaults the
+      // status to pending and computes the amount; payment is taken after
+      // admin approval.
       final request = BookingCreationRequest(
         userId: userId,
         vehicleId: int.tryParse(data.car?.id ?? ''),
         driverId: int.tryParse(data.driver?.id ?? ''),
-        corporateCompanyId:
-            data.isCorporate ? int.tryParse(data.organization?.id ?? '') : null,
-        totalAmount: data.totalPrice,
-        statusId: statusId,
+        corporateCompanyId: data.isCorporate ? data.company?.id : null,
         bookingTypeId: bookingTypeId,
         serviceTypeId: serviceTypeId,
-        paymentTypeId: paymentTypeId,
         bookingDetails: [detail],
       );
 
@@ -213,27 +205,6 @@ class BookingFlowProvider extends ChangeNotifier {
       if (bookingId == null) {
         _error = 'booking_failed';
         return false;
-      }
-
-      // Gateway payment methods kick off an OmPay checkout. The redirect is
-      // opened externally; final reconciliation happens via the backend webhook,
-      // so verify here is best-effort and never blocks success.
-      if (_usesGateway(data.paymentMethod)) {
-        final init = await repo.omPayInit(bookingId, kIsWeb ? 'web' : 'mobile');
-        final url = init.redirectUrl ?? init.checkoutJsUrl;
-        if (url != null && url.isNotEmpty) {
-          final uri = Uri.tryParse(url);
-          if (uri != null) {
-            await launchUrl(uri, mode: LaunchMode.externalApplication);
-          }
-        }
-        if (init.orderId != null) {
-          try {
-            await repo.omPayVerify(bookingId, init.orderId!);
-          } catch (_) {
-            // pending/failed verification is non-fatal here
-          }
-        }
       }
 
       data.assignBookingRef(created.bookingNo ?? 'SLF$bookingId');
@@ -249,11 +220,6 @@ class BookingFlowProvider extends ChangeNotifier {
       notifyListeners();
     }
   }
-
-  bool _usesGateway(PaymentMethod m) =>
-      m == PaymentMethod.card ||
-      m == PaymentMethod.applePay ||
-      m == PaymentMethod.wallet;
 
   void _onDataChange() => notifyListeners();
 

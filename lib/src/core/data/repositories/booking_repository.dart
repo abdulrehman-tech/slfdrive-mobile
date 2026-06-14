@@ -10,6 +10,7 @@ abstract class BookingRepository {
   Future<BookingCreationResponse> create(BookingCreationRequest request);
   Future<PagedResponse<Booking>> myPaginated(PaginationParams params);
   Future<Booking?> getById(int id);
+  Future<bool> pay({required int bookingId, required int paymentTypeId});
   Future<OmPayInitResponse> omPayInit(int bookingId, String clientType);
   Future<bool> omPayVerify(int bookingId, String orderId);
 }
@@ -29,6 +30,10 @@ class BookingRepositoryImpl implements BookingRepository {
 
   @override
   Future<Booking?> getById(int id) => remote.getById(id);
+
+  @override
+  Future<bool> pay({required int bookingId, required int paymentTypeId}) =>
+      remote.pay(bookingId: bookingId, paymentTypeId: paymentTypeId);
 
   @override
   Future<OmPayInitResponse> omPayInit(int bookingId, String clientType) =>

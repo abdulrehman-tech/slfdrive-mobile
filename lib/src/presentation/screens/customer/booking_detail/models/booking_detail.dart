@@ -1,6 +1,16 @@
+import 'package:easy_localization/easy_localization.dart';
+
 import '../../../../../core/models/booking/booking.dart';
 
 enum BookingTimelineStage { confirmed, pickedUp, inTrip, returned }
+
+/// Friendly label for a booking's service type (vehicle / driver / both).
+String _serviceLabel(Booking b) {
+  final s = (b.serviceType ?? '').toLowerCase();
+  if (s.contains('with') || b.serviceTypeId == 11) return 'booking_kind_vehicle_driver'.tr();
+  if (s.contains('driver') || b.serviceTypeId == 9) return 'booking_kind_driver'.tr();
+  return 'booking_kind_vehicle'.tr();
+}
 
 class BookingDetail {
   final int id;
@@ -22,6 +32,10 @@ class BookingDetail {
   final String? driverAvatar;
   final String? driverPhone;
   final BookingTimelineStage stage;
+  final String statusLabel;
+  final bool isApproved;
+  final bool isPending;
+  final bool isPaid;
 
   const BookingDetail({
     required this.id,
@@ -40,10 +54,17 @@ class BookingDetail {
     required this.deliveryFee,
     required this.paymentMethod,
     required this.stage,
+    this.statusLabel = '',
+    this.isApproved = false,
+    this.isPending = false,
+    this.isPaid = false,
     this.driverName,
     this.driverAvatar,
     this.driverPhone,
   });
+
+  /// Customer can pay once an admin has approved the booking and it isn't paid.
+  bool get canPay => isApproved && !isPaid;
 
   int get days {
     final d = end.difference(start).inDays;
@@ -75,10 +96,14 @@ class BookingDetail {
             : s.contains('picked')
                 ? BookingTimelineStage.pickedUp
                 : BookingTimelineStage.confirmed;
+    final pay = (b.paymentStatus ?? '').toLowerCase();
+    final isApproved = s.contains('approved'); // covers "approved" + "CorporateApproved"
+    final isPending = s.contains('pending');
+    final isPaid = pay.contains('paid');
     return BookingDetail(
       id: b.id,
       ref: b.bookingNo ?? 'SLF${b.id}',
-      carName: b.serviceType?.trim().isNotEmpty == true ? b.serviceType! : 'Booking #${b.id}',
+      carName: _serviceLabel(b),
       carImageUrl: '',
       brand: '',
       plateNumber: '',
@@ -93,6 +118,10 @@ class BookingDetail {
       deliveryFee: 0,
       paymentMethod: b.paymentStatus ?? '',
       stage: stage,
+      statusLabel: b.status ?? '',
+      isApproved: isApproved,
+      isPending: isPending,
+      isPaid: isPaid,
       driverName: b.driverFullName,
       driverAvatar: null,
       driverPhone: b.driverPhoneNumber,

@@ -1,4 +1,5 @@
 import '../../models/common/general_lookup.dart';
+import '../../models/company/all_company.dart';
 import '../../models/lookup/location_option.dart';
 import '../../models/lookup/offered_service.dart';
 import '../../models/vehicle/vehicle_brand.dart';
@@ -14,6 +15,7 @@ abstract class LookupRepository {
   Future<List<OfferedService>> getActiveOfferedServices();
   Future<List<GeneralLookup>> getActiveGeneralTypes();
   Future<List<GeneralLookup>> getActiveGeneralStatuses();
+  Future<List<AllCompany>> getActiveCompanies();
 }
 
 class LookupRepositoryImpl implements LookupRepository {
@@ -44,4 +46,7 @@ class LookupRepositoryImpl implements LookupRepository {
   @override
   Future<List<GeneralLookup>> getActiveGeneralStatuses() =>
       remote.getActiveGeneralStatuses();
+
+  @override
+  Future<List<AllCompany>> getActiveCompanies() => remote.getActiveCompanies();
 }

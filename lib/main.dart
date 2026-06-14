@@ -14,7 +14,7 @@ import 'src/presentation/providers/auth_provider.dart';
 import 'src/presentation/providers/location_provider.dart';
 import 'src/presentation/providers/role_provider.dart';
 import 'src/presentation/providers/theme_provider.dart';
-import 'src/presentation/screens/customer/profile/corporate/provider/corporate_provider.dart';
+import 'src/presentation/screens/customer/favorites/provider/favorites_provider.dart';
 import 'src/presentation/theme/app_theme.dart';
 import 'src/presentation/routes/app_router.dart';
  void main() async {
@@ -58,10 +58,10 @@ import 'src/presentation/routes/app_router.dart';
           ChangeNotifierProvider(create: (_) => ThemeProvider()),
           ChangeNotifierProvider.value(value: roleProvider),
           ChangeNotifierProvider(create: (_) => getIt<AuthProvider>()),
-          ChangeNotifierProvider(create: (_) => CorporateProvider()),
           ChangeNotifierProvider(
             create: (_) => LocationProvider(getIt<AuthRepository>(), getIt<FlutterSecureStorage>()),
           ),
+          ChangeNotifierProvider(create: (_) => FavoritesProvider()),
         ],
         child: const MyApp(),
       ),

@@ -27,4 +27,8 @@ class StorageKeys {
   static const String lastSyncTime = 'last_sync_time';
   static const String cachedCars = 'cached_cars';
   static const String cachedDrivers = 'cached_drivers';
+
+  // Locally-persisted favourites (no backend endpoint).
+  static const String favoriteCars = 'favorite_cars';
+  static const String favoriteDrivers = 'favorite_drivers';
 }

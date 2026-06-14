@@ -33,20 +33,18 @@ class _PickupModeStepState extends State<PickupModeStep> {
     super.dispose();
   }
 
-  Future<void> _openMapPicker({required bool isDelivery}) async {
+  /// Opens the map picker for the delivery address. Self-pickup is read-only
+  /// (the vehicle's own location), so it never opens the picker.
+  Future<void> _openDeliveryPicker() async {
     final result = await context.pushNamed<BookingLocation?>(
       'booking-location-picker',
       extra: {
-        'initial': isDelivery ? widget.data.deliveryLocation : widget.data.pickupLocation,
-        'forDelivery': isDelivery,
+        'initial': widget.data.deliveryLocation,
+        'forDelivery': true,
       },
     );
     if (result != null) {
-      if (isDelivery) {
-        widget.data.setDeliveryLocation(result);
-      } else {
-        widget.data.setPickupLocation(result);
-      }
+      widget.data.setDeliveryLocation(result);
       setState(() {});
     }
   }
@@ -73,16 +71,12 @@ class _PickupModeStepState extends State<PickupModeStep> {
         PickupModeToggleRow(data: d, isDark: isDark),
         SizedBox(height: 16.r),
         if (d.pickupMode == PickupMode.selfPickup)
-          PickupSelfSection(
-            data: d,
-            isDark: isDark,
-            onOpenMap: () => _openMapPicker(isDelivery: false),
-          ),
+          PickupSelfSection(data: d, isDark: isDark),
         if (d.pickupMode == PickupMode.delivery) ...[
           PickupDeliveryLocationSection(
             data: d,
             isDark: isDark,
-            onOpenMap: () => _openMapPicker(isDelivery: true),
+            onOpenMap: _openDeliveryPicker,
           ),
           SizedBox(height: 14.r),
           PickupDeliveryNotesSection(

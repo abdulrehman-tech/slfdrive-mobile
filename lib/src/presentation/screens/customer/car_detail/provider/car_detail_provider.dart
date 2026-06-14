@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import '../../../../../core/data/repositories/vehicle_repository.dart';
 import '../../../../../core/errors/app_exception.dart';
 import '../../../../../core/models/vehicle/vehicle.dart';
+import '../../favorites/models/fav_car.dart';
 
 /// Loads a single vehicle by [vehicleId] and owns the image-carousel index
 /// and favourite toggle for the car detail screen.
@@ -38,9 +39,6 @@ class CarDetailProvider extends ChangeNotifier {
   int _currentImageIndex = 0;
   int get currentImageIndex => _currentImageIndex;
 
-  bool _isFavourite = false;
-  bool get isFavourite => _isFavourite;
-
   // ---- Loading ----
   Future<void> load() async {
     _isLoading = true;
@@ -69,8 +67,18 @@ class CarDetailProvider extends ChangeNotifier {
   }
 
   // ---- Favourite ----
-  void toggleFavourite() {
-    _isFavourite = !_isFavourite;
-    notifyListeners();
+  /// Snapshot of the loaded vehicle for the local favourites store, or null
+  /// before the vehicle has loaded.
+  FavCar? favSnapshot() {
+    final v = _vehicle;
+    if (v == null) return null;
+    return FavCar(
+      id: v.id.toString(),
+      name: v.displayTitle(ar: ar),
+      imageUrl: v.primaryPhoto ?? '',
+      pricePerDay: v.pricePerDay ?? 0,
+      brand: v.brandName ?? '',
+      rating: v.rating ?? 0,
+    );
   }
 }

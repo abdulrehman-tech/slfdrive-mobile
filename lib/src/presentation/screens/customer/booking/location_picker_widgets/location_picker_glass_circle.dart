@@ -9,6 +9,7 @@ class LocationPickerGlassCircle extends StatelessWidget {
   final bool isDark;
   final VoidCallback onTap;
   final Color? color;
+  final bool loading;
 
   const LocationPickerGlassCircle({
     super.key,
@@ -16,6 +17,7 @@ class LocationPickerGlassCircle extends StatelessWidget {
     required this.isDark,
     required this.onTap,
     this.color,
+    this.loading = false,
   });
 
   @override
@@ -43,7 +45,18 @@ class LocationPickerGlassCircle extends StatelessWidget {
                 ),
               ],
             ),
-            child: Icon(icon, size: 19.r, color: color ?? (isDark ? Colors.white : Colors.black87)),
+            child: loading
+                ? Center(
+                    child: SizedBox(
+                      width: 18.r,
+                      height: 18.r,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: color ?? (isDark ? Colors.white : Colors.black87),
+                      ),
+                    ),
+                  )
+                : Icon(icon, size: 19.r, color: color ?? (isDark ? Colors.white : Colors.black87)),
           ),
         ),
       ),

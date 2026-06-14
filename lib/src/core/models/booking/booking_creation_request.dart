@@ -7,11 +7,11 @@ class BookingCreationRequest {
   final int? driverId;
   final int? rentalCompanyId;
   final int? corporateCompanyId;
-  final double totalAmount;
-  final int statusId;
+  final double? totalAmount;
+  final int? statusId;
   final int bookingTypeId;
   final int serviceTypeId;
-  final int paymentTypeId;
+  final int? paymentTypeId;
   final double? commissionPercent;
   final double? commissionAmount;
   final List<BookingDetailsCreationRequest> bookingDetails;
@@ -22,11 +22,11 @@ class BookingCreationRequest {
     this.driverId,
     this.rentalCompanyId,
     this.corporateCompanyId,
-    required this.totalAmount,
-    required this.statusId,
+    this.totalAmount,
+    this.statusId,
     required this.bookingTypeId,
     required this.serviceTypeId,
-    required this.paymentTypeId,
+    this.paymentTypeId,
     this.commissionPercent,
     this.commissionAmount,
     this.bookingDetails = const [],
@@ -38,11 +38,11 @@ class BookingCreationRequest {
         if (driverId != null) 'driverId': driverId,
         if (rentalCompanyId != null) 'rentalCompanyId': rentalCompanyId,
         if (corporateCompanyId != null) 'corporateCompanyId': corporateCompanyId,
-        'totalAmount': totalAmount,
-        'statusId': statusId,
+        if (totalAmount != null) 'totalAmount': totalAmount,
+        if (statusId != null) 'statusId': statusId,
         'bookingTypeId': bookingTypeId,
         'serviceTypeId': serviceTypeId,
-        'paymentTypeId': paymentTypeId,
+        if (paymentTypeId != null) 'paymentTypeId': paymentTypeId,
         if (commissionPercent != null) 'commissionPercent': commissionPercent,
         if (commissionAmount != null) 'commissionAmount': commissionAmount,
         'bookingDetails': bookingDetails.map((d) => d.toJson()).toList(),
@@ -57,7 +57,7 @@ class BookingDetailsCreationRequest {
   final double? pickUpLon;
   final double? dropOffLat;
   final double? dropOffLon;
-  final double amount;
+  final double? amount;
 
   const BookingDetailsCreationRequest({
     required this.fromDateTime,
@@ -66,7 +66,7 @@ class BookingDetailsCreationRequest {
     this.pickUpLon,
     this.dropOffLat,
     this.dropOffLon,
-    required this.amount,
+    this.amount,
   });
 
   Map<String, dynamic> toJson() => {
@@ -76,7 +76,7 @@ class BookingDetailsCreationRequest {
         if (pickUpLon != null) 'pickUpLon': pickUpLon,
         if (dropOffLat != null) 'dropOffLat': dropOffLat,
         if (dropOffLon != null) 'dropOffLon': dropOffLon,
-        'amount': amount,
+        if (amount != null) 'amount': amount,
       };
 }
 

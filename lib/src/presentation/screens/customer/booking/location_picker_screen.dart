@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -48,6 +49,17 @@ class _LocationPickerView extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDesktop = Breakpoints.isDesktop(MediaQuery.of(context).size.width);
     final isDark = _isDark(context);
+
+    // Surface a geolocation failure (service off / permission denied) as a
+    // snackbar, then clear it so it fires only once.
+    final geoError = context.select<LocationPickerProvider, String?>((p) => p.geoError);
+    if (geoError != null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!context.mounted) return;
+        context.read<LocationPickerProvider>().clearGeoError();
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(geoError.tr())));
+      });
+    }
 
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,

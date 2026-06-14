@@ -1,62 +1,54 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 import 'package:provider/provider.dart';
 
-import '../../profile/corporate/models/membership_status.dart';
-import '../../profile/corporate/provider/corporate_provider.dart';
-import '../../profile/corporate/widgets/organization_picker_sheet.dart';
 import '../models/booking_data.dart';
+import '../provider/corporate_companies_provider.dart';
 import '../widgets/booking_glass_card.dart';
-import 'corporate_widgets/corporate_org_card.dart';
-import 'corporate_widgets/corporate_status_note.dart';
+import 'corporate_widgets/corporate_company_picker.dart';
 import 'corporate_widgets/corporate_toggle.dart';
 
+/// Booking step where the user chooses personal vs corporate, and — when
+/// corporate — picks the company they're booking for from the live
+/// `AllCompanies/active` list.
 class CorporateStep extends StatelessWidget {
   final BookingData data;
   final bool isDark;
   const CorporateStep({super.key, required this.data, required this.isDark});
 
-  Future<void> _pickOrganization(BuildContext context) async {
-    final corporate = context.read<CorporateProvider>();
-    final picked = await showOrganizationPickerSheet(
+  Future<void> _pickCompany(BuildContext context) async {
+    final provider = context.read<CorporateCompaniesProvider>();
+    await provider.ensureLoaded();
+    if (!context.mounted) return;
+    final picked = await showCompanyPickerSheet(
       context,
-      organizations: corporate.approvedOrganizations,
+      companies: provider.companies,
       isDark: isDark,
-      selected: data.organization,
-      titleKey: 'booking_corporate_select_org',
+      selected: data.company,
+      isLoading: provider.isLoading,
+      error: provider.error,
     );
-    if (picked != null) data.setCorporate(true, organization: picked);
+    if (picked != null) data.setCorporate(true, company: picked);
   }
 
   void _handleToggle(BuildContext context, bool corporate) {
-    final corp = context.read<CorporateProvider>();
     if (!corporate) {
       data.setCorporate(false);
       return;
     }
-    if (corp.effectiveStatus != MembershipStatus.approved) {
-      // Cannot become corporate — keep as personal; the inline note explains.
-      data.setCorporate(false);
-      return;
-    }
-    final approved = corp.approvedOrganizations;
-    if (approved.length == 1) {
-      data.setCorporate(true, organization: approved.first);
-    } else {
-      data.setCorporate(true);
-      _pickOrganization(context);
-    }
+    data.setCorporate(true, company: data.company);
+    if (data.company == null) _pickCompany(context);
   }
 
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
-    final corporate = context.watch<CorporateProvider>();
-    final status = corporate.effectiveStatus;
-    final isApproved = status == MembershipStatus.approved;
-    final approvedOrgs = corporate.approvedOrganizations;
+    // Companies load lazily when the user switches to corporate / opens the
+    // picker (see _handleToggle / _pickCompany) — never during build, which
+    // would notify listeners mid-build.
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -81,45 +73,87 @@ class CorporateStep extends StatelessWidget {
         CorporateToggle(
           isCorporate: data.isCorporate,
           isDark: isDark,
-          corporateDisabled: !isApproved,
           onChanged: (v) => _handleToggle(context, v),
         ),
-        if (data.isCorporate && data.organization != null) ...[
+        if (data.isCorporate) ...[
           SizedBox(height: 18.r),
           BookingSectionHeader(
             icon: Iconsax.buildings_copy,
-            iconColor: data.organization!.accentColor,
-            title: 'booking_corporate_selected_org'.tr(),
+            iconColor: const Color(0xFF4D63DD),
+            title: 'booking_corporate_selected_company'.tr(),
             isDark: isDark,
-            trailing: approvedOrgs.length > 1
-                ? TextButton.icon(
-                    onPressed: () => _pickOrganization(context),
-                    style: TextButton.styleFrom(
-                      foregroundColor: data.organization!.accentColor,
-                      padding: EdgeInsets.symmetric(horizontal: 8.r, vertical: 4.r),
-                      minimumSize: Size.zero,
-                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                    ),
-                    icon: Icon(Iconsax.arrow_swap_horizontal_copy, size: 13.r),
-                    label: Text(
-                      'booking_corporate_switch_org'.tr(),
-                      style: TextStyle(fontSize: 11.r, fontWeight: FontWeight.w800),
-                    ),
-                  )
-                : null,
           ),
           SizedBox(height: 12.r),
-          CorporateOrgCard(
-            organization: data.organization!,
+          _CompanySelector(
+            company: data.company,
             isDark: isDark,
-            onChange: () => _pickOrganization(context),
+            onTap: () => _pickCompany(context),
           ),
         ],
-        if (!isApproved) ...[
-          SizedBox(height: 18.r),
-          CorporateStatusNote(status: status, isDark: isDark),
-        ],
       ],
+    );
+  }
+}
+
+class _CompanySelector extends StatelessWidget {
+  final dynamic company; // AllCompany?
+  final bool isDark;
+  final VoidCallback onTap;
+  const _CompanySelector({required this.company, required this.isDark, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    final logo = company?.resolvedLogoUrl as String?;
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: EdgeInsets.all(14.r),
+        decoration: BoxDecoration(
+          color: isDark ? Colors.white.withValues(alpha: 0.04) : Colors.black.withValues(alpha: 0.03),
+          borderRadius: BorderRadius.circular(16.r),
+          border: Border.all(
+            color: isDark ? Colors.white.withValues(alpha: 0.08) : Colors.black.withValues(alpha: 0.06),
+          ),
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 46.r,
+              height: 46.r,
+              decoration: BoxDecoration(
+                color: const Color(0xFF4D63DD).withValues(alpha: 0.12),
+                borderRadius: BorderRadius.circular(12.r),
+              ),
+              clipBehavior: Clip.antiAlias,
+              child: (company != null && logo != null)
+                  ? CachedNetworkImage(
+                      imageUrl: logo,
+                      fit: BoxFit.cover,
+                      errorWidget: (c, u, e) =>
+                          Icon(Iconsax.buildings_copy, size: 22.r, color: const Color(0xFF4D63DD)),
+                    )
+                  : Icon(Iconsax.buildings_copy, size: 22.r, color: const Color(0xFF4D63DD)),
+            ),
+            SizedBox(width: 12.r),
+            Expanded(
+              child: Text(
+                company != null
+                    ? (company.displayName() as String)
+                    : 'booking_corporate_select_company'.tr(),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  fontSize: 14.r,
+                  fontWeight: FontWeight.w700,
+                  color: company != null ? cs.onSurface : cs.onSurface.withValues(alpha: 0.5),
+                ),
+              ),
+            ),
+            Icon(Iconsax.arrow_right_3_copy, size: 18.r, color: cs.onSurface.withValues(alpha: 0.4)),
+          ],
+        ),
+      ),
     );
   }
 }

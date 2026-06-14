@@ -16,6 +16,7 @@ import 'widgets/car_card.dart';
 import 'widgets/driver_card.dart';
 import 'widgets/leave_review_sheet.dart';
 import 'widgets/location_map_card.dart';
+import 'widgets/pay_booking_sheet.dart';
 import 'widgets/price_card.dart';
 import 'widgets/qr_card.dart';
 import 'widgets/ref_card.dart';
@@ -42,6 +43,22 @@ class _BookingDetailView extends StatelessWidget {
     final tp = context.watch<ThemeProvider>();
     return tp.isDarkMode ||
         (tp.isSystemMode && MediaQuery.of(context).platformBrightness == Brightness.dark);
+  }
+
+  Widget _payButton(BuildContext context, BookingDetail b, bool isDark) {
+    return SizedBox(
+      width: double.infinity,
+      child: FilledButton.icon(
+        onPressed: () async {
+          final ok = await PayBookingSheet.show(context, bookingId: b.id, isDark: isDark);
+          if (ok == true && context.mounted) {
+            context.read<BookingDetailProvider>().load();
+          }
+        },
+        icon: const Icon(CupertinoIcons.creditcard_fill, size: 18),
+        label: Text('pay_now'.tr()),
+      ),
+    );
   }
 
   Widget _reviewButton(BuildContext context, BookingDetail b, bool isDark) {
@@ -133,6 +150,10 @@ class _BookingDetailView extends StatelessWidget {
                   SizedBox(height: 14.r),
                   BookingQrCard(booking: b, isDark: isDark, cs: cs),
                   SizedBox(height: 14.r),
+                  if (b.canPay) ...[
+                    _payButton(context, b, isDark),
+                    SizedBox(height: 14.r),
+                  ],
                   if (b.isCompleted) ...[
                     _reviewButton(context, b, isDark),
                     SizedBox(height: 14.r),
@@ -225,6 +246,10 @@ class _BookingDetailView extends StatelessWidget {
                         SizedBox(height: 16.r),
                         BookingActionRow(booking: b, isDark: isDark, cs: cs),
                         SizedBox(height: 12.r),
+                        if (b.canPay) ...[
+                          _payButton(context, b, isDark),
+                          SizedBox(height: 12.r),
+                        ],
                         if (b.isCompleted) ...[
                           _reviewButton(context, b, isDark),
                           SizedBox(height: 12.r),

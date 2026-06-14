@@ -50,15 +50,9 @@ class BookingLookups {
   int? paymentTypeId(PaymentMethod method) {
     switch (method) {
       case PaymentMethod.card:
-      case PaymentMethod.applePay:
-      case PaymentMethod.wallet:
-        // All non-cash methods run through the OmPay card gateway.
         return _type('payment_type', const ['card', 'ompay']);
-      case PaymentMethod.cashOnDelivery:
+      case PaymentMethod.cash:
         return _type('payment_type', const ['cash']);
-      case PaymentMethod.billToCompany:
-        // No dedicated corporate payment type; settle as cash/invoice.
-        return _type('payment_type', const ['cash', 'card']);
     }
   }
 

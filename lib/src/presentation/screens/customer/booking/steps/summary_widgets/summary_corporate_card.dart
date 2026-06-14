@@ -1,14 +1,14 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 
-import '../../../profile/corporate/widgets/organization_logo.dart';
 import '../../models/booking_data.dart';
 import '../../widgets/booking_glass_card.dart';
 
-/// Summary entry shown only when the booking is corporate. Surfaces the
-/// chosen organization plus a hint about the billing path.
+/// Summary entry shown only for a corporate booking. Surfaces the chosen
+/// company.
 class SummaryCorporateCard extends StatelessWidget {
   final BookingData data;
   final bool isDark;
@@ -17,10 +17,10 @@ class SummaryCorporateCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
-    final org = data.organization;
-    if (!data.isCorporate || org == null) return const SizedBox.shrink();
-    final isBilled = data.paymentMethod == PaymentMethod.billToCompany;
-    final color = org.accentColor;
+    final company = data.company;
+    if (!data.isCorporate || company == null) return const SizedBox.shrink();
+    const color = Color(0xFF4D63DD);
+    final logo = company.resolvedLogoUrl;
     return BookingGlassCard(
       isDark: isDark,
       borderColor: color.withValues(alpha: 0.35),
@@ -46,27 +46,30 @@ class SummaryCorporateCard extends StatelessWidget {
           SizedBox(height: 10.r),
           Row(
             children: [
-              OrganizationLogo(organization: org, size: 40.r, isDark: isDark),
+              Container(
+                width: 40.r,
+                height: 40.r,
+                decoration: BoxDecoration(
+                  color: color.withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(11.r),
+                ),
+                clipBehavior: Clip.antiAlias,
+                child: logo != null
+                    ? CachedNetworkImage(
+                        imageUrl: logo,
+                        fit: BoxFit.cover,
+                        errorWidget: (c, u, e) =>
+                            Icon(Iconsax.buildings_copy, size: 18.r, color: color),
+                      )
+                    : Icon(Iconsax.buildings_copy, size: 18.r, color: color),
+              ),
               SizedBox(width: 12.r),
               Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      org.name,
-                      style: TextStyle(fontSize: 14.r, fontWeight: FontWeight.w800, color: cs.onSurface),
-                    ),
-                    SizedBox(height: 2.r),
-                    Text(
-                      isBilled
-                          ? 'summary_corporate_billed_to_company'.tr()
-                          : 'summary_corporate_paid_personally'.tr(),
-                      style: TextStyle(
-                        fontSize: 11.r,
-                        color: cs.onSurface.withValues(alpha: 0.6),
-                      ),
-                    ),
-                  ],
+                child: Text(
+                  company.displayName(),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(fontSize: 14.r, fontWeight: FontWeight.w800, color: cs.onSurface),
                 ),
               ),
             ],

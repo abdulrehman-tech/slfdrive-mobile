@@ -6,6 +6,7 @@ import 'package:iconsax_flutter/iconsax_flutter.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../widgets/auth_gate.dart';
+import '../../favorites/provider/favorites_provider.dart';
 import '../provider/driver_detail_provider.dart';
 import 'glass_button.dart';
 import 'identity_card.dart';
@@ -65,13 +66,21 @@ class CoverHeader extends StatelessWidget {
                   children: [
                     GlassButton(icon: Iconsax.share_copy, onTap: () {}),
                     SizedBox(width: 8.r),
-                    GlassButton(
-                      icon: provider.isFavourite ? Iconsax.heart_copy : Iconsax.heart,
-                      onTap: () async {
-                        if (!await requireLogin(context)) return;
-                        provider.toggleFavourite();
+                    Builder(
+                      builder: (context) {
+                        final fav = context.watch<FavoritesProvider>();
+                        final isFav = fav.isDriverFav(profile.id);
+                        return GlassButton(
+                          icon: isFav ? Iconsax.heart : Iconsax.heart_copy,
+                          onTap: () async {
+                            final snap = provider.favSnapshot();
+                            if (snap == null) return;
+                            if (!await requireLogin(context)) return;
+                            fav.toggleDriver(snap);
+                          },
+                          iconColor: isFav ? const Color(0xFFE91E63) : null,
+                        );
                       },
-                      iconColor: provider.isFavourite ? const Color(0xFFE91E63) : null,
                     ),
                   ],
                 ),

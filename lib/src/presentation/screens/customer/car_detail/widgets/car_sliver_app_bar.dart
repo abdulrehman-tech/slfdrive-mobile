@@ -5,6 +5,7 @@ import 'package:iconsax_flutter/iconsax_flutter.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../widgets/auth_gate.dart';
+import '../../favorites/provider/favorites_provider.dart';
 import '../provider/car_detail_provider.dart';
 import 'sliver_image_gallery.dart';
 
@@ -47,27 +48,36 @@ class CarSliverAppBar extends StatelessWidget {
         ),
       ),
       actions: [
-        GestureDetector(
-          onTap: () async {
-            if (!await requireLogin(context)) return;
-            provider.toggleFavourite();
+        Builder(
+          builder: (context) {
+            final fav = context.watch<FavoritesProvider>();
+            final id = vehicle?.id.toString();
+            final isFav = id != null && fav.isCarFav(id);
+            return GestureDetector(
+              onTap: () async {
+                final snap = provider.favSnapshot();
+                if (snap == null) return;
+                if (!await requireLogin(context)) return;
+                fav.toggleCar(snap);
+              },
+              child: Padding(
+                padding: EdgeInsetsDirectional.only(end: 12.r),
+                child: Container(
+                  width: 40.r,
+                  height: 40.r,
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.15),
+                    borderRadius: BorderRadius.circular(10.r),
+                  ),
+                  child: Icon(
+                    isFav ? Iconsax.heart : Iconsax.heart_copy,
+                    size: 18.r,
+                    color: isFav ? const Color(0xFFE91E63) : Colors.white,
+                  ),
+                ),
+              ),
+            );
           },
-          child: Padding(
-            padding: EdgeInsetsDirectional.only(end: 12.r),
-            child: Container(
-              width: 40.r,
-              height: 40.r,
-              decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.15),
-                borderRadius: BorderRadius.circular(10.r),
-              ),
-              child: Icon(
-                provider.isFavourite ? Iconsax.heart_copy : Iconsax.heart,
-                size: 18.r,
-                color: provider.isFavourite ? const Color(0xFFE91E63) : Colors.white,
-              ),
-            ),
-          ),
         ),
       ],
       flexibleSpace: FlexibleSpaceBar(background: SliverImageGallery(isDark: isDark, cs: cs)),

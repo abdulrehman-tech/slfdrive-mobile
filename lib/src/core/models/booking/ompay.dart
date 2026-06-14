@@ -7,6 +7,7 @@ class OmPayInitResponse {
   final String? clientId;
   final String? redirectUrl;
   final String? checkoutJsUrl;
+  final String? checkoutPageUrl;
   final int? paymentId;
   final double? amount;
   final String? currency;
@@ -16,6 +17,7 @@ class OmPayInitResponse {
     this.clientId,
     this.redirectUrl,
     this.checkoutJsUrl,
+    this.checkoutPageUrl,
     this.paymentId,
     this.amount,
     this.currency,
@@ -27,6 +29,7 @@ class OmPayInitResponse {
       clientId: json['clientId'] as String?,
       redirectUrl: json['redirectUrl'] as String?,
       checkoutJsUrl: json['checkoutJsUrl'] as String?,
+      checkoutPageUrl: json['checkoutPageUrl'] as String?,
       paymentId: (json['paymentId'] as num?)?.toInt(),
       amount: (json['amount'] as num?)?.toDouble(),
       currency: json['currency'] as String?,

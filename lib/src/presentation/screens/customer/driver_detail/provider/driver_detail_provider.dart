@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../../../core/data/repositories/driver_repository.dart';
 import '../../../../../core/di/injection_container.dart';
 import '../../../../../core/errors/app_exception.dart';
+import '../../favorites/models/fav_driver.dart';
 import '../models/driver_profile.dart';
 
 /// Loads a single driver from `GET /api/Driver/{id}` and exposes it as the
@@ -26,8 +27,20 @@ class DriverDetailProvider extends ChangeNotifier {
   String? _error;
   String? get error => _error;
 
-  bool _isFavourite = false;
-  bool get isFavourite => _isFavourite;
+  /// Snapshot of the loaded driver for the local favourites store, or null
+  /// before the driver has loaded.
+  FavDriver? favSnapshot() {
+    final p = _profile;
+    if (p == null) return null;
+    return FavDriver(
+      id: p.id,
+      name: p.name,
+      avatarUrl: p.avatarUrl,
+      rating: p.rating,
+      trips: p.trips,
+      speciality: p.languages.isNotEmpty ? p.languages.first : '',
+    );
+  }
 
   Future<void> load() async {
     _isLoading = true;
@@ -48,11 +61,6 @@ class DriverDetailProvider extends ChangeNotifier {
       _isLoading = false;
       notifyListeners();
     }
-  }
-
-  void toggleFavourite() {
-    _isFavourite = !_isFavourite;
-    notifyListeners();
   }
 
   final ScrollController scroll = ScrollController();

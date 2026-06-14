@@ -4,6 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 
+import '../../booking/models/booking_data.dart';
 import 'glass_card.dart';
 
 class ServiceRow extends StatelessWidget {
@@ -34,7 +35,17 @@ class ServiceRow extends StatelessWidget {
             child: Padding(
               padding: EdgeInsetsDirectional.only(end: i < _services.length - 1 ? 10.r : 0),
               child: GestureDetector(
-                onTap: () => context.pushNamed(i == 2 ? 'driver-listing' : 'car-listing'),
+                onTap: () {
+                  // 0 = rent a car (browse), 1 = car + driver (booking flow),
+                  // 2 = hire a driver (browse).
+                  if (i == 1) {
+                    context.pushNamed('booking', extra: {
+                      'service': BookingServiceType.carWithDriver,
+                    });
+                  } else {
+                    context.pushNamed(i == 2 ? 'driver-listing' : 'car-listing');
+                  }
+                },
                 child: GlassCard(
                   isDark: isDark,
                   borderRadius: 18.r,

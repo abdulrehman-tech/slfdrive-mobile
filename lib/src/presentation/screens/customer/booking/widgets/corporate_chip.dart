@@ -3,18 +3,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 
-import '../../profile/corporate/models/organization.dart';
+import '../../../../../core/models/company/all_company.dart';
 
 /// Compact chip rendered in the booking flow header once a corporate booking
-/// is locked in — keeps the mode visible across every step.
+/// is locked in — keeps the mode + company visible across every step.
 class CorporateChip extends StatelessWidget {
-  final Organization organization;
+  final AllCompany company;
   final bool isDark;
-  const CorporateChip({super.key, required this.organization, required this.isDark});
+  const CorporateChip({super.key, required this.company, required this.isDark});
 
   @override
   Widget build(BuildContext context) {
-    final color = organization.accentColor;
+    const color = Color(0xFF4D63DD);
     return Container(
       padding: EdgeInsetsDirectional.fromSTEB(8.r, 4.r, 10.r, 4.r),
       decoration: BoxDecoration(
@@ -29,7 +29,7 @@ class CorporateChip extends StatelessWidget {
           SizedBox(width: 6.r),
           Flexible(
             child: Text(
-              'booking_corporate_chip'.tr(namedArgs: {'org': organization.name}),
+              'booking_corporate_chip'.tr(namedArgs: {'org': company.displayName()}),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: TextStyle(

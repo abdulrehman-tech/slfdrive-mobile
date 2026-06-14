@@ -36,11 +36,6 @@ class SummaryPricingCard extends StatelessWidget {
             label: '${p.basePerDay.toStringAsFixed(0)} × ${p.days} ${'booking_dates_days'.tr()}',
             amount: p.basePerDay * p.days,
           ),
-          if (p.extrasPerDay > 0)
-            SummaryPriceRow(
-              label: 'booking_summary_extras'.tr(),
-              amount: p.extrasPerDay * p.days,
-            ),
           if (p.deliveryFee > 0)
             SummaryPriceRow(label: 'booking_summary_delivery_fee'.tr(), amount: p.deliveryFee),
           SummaryPriceRow(label: 'booking_summary_vat'.tr(), amount: p.vat),

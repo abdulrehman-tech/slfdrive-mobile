@@ -3,7 +3,6 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../models/booking_data.dart';
 import 'summary_widgets/summary_corporate_card.dart';
-import 'summary_widgets/summary_extras_card.dart';
 import 'summary_widgets/summary_header.dart';
 import 'summary_widgets/summary_logistics_card.dart';
 import 'summary_widgets/summary_pricing_card.dart';
@@ -32,7 +31,7 @@ class _SummaryStepState extends State<SummaryStep> {
         const SummaryHeader(),
         SizedBox(height: 18.r),
 
-        if (d.isCorporate && d.organization != null) ...[
+        if (d.isCorporate && d.company != null) ...[
           SummaryCorporateCard(data: d, isDark: isDark),
           SizedBox(height: 12.r),
         ],
@@ -47,11 +46,6 @@ class _SummaryStepState extends State<SummaryStep> {
 
         // Location card
         SummaryLogisticsCard(data: d, isDark: isDark),
-
-        if (d.selectedExtras.isNotEmpty) ...[
-          SizedBox(height: 12.r),
-          SummaryExtrasCard(data: d, isDark: isDark),
-        ],
 
         SizedBox(height: 12.r),
 

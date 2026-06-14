@@ -73,7 +73,7 @@ class FavoritesAppBar extends StatelessWidget {
                   ),
                 ),
                 child: Icon(
-                  Iconsax.search_normal_1,
+                  Iconsax.search_normal_1_copy,
                   color: cs.onSurface.withValues(alpha: 0.6),
                   size: 18.r,
                 ),

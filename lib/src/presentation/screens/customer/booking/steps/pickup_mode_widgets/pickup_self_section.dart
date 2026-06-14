@@ -5,23 +5,22 @@ import 'package:iconsax_flutter/iconsax_flutter.dart';
 
 import '../../models/booking_data.dart';
 import '../../widgets/booking_glass_card.dart';
-import 'pickup_location_preview.dart';
 
+/// Self-pickup: the customer collects the vehicle from where it is. That point
+/// is fixed by the provider, so it's shown read-only (no map / no editing).
 class PickupSelfSection extends StatelessWidget {
   final BookingData data;
   final bool isDark;
-  final VoidCallback onOpenMap;
 
-  const PickupSelfSection({
-    super.key,
-    required this.data,
-    required this.isDark,
-    required this.onOpenMap,
-  });
+  const PickupSelfSection({super.key, required this.data, required this.isDark});
 
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
+    final car = data.car;
+    final hasLocation = car?.hasLocation == true;
+    final locationName = (car?.locationName ?? '').trim();
+
     return BookingGlassCard(
       isDark: isDark,
       padding: EdgeInsets.all(14.r),
@@ -35,34 +34,62 @@ class PickupSelfSection extends StatelessWidget {
             isDark: isDark,
           ),
           SizedBox(height: 12.r),
-          PickupLocationPreview(
-            location: data.pickupLocation,
-            fallbackLabel: 'booking_pickup_owner_default'.tr(),
-            fallbackAddress: data.car != null ? '${data.car!.brand} — Muscat, Oman' : 'Muscat, Oman',
-            isDark: isDark,
-            onTap: onOpenMap,
-          ),
-          SizedBox(height: 10.r),
-          GestureDetector(
-            onTap: onOpenMap,
-            child: Container(
-              padding: EdgeInsets.symmetric(horizontal: 12.r, vertical: 9.r),
-              decoration: BoxDecoration(
-                color: cs.primary.withValues(alpha: isDark ? 0.2 : 0.1),
-                borderRadius: BorderRadius.circular(11.r),
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(Iconsax.map_copy, size: 14.r, color: cs.primary),
-                  SizedBox(width: 6.r),
-                  Text(
-                    'booking_pickup_open_map'.tr(),
-                    style: TextStyle(fontSize: 12.r, color: cs.primary, fontWeight: FontWeight.w700),
-                  ),
-                ],
+          Container(
+            padding: EdgeInsets.all(12.r),
+            decoration: BoxDecoration(
+              color: isDark ? Colors.white.withValues(alpha: 0.04) : Colors.black.withValues(alpha: 0.03),
+              borderRadius: BorderRadius.circular(12.r),
+              border: Border.all(
+                color: isDark ? Colors.white.withValues(alpha: 0.08) : Colors.black.withValues(alpha: 0.05),
               ),
             ),
+            child: Row(
+              children: [
+                Container(
+                  width: 44.r,
+                  height: 44.r,
+                  decoration: BoxDecoration(
+                    color: cs.primary.withValues(alpha: isDark ? 0.2 : 0.1),
+                    borderRadius: BorderRadius.circular(12.r),
+                  ),
+                  child: Icon(Iconsax.location_copy, color: cs.primary, size: 20.r),
+                ),
+                SizedBox(width: 12.r),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'booking_pickup_owner_default'.tr(),
+                        style: TextStyle(fontSize: 13.r, fontWeight: FontWeight.w700, color: cs.onSurface),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      SizedBox(height: 2.r),
+                      Text(
+                        hasLocation
+                            ? (locationName.isNotEmpty ? locationName : 'booking_pickup_provider_location'.tr())
+                            : 'booking_pickup_location_pending'.tr(),
+                        style: TextStyle(
+                          fontSize: 11.r,
+                          color: cs.onSurface.withValues(alpha: 0.55),
+                          height: 1.3,
+                        ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                  ),
+                ),
+                // Read-only lock indicator — the pickup point can't be changed.
+                Icon(Iconsax.lock_1_copy, size: 16.r, color: cs.onSurface.withValues(alpha: 0.3)),
+              ],
+            ),
+          ),
+          SizedBox(height: 8.r),
+          Text(
+            'booking_pickup_self_note'.tr(),
+            style: TextStyle(fontSize: 11.r, color: cs.onSurface.withValues(alpha: 0.5), height: 1.4),
           ),
         ],
       ),

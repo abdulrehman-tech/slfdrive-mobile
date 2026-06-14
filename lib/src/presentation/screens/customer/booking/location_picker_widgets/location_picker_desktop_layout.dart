@@ -98,6 +98,7 @@ class LocationPickerDesktopLayout extends StatelessWidget {
                   icon: Iconsax.gps_copy,
                   isDark: isDark,
                   color: cs.primary,
+                  loading: context.select<LocationPickerProvider, bool>((p) => p.locating),
                   onTap: provider.goToMyLocation,
                 ),
               ),

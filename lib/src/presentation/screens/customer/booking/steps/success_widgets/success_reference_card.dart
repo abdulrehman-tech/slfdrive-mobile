@@ -29,13 +29,7 @@ class SuccessReferenceCard extends StatelessWidget {
               end: Alignment.bottomRight,
             ),
             borderRadius: BorderRadius.circular(20.r),
-            boxShadow: [
-              BoxShadow(
-                color: cs.primary.withValues(alpha: 0.3),
-                blurRadius: 20.r,
-                offset: Offset(0, 8.r),
-              ),
-            ],
+            boxShadow: [BoxShadow(color: cs.primary.withValues(alpha: 0.3), blurRadius: 20.r, offset: Offset(0, 8.r))],
           ),
           child: Row(
             children: [
@@ -51,13 +45,18 @@ class SuccessReferenceCard extends StatelessWidget {
                     ),
                   ),
                   SizedBox(height: 4.r),
-                  Text(
-                    reference,
-                    style: TextStyle(
-                      fontSize: 22.r,
-                      fontWeight: FontWeight.w900,
-                      color: Colors.white,
-                      letterSpacing: 1.2,
+                  SizedBox(
+                    width: 200.w,
+                    child: Text(
+                      reference,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        fontSize: 22.r,
+                        fontWeight: FontWeight.w900,
+                        color: Colors.white,
+                        letterSpacing: 1.2,
+                      ),
                     ),
                   ),
                 ],
@@ -67,9 +66,7 @@ class SuccessReferenceCard extends StatelessWidget {
                 onTap: () async {
                   await Clipboard.setData(ClipboardData(text: reference));
                   if (!context.mounted) return;
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('booking_success_copied'.tr())),
-                  );
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('booking_success_copied'.tr())));
                 },
                 child: Container(
                   width: 42.r,

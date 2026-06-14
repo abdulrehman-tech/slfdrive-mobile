@@ -39,7 +39,9 @@ class SummaryLogisticsCard extends StatelessWidget {
                 ? 'booking_summary_pickup_at'.tr()
                 : 'booking_summary_delivery_to'.tr(),
             value: (d.pickupMode == PickupMode.selfPickup
-                ? (d.pickupLocation?.address ?? 'Owner location')
+                ? ((d.car?.locationName?.trim().isNotEmpty == true)
+                    ? d.car!.locationName!
+                    : 'booking_pickup_provider_location'.tr())
                 : (d.deliveryLocation?.address ?? 'Set address')),
             multi: true,
           ),

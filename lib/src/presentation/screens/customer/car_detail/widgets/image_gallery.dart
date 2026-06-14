@@ -5,6 +5,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 import 'package:provider/provider.dart';
 
+import '../../favorites/provider/favorites_provider.dart';
 import '../provider/car_detail_provider.dart';
 import 'car_glass_button.dart';
 import 'fullscreen_gallery.dart';
@@ -78,11 +79,21 @@ class ImageGallery extends StatelessWidget {
                   isDark: isDark,
                   onTap: () => Navigator.of(context).pop(),
                 ),
-                CarGlassButton(
-                  icon: provider.isFavourite ? Iconsax.heart_copy : Iconsax.heart,
-                  isDark: isDark,
-                  onTap: provider.toggleFavourite,
-                  iconColor: provider.isFavourite ? const Color(0xFFE91E63) : null,
+                Builder(
+                  builder: (context) {
+                    final fav = context.watch<FavoritesProvider>();
+                    final id = provider.vehicle?.id.toString();
+                    final isFav = id != null && fav.isCarFav(id);
+                    return CarGlassButton(
+                      icon: isFav ? Iconsax.heart : Iconsax.heart_copy,
+                      isDark: isDark,
+                      onTap: () {
+                        final snap = provider.favSnapshot();
+                        if (snap != null) fav.toggleCar(snap);
+                      },
+                      iconColor: isFav ? const Color(0xFFE91E63) : null,
+                    );
+                  },
                 ),
               ],
             ),

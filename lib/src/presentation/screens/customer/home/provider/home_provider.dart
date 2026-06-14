@@ -1,12 +1,11 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 
 import '../../../../../core/data/repositories/driver_listing_repository.dart';
+import '../../../../../core/data/repositories/lookup_repository.dart';
 import '../../../../../core/data/repositories/vehicle_repository.dart';
+import '../../../../../core/di/injection_container.dart';
 import '../../../../../core/errors/app_exception.dart';
 import '../../../../../core/models/common/pagination_params.dart';
-import '../data/home_mock_data.dart';
 import '../models/ad_item.dart';
 import '../models/car_brand.dart';
 import '../models/car_item.dart';
@@ -28,7 +27,6 @@ class HomeProvider extends ChangeNotifier {
   })  : _vehicleRepo = vehicleRepository,
         _driverRepo = driverRepository,
         _ar = ar {
-    _startAdsTimer();
     load();
   }
 
@@ -59,8 +57,9 @@ class HomeProvider extends ChangeNotifier {
   List<DriverItem> _nearbyDrivers = const [];
   List<DriverItem> get nearbyDrivers => _nearbyDrivers;
 
-  // ── Brands (static marketing data — never fetched from the API) ─
-  final List<CarBrand> brands = kHomeBrands;
+  // ── Brands (active vehicle brands from the API) ────────────────
+  List<CarBrand> _brands = const [];
+  List<CarBrand> get brands => _brands;
   int _selectedBrandIndex = -1;
   int get selectedBrandIndex => _selectedBrandIndex;
 
@@ -69,24 +68,13 @@ class HomeProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  // ── Ads carousel (static marketing data) ───────────────────────
-  final List<AdItem> ads = kHomeAds;
+  // ── Ads carousel ───────────────────────────────────────────────
+  // No ads backend yet — empty until a real source exists; the carousel hides
+  // itself when empty.
+  final List<AdItem> ads = const [];
   final PageController adsController = PageController(viewportFraction: 0.92);
   int _adsPage = 0;
   int get adsPage => _adsPage;
-  Timer? _adsTimer;
-
-  void _startAdsTimer() {
-    _adsTimer = Timer.periodic(const Duration(seconds: 4), (_) {
-      if (!adsController.hasClients) return;
-      final next = (_adsPage + 1) % ads.length;
-      adsController.animateToPage(
-        next,
-        duration: const Duration(milliseconds: 450),
-        curve: Curves.easeOutCubic,
-      );
-    });
-  }
 
   void onAdsPageChanged(int i) {
     _adsPage = i;
@@ -98,7 +86,17 @@ class HomeProvider extends ChangeNotifier {
   /// Triggers a parallel load of featured cars and nearby drivers. Safe to
   /// call again as a refresh — both section states reset independently.
   Future<void> load() async {
-    await Future.wait([_loadCars(), _loadDrivers()]);
+    await Future.wait([_loadCars(), _loadDrivers(), _loadBrands()]);
+  }
+
+  Future<void> _loadBrands() async {
+    try {
+      final brands = await getIt<LookupRepository>().getActiveBrands();
+      _brands = brands.map((b) => CarBrand(b.displayName(ar: _ar), '')).toList();
+      notifyListeners();
+    } catch (_) {
+      // Brands are non-critical chrome; leave empty on failure.
+    }
   }
 
   Future<void> _loadCars() async {
@@ -167,7 +165,6 @@ class HomeProvider extends ChangeNotifier {
 
   @override
   void dispose() {
-    _adsTimer?.cancel();
     adsController.dispose();
     super.dispose();
   }

@@ -51,45 +51,45 @@ class BookingsProvider extends ChangeNotifier {
   }
 
   static const tabKeys = [
-    'bookings_tab_upcoming',
-    'bookings_tab_active',
+    'bookings_tab_pending',
+    'bookings_tab_approved',
     'bookings_tab_completed',
-    'bookings_tab_cancelled',
+    'bookings_tab_rejected',
   ];
 
   static const tabIcons = [
-    Iconsax.calendar_tick,
-    Iconsax.timer_1,
+    Iconsax.clock,
     Iconsax.tick_circle,
+    Iconsax.medal_star,
     Iconsax.close_circle,
   ];
 
   static const tabColors = [
-    Color(0xFF3D5AFE),
     Color(0xFFFFA726),
+    Color(0xFF3D5AFE),
     Color(0xFF4CAF50),
     Color(0xFFE53935),
   ];
 
   static const statusMap = [
-    BookingStatus.confirmed,
-    BookingStatus.inProgress,
+    BookingStatus.pending,
+    BookingStatus.approved,
     BookingStatus.completed,
-    BookingStatus.cancelled,
+    BookingStatus.rejected,
   ];
 
   static const emptyTitles = [
-    'bookings_empty_upcoming',
-    'bookings_empty_active',
+    'bookings_empty_pending',
+    'bookings_empty_approved',
     'bookings_empty_completed',
-    'bookings_empty_cancelled',
+    'bookings_empty_rejected',
   ];
 
   static const emptySubs = [
-    'bookings_empty_upcoming_sub',
-    'bookings_empty_active_sub',
+    'bookings_empty_pending_sub',
+    'bookings_empty_approved_sub',
     'bookings_empty_completed_sub',
-    'bookings_empty_cancelled_sub',
+    'bookings_empty_rejected_sub',
   ];
 
   int get tabIndex => _tabIndex;

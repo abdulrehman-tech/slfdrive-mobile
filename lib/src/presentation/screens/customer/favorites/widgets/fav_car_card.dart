@@ -141,7 +141,7 @@ class FavCarCard extends StatelessWidget {
               color: const Color(0xFFE91E63).withValues(alpha: isDark ? 0.15 : 0.08),
               borderRadius: BorderRadius.circular(9.r),
             ),
-            child: Icon(Iconsax.heart_copy, color: const Color(0xFFE91E63), size: 14.r),
+            child: Icon(Iconsax.heart, color: const Color(0xFFE91E63), size: 14.r),
           ),
         ),
       ],

@@ -56,21 +56,31 @@ class LocationPickerMobileLayout extends StatelessWidget {
             ),
           ),
         ),
-        Positioned(
-          bottom: 200.r,
-          right: 16.r,
-          child: LocationPickerGlassCircle(
-            icon: Iconsax.gps_copy,
-            isDark: isDark,
-            color: cs.primary,
-            onTap: provider.goToMyLocation,
-          ),
-        ),
+        // GPS button + bottom sheet share a bottom-aligned column so the button
+        // always sits just above the sheet, regardless of the sheet's height.
         Positioned(
           left: 0,
           right: 0,
           bottom: 0,
-          child: LocationPickerBottomSheet(isDark: isDark, onConfirm: onConfirm),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Padding(
+                padding: EdgeInsets.only(right: 16.r, bottom: 12.r),
+                child: Align(
+                  alignment: Alignment.centerRight,
+                  child: LocationPickerGlassCircle(
+                    icon: Iconsax.gps_copy,
+                    isDark: isDark,
+                    color: cs.primary,
+                    loading: context.select<LocationPickerProvider, bool>((p) => p.locating),
+                    onTap: provider.goToMyLocation,
+                  ),
+                ),
+              ),
+              LocationPickerBottomSheet(isDark: isDark, onConfirm: onConfirm),
+            ],
+          ),
         ),
       ],
     );

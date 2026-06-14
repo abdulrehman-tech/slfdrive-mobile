@@ -81,18 +81,20 @@ class BrandTile extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(fontSize: 12.r, fontWeight: FontWeight.w700, color: cs.onSurface),
                   ),
-                  SizedBox(height: 3.r),
-                  Container(
-                    padding: EdgeInsets.symmetric(horizontal: 7.r, vertical: 2.r),
-                    decoration: BoxDecoration(
-                      color: cs.primary.withValues(alpha: isDark ? 0.18 : 0.1),
-                      borderRadius: BorderRadius.circular(20.r),
+                  if (brand.carsCount > 0) ...[
+                    SizedBox(height: 3.r),
+                    Container(
+                      padding: EdgeInsets.symmetric(horizontal: 7.r, vertical: 2.r),
+                      decoration: BoxDecoration(
+                        color: cs.primary.withValues(alpha: isDark ? 0.18 : 0.1),
+                        borderRadius: BorderRadius.circular(20.r),
+                      ),
+                      child: Text(
+                        '${brand.carsCount} ${'brands_cars'.tr()}',
+                        style: TextStyle(fontSize: 9.r, color: cs.primary, fontWeight: FontWeight.w700),
+                      ),
                     ),
-                    child: Text(
-                      '${brand.carsCount} ${'brands_cars'.tr()}',
-                      style: TextStyle(fontSize: 9.r, color: cs.primary, fontWeight: FontWeight.w700),
-                    ),
-                  ),
+                  ],
                 ],
               ),
             ),

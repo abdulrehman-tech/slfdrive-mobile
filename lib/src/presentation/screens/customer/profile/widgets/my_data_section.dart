@@ -2,10 +2,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
-import 'package:provider/provider.dart';
 
-import '../corporate/models/membership_status.dart';
-import '../corporate/provider/corporate_provider.dart';
 import '../../../common/profile/widgets/profile_section.dart';
 import '../../../common/profile/widgets/profile_tile.dart';
 
@@ -15,8 +12,6 @@ class MyDataSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final corporate = context.watch<CorporateProvider>();
-    final status = corporate.effectiveStatus;
     return ProfileSection(
       title: 'profile_section_my_data'.tr(),
       isDark: isDark,
@@ -43,19 +38,6 @@ class MyDataSection extends StatelessWidget {
           valueColor: const Color(0xFFFF6D00),
           isDark: isDark,
           onTap: () => context.push('/profile/kyc'),
-        ),
-        ProfileTile(
-          icon: Iconsax.briefcase_copy,
-          iconColor: const Color(0xFF7C4DFF),
-          title: 'profile_corporate_membership'.tr(),
-          value: status == MembershipStatus.notApplied
-              ? 'corporate_status_apply_now'.tr()
-              : status.label,
-          valueColor: status == MembershipStatus.notApplied ? null : status.color,
-          isDark: isDark,
-          onTap: () => context.push(
-            status == MembershipStatus.notApplied ? '/profile/corporate/apply' : '/profile/corporate',
-          ),
         ),
       ],
     );

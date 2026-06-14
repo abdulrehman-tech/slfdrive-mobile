@@ -1,6 +1,6 @@
 import 'package:flutter/foundation.dart';
 
-import '../../profile/corporate/models/organization.dart';
+import '../../../../../core/models/company/all_company.dart';
 
 // ============================================================
 // ENUMS
@@ -19,7 +19,9 @@ enum BookingServiceType {
 
 enum PickupMode { selfPickup, delivery }
 
-enum PaymentMethod { card, applePay, wallet, cashOnDelivery, billToCompany }
+/// Payment methods offered at pay time (after a booking is approved).
+/// `card` runs through the OmPay gateway; `cash` is recorded directly.
+enum PaymentMethod { card, cash }
 
 extension BookingServiceTypeX on BookingServiceType {
   String get titleKey {
@@ -64,6 +66,12 @@ class BookingCar {
   final String plateNumber;
   final String plateCode;
 
+  /// The vehicle's own location (its pickup point). Self-pickup shows this
+  /// read-only; it's also the booking's pickup coordinates.
+  final double? lat;
+  final double? lon;
+  final String? locationName;
+
   const BookingCar({
     required this.id,
     required this.name,
@@ -72,7 +80,12 @@ class BookingCar {
     required this.pricePerDay,
     this.plateNumber = '12345',
     this.plateCode = 'A',
+    this.lat,
+    this.lon,
+    this.locationName,
   });
+
+  bool get hasLocation => lat != null && lon != null;
 }
 
 class BookingDriver {
@@ -115,88 +128,24 @@ class BookingLocation {
       );
 }
 
-class BookingExtra {
-  final String id;
-  final String titleKey;
-  final String subtitleKey;
-  final String iconKey;
-  final double pricePerDay;
-
-  const BookingExtra({
-    required this.id,
-    required this.titleKey,
-    required this.subtitleKey,
-    required this.iconKey,
-    required this.pricePerDay,
-  });
-}
-
-// Canonical catalogue of available extras — pricing is per day.
-const kBookingExtras = <BookingExtra>[
-  BookingExtra(
-    id: 'child_seat',
-    titleKey: 'booking_extra_child_seat',
-    subtitleKey: 'booking_extra_child_seat_desc',
-    iconKey: 'safety',
-    pricePerDay: 3,
-  ),
-  BookingExtra(
-    id: 'gps',
-    titleKey: 'booking_extra_gps',
-    subtitleKey: 'booking_extra_gps_desc',
-    iconKey: 'map',
-    pricePerDay: 2,
-  ),
-  BookingExtra(
-    id: 'extra_driver',
-    titleKey: 'booking_extra_extra_driver',
-    subtitleKey: 'booking_extra_extra_driver_desc',
-    iconKey: 'user',
-    pricePerDay: 5,
-  ),
-  BookingExtra(
-    id: 'premium_insurance',
-    titleKey: 'booking_extra_premium_insurance',
-    subtitleKey: 'booking_extra_premium_insurance_desc',
-    iconKey: 'shield',
-    pricePerDay: 8,
-  ),
-  BookingExtra(
-    id: 'airport_delivery',
-    titleKey: 'booking_extra_airport_delivery',
-    subtitleKey: 'booking_extra_airport_delivery_desc',
-    iconKey: 'airplane',
-    pricePerDay: 10,
-  ),
-  BookingExtra(
-    id: 'fuel_full_tank',
-    titleKey: 'booking_extra_full_tank',
-    subtitleKey: 'booking_extra_full_tank_desc',
-    iconKey: 'fuel',
-    pricePerDay: 4,
-  ),
-];
-
 // ============================================================
-// PRICING BREAKDOWN
+// PRICING BREAKDOWN (estimate shown in summary; charged after approval)
 // ============================================================
 
 class BookingPricing {
   final double basePerDay;
   final int days;
-  final double extrasPerDay;
   final double deliveryFee;
   final double vatRate; // 0..1
 
   const BookingPricing({
     required this.basePerDay,
     required this.days,
-    required this.extrasPerDay,
     required this.deliveryFee,
     this.vatRate = 0.05,
   });
 
-  double get subtotal => (basePerDay + extrasPerDay) * days + deliveryFee;
+  double get subtotal => basePerDay * days + deliveryFee;
   double get vat => subtotal * vatRate;
   double get total => subtotal + vat;
 }
@@ -210,10 +159,10 @@ class BookingData extends ChangeNotifier {
   BookingCar? _car;
   BookingDriver? _driver;
 
-  // Corporate booking — null = personal/not-yet-decided. When `_isCorporate`
-  // is true the user must also pick an `_organization` they're approved for.
+  // Corporate booking — `_isCorporate` true means the user must also pick the
+  // company (`_company`) they are booking on behalf of.
   bool _isCorporate = false;
-  Organization? _organization;
+  AllCompany? _company;
 
   DateTime? _startAt;
   DateTime? _endAt;
@@ -222,8 +171,6 @@ class BookingData extends ChangeNotifier {
   BookingLocation? _pickupLocation;
   BookingLocation? _deliveryLocation;
   String _deliveryNotes = '';
-
-  final Set<String> _selectedExtras = {};
 
   PaymentMethod _paymentMethod = PaymentMethod.card;
   String? _promoCode;
@@ -245,14 +192,13 @@ class BookingData extends ChangeNotifier {
   BookingCar? get car => _car;
   BookingDriver? get driver => _driver;
   bool get isCorporate => _isCorporate;
-  Organization? get organization => _organization;
+  AllCompany? get company => _company;
   DateTime? get startAt => _startAt;
   DateTime? get endAt => _endAt;
   PickupMode get pickupMode => _pickupMode;
   BookingLocation? get pickupLocation => _pickupLocation;
   BookingLocation? get deliveryLocation => _deliveryLocation;
   String get deliveryNotes => _deliveryNotes;
-  Set<String> get selectedExtras => Set.unmodifiable(_selectedExtras);
   PaymentMethod get paymentMethod => _paymentMethod;
   String? get promoCode => _promoCode;
   double get promoDiscount => _promoDiscount;
@@ -272,30 +218,11 @@ class BookingData extends ChangeNotifier {
     return base;
   }
 
-  double get extrasPerDay {
-    double total = 0;
-    for (final id in _selectedExtras) {
-      final extra = kBookingExtras.firstWhere(
-        (e) => e.id == id,
-        orElse: () => const BookingExtra(
-          id: '',
-          titleKey: '',
-          subtitleKey: '',
-          iconKey: '',
-          pricePerDay: 0,
-        ),
-      );
-      total += extra.pricePerDay;
-    }
-    return total;
-  }
-
   double get deliveryFee => _pickupMode == PickupMode.delivery ? 10 : 0;
 
   BookingPricing get pricing => BookingPricing(
     basePerDay: basePerDay,
     days: days,
-    extrasPerDay: extrasPerDay,
     deliveryFee: deliveryFee,
   );
 
@@ -320,17 +247,14 @@ class BookingData extends ChangeNotifier {
     notifyListeners();
   }
 
-  void setCorporate(bool isCorporate, {Organization? organization}) {
+  void setCorporate(bool isCorporate, {AllCompany? company}) {
     _isCorporate = isCorporate;
-    _organization = isCorporate ? organization : null;
-    if (!isCorporate && _paymentMethod == PaymentMethod.billToCompany) {
-      _paymentMethod = PaymentMethod.card;
-    }
+    _company = isCorporate ? company : null;
     notifyListeners();
   }
 
-  void setOrganization(Organization? organization) {
-    _organization = organization;
+  void setCompany(AllCompany? company) {
+    _company = company;
     notifyListeners();
   }
 
@@ -357,15 +281,6 @@ class BookingData extends ChangeNotifier {
 
   void setDeliveryNotes(String s) {
     _deliveryNotes = s;
-    notifyListeners();
-  }
-
-  void toggleExtra(String id) {
-    if (_selectedExtras.contains(id)) {
-      _selectedExtras.remove(id);
-    } else {
-      _selectedExtras.add(id);
-    }
     notifyListeners();
   }
 

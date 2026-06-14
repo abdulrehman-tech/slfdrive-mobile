@@ -160,7 +160,7 @@ class FavDriverCard extends StatelessWidget {
           color: const Color(0xFFE91E63).withValues(alpha: isDark ? 0.15 : 0.08),
           borderRadius: BorderRadius.circular(10.r),
         ),
-        child: Icon(Iconsax.heart_copy, color: const Color(0xFFE91E63), size: 15.r),
+        child: Icon(Iconsax.heart, color: const Color(0xFFE91E63), size: 15.r),
       ),
     );
   }

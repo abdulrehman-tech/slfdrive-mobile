@@ -1,17 +1,54 @@
 import 'package:flutter/foundation.dart';
 
-import '../data/brands_mock_data.dart';
+import '../../../../../core/data/repositories/lookup_repository.dart';
+import '../../../../../core/di/injection_container.dart';
 import '../models/brand.dart';
 
+/// Loads active vehicle brands from the backend (`VehicleBrand/active`) and
+/// filters them by the search query.
 class BrandsProvider extends ChangeNotifier {
+  BrandsProvider({LookupRepository? repository})
+      : _repository = repository ?? getIt<LookupRepository>() {
+    load();
+  }
+
+  final LookupRepository _repository;
+
+  final List<Brand> _all = [];
   String _query = '';
+  bool _isLoading = false;
+  String? _error;
 
   String get query => _query;
+  bool get isLoading => _isLoading;
+  String? get error => _error;
 
   List<Brand> get filteredBrands {
-    if (_query.trim().isEmpty) return kAllBrands;
+    if (_query.trim().isEmpty) return List.unmodifiable(_all);
     final q = _query.toLowerCase();
-    return kAllBrands.where((b) => b.name.toLowerCase().contains(q)).toList();
+    return _all.where((b) => b.name.toLowerCase().contains(q)).toList();
+  }
+
+  Future<void> load() async {
+    _isLoading = true;
+    _error = null;
+    notifyListeners();
+    try {
+      final brands = await _repository.getActiveBrands();
+      _all
+        ..clear()
+        ..addAll(brands.map((b) => Brand(
+              name: b.displayName(),
+              logoAsset: '',
+              carsCount: 0,
+              tagline: '',
+            )));
+    } catch (e) {
+      _error = e.toString();
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
   }
 
   void setQuery(String value) {

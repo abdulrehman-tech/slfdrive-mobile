@@ -10,7 +10,6 @@ import '../../../providers/theme_provider.dart';
 import '../../common/profile/sections/preferences_section.dart';
 import '../../common/profile/sections/sign_out_button.dart';
 import '../../common/profile/sections/support_section.dart';
-import '../../common/profile/widgets/logout_dialog.dart';
 import '../../common/profile/widgets/profile_header_card.dart';
 import '../../common/profile/widgets/profile_section.dart';
 import '../../common/profile/widgets/profile_tile.dart';

@@ -5,11 +5,10 @@ import '../models/booking_step_id.dart';
 import '../steps/corporate_step.dart';
 import '../steps/dates_step.dart';
 import '../steps/driver_select_step.dart';
-import '../steps/extras_step.dart';
-import '../steps/payment_step.dart';
 import '../steps/pickup_mode_step.dart';
 import '../steps/service_type_step.dart';
 import '../steps/summary_step.dart';
+import '../steps/vehicle_select_step.dart';
 
 /// Resolves and builds the widget for a given [BookingStepId].
 class BookingFlowStepContent extends StatelessWidget {
@@ -33,16 +32,14 @@ class BookingFlowStepContent extends StatelessWidget {
         return CorporateStep(data: data, isDark: isDark);
       case BookingStepId.dates:
         return DatesStep(data: data, isDark: isDark);
+      case BookingStepId.vehicle:
+        return VehicleSelectStep(data: data, isDark: isDark);
       case BookingStepId.pickup:
         return PickupModeStep(data: data, isDark: isDark);
-      case BookingStepId.extras:
-        return ExtrasStep(data: data, isDark: isDark);
       case BookingStepId.driver:
         return DriverSelectStep(data: data, isDark: isDark);
       case BookingStepId.summary:
         return SummaryStep(data: data, isDark: isDark);
-      case BookingStepId.payment:
-        return PaymentStep(data: data, isDark: isDark);
     }
   }
 }

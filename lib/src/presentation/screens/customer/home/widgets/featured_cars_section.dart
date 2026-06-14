@@ -6,6 +6,9 @@ import 'package:iconsax_flutter/iconsax_flutter.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../widgets/auth_gate.dart';
+import '../../favorites/models/fav_car.dart';
+import '../../favorites/provider/favorites_provider.dart';
+import '../models/car_item.dart';
 import '../provider/home_provider.dart';
 import 'car_card.dart';
 import 'section_header.dart';
@@ -16,15 +19,23 @@ class FeaturedCarsSection extends StatelessWidget {
   const FeaturedCarsSection({super.key, this.isDesktop = false, required this.isDark});
 
   // Saving a favourite is a gated action — guests are prompted to log in.
-  Future<void> _onFavourite(BuildContext context, HomeProvider home, String id) async {
+  Future<void> _onFavourite(BuildContext context, FavoritesProvider fav, CarItem car) async {
     if (!await requireLogin(context)) return;
-    home.toggleFavourite(id);
+    fav.toggleCar(FavCar(
+      id: car.id,
+      name: car.name,
+      imageUrl: car.imageUrl,
+      pricePerDay: car.pricePerDay,
+      brand: '',
+      rating: car.rating ?? 0,
+    ));
   }
 
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
     final home = context.watch<HomeProvider>();
+    final fav = context.watch<FavoritesProvider>();
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -49,16 +60,19 @@ class FeaturedCarsSection extends StatelessWidget {
         else if (isDesktop)
           ...List.generate(
             home.featuredCars.length,
-            (i) => Padding(
-              padding: EdgeInsets.only(bottom: 16.r),
-              child: CarCard(
-                car: home.featuredCars[i],
-                isDark: isDark,
-                cs: cs,
-                onFavourite: () => _onFavourite(context, home, home.featuredCars[i].id),
-                onTap: () => context.pushNamed('car-detail', pathParameters: {'id': home.featuredCars[i].id}),
-              ),
-            ),
+            (i) {
+              final car = home.featuredCars[i]..isFavourite = fav.isCarFav(home.featuredCars[i].id);
+              return Padding(
+                padding: EdgeInsets.only(bottom: 16.r),
+                child: CarCard(
+                  car: car,
+                  isDark: isDark,
+                  cs: cs,
+                  onFavourite: () => _onFavourite(context, fav, car),
+                  onTap: () => context.pushNamed('car-detail', pathParameters: {'id': car.id}),
+                ),
+              );
+            },
           )
         else
           SizedBox(
@@ -68,19 +82,22 @@ class FeaturedCarsSection extends StatelessWidget {
               physics: const BouncingScrollPhysics(),
               padding: EdgeInsets.symmetric(horizontal: 16.r),
               itemCount: home.featuredCars.length,
-              itemBuilder: (_, i) => Padding(
-                padding: EdgeInsetsDirectional.only(end: 16.r),
-                child: SizedBox(
-                  width: 220.r,
-                  child: CarCard(
-                    car: home.featuredCars[i],
-                    isDark: isDark,
-                    cs: cs,
-                    onFavourite: () => _onFavourite(context, home, home.featuredCars[i].id),
-                    onTap: () => context.pushNamed('car-detail', pathParameters: {'id': home.featuredCars[i].id}),
+              itemBuilder: (_, i) {
+                final car = home.featuredCars[i]..isFavourite = fav.isCarFav(home.featuredCars[i].id);
+                return Padding(
+                  padding: EdgeInsetsDirectional.only(end: 16.r),
+                  child: SizedBox(
+                    width: 220.r,
+                    child: CarCard(
+                      car: car,
+                      isDark: isDark,
+                      cs: cs,
+                      onFavourite: () => _onFavourite(context, fav, car),
+                      onTap: () => context.pushNamed('car-detail', pathParameters: {'id': car.id}),
+                    ),
                   ),
-                ),
-              ),
+                );
+              },
             ),
           ),
       ],

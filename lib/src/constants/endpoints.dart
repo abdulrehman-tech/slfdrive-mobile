@@ -50,9 +50,13 @@ class ApiEndpoints {
   static String generalTypesByType(String type) => '/api/GeneralType/type/$type';
   static String generalStatusesByType(String type) => '/api/GeneralStatus/type/$type';
 
+  // Corporate companies (booking-time company picker)
+  static const String activeAllCompanies = '/api/AllCompanies/active';
+
   // Bookings
   static const String bookingCreate = '/api/Booking/create';
   static const String bookingMyPaginated = '/api/Booking/my/paginated';
+  static const String bookingPay = '/api/Booking/pay';
   static String bookingById(int id) => '/api/Booking/$id';
   static String bookingOmPayInit(int id) => '/api/Booking/$id/pay/ompay/init';
   static String bookingOmPayVerify(int id) => '/api/Booking/$id/pay/ompay/verify';

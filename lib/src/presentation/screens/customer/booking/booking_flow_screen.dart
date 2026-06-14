@@ -7,6 +7,7 @@ import '../../../../constants/breakpoints.dart';
 import '../../../providers/theme_provider.dart';
 import 'models/booking_data.dart';
 import 'provider/booking_flow_provider.dart';
+import 'provider/corporate_companies_provider.dart';
 import 'steps/success_screen.dart';
 import 'widgets/booking_flow_bottom_bar.dart';
 import 'widgets/booking_flow_desktop_sidebar.dart';
@@ -33,12 +34,19 @@ class BookingFlowScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider<BookingFlowProvider>(
-      create: (_) => BookingFlowProvider(
-        initialServiceType: initialServiceType,
-        initialCar: initialCar,
-        initialDriver: initialDriver,
-      ),
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider<BookingFlowProvider>(
+          create: (_) => BookingFlowProvider(
+            initialServiceType: initialServiceType,
+            initialCar: initialCar,
+            initialDriver: initialDriver,
+          ),
+        ),
+        ChangeNotifierProvider<CorporateCompaniesProvider>(
+          create: (_) => CorporateCompaniesProvider(),
+        ),
+      ],
       child: const _BookingFlowView(),
     );
   }
@@ -57,7 +65,7 @@ class _BookingFlowView extends StatelessWidget {
     final provider = context.read<BookingFlowProvider>();
     final shouldSubmit = provider.advance();
     if (!shouldSubmit) return;
-    final ok = await provider.submitPayment();
+    final ok = await provider.submitBooking();
     if (!context.mounted) return;
     if (!ok) {
       final msg = provider.error == null ? 'booking_failed'.tr() : provider.error!.tr();

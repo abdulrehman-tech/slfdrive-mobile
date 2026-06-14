@@ -37,6 +37,11 @@ class LocationPickerProvider extends ChangeNotifier {
   String _address = 'Muscat, Oman';
   String _label = '';
   bool _resolving = false;
+  bool _locating = false;
+
+  /// One-shot i18n key for a geolocation failure; the screen shows it then
+  /// calls [clearGeoError].
+  String? _geoError;
 
   // Places autocomplete state.
   List<PlacePrediction> _predictions = const [];
@@ -47,8 +52,12 @@ class LocationPickerProvider extends ChangeNotifier {
   String get address => _address;
   String get label => _label;
   bool get resolving => _resolving;
+  bool get locating => _locating;
+  String? get geoError => _geoError;
   List<PlacePrediction> get predictions => _predictions;
   bool get searching => _searching;
+
+  void clearGeoError() => _geoError = null;
 
   @override
   void dispose() {
@@ -151,20 +160,45 @@ class LocationPickerProvider extends ChangeNotifier {
   }
 
   Future<void> goToMyLocation() async {
+    if (_locating) return;
+    _locating = true;
+    _geoError = null;
+    notifyListeners();
     try {
-      final permission = await Geolocator.requestPermission();
-      if (permission == LocationPermission.denied || permission == LocationPermission.deniedForever) {
+      final serviceEnabled = await Geolocator.isLocationServiceEnabled();
+      if (!serviceEnabled) {
+        _geoError = 'location_service_disabled';
+        return;
+      }
+      var permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+      }
+      if (permission == LocationPermission.denied) {
+        _geoError = 'location_permission_denied';
+        return;
+      }
+      if (permission == LocationPermission.deniedForever) {
+        _geoError = 'location_permission_denied_forever';
         return;
       }
       final pos = await Geolocator.getCurrentPosition();
       final latLng = LatLng(pos.latitude, pos.longitude);
       _center = latLng;
       notifyListeners();
-      final controller = await mapController.future;
-      await controller.animateCamera(CameraUpdate.newLatLng(latLng));
+      try {
+        final controller = await mapController.future;
+        await controller.animateCamera(CameraUpdate.newLatLng(latLng));
+      } catch (e) {
+        if (kDebugMode) debugPrint('Camera move failed: $e');
+      }
       await resolveAddressFromCenter();
     } catch (e) {
       if (kDebugMode) debugPrint('Geolocator failed: $e');
+      _geoError = 'location_failed';
+    } finally {
+      _locating = false;
+      notifyListeners();
     }
   }
 

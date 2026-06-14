@@ -4,107 +4,152 @@ import 'package:iconsax_flutter/iconsax_flutter.dart';
 
 import '../../../../../core/models/booking/booking.dart';
 
-enum BookingStatus { confirmed, inProgress, completed, cancelled }
+/// Backend booking lifecycle (booking_status): pending → approved → completed,
+/// or rejected. (`CorporateApproved` folds into approved.)
+enum BookingStatus { pending, approved, completed, rejected }
+
+/// What was booked, from the service type (vehicle / driver / vehicle-with-driver).
+enum BookingServiceKind { vehicle, driver, vehicleWithDriver }
 
 class BookingItem {
   final int id;
-  final String carName;
-  final String carImageUrl;
+  final String bookingNo;
+  final BookingServiceKind kind;
+  final BookingStatus status;
+  final bool isPaid;
   final String pickupDate;
   final String dropoffDate;
-  final String pickupLocation;
   final double totalPrice;
-  final BookingStatus status;
   final String? driverName;
-  final String? driverAvatarUrl;
 
   const BookingItem({
     required this.id,
-    required this.carName,
-    required this.carImageUrl,
+    required this.bookingNo,
+    required this.kind,
+    required this.status,
+    required this.isPaid,
     required this.pickupDate,
     required this.dropoffDate,
-    required this.pickupLocation,
     required this.totalPrice,
-    required this.status,
     this.driverName,
-    this.driverAvatarUrl,
   });
 
-  /// Maps a backend [Booking] (from `Booking/my/paginated`) to the list item.
-  /// `BookingResponseDto` doesn't carry a vehicle display name, so the title
-  /// falls back to the service type / booking number.
+  /// Customer can pay once approved and not yet paid.
+  bool get canPay => status == BookingStatus.approved && !isPaid;
+
   factory BookingItem.fromBooking(Booking b) {
     String date(String? iso) => (iso == null || iso.length < 10) ? '' : iso.substring(0, 10);
     return BookingItem(
       id: b.id,
-      carName: b.serviceType?.trim().isNotEmpty == true
-          ? b.serviceType!
-          : (b.bookingNo ?? 'Booking #${b.id}'),
-      carImageUrl: '',
+      bookingNo: b.bookingNo ?? 'SLF${b.id}',
+      kind: serviceKindFromApi(b),
+      status: bookingStatusFromApi(b),
+      isPaid: (b.paymentStatus ?? '').toLowerCase().contains('paid'),
       pickupDate: date(b.fromDateTime),
       dropoffDate: date(b.toDateTime),
-      pickupLocation: '',
       totalPrice: b.totalAmount ?? 0,
-      status: bookingStatusFromApi(b),
       driverName: b.driverFullName,
-      driverAvatarUrl: null,
     );
   }
 }
 
-/// Resolves the backend status string onto the UI's [BookingStatus] tabs.
+/// Maps the backend booking_status string onto the four UI states.
 BookingStatus bookingStatusFromApi(Booking b) {
   final s = '${b.status ?? ''} ${b.statusType ?? ''}'.toLowerCase();
-  if (s.contains('cancel') || s.contains('reject')) return BookingStatus.cancelled;
+  if (s.contains('reject') || s.contains('cancel')) return BookingStatus.rejected;
   if (b.completedAt != null || s.contains('complete')) return BookingStatus.completed;
-  if (s.contains('progress') ||
-      s.contains('active') ||
-      s.contains('ongoing') ||
-      s.contains('trip') ||
-      s.contains('picked')) {
-    return BookingStatus.inProgress;
+  if (s.contains('approved')) return BookingStatus.approved; // incl. CorporateApproved
+  return BookingStatus.pending;
+}
+
+/// Maps service_type (name or id) onto the service kind.
+BookingServiceKind serviceKindFromApi(Booking b) {
+  final s = (b.serviceType ?? '').toLowerCase();
+  if (s.contains('with')) return BookingServiceKind.vehicleWithDriver; // vehicle-with-driver
+  if (s.contains('driver')) return BookingServiceKind.driver;
+  if (s.contains('vehicle')) return BookingServiceKind.vehicle;
+  switch (b.serviceTypeId) {
+    case 11:
+      return BookingServiceKind.vehicleWithDriver;
+    case 9:
+      return BookingServiceKind.driver;
+    default:
+      return BookingServiceKind.vehicle;
   }
-  return BookingStatus.confirmed;
 }
 
 extension BookingStatusX on BookingStatus {
   Color get color {
     switch (this) {
-      case BookingStatus.confirmed:
-        return const Color(0xFF3D5AFE);
-      case BookingStatus.inProgress:
+      case BookingStatus.pending:
         return const Color(0xFFFFA726);
+      case BookingStatus.approved:
+        return const Color(0xFF3D5AFE);
       case BookingStatus.completed:
         return const Color(0xFF4CAF50);
-      case BookingStatus.cancelled:
+      case BookingStatus.rejected:
         return const Color(0xFFE53935);
     }
   }
 
   IconData get icon {
     switch (this) {
-      case BookingStatus.confirmed:
-        return Iconsax.calendar_tick;
-      case BookingStatus.inProgress:
-        return Iconsax.timer_1;
-      case BookingStatus.completed:
+      case BookingStatus.pending:
+        return Iconsax.clock;
+      case BookingStatus.approved:
         return Iconsax.tick_circle;
-      case BookingStatus.cancelled:
+      case BookingStatus.completed:
+        return Iconsax.medal_star;
+      case BookingStatus.rejected:
         return Iconsax.close_circle;
     }
   }
 
   String get label {
     switch (this) {
-      case BookingStatus.confirmed:
-        return 'bookings_status_confirmed'.tr();
-      case BookingStatus.inProgress:
-        return 'bookings_status_in_progress'.tr();
+      case BookingStatus.pending:
+        return 'bookings_status_pending'.tr();
+      case BookingStatus.approved:
+        return 'bookings_status_approved'.tr();
       case BookingStatus.completed:
         return 'bookings_status_completed'.tr();
-      case BookingStatus.cancelled:
-        return 'bookings_status_cancelled'.tr();
+      case BookingStatus.rejected:
+        return 'bookings_status_rejected'.tr();
+    }
+  }
+}
+
+extension BookingServiceKindX on BookingServiceKind {
+  IconData get icon {
+    switch (this) {
+      case BookingServiceKind.vehicle:
+        return Iconsax.car_copy;
+      case BookingServiceKind.driver:
+        return Iconsax.profile_2user_copy;
+      case BookingServiceKind.vehicleWithDriver:
+        return Iconsax.driver_copy;
+    }
+  }
+
+  Color get color {
+    switch (this) {
+      case BookingServiceKind.vehicle:
+        return const Color(0xFF3D5AFE);
+      case BookingServiceKind.driver:
+        return const Color(0xFF00BCD4);
+      case BookingServiceKind.vehicleWithDriver:
+        return const Color(0xFF7C4DFF);
+    }
+  }
+
+  String get title {
+    switch (this) {
+      case BookingServiceKind.vehicle:
+        return 'booking_kind_vehicle'.tr();
+      case BookingServiceKind.driver:
+        return 'booking_kind_driver'.tr();
+      case BookingServiceKind.vehicleWithDriver:
+        return 'booking_kind_vehicle_driver'.tr();
     }
   }
 }

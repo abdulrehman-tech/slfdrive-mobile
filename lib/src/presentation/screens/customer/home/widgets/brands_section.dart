@@ -17,6 +17,7 @@ class BrandsSection extends StatelessWidget {
     final cs = Theme.of(context).colorScheme;
     final home = context.watch<HomeProvider>();
     final brands = home.brands;
+    if (brands.isEmpty) return const SizedBox.shrink();
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,

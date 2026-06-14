@@ -6,6 +6,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 import 'package:provider/provider.dart';
 
+import '../../favorites/provider/favorites_provider.dart';
 import '../provider/driver_detail_provider.dart';
 
 /// Glass header that fades in on scroll (mobile only).
@@ -62,21 +63,32 @@ class GlassHeaderOverlay extends StatelessWidget {
                       style: TextStyle(fontSize: 15.r, fontWeight: FontWeight.w800, color: cs.onSurface),
                     ),
                   ),
-                  GestureDetector(
-                    onTap: provider.toggleFavourite,
-                    child: Container(
-                      width: 38.r,
-                      height: 38.r,
-                      decoration: BoxDecoration(
-                        color: isDark ? Colors.white.withValues(alpha: 0.08) : Colors.black.withValues(alpha: 0.05),
-                        borderRadius: BorderRadius.circular(11.r),
-                      ),
-                      child: Icon(
-                        provider.isFavourite ? Iconsax.heart_copy : Iconsax.heart,
-                        size: 16.r,
-                        color: provider.isFavourite ? const Color(0xFFE91E63) : cs.onSurface,
-                      ),
-                    ),
+                  Builder(
+                    builder: (context) {
+                      final fav = context.watch<FavoritesProvider>();
+                      final isFav = fav.isDriverFav(profile.id);
+                      return GestureDetector(
+                        onTap: () {
+                          final snap = provider.favSnapshot();
+                          if (snap != null) fav.toggleDriver(snap);
+                        },
+                        child: Container(
+                          width: 38.r,
+                          height: 38.r,
+                          decoration: BoxDecoration(
+                            color: isDark
+                                ? Colors.white.withValues(alpha: 0.08)
+                                : Colors.black.withValues(alpha: 0.05),
+                            borderRadius: BorderRadius.circular(11.r),
+                          ),
+                          child: Icon(
+                            isFav ? Iconsax.heart : Iconsax.heart_copy,
+                            size: 16.r,
+                            color: isFav ? const Color(0xFFE91E63) : cs.onSurface,
+                          ),
+                        ),
+                      );
+                    },
                   ),
                 ],
               ),

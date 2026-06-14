@@ -89,7 +89,7 @@ class CarCard extends StatelessWidget {
                         borderRadius: BorderRadius.circular(10.r),
                       ),
                       child: Icon(
-                        car.isFavourite ? Iconsax.heart_copy : Iconsax.heart,
+                        car.isFavourite ? Iconsax.heart : Iconsax.heart_copy,
                         color: car.isFavourite ? Colors.redAccent : (isDark ? Colors.white60 : Colors.black45),
                         size: 16.r,
                       ),

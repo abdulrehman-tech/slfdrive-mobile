@@ -1,6 +1,7 @@
 import '../../../constants/endpoints.dart';
 import '../../errors/error_handler.dart';
 import '../../models/common/general_lookup.dart';
+import '../../models/company/all_company.dart';
 import '../../models/lookup/location_option.dart';
 import '../../models/lookup/offered_service.dart';
 import '../../models/vehicle/vehicle_brand.dart';
@@ -30,6 +31,9 @@ abstract class LookupRemoteDataSource {
 
   /// All active general statuses from `/api/GeneralStatus/active`.
   Future<List<GeneralLookup>> getActiveGeneralStatuses();
+
+  /// Active corporate companies from `/api/AllCompanies/active`.
+  Future<List<AllCompany>> getActiveCompanies();
 }
 
 class LookupRemoteDataSourceImpl implements LookupRemoteDataSource {
@@ -64,6 +68,10 @@ class LookupRemoteDataSourceImpl implements LookupRemoteDataSource {
   @override
   Future<List<GeneralLookup>> getActiveGeneralStatuses() =>
       _getList(ApiEndpoints.activeGeneralStatuses, GeneralLookup.fromJson);
+
+  @override
+  Future<List<AllCompany>> getActiveCompanies() =>
+      _getList(ApiEndpoints.activeAllCompanies, AllCompany.fromJson);
 
   /// Shared GET → unwrap `data` list → map helper for the lookup endpoints.
   Future<List<T>> _getList<T>(String path, T Function(Map<String, dynamic>) fromJson) async {

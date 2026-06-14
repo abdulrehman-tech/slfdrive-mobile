@@ -19,6 +19,10 @@ abstract class BookingRemoteDataSource {
   /// Single booking (`GET /api/Booking/{id}`), or null when not found.
   Future<Booking?> getById(int id);
 
+  /// Records a non-gateway payment for a booking (`POST /api/Booking/pay`),
+  /// e.g. cash. Returns true on success.
+  Future<bool> pay({required int bookingId, required int paymentTypeId});
+
   /// Starts an OmPay checkout for a booking
   /// (`POST /api/Booking/{id}/pay/ompay/init`).
   Future<OmPayInitResponse> omPayInit(int bookingId, String clientType);
@@ -71,6 +75,21 @@ class BookingRemoteDataSourceImpl implements BookingRemoteDataSource {
         return Booking.fromJson(body['data'] as Map<String, dynamic>);
       }
       return null;
+    } catch (e) {
+      throw ErrorHandler.handleError(e);
+    }
+  }
+
+  @override
+  Future<bool> pay({required int bookingId, required int paymentTypeId}) async {
+    try {
+      final res = await apiClient.post(
+        ApiEndpoints.bookingPay,
+        data: {'id': bookingId, 'paymentTypeId': paymentTypeId},
+      );
+      final body = res.data as Map<String, dynamic>;
+      if (body['isSuccess'] == true) return true;
+      throw AppException(message: _message(body) ?? 'Payment failed');
     } catch (e) {
       throw ErrorHandler.handleError(e);
     }

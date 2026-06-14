@@ -14,6 +14,7 @@ class AdsCarousel extends StatelessWidget {
   Widget build(BuildContext context) {
     final home = context.watch<HomeProvider>();
     final ads = home.ads;
+    if (ads.isEmpty) return const SizedBox.shrink();
     final height = isDesktop ? 180.r : 140.r;
     final hPad = isDesktop ? 0.0 : 16.r;
 

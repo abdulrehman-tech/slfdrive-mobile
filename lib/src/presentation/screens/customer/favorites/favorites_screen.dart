@@ -19,10 +19,8 @@ class FavoritesScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (_) => FavoritesProvider(),
-      child: const _FavoritesView(),
-    );
+    // FavoritesProvider is a global, persisted singleton (registered in main).
+    return const _FavoritesView();
   }
 }
 
@@ -31,9 +29,7 @@ class _FavoritesView extends StatelessWidget {
 
   bool _isDark(BuildContext context) {
     final tp = context.watch<ThemeProvider>();
-    return tp.isDarkMode ||
-        (tp.isSystemMode &&
-            MediaQuery.of(context).platformBrightness == Brightness.dark);
+    return tp.isDarkMode || (tp.isSystemMode && MediaQuery.of(context).platformBrightness == Brightness.dark);
   }
 
   @override
@@ -60,7 +56,7 @@ class _FavoritesView extends StatelessWidget {
         FavoritesAppBar(isDark: isDark),
         SliverToBoxAdapter(
           child: Padding(
-            padding: EdgeInsets.fromLTRB(16.r, 16.r, 16.r, 8.r),
+            padding: EdgeInsets.all(16.r),
             child: FavoritesFilterChips(isDark: isDark),
           ),
         ),
@@ -69,7 +65,7 @@ class _FavoritesView extends StatelessWidget {
         else ...[
           if (showCars && cars.isNotEmpty)
             SliverPadding(
-              padding: EdgeInsets.symmetric(horizontal: 16.r),
+              padding: EdgeInsets.symmetric(horizontal: 16.r, vertical: 8.r),
               sliver: SliverList(
                 delegate: SliverChildBuilderDelegate(
                   (_, i) => Padding(
@@ -77,12 +73,8 @@ class _FavoritesView extends StatelessWidget {
                     child: FavCarCard(
                       car: cars[i],
                       isDark: isDark,
-                      onRemove: () =>
-                          context.read<FavoritesProvider>().removeCarAt(i),
-                      onTap: () => context.pushNamed(
-                        'car-detail',
-                        pathParameters: {'id': cars[i].id},
-                      ),
+                      onRemove: () => context.read<FavoritesProvider>().removeCarAt(i),
+                      onTap: () => context.pushNamed('car-detail', pathParameters: {'id': cars[i].id}),
                     ),
                   ),
                   childCount: cars.length,
@@ -106,12 +98,8 @@ class _FavoritesView extends StatelessWidget {
                     child: FavDriverCard(
                       driver: drivers[i],
                       isDark: isDark,
-                      onRemove: () =>
-                          context.read<FavoritesProvider>().removeDriverAt(i),
-                      onTap: () => context.pushNamed(
-                        'driver-detail',
-                        pathParameters: {'id': drivers[i].id},
-                      ),
+                      onRemove: () => context.read<FavoritesProvider>().removeDriverAt(i),
+                      onTap: () => context.pushNamed('driver-detail', pathParameters: {'id': drivers[i].id}),
                     ),
                   ),
                   childCount: drivers.length,
@@ -150,11 +138,7 @@ class _FavoritesView extends StatelessWidget {
                 children: [
                   Text(
                     'favorites_title'.tr(),
-                    style: TextStyle(
-                      fontSize: 24.r,
-                      fontWeight: FontWeight.bold,
-                      color: cs.onSurface,
-                    ),
+                    style: TextStyle(fontSize: 24.r, fontWeight: FontWeight.bold, color: cs.onSurface),
                   ),
                   SizedBox(width: 24.r),
                   Expanded(child: FavoritesFilterChips(isDark: isDark)),
@@ -182,20 +166,14 @@ class _FavoritesView extends StatelessWidget {
                               child: FavCarCard(
                                 car: e.value,
                                 isDark: isDark,
-                                onRemove: () => context
-                                    .read<FavoritesProvider>()
-                                    .removeCarAt(e.key),
-                                onTap: () => context.pushNamed(
-                                  'car-detail',
-                                  pathParameters: {'id': e.value.id},
-                                ),
+                                onRemove: () => context.read<FavoritesProvider>().removeCarAt(e.key),
+                                onTap: () => context.pushNamed('car-detail', pathParameters: {'id': e.value.id}),
                               ),
                             );
                           }).toList(),
                         ),
                       ),
-                    if (showCars && showDrivers && drivers.isNotEmpty)
-                      SizedBox(width: 24.r),
+                    if (showCars && showDrivers && drivers.isNotEmpty) SizedBox(width: 24.r),
                     if (showDrivers && drivers.isNotEmpty)
                       SizedBox(
                         width: 300.r,
@@ -210,13 +188,8 @@ class _FavoritesView extends StatelessWidget {
                                 child: FavDriverCard(
                                   driver: e.value,
                                   isDark: isDark,
-                                  onRemove: () => context
-                                      .read<FavoritesProvider>()
-                                      .removeDriverAt(e.key),
-                                  onTap: () => context.pushNamed(
-                                    'driver-detail',
-                                    pathParameters: {'id': e.value.id},
-                                  ),
+                                  onRemove: () => context.read<FavoritesProvider>().removeDriverAt(e.key),
+                                  onTap: () => context.pushNamed('driver-detail', pathParameters: {'id': e.value.id}),
                                 ),
                               );
                             }),

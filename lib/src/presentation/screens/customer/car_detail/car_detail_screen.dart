@@ -67,6 +67,11 @@ class _CarDetailView extends StatelessWidget {
       pricePerDay: vehicle.pricePerDay ?? 0,
       plateNumber: vehicle.plateNumber ?? '',
       plateCode: '',
+      lat: vehicle.lat,
+      lon: vehicle.lon,
+      locationName: context.read<CarDetailProvider>().ar
+          ? (vehicle.locationNameAr ?? vehicle.locationName)
+          : vehicle.locationName,
     );
     context.pushNamed('booking', extra: {'service': BookingServiceType.rentCar, 'car': car});
   }

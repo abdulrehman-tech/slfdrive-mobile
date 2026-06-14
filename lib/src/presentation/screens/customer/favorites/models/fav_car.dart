@@ -14,4 +14,22 @@ class FavCar {
     required this.brand,
     required this.rating,
   });
+
+  Map<String, dynamic> toJson() => {
+        'id': id,
+        'name': name,
+        'imageUrl': imageUrl,
+        'pricePerDay': pricePerDay,
+        'brand': brand,
+        'rating': rating,
+      };
+
+  factory FavCar.fromJson(Map<String, dynamic> json) => FavCar(
+        id: json['id']?.toString() ?? '',
+        name: json['name'] as String? ?? '',
+        imageUrl: json['imageUrl'] as String? ?? '',
+        pricePerDay: (json['pricePerDay'] as num?)?.toDouble() ?? 0,
+        brand: json['brand'] as String? ?? '',
+        rating: (json['rating'] as num?)?.toDouble() ?? 0,
+      );
 }
