@@ -1,15 +1,14 @@
 import 'package:easy_localization/easy_localization.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 import '../../../../../core/data/repositories/booking_repository.dart';
 import '../../../../../core/di/injection_container.dart';
 import '../../../../../core/errors/app_exception.dart';
 import '../../../../../core/services/booking_lookups.dart';
 import '../../booking/models/booking_data.dart' show PaymentMethod;
+import 'ompay_webview_page.dart';
 
 /// Bottom sheet for paying an approved booking: card (OmPay gateway) or cash
 /// (recorded via `POST /api/Booking/pay`).
@@ -39,39 +38,80 @@ class _PayBookingSheetState extends State<PayBookingSheet> {
   Future<void> _pay() async {
     setState(() => _submitting = true);
     final repo = getIt<BookingRepository>();
+    final messenger = ScaffoldMessenger.of(context);
+    final navigator = Navigator.of(context);
+    void snack(String msg) => messenger.showSnackBar(SnackBar(content: Text(msg)));
+
     try {
       if (_method == PaymentMethod.card) {
-        final init = await repo.omPayInit(widget.bookingId, kIsWeb ? 'web' : 'mobile');
-        final url = init.checkoutPageUrl ?? init.redirectUrl ?? init.checkoutJsUrl;
-        if (url != null && url.isNotEmpty) {
-          final uri = Uri.tryParse(url);
-          if (uri != null) await launchUrl(uri, mode: LaunchMode.externalApplication);
-        }
-        if (init.orderId != null) {
-          try {
-            await repo.omPayVerify(widget.bookingId, init.orderId!);
-          } catch (_) {
-            // pending/failed verification is reconciled via the backend webhook
-          }
-        }
+        await _payWithCard(repo, navigator, snack);
       } else {
         final lookups = getIt<BookingLookups>();
         await lookups.ensureLoaded();
         final cashId = lookups.paymentTypeId(PaymentMethod.cash);
         if (cashId == null) throw AppException(message: 'pay_failed'.tr());
         await repo.pay(bookingId: widget.bookingId, paymentTypeId: cashId);
+        if (!mounted) return;
+        navigator.pop(true);
+        snack('pay_started'.tr());
       }
-      if (!mounted) return;
-      Navigator.of(context).pop(true);
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('pay_started'.tr())));
     } on AppException catch (e) {
       if (!mounted) return;
       setState(() => _submitting = false);
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.message)));
+      snack(e.message);
     } catch (_) {
       if (!mounted) return;
       setState(() => _submitting = false);
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('pay_failed'.tr())));
+      snack('pay_failed'.tr());
+    }
+  }
+
+  /// Card → OmPay: start the session, open the checkout in a secure in-app
+  /// WebView, then confirm the order on its return.
+  Future<void> _payWithCard(
+    BookingRepository repo,
+    NavigatorState navigator,
+    void Function(String) snack,
+  ) async {
+    final init = await repo.omPayInit(widget.bookingId, 'mobile');
+    final url = init.checkoutPageUrl ?? init.redirectUrl ?? init.checkoutJsUrl;
+    if (url == null || url.isEmpty) {
+      throw AppException(message: 'pay_failed'.tr());
+    }
+
+    // The gateway redirects to the backend result page when the flow ends;
+    // detect it (plus the future slfdrive:// deep link) to close the WebView.
+    final markers = <String>{
+      '/ompay/result',
+      if (init.redirectUrl != null && init.redirectUrl!.isNotEmpty) init.redirectUrl!,
+    }.toList();
+
+    // Root navigator so the WebView covers this bottom sheet.
+    final result = await navigator.push<OmPayWebResult>(
+      MaterialPageRoute(
+        builder: (_) => OmPayWebViewPage(checkoutUrl: url, returnUrlContains: markers),
+      ),
+    );
+    if (!mounted) return;
+
+    final outcome = result?.outcome ?? OmPayWebOutcome.cancelled;
+    if (outcome == OmPayWebOutcome.success) {
+      // Confirm with the backend; payment may still settle via the webhook.
+      bool paid = false;
+      final orderId = result?.orderId ?? init.orderId;
+      if (orderId != null) {
+        try {
+          paid = await repo.omPayVerify(widget.bookingId, orderId);
+        } catch (_) {
+          // treated as pending — reconciled by the backend webhook
+        }
+      }
+      navigator.pop(true); // closes the sheet → booking detail reloads
+      snack((paid ? 'pay_success' : 'pay_pending').tr());
+    } else {
+      // Cancelled / failed — keep the sheet open so the user can retry.
+      setState(() => _submitting = false);
+      snack((outcome == OmPayWebOutcome.failed ? 'pay_failed' : 'pay_cancelled').tr());
     }
   }
 

@@ -100,6 +100,7 @@ dependencies:
   
   # Cache Management
   flutter_cache_manager: ^3.4.1
+  flutter_inappwebview: ^6.1.5
 
 dev_dependencies:
   flutter_test:

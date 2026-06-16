@@ -6,10 +6,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
+import 'package:provider/provider.dart';
 
 import '../../../../../constants/color_constants.dart';
 import '../../../../widgets/omr_icon.dart';
+import '../../booking_detail/widgets/pay_booking_sheet.dart';
 import '../models/booking_item.dart';
+import '../provider/bookings_provider.dart';
 import 'booking_status_badge.dart';
 import 'date_column.dart';
 
@@ -27,6 +30,12 @@ class BookingCard extends StatelessWidget {
 
   void _openDetail(BuildContext context) =>
       context.pushNamed('booking-detail', pathParameters: {'id': booking.id.toString()});
+
+  Future<void> _pay(BuildContext context) async {
+    final provider = context.read<BookingsProvider>();
+    final ok = await PayBookingSheet.show(context, bookingId: booking.id, isDark: isDark);
+    if (ok == true) provider.load();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -216,7 +225,7 @@ class BookingCard extends StatelessWidget {
           SizedBox(width: 10.r),
           Expanded(
             child: GestureDetector(
-              onTap: () => _openDetail(context),
+              onTap: () => _pay(context),
               child: Container(
                 padding: EdgeInsets.symmetric(vertical: 10.r),
                 decoration: BoxDecoration(

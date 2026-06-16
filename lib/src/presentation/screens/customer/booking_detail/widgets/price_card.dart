@@ -13,12 +13,7 @@ class BookingPriceCard extends StatelessWidget {
   final bool isDark;
   final ColorScheme cs;
 
-  const BookingPriceCard({
-    super.key,
-    required this.booking,
-    required this.isDark,
-    required this.cs,
-  });
+  const BookingPriceCard({super.key, required this.booking, required this.isDark, required this.cs});
 
   @override
   Widget build(BuildContext context) {
@@ -96,7 +91,10 @@ class BookingPriceCard extends StatelessWidget {
       child: Row(
         children: [
           Expanded(
-            child: Text(label, style: TextStyle(fontSize: 12.r, color: cs.onSurface.withValues(alpha: 0.6))),
+            child: Text(
+              label,
+              style: TextStyle(fontSize: 12.r, color: cs.onSurface.withValues(alpha: 0.6)),
+            ),
           ),
           OmrIcon(size: 11.r, color: cs.onSurface.withValues(alpha: 0.7)),
           SizedBox(width: 2.r),

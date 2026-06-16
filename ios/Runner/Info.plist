@@ -56,5 +56,40 @@
 	<!-- Avatar selection uses the photo library. -->
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>SLF Drive needs access to your photos so you can set a profile picture.</string>
+	<!-- App Transport Security: the OmPay checkout page is served from the
+	     backend's self-signed-cert host (161.97.144.112). WKWebView enforces ATS
+	     before the server-trust callback can run, so allow insecure loads in web
+	     content for that host. The WebView still validates every other host;
+	     Dio handles the same host for API calls separately. -->
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<key>NSAllowsArbitraryLoadsInWebContent</key>
+		<true/>
+		<key>NSExceptionDomains</key>
+		<dict>
+			<key>161.97.144.112</key>
+			<dict>
+				<key>NSExceptionAllowsInsecureHTTPLoads</key>
+				<true/>
+				<key>NSIncludesSubdomains</key>
+				<true/>
+			</dict>
+		</dict>
+	</dict>
+	<!-- OmPay payment-gateway return deep link (slfdrive://payment/...). The
+	     checkout runs in an in-app WebView that intercepts this URL; this
+	     registration only matters if the gateway bounces to an external
+	     browser, so the return can re-open the app. -->
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLName</key>
+			<string>com.gmq.slfdrive</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>slfdrive</string>
+			</array>
+		</dict>
+	</array>
 </dict>
 </plist>

@@ -20,6 +20,30 @@ class BookingDriverCard extends StatelessWidget {
     required this.cs,
   });
 
+  Widget _fallbackAvatar() => CircleAvatar(
+        radius: 24.r,
+        backgroundColor: isDark ? const Color(0xFF2A2A3A) : const Color(0xFFEEEEEE),
+        child: Icon(Iconsax.user_copy, size: 20.r, color: cs.primary),
+      );
+
+  Widget _avatar() {
+    final url = booking.driverAvatar;
+    if (url == null || url.isEmpty) return _fallbackAvatar();
+    return CachedNetworkImage(
+      imageUrl: url,
+      imageBuilder: (_, img) => Container(
+        width: 48.r,
+        height: 48.r,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          image: DecorationImage(image: img, fit: BoxFit.cover),
+          border: Border.all(color: cs.primary.withValues(alpha: 0.3), width: 2),
+        ),
+      ),
+      errorWidget: (_, _, _) => _fallbackAvatar(),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return BookingGlassCard(
@@ -28,23 +52,7 @@ class BookingDriverCard extends StatelessWidget {
         padding: EdgeInsets.all(14.r),
         child: Row(
           children: [
-            CachedNetworkImage(
-              imageUrl: booking.driverAvatar!,
-              imageBuilder: (_, img) => Container(
-                width: 48.r,
-                height: 48.r,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  image: DecorationImage(image: img, fit: BoxFit.cover),
-                  border: Border.all(color: cs.primary.withValues(alpha: 0.3), width: 2),
-                ),
-              ),
-              errorWidget: (_, _, _) => CircleAvatar(
-                radius: 24.r,
-                backgroundColor: isDark ? const Color(0xFF2A2A3A) : const Color(0xFFEEEEEE),
-                child: Icon(Iconsax.user_copy, size: 20.r, color: cs.primary),
-              ),
-            ),
+            _avatar(),
             SizedBox(width: 12.r),
             Expanded(
               child: Column(
