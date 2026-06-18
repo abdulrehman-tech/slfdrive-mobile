@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -10,6 +11,7 @@ import 'package:provider/provider.dart';
 
 import '../../../../../constants/color_constants.dart';
 import '../../../../widgets/omr_icon.dart';
+import '../../booking_detail/models/booking_detail.dart' show BookingDetailSeed;
 import '../../booking_detail/widgets/pay_booking_sheet.dart';
 import '../models/booking_item.dart';
 import '../provider/bookings_provider.dart';
@@ -28,8 +30,17 @@ class BookingCard extends StatelessWidget {
     required this.cs,
   });
 
-  void _openDetail(BuildContext context) =>
-      context.pushNamed('booking-detail', pathParameters: {'id': booking.id.toString()});
+  void _openDetail(BuildContext context) => context.pushNamed(
+        'booking-detail',
+        pathParameters: {'id': booking.id.toString()},
+        // Seed the detail screen with what we already fetched, so it paints fast.
+        extra: BookingDetailSeed(
+          vehicleName: booking.vehicleName,
+          vehicleImageUrl: booking.vehicleImageUrl,
+          driverName: booking.driverName,
+          driverPhotoUrl: booking.driverPhotoUrl,
+        ),
+      );
 
   Future<void> _pay(BuildContext context) async {
     final provider = context.read<BookingsProvider>();
@@ -82,30 +93,24 @@ class BookingCard extends StatelessWidget {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Container(
-          width: 44.r,
-          height: 44.r,
-          decoration: BoxDecoration(
-            color: kind.color.withValues(alpha: isDark ? 0.2 : 0.12),
-            borderRadius: BorderRadius.circular(12.r),
-          ),
-          child: Icon(kind.icon, size: 22.r, color: kind.color),
-        ),
+        _thumbnail(kind),
         SizedBox(width: 12.r),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                kind.title,
+                booking.title,
                 style: TextStyle(fontSize: 15.r, fontWeight: FontWeight.bold, color: cs.onSurface),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),
               SizedBox(height: 2.r),
               Text(
-                booking.bookingNo,
+                '${kind.title} · ${booking.bookingNo}',
                 style: TextStyle(fontSize: 11.r, color: cs.onSurface.withValues(alpha: 0.5)),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               ),
             ],
           ),
@@ -113,6 +118,31 @@ class BookingCard extends StatelessWidget {
         SizedBox(width: 8.r),
         BookingStatusBadge(status: booking.status, isDark: isDark),
       ],
+    );
+  }
+
+  Widget _thumbnail(BookingServiceKind kind) {
+    final url = booking.thumbnailUrl;
+    final placeholder = Container(
+      width: 44.r,
+      height: 44.r,
+      decoration: BoxDecoration(
+        color: kind.color.withValues(alpha: isDark ? 0.2 : 0.12),
+        borderRadius: BorderRadius.circular(12.r),
+      ),
+      child: Icon(kind.icon, size: 22.r, color: kind.color),
+    );
+    if (url == null) return placeholder;
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(12.r),
+      child: CachedNetworkImage(
+        imageUrl: url,
+        width: 44.r,
+        height: 44.r,
+        fit: BoxFit.cover,
+        placeholder: (c, u) => placeholder,
+        errorWidget: (c, u, e) => placeholder,
+      ),
     );
   }
 

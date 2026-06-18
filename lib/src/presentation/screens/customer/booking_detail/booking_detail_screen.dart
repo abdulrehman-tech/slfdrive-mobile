@@ -11,6 +11,7 @@ import 'provider/booking_detail_provider.dart';
 import 'widgets/action_bar.dart';
 import 'widgets/action_row.dart';
 import 'widgets/booking_app_bar.dart';
+import 'widgets/booking_detail_skeleton.dart';
 import 'widgets/cancel_button.dart';
 import 'widgets/car_card.dart';
 import 'widgets/driver_card.dart';
@@ -18,19 +19,21 @@ import 'widgets/leave_review_sheet.dart';
 import 'widgets/location_map_card.dart';
 import 'widgets/pay_booking_sheet.dart';
 import 'widgets/price_card.dart';
-import 'widgets/qr_card.dart';
 import 'widgets/ref_card.dart';
 import 'widgets/schedule_card.dart';
-import 'widgets/timeline_card.dart';
 
 class BookingDetailScreen extends StatelessWidget {
   final String bookingId;
-  const BookingDetailScreen({super.key, required this.bookingId});
+  final BookingDetailSeed? seed;
+  const BookingDetailScreen({super.key, required this.bookingId, this.seed});
 
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (_) => BookingDetailProvider(bookingId: int.tryParse(bookingId) ?? 0),
+      create: (_) => BookingDetailProvider(
+        bookingId: int.tryParse(bookingId) ?? 0,
+        seed: seed,
+      ),
       child: const _BookingDetailView(),
     );
   }
@@ -103,7 +106,12 @@ class _BookingDetailView extends StatelessWidget {
 
     Widget body;
     if (booking == null && provider.isLoading) {
-      body = const Center(child: CircularProgressIndicator());
+      body = const Stack(
+        children: [
+          BookingDetailSkeleton(),
+          BookingDetailSkeletonClose(),
+        ],
+      );
     } else if (booking == null) {
       body = _BookingErrorState(
         message: provider.error ?? 'booking_not_found'.tr(),
@@ -134,11 +142,11 @@ class _BookingDetailView extends StatelessWidget {
                 children: [
                   BookingRefCard(booking: b, isDark: isDark, cs: cs),
                   SizedBox(height: 14.r),
-                  BookingTimelineCard(booking: b, isDark: isDark, cs: cs),
-                  SizedBox(height: 14.r),
-                  BookingCarCard(booking: b, isDark: isDark, cs: cs),
-                  SizedBox(height: 14.r),
-                  if (b.driverName != null) ...[
+                  if (b.hasVehicle) ...[
+                    BookingCarCard(booking: b, isDark: isDark, cs: cs),
+                    SizedBox(height: 14.r),
+                  ],
+                  if (b.hasDriver) ...[
                     BookingDriverCard(booking: b, isDark: isDark, cs: cs),
                     SizedBox(height: 14.r),
                   ],
@@ -147,8 +155,6 @@ class _BookingDetailView extends StatelessWidget {
                   BookingLocationMapCard(booking: b, isDark: isDark, cs: cs),
                   SizedBox(height: 14.r),
                   BookingPriceCard(booking: b, isDark: isDark, cs: cs),
-                  SizedBox(height: 14.r),
-                  BookingQrCard(booking: b, isDark: isDark, cs: cs),
                   SizedBox(height: 14.r),
                   if (b.canPay) ...[
                     _payButton(context, b, isDark),
@@ -221,10 +227,10 @@ class _BookingDetailView extends StatelessWidget {
                       children: [
                         BookingRefCard(booking: b, isDark: isDark, cs: cs),
                         SizedBox(height: 16.r),
-                        BookingTimelineCard(booking: b, isDark: isDark, cs: cs),
-                        SizedBox(height: 16.r),
-                        BookingCarCard(booking: b, isDark: isDark, cs: cs),
-                        SizedBox(height: 16.r),
+                        if (b.hasVehicle) ...[
+                          BookingCarCard(booking: b, isDark: isDark, cs: cs),
+                          SizedBox(height: 16.r),
+                        ],
                         BookingLocationMapCard(booking: b, isDark: isDark, cs: cs),
                       ],
                     ),
@@ -236,13 +242,11 @@ class _BookingDetailView extends StatelessWidget {
                       children: [
                         BookingScheduleCard(booking: b, isDark: isDark, cs: cs),
                         SizedBox(height: 16.r),
-                        if (b.driverName != null) ...[
+                        if (b.hasDriver) ...[
                           BookingDriverCard(booking: b, isDark: isDark, cs: cs),
                           SizedBox(height: 16.r),
                         ],
                         BookingPriceCard(booking: b, isDark: isDark, cs: cs),
-                        SizedBox(height: 16.r),
-                        BookingQrCard(booking: b, isDark: isDark, cs: cs),
                         SizedBox(height: 16.r),
                         BookingActionRow(booking: b, isDark: isDark, cs: cs),
                         SizedBox(height: 12.r),

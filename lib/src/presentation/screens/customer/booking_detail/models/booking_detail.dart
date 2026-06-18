@@ -4,6 +4,22 @@ import '../../../../../core/models/booking/booking.dart';
 
 enum BookingTimelineStage { confirmed, pickedUp, inTrip, returned }
 
+/// Vehicle/driver display values already fetched by the bookings list, passed to
+/// the detail screen via route `extra` so the card's image/name paint instantly
+/// (the full booking still loads + re-enriches in the background).
+class BookingDetailSeed {
+  final String? vehicleName;
+  final String? vehicleImageUrl;
+  final String? driverName;
+  final String? driverPhotoUrl;
+  const BookingDetailSeed({
+    this.vehicleName,
+    this.vehicleImageUrl,
+    this.driverName,
+    this.driverPhotoUrl,
+  });
+}
+
 /// Friendly label for a booking's service type (vehicle / driver / both).
 String _serviceLabel(Booking b) {
   final s = (b.serviceType ?? '').toLowerCase();
@@ -37,6 +53,27 @@ class BookingDetail {
   final bool isPending;
   final bool isPaid;
 
+  /// Service label (e.g. "Vehicle rental"); shown alongside the enriched name.
+  final String serviceLabel;
+
+  /// Backend ids used to enrich the detail from Vehicle/{id} + the driver list.
+  final int? vehicleId;
+  final int? driverId;
+
+  // Vehicle specs (from Vehicle/{id}).
+  final String? color;
+  final int? year;
+  final int? seats;
+  final String? transmission;
+  final String? fuelType;
+  final String? vehicleType;
+  final String? vehicleLocation;
+
+  // Driver specs (from the driver list match).
+  final int? driverExperienceYears;
+  final String? driverLanguages;
+  final String? driverLocation;
+
   const BookingDetail({
     required this.id,
     required this.ref,
@@ -55,16 +92,92 @@ class BookingDetail {
     required this.paymentMethod,
     required this.stage,
     this.statusLabel = '',
+    this.serviceLabel = '',
     this.isApproved = false,
     this.isPending = false,
     this.isPaid = false,
+    this.vehicleId,
+    this.driverId,
     this.driverName,
     this.driverAvatar,
     this.driverPhone,
+    this.color,
+    this.year,
+    this.seats,
+    this.transmission,
+    this.fuelType,
+    this.vehicleType,
+    this.vehicleLocation,
+    this.driverExperienceYears,
+    this.driverLanguages,
+    this.driverLocation,
   });
+
+  bool get hasVehicle => vehicleId != null;
+  bool get hasDriver => driverId != null;
 
   /// Customer can pay once an admin has approved the booking and it isn't paid.
   bool get canPay => isApproved && !isPaid;
+
+  BookingDetail copyWith({
+    String? carName,
+    String? carImageUrl,
+    String? brand,
+    String? plateNumber,
+    String? plateCode,
+    String? driverName,
+    String? driverAvatar,
+    String? driverPhone,
+    String? color,
+    int? year,
+    int? seats,
+    String? transmission,
+    String? fuelType,
+    String? vehicleType,
+    String? vehicleLocation,
+    int? driverExperienceYears,
+    String? driverLanguages,
+    String? driverLocation,
+  }) {
+    return BookingDetail(
+      id: id,
+      ref: ref,
+      carName: carName ?? this.carName,
+      carImageUrl: carImageUrl ?? this.carImageUrl,
+      brand: brand ?? this.brand,
+      plateNumber: plateNumber ?? this.plateNumber,
+      plateCode: plateCode ?? this.plateCode,
+      pickupLocation: pickupLocation,
+      dropoffLocation: dropoffLocation,
+      start: start,
+      end: end,
+      pricePerDay: pricePerDay,
+      extrasPerDay: extrasPerDay,
+      deliveryFee: deliveryFee,
+      paymentMethod: paymentMethod,
+      stage: stage,
+      statusLabel: statusLabel,
+      serviceLabel: serviceLabel,
+      isApproved: isApproved,
+      isPending: isPending,
+      isPaid: isPaid,
+      vehicleId: vehicleId,
+      driverId: driverId,
+      driverName: driverName ?? this.driverName,
+      driverAvatar: driverAvatar ?? this.driverAvatar,
+      driverPhone: driverPhone ?? this.driverPhone,
+      color: color ?? this.color,
+      year: year ?? this.year,
+      seats: seats ?? this.seats,
+      transmission: transmission ?? this.transmission,
+      fuelType: fuelType ?? this.fuelType,
+      vehicleType: vehicleType ?? this.vehicleType,
+      vehicleLocation: vehicleLocation ?? this.vehicleLocation,
+      driverExperienceYears: driverExperienceYears ?? this.driverExperienceYears,
+      driverLanguages: driverLanguages ?? this.driverLanguages,
+      driverLocation: driverLocation ?? this.driverLocation,
+    );
+  }
 
   int get days {
     final d = end.difference(start).inDays;
@@ -119,9 +232,12 @@ class BookingDetail {
       paymentMethod: b.paymentStatus ?? '',
       stage: stage,
       statusLabel: b.status ?? '',
+      serviceLabel: _serviceLabel(b),
       isApproved: isApproved,
       isPending: isPending,
       isPaid: isPaid,
+      vehicleId: b.vehicleId,
+      driverId: b.driverId,
       driverName: b.driverFullName,
       driverAvatar: null,
       driverPhone: b.driverPhoneNumber,

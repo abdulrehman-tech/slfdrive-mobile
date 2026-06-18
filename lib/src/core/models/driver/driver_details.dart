@@ -3,6 +3,9 @@
 /// and profile fields without requiring a re-login.
 class DriverDetails {
   final int id;
+  /// The driver entity's own id — what `Booking/create` expects as `driverId`
+  /// (distinct from the response row [id]).
+  final int? driverId;
   final String? fullName;
   final String? fullNameAr;
   final String? email;
@@ -31,6 +34,7 @@ class DriverDetails {
 
   const DriverDetails({
     required this.id,
+    this.driverId,
     this.fullName,
     this.fullNameAr,
     this.email,
@@ -61,6 +65,7 @@ class DriverDetails {
   factory DriverDetails.fromJson(Map<String, dynamic> json) {
     return DriverDetails(
       id: (json['id'] as num?)?.toInt() ?? 0,
+      driverId: (json['driverId'] as num?)?.toInt(),
       fullName: json['fullName'] as String?,
       fullNameAr: json['fullNameAr'] as String?,
       email: json['email'] as String?,

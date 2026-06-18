@@ -57,8 +57,17 @@ class _OmPayWebViewPageState extends State<OmPayWebViewPage> {
     Navigator.of(context).pop(result);
   }
 
-  bool _isReturnUrl(String url) =>
-      widget.returnUrlContains.any((m) => m.isNotEmpty && url.contains(m));
+  /// True when [uri] is the gateway's terminal return page — matched on the URL
+  /// PATH only. (The merchant checkout URL carries the result URL inside its
+  /// `redirectUrl` query param, so matching the whole URL would close too early.)
+  bool _isReturnUri(WebUri uri) {
+    final path = uri.path.toLowerCase();
+    if (path.contains('ompay/result')) return true;
+    return widget.returnUrlContains.any((m) {
+      final mp = (Uri.tryParse(m)?.path ?? m).toLowerCase();
+      return mp.isNotEmpty && mp != '/' && path.contains(mp);
+    });
+  }
 
   /// Maps a `slfdrive://payment/<path>` URL to a result, or null if it isn't a
   /// return URL.
@@ -112,11 +121,26 @@ class _OmPayWebViewPageState extends State<OmPayWebViewPage> {
         useShouldOverrideUrlLoading: true,
         javaScriptEnabled: true,
         transparentBackground: false,
+        // The checkout page hands off to the OmPay gateway via window.open /
+        // target=_blank — allow it and route it into this same WebView.
+        javaScriptCanOpenWindowsAutomatically: true,
+        supportMultipleWindows: true,
+        thirdPartyCookiesEnabled: true, // Android: gateway sets cookies
+        allowsInlineMediaPlayback: true, // iOS
         // Payment pages must not be cached/restored across sessions.
         cacheEnabled: false,
         clearCache: true,
       ),
       onWebViewCreated: (c) => _controller = c,
+      // The gateway is opened in a new window; load it in the main WebView
+      // instead of dropping it (which left the page stuck on "redirecting...").
+      onCreateWindow: (controller, createWindowAction) async {
+        final url = createWindowAction.request.url;
+        if (url != null) {
+          await controller.loadUrl(urlRequest: URLRequest(url: url));
+        }
+        return false;
+      },
       shouldOverrideUrlLoading: (controller, action) async {
         final result = _resultFor(action.request.url);
         if (result != null) {
@@ -138,7 +162,7 @@ class _OmPayWebViewPageState extends State<OmPayWebViewPage> {
         // We let it load (so the backend captures the payment), then close and
         // let the caller verify the order. Outcome=success here only means
         // "returned" — verify decides paid vs pending.
-        if (uri != null && _isReturnUrl(uri.toString())) {
+        if (uri != null && _isReturnUri(uri)) {
           _finish(const OmPayWebResult(OmPayWebOutcome.success));
         }
       },

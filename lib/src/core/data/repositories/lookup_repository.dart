@@ -16,6 +16,7 @@ abstract class LookupRepository {
   Future<List<GeneralLookup>> getActiveGeneralTypes();
   Future<List<GeneralLookup>> getActiveGeneralStatuses();
   Future<List<AllCompany>> getActiveCompanies();
+  Future<int?> getBranchCompanyId(int branchId);
 }
 
 class LookupRepositoryImpl implements LookupRepository {
@@ -49,4 +50,7 @@ class LookupRepositoryImpl implements LookupRepository {
 
   @override
   Future<List<AllCompany>> getActiveCompanies() => remote.getActiveCompanies();
+
+  @override
+  Future<int?> getBranchCompanyId(int branchId) => remote.getBranchCompanyId(branchId);
 }

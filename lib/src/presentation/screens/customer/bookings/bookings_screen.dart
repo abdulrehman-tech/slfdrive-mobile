@@ -1,6 +1,7 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import '../../../widgets/skeletons/list_skeleton.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../constants/breakpoints.dart';
@@ -57,7 +58,7 @@ class _MobileLayout extends StatelessWidget {
         BookingsAppBar(isDark: isDark, cs: cs),
         SliverToBoxAdapter(child: BookingsTabBar(isDark: isDark, cs: cs)),
         if (provider.isLoading && provider.bookings.isEmpty)
-          const SliverFillRemaining(child: Center(child: CircularProgressIndicator()))
+          const SliverFillRemaining(child: ListSkeleton(itemCount: 4, itemHeight: 150))
         else if (bookings.isEmpty)
           SliverFillRemaining(
             child: BookingsEmpty(
@@ -127,7 +128,7 @@ class _DesktopLayout extends StatelessWidget {
               ),
               SizedBox(height: 24.r),
               if (provider.isLoading && provider.bookings.isEmpty)
-                SizedBox(height: 400.r, child: const Center(child: CircularProgressIndicator()))
+                SizedBox(height: 400.r, child: const ListSkeleton(itemCount: 3, itemHeight: 150))
               else if (bookings.isEmpty)
                 SizedBox(
                   height: 400.r,

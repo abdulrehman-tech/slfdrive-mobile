@@ -20,7 +20,12 @@ class BookingItem {
   final String pickupDate;
   final String dropoffDate;
   final double totalPrice;
+  final int? vehicleId;
+  final int? driverId;
+  final String? vehicleName;
+  final String? vehicleImageUrl;
   final String? driverName;
+  final String? driverPhotoUrl;
 
   const BookingItem({
     required this.id,
@@ -31,11 +36,56 @@ class BookingItem {
     required this.pickupDate,
     required this.dropoffDate,
     required this.totalPrice,
+    this.vehicleId,
+    this.driverId,
+    this.vehicleName,
+    this.vehicleImageUrl,
     this.driverName,
+    this.driverPhotoUrl,
   });
 
   /// Customer can pay once approved and not yet paid.
   bool get canPay => status == BookingStatus.approved && !isPaid;
+
+  /// Headline for the card: vehicle name when known; for a driver hire, the
+  /// driver name; otherwise the service label.
+  String get title {
+    if (vehicleName != null && vehicleName!.isNotEmpty) return vehicleName!;
+    if (driverName != null && driverName!.isNotEmpty) return driverName!;
+    return kind.title;
+  }
+
+  /// Thumbnail: vehicle photo when present, otherwise the driver photo (driver
+  /// hire). Null → the card falls back to the service-kind icon.
+  String? get thumbnailUrl {
+    if (vehicleImageUrl != null && vehicleImageUrl!.isNotEmpty) return vehicleImageUrl;
+    if (driverPhotoUrl != null && driverPhotoUrl!.isNotEmpty) return driverPhotoUrl;
+    return null;
+  }
+
+  BookingItem copyWith({
+    String? vehicleName,
+    String? vehicleImageUrl,
+    String? driverName,
+    String? driverPhotoUrl,
+  }) {
+    return BookingItem(
+      id: id,
+      bookingNo: bookingNo,
+      kind: kind,
+      status: status,
+      isPaid: isPaid,
+      pickupDate: pickupDate,
+      dropoffDate: dropoffDate,
+      totalPrice: totalPrice,
+      vehicleId: vehicleId,
+      driverId: driverId,
+      vehicleName: vehicleName ?? this.vehicleName,
+      vehicleImageUrl: vehicleImageUrl ?? this.vehicleImageUrl,
+      driverName: driverName ?? this.driverName,
+      driverPhotoUrl: driverPhotoUrl ?? this.driverPhotoUrl,
+    );
+  }
 
   factory BookingItem.fromBooking(Booking b) {
     String date(String? iso) => (iso == null || iso.length < 10) ? '' : iso.substring(0, 10);
@@ -48,6 +98,8 @@ class BookingItem {
       pickupDate: date(b.fromDateTime),
       dropoffDate: date(b.toDateTime),
       totalPrice: b.totalAmount ?? 0,
+      vehicleId: b.vehicleId,
+      driverId: b.driverId,
       driverName: b.driverFullName,
     );
   }

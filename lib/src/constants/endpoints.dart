@@ -53,6 +53,9 @@ class ApiEndpoints {
   // Corporate companies (booking-time company picker)
   static const String activeAllCompanies = '/api/AllCompanies/active';
 
+  // Branch (resolves a vehicle's branch -> owning company)
+  static String branchById(int id) => '/api/Branch/$id';
+
   // Bookings
   static const String bookingCreate = '/api/Booking/create';
   static const String bookingMyPaginated = '/api/Booking/my/paginated';

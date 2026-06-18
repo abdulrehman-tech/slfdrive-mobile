@@ -2,6 +2,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import '../../../widgets/skeletons/list_skeleton.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
@@ -134,7 +135,7 @@ class _DriverListingView extends StatelessWidget {
         SliverToBoxAdapter(child: SizedBox(height: 12.r)),
         if (provider.isLoading)
           SliverFillRemaining(
-            child: Center(child: CircularProgressIndicator(color: cs.primary)),
+            child: const ListSkeleton(itemCount: 5, itemHeight: 96),
           )
         else if (provider.error != null)
           SliverFillRemaining(
@@ -199,7 +200,7 @@ class _DriverListingView extends StatelessWidget {
               if (provider.isLoading)
                 SizedBox(
                   height: 300.r,
-                  child: Center(child: CircularProgressIndicator(color: cs.primary)),
+                  child: const ListSkeleton(itemCount: 5, itemHeight: 96),
                 )
               else if (provider.error != null)
                 SizedBox(

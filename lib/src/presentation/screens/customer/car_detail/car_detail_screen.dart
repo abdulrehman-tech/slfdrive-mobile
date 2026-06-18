@@ -2,6 +2,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import '../../../widgets/skeletons/list_skeleton.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
@@ -72,6 +73,7 @@ class _CarDetailView extends StatelessWidget {
       locationName: context.read<CarDetailProvider>().ar
           ? (vehicle.locationNameAr ?? vehicle.locationName)
           : vehicle.locationName,
+      branchId: vehicle.branchId,
     );
     context.pushNamed('booking', extra: {'service': BookingServiceType.rentCar, 'car': car});
   }
@@ -86,7 +88,7 @@ class _CarDetailView extends StatelessWidget {
     if (provider.isLoading) {
       return Scaffold(
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-        body: Center(child: CircularProgressIndicator(color: cs.primary)),
+        body: const ListSkeleton(itemCount: 4, itemHeight: 170),
       );
     }
 

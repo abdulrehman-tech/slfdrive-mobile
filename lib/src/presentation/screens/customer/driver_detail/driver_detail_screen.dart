@@ -2,6 +2,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import '../../../widgets/skeletons/list_skeleton.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
@@ -51,7 +52,8 @@ class _DriverDetailView extends StatelessWidget {
     if (!await requireLogin(context)) return;
     if (!context.mounted) return;
     final driver = BookingDriver(
-      id: profile.id,
+      // Bookings need the driver's `driverId`, not the listing/route id.
+      id: profile.bookingDriverId.isNotEmpty ? profile.bookingDriverId : profile.id,
       name: profile.name,
       avatarUrl: profile.avatarUrl,
       rating: profile.rating,
@@ -70,7 +72,7 @@ class _DriverDetailView extends StatelessWidget {
 
     Widget body;
     if (provider.profile == null && provider.isLoading) {
-      body = const Center(child: CircularProgressIndicator());
+      body = const ListSkeleton(itemCount: 4, itemHeight: 170);
     } else if (provider.profile == null) {
       body = _ErrorState(
         message: provider.error ?? 'driver_not_found'.tr(),

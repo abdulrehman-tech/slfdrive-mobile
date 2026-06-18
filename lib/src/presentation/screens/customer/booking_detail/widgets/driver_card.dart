@@ -44,6 +44,17 @@ class BookingDriverCard extends StatelessWidget {
     );
   }
 
+  /// "8 yrs · English, Arabic · Muscat" — only the parts the API returned.
+  String get _driverSubtitle {
+    final parts = <String>[
+      if (booking.driverExperienceYears != null && booking.driverExperienceYears! > 0)
+        '${booking.driverExperienceYears} ${'booking_detail_years'.tr()}',
+      if ((booking.driverLanguages ?? '').trim().isNotEmpty) booking.driverLanguages!.trim(),
+      if ((booking.driverLocation ?? '').trim().isNotEmpty) booking.driverLocation!.trim(),
+    ];
+    return parts.join(' · ');
+  }
+
   @override
   Widget build(BuildContext context) {
     return BookingGlassCard(
@@ -64,9 +75,20 @@ class BookingDriverCard extends StatelessWidget {
                   ),
                   SizedBox(height: 2.r),
                   Text(
-                    booking.driverName!,
+                    booking.driverName ?? 'Driver',
                     style: TextStyle(fontSize: 14.r, fontWeight: FontWeight.w700, color: cs.onSurface),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
+                  if (_driverSubtitle.isNotEmpty) ...[
+                    SizedBox(height: 3.r),
+                    Text(
+                      _driverSubtitle,
+                      style: TextStyle(fontSize: 11.r, color: cs.onSurface.withValues(alpha: 0.55)),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
                 ],
               ),
             ),

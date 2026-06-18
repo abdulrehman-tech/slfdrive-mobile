@@ -26,6 +26,7 @@ import '../screens/customer/booking/booking_flow_screen.dart';
 import '../screens/customer/booking/location_picker_screen.dart';
 import '../screens/customer/booking/models/booking_data.dart';
 import '../screens/customer/booking_detail/booking_detail_screen.dart';
+import '../screens/customer/booking_detail/models/booking_detail.dart' show BookingDetailSeed;
 import '../screens/customer/bookings/bookings_screen.dart';
 import '../screens/customer/favorites/favorites_screen.dart';
 import '../screens/customer/profile/profile_screen.dart';
@@ -352,8 +353,9 @@ class AppRouter {
         name: 'booking-detail',
         pageBuilder: (context, state) {
           final id = state.pathParameters['id'] ?? '';
+          final seed = state.extra is BookingDetailSeed ? state.extra as BookingDetailSeed : null;
           return AppModalTransition(
-            child: BookingDetailScreen(bookingId: id),
+            child: BookingDetailScreen(bookingId: id, seed: seed),
             name: state.name,
           );
         },

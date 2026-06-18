@@ -34,6 +34,10 @@ abstract class LookupRemoteDataSource {
 
   /// Active corporate companies from `/api/AllCompanies/active`.
   Future<List<AllCompany>> getActiveCompanies();
+
+  /// The owning company id (`allCompanyId`) for a branch (`/api/Branch/{id}`),
+  /// or null if unavailable.
+  Future<int?> getBranchCompanyId(int branchId);
 }
 
 class LookupRemoteDataSourceImpl implements LookupRemoteDataSource {
@@ -68,6 +72,19 @@ class LookupRemoteDataSourceImpl implements LookupRemoteDataSource {
   @override
   Future<List<GeneralLookup>> getActiveGeneralStatuses() =>
       _getList(ApiEndpoints.activeGeneralStatuses, GeneralLookup.fromJson);
+
+  @override
+  Future<int?> getBranchCompanyId(int branchId) async {
+    try {
+      final res = await apiClient.get(ApiEndpoints.branchById(branchId));
+      final body = res.data as Map<String, dynamic>;
+      final data = body['data'];
+      if (data is Map<String, dynamic>) return (data['allCompanyId'] as num?)?.toInt();
+      return null;
+    } catch (e) {
+      throw ErrorHandler.handleError(e);
+    }
+  }
 
   @override
   Future<List<AllCompany>> getActiveCompanies() async {

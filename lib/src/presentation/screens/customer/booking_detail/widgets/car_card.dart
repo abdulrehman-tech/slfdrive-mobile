@@ -77,33 +77,77 @@ class BookingCarCard extends StatelessWidget {
               ],
             ),
           ),
-          Padding(
-            padding: EdgeInsets.fromLTRB(14.r, 0, 14.r, 14.r),
-            child: Container(
-              padding: EdgeInsets.all(12.r),
-              decoration: BoxDecoration(
-                color: isDark ? Colors.white.withValues(alpha: 0.04) : Colors.black.withValues(alpha: 0.03),
-                borderRadius: BorderRadius.circular(12.r),
-                border: Border.all(
-                  color: isDark ? Colors.white.withValues(alpha: 0.06) : Colors.black.withValues(alpha: 0.04),
-                ),
-              ),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Text(
-                      'booking_detail_plate'.tr(),
-                      style: TextStyle(
-                        fontSize: 11.r,
-                        color: cs.onSurface.withValues(alpha: 0.55),
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ),
-                  OmanPlate(number: booking.plateNumber, code: booking.plateCode, width: 120),
-                ],
+          if (_specs.isNotEmpty)
+            Padding(
+              padding: EdgeInsets.fromLTRB(14.r, 0, 14.r, 12.r),
+              child: Wrap(
+                spacing: 8.r,
+                runSpacing: 8.r,
+                children: _specs.map((s) => _chip(s.$1, s.$2)).toList(),
               ),
             ),
+          if (booking.plateNumber.isNotEmpty)
+            Padding(
+              padding: EdgeInsets.fromLTRB(14.r, 0, 14.r, 14.r),
+              child: Container(
+                padding: EdgeInsets.all(12.r),
+                decoration: BoxDecoration(
+                  color: isDark ? Colors.white.withValues(alpha: 0.04) : Colors.black.withValues(alpha: 0.03),
+                  borderRadius: BorderRadius.circular(12.r),
+                  border: Border.all(
+                    color: isDark ? Colors.white.withValues(alpha: 0.06) : Colors.black.withValues(alpha: 0.04),
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        'booking_detail_plate'.tr(),
+                        style: TextStyle(
+                          fontSize: 11.r,
+                          color: cs.onSurface.withValues(alpha: 0.55),
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                    OmanPlate(number: booking.plateNumber, code: booking.plateCode, width: 120),
+                  ],
+                ),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+
+  /// Available vehicle specs as (icon, value) — only the ones the API returned.
+  List<(IconData, String)> get _specs {
+    final b = booking;
+    return [
+      if ((b.vehicleType ?? '').isNotEmpty) (Iconsax.car_copy, b.vehicleType!),
+      if (b.year != null && b.year! > 0) (Iconsax.calendar_1_copy, '${b.year}'),
+      if ((b.color ?? '').isNotEmpty) (Iconsax.colorfilter_copy, b.color!),
+      if (b.seats != null && b.seats! > 0) (Iconsax.profile_2user_copy, '${b.seats} ${'booking_detail_seats'.tr()}'),
+      if ((b.transmission ?? '').isNotEmpty) (Iconsax.setting_4_copy, b.transmission!),
+      if ((b.fuelType ?? '').isNotEmpty) (Iconsax.gas_station_copy, b.fuelType!),
+    ];
+  }
+
+  Widget _chip(IconData icon, String value) {
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 10.r, vertical: 6.r),
+      decoration: BoxDecoration(
+        color: isDark ? Colors.white.withValues(alpha: 0.05) : Colors.black.withValues(alpha: 0.035),
+        borderRadius: BorderRadius.circular(10.r),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 13.r, color: cs.primary),
+          SizedBox(width: 5.r),
+          Text(
+            value,
+            style: TextStyle(fontSize: 11.r, fontWeight: FontWeight.w600, color: cs.onSurface.withValues(alpha: 0.8)),
           ),
         ],
       ),

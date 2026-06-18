@@ -72,6 +72,10 @@ class BookingCar {
   final double? lon;
   final String? locationName;
 
+  /// The vehicle's branch — resolves (via Branch → allCompanyId) to the owning
+  /// company, used to scope the driver list in the vehicle-with-driver flow.
+  final int? branchId;
+
   const BookingCar({
     required this.id,
     required this.name,
@@ -83,6 +87,7 @@ class BookingCar {
     this.lat,
     this.lon,
     this.locationName,
+    this.branchId,
   });
 
   bool get hasLocation => lat != null && lon != null;

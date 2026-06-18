@@ -28,6 +28,10 @@ class DriverListingItem {
   final double? distanceKm;
   final double? rating;
 
+  /// Company the driver belongs to (null = freelance). Used to scope the driver
+  /// list to the car's company in the vehicle-with-driver flow.
+  final int? allCompanyId;
+
   const DriverListingItem({
     required this.id,
     this.driverId,
@@ -48,6 +52,7 @@ class DriverListingItem {
     this.lon,
     this.distanceKm,
     this.rating,
+    this.allCompanyId,
   });
 
   String displayName({bool ar = false}) {
@@ -78,6 +83,7 @@ class DriverListingItem {
       lon: (json['lon'] as num?)?.toDouble(),
       distanceKm: (json['distanceKm'] as num?)?.toDouble(),
       rating: (json['rating'] as num?)?.toDouble(),
+      allCompanyId: (json['allCompanyId'] as num?)?.toInt(),
     );
   }
 }

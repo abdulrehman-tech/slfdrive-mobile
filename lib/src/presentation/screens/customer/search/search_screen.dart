@@ -1,6 +1,7 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import '../../../widgets/skeletons/list_skeleton.dart';
 import 'package:go_router/go_router.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 import 'package:provider/provider.dart';
@@ -108,7 +109,7 @@ class _SearchView extends StatelessWidget {
         ),
         Expanded(
           child: provider.isLoading && !hasResults
-              ? const Center(child: CircularProgressIndicator())
+              ? const ListSkeleton()
               : !hasResults
               ? EmptyResults(
                   isDark: isDark,
@@ -209,7 +210,7 @@ class _SearchView extends StatelessWidget {
               child: provider.query.isEmpty && !provider.hasActiveFilters && !hasResults
                   ? InitialState(isDark: isDark, cs: cs)
                   : provider.isLoading && !hasResults
-                      ? const Center(child: CircularProgressIndicator())
+                      ? const ListSkeleton()
                       : !hasResults
                       ? EmptyResults(
                           isDark: isDark,

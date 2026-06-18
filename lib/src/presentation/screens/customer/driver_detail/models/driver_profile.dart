@@ -12,6 +12,9 @@ const String _kDefaultCoverUrl =
 
 class DriverProfile {
   final String id;
+  /// The driver's own id for `Booking/create` (`driverId`), distinct from the
+  /// listing/route [id] used for navigation + favourites.
+  final String bookingDriverId;
   final String name;
   final String coverUrl;
   final String avatarUrl;
@@ -33,6 +36,7 @@ class DriverProfile {
 
   const DriverProfile({
     required this.id,
+    this.bookingDriverId = '',
     required this.name,
     required this.coverUrl,
     required this.avatarUrl,
@@ -73,6 +77,7 @@ class DriverProfile {
     ];
     return DriverProfile(
       id: d.id.toString(),
+      bookingDriverId: (d.driverId ?? d.id).toString(),
       name: d.fullName ?? '',
       coverUrl: _kDefaultCoverUrl,
       avatarUrl: ApiEndpoints.resolveMediaUrl(d.photoUrl) ?? '',

@@ -2,9 +2,11 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import '../../../../widgets/skeletons/list_skeleton.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 
 import '../../../../../core/data/repositories/driver_listing_repository.dart';
+import '../../../../../core/data/repositories/lookup_repository.dart';
 import '../../../../../core/di/injection_container.dart';
 import '../../../../../core/errors/app_exception.dart';
 import '../../../../../core/models/common/pagination_params.dart';
@@ -26,8 +28,10 @@ class DriverSelectStep extends StatefulWidget {
 
 class _DriverSelectStepState extends State<DriverSelectStep> {
   final _repo = getIt<DriverListingRepository>();
+  final _lookup = getIt<LookupRepository>();
   List<DriverListingItem> _drivers = const [];
   bool _loading = false;
+  bool _companyScoped = false; // list was filtered to the car's company
   String? _error;
 
   @override
@@ -42,9 +46,30 @@ class _DriverSelectStepState extends State<DriverSelectStep> {
       _error = null;
     });
     try {
+      // For "Car + driver", scope the list to drivers of the company that owns
+      // the chosen car (vehicle → branch → allCompanyId). Best-effort: if the
+      // company can't be resolved, fall back to showing all drivers.
+      int? companyId;
+      final car = widget.data.car;
+      if (widget.data.serviceType == BookingServiceType.carWithDriver && car?.branchId != null) {
+        try {
+          companyId = await _lookup.getBranchCompanyId(car!.branchId!);
+        } catch (_) {
+          companyId = null;
+        }
+      }
+
       final page = await _repo.getPaginated(const PaginationParams(pageNumber: 1, pageSize: 50));
       if (!mounted) return;
-      setState(() => _drivers = page.items);
+      var drivers = page.items;
+      final scoped = companyId != null;
+      if (scoped) {
+        drivers = drivers.where((d) => d.allCompanyId == companyId).toList();
+      }
+      setState(() {
+        _drivers = drivers;
+        _companyScoped = scoped;
+      });
     } on AppException catch (e) {
       if (!mounted) return;
       setState(() => _error = e.message);
@@ -58,7 +83,9 @@ class _DriverSelectStepState extends State<DriverSelectStep> {
 
   void _select(DriverListingItem d) {
     widget.data.setDriver(BookingDriver(
-      id: d.id.toString(),
+      // Bookings reference the driver's own id (`driverId`), NOT the response
+      // row `id` — sending `id` makes Booking/create 500.
+      id: (d.driverId ?? d.id).toString(),
       name: d.displayName(),
       avatarUrl: d.resolvedPhotoUrl ?? '',
       rating: d.rating ?? 0,
@@ -86,7 +113,7 @@ class _DriverSelectStepState extends State<DriverSelectStep> {
         if (_loading)
           Padding(
             padding: EdgeInsets.symmetric(vertical: 40.r),
-            child: const Center(child: CircularProgressIndicator()),
+            child: const ListSkeleton(itemCount: 4, itemHeight: 84, padding: EdgeInsets.zero),
           )
         else if (_error != null)
           _ErrorRetry(message: _error!, onRetry: _load)
@@ -95,7 +122,8 @@ class _DriverSelectStepState extends State<DriverSelectStep> {
             padding: EdgeInsets.symmetric(vertical: 30.r),
             child: Center(
               child: Text(
-                'search_no_results'.tr(),
+                (_companyScoped ? 'booking_driver_none_for_company' : 'search_no_results').tr(),
+                textAlign: TextAlign.center,
                 style: TextStyle(color: cs.onSurface.withValues(alpha: 0.6), fontSize: 13.r),
               ),
             ),
@@ -106,7 +134,7 @@ class _DriverSelectStepState extends State<DriverSelectStep> {
               padding: EdgeInsets.only(bottom: 10.r),
               child: _DriverCard(
                 driver: d,
-                isSelected: widget.data.driver?.id == d.id.toString(),
+                isSelected: widget.data.driver?.id == (d.driverId ?? d.id).toString(),
                 onTap: () => _select(d),
                 isDark: widget.isDark,
               ),

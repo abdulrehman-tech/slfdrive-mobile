@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 
 import '../../../../constants/breakpoints.dart';
 import '../../../providers/theme_provider.dart';
+import '../../../widgets/skeletons/grid_skeleton.dart';
 import 'provider/brands_provider.dart';
 import 'widgets/brand_tile.dart';
 import 'widgets/brands_app_bar.dart';
@@ -87,7 +88,11 @@ class _BrandsViewState extends State<_BrandsView> {
         ),
         SliverPadding(
           padding: EdgeInsets.fromLTRB(16.r, 12.r, 16.r, 32.r),
-          sliver: brands.isEmpty
+          sliver: (provider.isLoading && brands.isEmpty)
+              ? SliverToBoxAdapter(
+                  child: GridSkeleton(crossAxisCount: 3, itemCount: 9, padding: EdgeInsets.zero),
+                )
+              : brands.isEmpty
               ? SliverFillRemaining(child: BrandsEmptyState(isDark: isDark, cs: cs))
               : SliverGrid(
                   gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
@@ -139,7 +144,9 @@ class _BrandsViewState extends State<_BrandsView> {
               SizedBox(height: 20.r),
               BrandsCountLabel(count: brands.length, cs: cs, fontSize: 13.r),
               SizedBox(height: 16.r),
-              brands.isEmpty
+              (provider.isLoading && brands.isEmpty)
+                  ? GridSkeleton(crossAxisCount: 6, itemCount: 12, padding: EdgeInsets.zero)
+                  : brands.isEmpty
                   ? SizedBox(height: 420.r, child: BrandsEmptyState(isDark: isDark, cs: cs))
                   : GridView.builder(
                       shrinkWrap: true,

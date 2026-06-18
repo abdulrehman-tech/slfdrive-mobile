@@ -6,24 +6,17 @@ import 'summary_widgets/summary_corporate_card.dart';
 import 'summary_widgets/summary_header.dart';
 import 'summary_widgets/summary_logistics_card.dart';
 import 'summary_widgets/summary_pricing_card.dart';
-import 'summary_widgets/summary_promo_card.dart';
 import 'summary_widgets/summary_schedule_card.dart';
 import 'summary_widgets/summary_subject_card.dart';
 
-class SummaryStep extends StatefulWidget {
+class SummaryStep extends StatelessWidget {
   final BookingData data;
   final bool isDark;
   const SummaryStep({super.key, required this.data, required this.isDark});
 
   @override
-  State<SummaryStep> createState() => _SummaryStepState();
-}
-
-class _SummaryStepState extends State<SummaryStep> {
-  @override
   Widget build(BuildContext context) {
-    final d = widget.data;
-    final isDark = widget.isDark;
+    final d = data;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -46,15 +39,6 @@ class _SummaryStepState extends State<SummaryStep> {
 
         // Location card
         SummaryLogisticsCard(data: d, isDark: isDark),
-
-        SizedBox(height: 12.r),
-
-        // Promo code
-        SummaryPromoCard(
-          data: d,
-          isDark: isDark,
-          onApplied: () => setState(() {}),
-        ),
 
         SizedBox(height: 14.r),
         SummaryPricingCard(data: d, isDark: isDark),

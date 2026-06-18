@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import '../../../../../widgets/skeletons/list_skeleton.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 
 import '../../../../../../core/models/company/all_company.dart';
@@ -78,7 +79,7 @@ class _CompanyPickerSheet extends StatelessWidget {
           if (isLoading)
             Padding(
               padding: EdgeInsets.symmetric(vertical: 30.r),
-              child: const Center(child: CircularProgressIndicator()),
+              child: const ListSkeleton(itemCount: 4, itemHeight: 58, padding: EdgeInsets.zero),
             )
           else if (error != null)
             Padding(

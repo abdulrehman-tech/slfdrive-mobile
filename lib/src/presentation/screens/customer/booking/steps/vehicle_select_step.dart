@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import '../../../../widgets/skeletons/list_skeleton.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 
 import '../../../../../core/data/repositories/vehicle_repository.dart';
@@ -67,6 +68,7 @@ class _VehicleSelectStepState extends State<VehicleSelectStep> {
       lat: v.lat,
       lon: v.lon,
       locationName: v.locationName,
+      branchId: v.branchId,
     ));
   }
 
@@ -89,7 +91,7 @@ class _VehicleSelectStepState extends State<VehicleSelectStep> {
         if (_loading)
           Padding(
             padding: EdgeInsets.symmetric(vertical: 40.r),
-            child: const Center(child: CircularProgressIndicator()),
+            child: const ListSkeleton(itemCount: 4, itemHeight: 84, padding: EdgeInsets.zero),
           )
         else if (_error != null)
           _ErrorRetry(message: _error!, onRetry: _load)
