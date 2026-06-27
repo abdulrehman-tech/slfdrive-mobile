@@ -12,6 +12,7 @@ class Booking {
   final int? statusId;
   final String? status;
   final String? statusType;
+  final int? bookingTypeId;
   final String? type;
   final String? serviceType;
   final int? serviceTypeId;
@@ -47,6 +48,7 @@ class Booking {
     this.statusId,
     this.status,
     this.statusType,
+    this.bookingTypeId,
     this.type,
     this.serviceType,
     this.serviceTypeId,
@@ -78,8 +80,33 @@ class Booking {
       (status?.toLowerCase() == 'completed') ||
       (statusType?.toLowerCase() == 'completed');
 
+  /// True when this booking is corporate (billed to a corporate company rather
+  /// than paid by the customer). `13` is the backend `booking_type` id.
+  bool get isCorporate =>
+      corporateCompanyId != null ||
+      bookingTypeId == 13 ||
+      (type?.toLowerCase() == 'corporate');
+
   DateTime? get fromDate => DateTime.tryParse(fromDateTime ?? '');
   DateTime? get toDate => DateTime.tryParse(toDateTime ?? '');
+
+  /// Rental duration in days (minimum 1). Matches the backend's day count used
+  /// for pricing (a 2-night range bills 2 days), so `totalAmount / durationDays`
+  /// yields the per-day rate.
+  int get durationDays {
+    final f = fromDate;
+    final t = toDate;
+    if (f == null || t == null) return 1;
+    final d = t.difference(f).inDays;
+    return d < 1 ? 1 : d;
+  }
+
+  /// Derived per-day rate (`totalAmount / durationDays`), or null when no total.
+  double? get perDayAmount {
+    final total = totalAmount;
+    if (total == null) return null;
+    return total / durationDays;
+  }
 
   factory Booking.fromJson(Map<String, dynamic> json) {
     double? d(String k) => (json[k] as num?)?.toDouble();
@@ -96,6 +123,7 @@ class Booking {
       statusId: i('statusId'),
       status: json['status'] as String?,
       statusType: json['statusType'] as String?,
+      bookingTypeId: i('bookingTypeId'),
       type: json['type'] as String?,
       serviceType: json['serviceType'] as String?,
       serviceTypeId: i('serviceTypeId'),

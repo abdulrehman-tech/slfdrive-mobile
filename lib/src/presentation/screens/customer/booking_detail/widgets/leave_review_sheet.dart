@@ -42,16 +42,10 @@ class _LeaveReviewSheetState extends State<LeaveReviewSheet> {
   Future<void> _submit() async {
     setState(() => _submitting = true);
     try {
-      await getIt<ReviewRepository>().submit(
-        bookingId: widget.bookingId,
-        rating: _rating,
-        comment: _comment.text,
-      );
+      await getIt<ReviewRepository>().submit(bookingId: widget.bookingId, rating: _rating, comment: _comment.text);
       if (!mounted) return;
       Navigator.of(context).pop(true);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('review_submitted'.tr())),
-      );
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('review_submitted'.tr())));
     } on AppException catch (e) {
       if (!mounted) return;
       setState(() => _submitting = false);
@@ -105,7 +99,7 @@ class _LeaveReviewSheetState extends State<LeaveReviewSheet> {
                     child: Padding(
                       padding: EdgeInsets.symmetric(horizontal: 4.r),
                       child: Icon(
-                        filled ? Iconsax.star_1_copy : Iconsax.star_1,
+                        filled ? Iconsax.star : Iconsax.star_1_copy,
                         size: 34.r,
                         color: const Color(0xFFFFC107),
                       ),
@@ -123,10 +117,7 @@ class _LeaveReviewSheetState extends State<LeaveReviewSheet> {
                 hintText: 'review_comment_hint'.tr(),
                 filled: true,
                 fillColor: cs.onSurface.withValues(alpha: 0.05),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(14.r),
-                  borderSide: BorderSide.none,
-                ),
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(14.r), borderSide: BorderSide.none),
               ),
             ),
             SizedBox(height: 18.r),
@@ -135,11 +126,7 @@ class _LeaveReviewSheetState extends State<LeaveReviewSheet> {
               child: FilledButton(
                 onPressed: _submitting ? null : _submit,
                 child: _submitting
-                    ? SizedBox(
-                        width: 18.r,
-                        height: 18.r,
-                        child: const CircularProgressIndicator(strokeWidth: 2),
-                      )
+                    ? SizedBox(width: 18.r, height: 18.r, child: const CircularProgressIndicator(strokeWidth: 2))
                     : Text('review_submit'.tr()),
               ),
             ),

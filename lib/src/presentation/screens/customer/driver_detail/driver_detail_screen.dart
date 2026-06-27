@@ -23,7 +23,6 @@ import 'widgets/pricing_card.dart';
 import 'widgets/reviews_card.dart';
 import 'widgets/services_card.dart';
 import 'widgets/stats_card.dart';
-import 'widgets/trust_card.dart';
 import 'widgets/vehicles_card.dart';
 
 class DriverDetailScreen extends StatelessWidget {
@@ -106,19 +105,27 @@ class _DriverDetailView extends StatelessWidget {
                 children: [
                   StatsCard(profile: profile, isDark: isDark, cs: cs),
                   SizedBox(height: 14.r),
-                  TrustCard(isDark: isDark, cs: cs),
-                  SizedBox(height: 14.r),
                   PricingCard(profile: profile, isDark: isDark, cs: cs),
-                  SizedBox(height: 14.r),
-                  AboutCard(profile: profile, isDark: isDark, cs: cs),
-                  SizedBox(height: 14.r),
-                  ServicesCard(profile: profile, isDark: isDark, cs: cs),
-                  SizedBox(height: 14.r),
-                  VehiclesCard(profile: profile, isDark: isDark, cs: cs),
-                  SizedBox(height: 14.r),
-                  AvailabilityCard(profile: profile, isDark: isDark, cs: cs),
-                  SizedBox(height: 14.r),
-                  LanguagesCard(profile: profile, isDark: isDark, cs: cs),
+                  if (profile.bio.trim().isNotEmpty) ...[
+                    SizedBox(height: 14.r),
+                    AboutCard(profile: profile, isDark: isDark, cs: cs),
+                  ],
+                  if (profile.services.isNotEmpty) ...[
+                    SizedBox(height: 14.r),
+                    ServicesCard(profile: profile, isDark: isDark, cs: cs),
+                  ],
+                  if (profile.vehicles.isNotEmpty) ...[
+                    SizedBox(height: 14.r),
+                    VehiclesCard(profile: profile, isDark: isDark, cs: cs),
+                  ],
+                  if (profile.availability.isNotEmpty) ...[
+                    SizedBox(height: 14.r),
+                    AvailabilityCard(profile: profile, isDark: isDark, cs: cs),
+                  ],
+                  if (profile.languages.isNotEmpty) ...[
+                    SizedBox(height: 14.r),
+                    LanguagesCard(profile: profile, isDark: isDark, cs: cs),
+                  ],
                   SizedBox(height: 14.r),
                   ReviewsCard(profile: profile, isDark: isDark, cs: cs),
                 ],
@@ -185,10 +192,14 @@ class _DriverDetailView extends StatelessWidget {
                     child: Column(
                       children: [
                         StatsCard(profile: profile, isDark: isDark, cs: cs),
-                        SizedBox(height: 16.r),
-                        AboutCard(profile: profile, isDark: isDark, cs: cs),
-                        SizedBox(height: 16.r),
-                        ServicesCard(profile: profile, isDark: isDark, cs: cs),
+                        if (profile.bio.trim().isNotEmpty) ...[
+                          SizedBox(height: 16.r),
+                          AboutCard(profile: profile, isDark: isDark, cs: cs),
+                        ],
+                        if (profile.services.isNotEmpty) ...[
+                          SizedBox(height: 16.r),
+                          ServicesCard(profile: profile, isDark: isDark, cs: cs),
+                        ],
                         SizedBox(height: 16.r),
                         ReviewsCard(profile: profile, isDark: isDark, cs: cs),
                       ],
@@ -199,15 +210,19 @@ class _DriverDetailView extends StatelessWidget {
                     flex: 2,
                     child: Column(
                       children: [
-                        TrustCard(isDark: isDark, cs: cs),
-                        SizedBox(height: 16.r),
                         PricingCard(profile: profile, isDark: isDark, cs: cs),
-                        SizedBox(height: 16.r),
-                        VehiclesCard(profile: profile, isDark: isDark, cs: cs),
-                        SizedBox(height: 16.r),
-                        AvailabilityCard(profile: profile, isDark: isDark, cs: cs),
-                        SizedBox(height: 16.r),
-                        LanguagesCard(profile: profile, isDark: isDark, cs: cs),
+                        if (profile.vehicles.isNotEmpty) ...[
+                          SizedBox(height: 16.r),
+                          VehiclesCard(profile: profile, isDark: isDark, cs: cs),
+                        ],
+                        if (profile.availability.isNotEmpty) ...[
+                          SizedBox(height: 16.r),
+                          AvailabilityCard(profile: profile, isDark: isDark, cs: cs),
+                        ],
+                        if (profile.languages.isNotEmpty) ...[
+                          SizedBox(height: 16.r),
+                          LanguagesCard(profile: profile, isDark: isDark, cs: cs),
+                        ],
                         SizedBox(height: 16.r),
                         DesktopHireButton(
                           profile: profile,

@@ -2,6 +2,9 @@ class StorageKeys {
   static const String accessToken = 'access_token';
   static const String refreshToken = 'refresh_token';
   static const String userId = 'user_id';
+  // Driver-entity id (distinct from userId) — what bookings filter/reference as
+  // driverId. Resolved from GET /api/Driver/{userId} and cached.
+  static const String driverId = 'driver_id';
   static const String userRole = 'user_role';
   static const String userEmail = 'user_email';
   static const String userPhone = 'user_phone';

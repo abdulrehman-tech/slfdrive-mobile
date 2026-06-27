@@ -130,7 +130,10 @@ class HomeProvider extends ChangeNotifier {
       final page = await _driverRepo.getNearest(
         params: const PaginationParams(pageSize: 10),
       );
+      // Only freelance drivers are bookable directly by customers; drivers
+      // affiliated to a rental company (allCompanyId != null) are hidden.
       _nearbyDrivers = page.items
+          .where((d) => d.allCompanyId == null)
           .map((d) => DriverItem.fromDriver(d, ar: _ar))
           .toList();
     } on AppException catch (e) {

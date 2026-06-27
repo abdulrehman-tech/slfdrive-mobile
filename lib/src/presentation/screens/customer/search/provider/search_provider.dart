@@ -92,7 +92,10 @@ class SearchProvider extends ChangeNotifier {
       final vehiclePage = await vehiclesFuture;
       final driverPage = await driversFuture;
       _carResults = vehiclePage.items.map(_mapCar).toList();
-      _driverResults = driverPage.items.map(_mapDriver).toList();
+      // Customers can only hire freelance drivers; company-affiliated drivers
+      // (allCompanyId != null) are excluded from search results.
+      _driverResults =
+          driverPage.items.where((d) => d.allCompanyId == null).map(_mapDriver).toList();
     } on AppException catch (e) {
       _error = e.message;
     } catch (e) {

@@ -15,11 +15,18 @@ class StatsCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Only real, backend-backed stats. Rating/trips have no per-driver endpoint
+    // yet, so they appear only when a non-zero value is actually available;
+    // response time isn't tracked at all and was dropped.
     final stats = <(String, String, IconData, Color)>[
-      ('${profile.rating}', 'driver_detail_rating'.tr(), Iconsax.star_1_copy, const Color(0xFFFFC107)),
-      ('${profile.trips}', 'driver_detail_trips'.tr(), Iconsax.route_square_copy, const Color(0xFF3D5AFE)),
       ('${profile.years}', 'driver_detail_years'.tr(), Iconsax.calendar_tick_copy, const Color(0xFF7C4DFF)),
-      (profile.responseTime, 'driver_detail_response'.tr(), Iconsax.timer_1_copy, const Color(0xFF4CAF50)),
+      ('${profile.languages.length}', 'driver_detail_languages'.tr(), Iconsax.language_circle_copy,
+          const Color(0xFF00BCD4)),
+      if (profile.rating > 0)
+        (profile.rating.toStringAsFixed(1), 'driver_detail_rating'.tr(), Iconsax.star_1_copy,
+            const Color(0xFFFFC107)),
+      if (profile.trips > 0)
+        ('${profile.trips}', 'driver_detail_trips'.tr(), Iconsax.route_square_copy, const Color(0xFF3D5AFE)),
     ];
     return Padding(
       padding: EdgeInsets.only(top: 48.r),

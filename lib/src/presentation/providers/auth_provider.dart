@@ -7,6 +7,8 @@ import '../../constants/storage_keys.dart';
 import '../../core/data/repositories/auth_repository.dart';
 import '../../core/data/repositories/customer_repository.dart';
 import '../../core/data/repositories/driver_repository.dart';
+import '../../core/di/injection_container.dart';
+import '../../core/services/driver_session.dart';
 import '../../core/errors/app_exception.dart';
 import '../../core/models/auth/auth_session.dart';
 import '../../core/models/user/user_model.dart';
@@ -92,6 +94,7 @@ class AuthProvider extends ChangeNotifier {
       StorageKeys.accessToken,
       StorageKeys.refreshToken,
       StorageKeys.userId,
+      StorageKeys.driverId,
       StorageKeys.userEmail,
       StorageKeys.userPhone,
       StorageKeys.userName,
@@ -109,6 +112,7 @@ class AuthProvider extends ChangeNotifier {
     _photoPath = null;
     _isAuthenticated = false;
     _isVerified = false;
+    getIt<DriverSession>().clear();
     notifyListeners();
   }
 
@@ -134,6 +138,10 @@ class AuthProvider extends ChangeNotifier {
       }
       if (d.photoUrl != null) {
         await _storage.write(key: StorageKeys.userProfileImage, value: d.photoUrl);
+      }
+      // Cache the driver-entity id used to filter the driver's bookings.
+      if (d.driverId != null) {
+        await _storage.write(key: StorageKeys.driverId, value: d.driverId.toString());
       }
       notifyListeners();
     } catch (_) {
@@ -352,6 +360,7 @@ class AuthProvider extends ChangeNotifier {
     _photoPath = null;
     _isAuthenticated = false;
     _isVerified = false;
+    getIt<DriverSession>().clear();
     notifyListeners();
   }
 

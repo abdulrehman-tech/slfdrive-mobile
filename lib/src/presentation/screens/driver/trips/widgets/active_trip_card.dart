@@ -1,9 +1,12 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
+import 'package:provider/provider.dart';
 
 import '../models/driver_trip.dart';
+import '../provider/driver_trips_provider.dart';
 
 class ActiveTripCard extends StatelessWidget {
   final DriverTrip trip;
@@ -100,22 +103,27 @@ class ActiveTripCard extends StatelessWidget {
     );
   }
 
+  Widget _avatar() {
+    final url = trip.avatarUrl;
+    final fallback = Icon(Iconsax.user, color: const Color(0xFF4D63DD), size: 20.r);
+    return Container(
+      width: 44.r,
+      height: 44.r,
+      decoration: BoxDecoration(
+        color: const Color(0xFF4D63DD).withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(12.r),
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: (url != null && url.isNotEmpty)
+          ? CachedNetworkImage(imageUrl: url, fit: BoxFit.cover, errorWidget: (c, u, e) => fallback)
+          : fallback,
+    );
+  }
+
   Widget _buildCustomerRow() {
     return Row(
       children: [
-        Container(
-          width: 44.r,
-          height: 44.r,
-          decoration: BoxDecoration(
-            color: const Color(0xFF4D63DD).withValues(alpha: 0.1),
-            borderRadius: BorderRadius.circular(12.r),
-          ),
-          child: Icon(
-            Iconsax.user,
-            color: const Color(0xFF4D63DD),
-            size: 20.r,
-          ),
-        ),
+        _avatar(),
         SizedBox(width: 12.r),
         Expanded(
           child: Column(
@@ -174,14 +182,21 @@ class ActiveTripCard extends StatelessWidget {
     );
   }
 
+  Future<void> _onComplete(BuildContext context) async {
+    final messenger = ScaffoldMessenger.of(context);
+    final ok = await context.read<DriverTripsProvider>().completeTrip(trip.bookingId);
+    if (!context.mounted) return;
+    messenger.showSnackBar(
+      SnackBar(
+        content: Text(ok ? 'trips_complete_snack'.tr() : 'trips_complete_failed'.tr()),
+        behavior: SnackBarBehavior.floating,
+      ),
+    );
+  }
+
   Widget _buildCompleteButton(BuildContext context) {
     return GestureDetector(
-      onTap: () => ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('trips_complete_snack'.tr()),
-          behavior: SnackBarBehavior.floating,
-        ),
-      ),
+      onTap: () => _onComplete(context),
       child: Container(
         width: double.infinity,
         padding: EdgeInsets.symmetric(vertical: 12.r),

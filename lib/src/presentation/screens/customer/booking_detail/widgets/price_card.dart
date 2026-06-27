@@ -61,26 +61,49 @@ class BookingPriceCard extends StatelessWidget {
               ],
             ),
             SizedBox(height: 10.r),
-            Container(
-              padding: EdgeInsets.symmetric(horizontal: 10.r, vertical: 6.r),
-              decoration: BoxDecoration(
-                color: cs.primary.withValues(alpha: isDark ? 0.15 : 0.08),
-                borderRadius: BorderRadius.circular(8.r),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(Iconsax.card_copy, size: 12.r, color: cs.primary),
-                  SizedBox(width: 5.r),
-                  Text(
-                    'booking_detail_paid_with'.tr(args: [booking.paymentMethod]),
-                    style: TextStyle(fontSize: 10.r, color: cs.primary, fontWeight: FontWeight.w700),
-                  ),
-                ],
-              ),
-            ),
+            _paymentStatusBadge(),
           ],
         ),
+      ),
+    );
+  }
+
+  /// Payment-status pill: green "Paid" once settled, amber "Awaiting payment"
+  /// while pending. Corporate bookings read "Billed to company".
+  Widget _paymentStatusBadge() {
+    final Color color;
+    final IconData icon;
+    final String label;
+    if (booking.isCorporate && !booking.isPaid) {
+      color = const Color(0xFF00BFA5);
+      icon = Iconsax.building_copy;
+      label = 'booking_payment_bill_to_company'.tr();
+    } else if (booking.isPaid) {
+      color = const Color(0xFF4CAF50);
+      icon = Iconsax.tick_circle_copy;
+      label = 'bookings_paid'.tr();
+    } else {
+      color = const Color(0xFFFFA726);
+      icon = Iconsax.clock_copy;
+      label = 'bookings_awaiting_payment'.tr();
+    }
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 10.r, vertical: 6.r),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: isDark ? 0.18 : 0.10),
+        borderRadius: BorderRadius.circular(8.r),
+        border: Border.all(color: color.withValues(alpha: 0.35)),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 12.r, color: color),
+          SizedBox(width: 5.r),
+          Text(
+            label,
+            style: TextStyle(fontSize: 10.r, color: color, fontWeight: FontWeight.w700),
+          ),
+        ],
       ),
     );
   }

@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 
 import '../../../../../core/models/company/all_company.dart';
+import '../../../../../core/models/lookup/location_option.dart';
 
 // ============================================================
 // ENUMS
@@ -177,6 +178,13 @@ class BookingData extends ChangeNotifier {
   BookingLocation? _deliveryLocation;
   String _deliveryNotes = '';
 
+  // Delivery area (`mst_location`) + the (company, area) fee resolved from the
+  // DeliveryFee API. Drives both the displayed fee and the `locationId` sent on
+  // booking create.
+  LocationOption? _deliveryArea;
+  double _deliveryFee = 0;
+  bool _deliveryFeeLoading = false;
+
   PaymentMethod _paymentMethod = PaymentMethod.card;
   String? _promoCode;
   double _promoDiscount = 0;
@@ -204,6 +212,8 @@ class BookingData extends ChangeNotifier {
   BookingLocation? get pickupLocation => _pickupLocation;
   BookingLocation? get deliveryLocation => _deliveryLocation;
   String get deliveryNotes => _deliveryNotes;
+  LocationOption? get deliveryArea => _deliveryArea;
+  bool get deliveryFeeLoading => _deliveryFeeLoading;
   PaymentMethod get paymentMethod => _paymentMethod;
   String? get promoCode => _promoCode;
   double get promoDiscount => _promoDiscount;
@@ -223,7 +233,10 @@ class BookingData extends ChangeNotifier {
     return base;
   }
 
-  double get deliveryFee => _pickupMode == PickupMode.delivery ? 10 : 0;
+  /// Delivery fee in OMR. Resolved from the DeliveryFee API for the (vehicle
+  /// company, selected area); 0 for self-pickup or when no fee is configured.
+  /// The backend recomputes the authoritative fee on booking create.
+  double get deliveryFee => _pickupMode == PickupMode.delivery ? _deliveryFee : 0;
 
   BookingPricing get pricing => BookingPricing(
     basePerDay: basePerDay,
@@ -281,6 +294,26 @@ class BookingData extends ChangeNotifier {
 
   void setDeliveryLocation(BookingLocation loc) {
     _deliveryLocation = loc;
+    notifyListeners();
+  }
+
+  /// Selects the delivery area. The fee is then resolved asynchronously by the
+  /// caller (which has API access) and pushed back via [setDeliveryFee].
+  void setDeliveryArea(LocationOption? area) {
+    _deliveryArea = area;
+    if (area == null) _deliveryFee = 0;
+    notifyListeners();
+  }
+
+  void setDeliveryFeeLoading(bool loading) {
+    _deliveryFeeLoading = loading;
+    notifyListeners();
+  }
+
+  /// Resolved (company, area) delivery fee in OMR.
+  void setDeliveryFee(double fee) {
+    _deliveryFee = fee;
+    _deliveryFeeLoading = false;
     notifyListeners();
   }
 

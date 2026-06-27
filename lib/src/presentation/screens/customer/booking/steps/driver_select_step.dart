@@ -64,7 +64,12 @@ class _DriverSelectStepState extends State<DriverSelectStep> {
       var drivers = page.items;
       final scoped = companyId != null;
       if (scoped) {
+        // Car + driver → drivers of the car's owning company.
         drivers = drivers.where((d) => d.allCompanyId == companyId).toList();
+      } else {
+        // Standalone driver hire → freelance drivers only (company-affiliated
+        // drivers are booked through their rental company, not directly).
+        drivers = drivers.where((d) => d.allCompanyId == null).toList();
       }
       setState(() {
         _drivers = drivers;

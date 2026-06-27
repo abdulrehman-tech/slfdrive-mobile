@@ -32,25 +32,9 @@ class EarningsCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'driver_today_earnings'.tr(),
-                  style: TextStyle(fontSize: 14.r, color: Colors.white.withValues(alpha: 0.8)),
-                ),
-                Container(
-                  padding: EdgeInsets.symmetric(horizontal: 12.r, vertical: 6.r),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.2),
-                    borderRadius: BorderRadius.circular(20.r),
-                  ),
-                  child: Text(
-                    '+12%',
-                    style: TextStyle(fontSize: 12.r, fontWeight: FontWeight.w600, color: Colors.white),
-                  ),
-                ),
-              ],
+            Text(
+              'driver_today_earnings'.tr(),
+              style: TextStyle(fontSize: 14.r, color: Colors.white.withValues(alpha: 0.8)),
             ),
             SizedBox(height: 12.r),
             Text(

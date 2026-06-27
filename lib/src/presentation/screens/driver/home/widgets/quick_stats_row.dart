@@ -29,7 +29,7 @@ class QuickStatsRow extends StatelessWidget {
           SizedBox(width: 12.r),
           _StatCard(
             icon: Iconsax.star_1,
-            value: provider.rating.toString(),
+            value: provider.ratingLabel,
             label: 'driver_rating'.tr(),
             color: const Color(0xFFFFA000),
             isDark: isDark,
@@ -37,7 +37,7 @@ class QuickStatsRow extends StatelessWidget {
           SizedBox(width: 12.r),
           _StatCard(
             icon: Iconsax.tick_circle,
-            value: '96%',
+            value: provider.completionLabel,
             label: 'driver_completion'.tr(),
             color: const Color(0xFF4CAF50),
             isDark: isDark,

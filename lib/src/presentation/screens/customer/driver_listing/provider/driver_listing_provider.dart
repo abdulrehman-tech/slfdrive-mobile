@@ -99,6 +99,10 @@ class DriverListingProvider extends ChangeNotifier {
   // ---- Derived view-model list ----
   List<DriverItem> get filteredDrivers {
     var items = _drivers
+        // Only freelance drivers are listed; company-affiliated drivers
+        // (allCompanyId != null) belong to a rental company and aren't bookable
+        // directly by customers here.
+        .where((d) => d.allCompanyId == null)
         .where((d) =>
             _vehicleFilter == DriverVehicleFilter.all || d.hasVehicle)
         .map((d) => DriverItem.fromDriver(d, ar: _ar))

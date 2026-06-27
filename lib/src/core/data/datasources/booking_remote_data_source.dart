@@ -16,6 +16,14 @@ abstract class BookingRemoteDataSource {
   /// The signed-in customer's bookings (`POST /api/Booking/my/paginated`).
   Future<PagedResponse<Booking>> myPaginated(PaginationParams params);
 
+  /// Bookings list (`POST /api/Booking/paginated`). Used by the driver app,
+  /// which filters the returned rows client-side by the assigned `driverId`.
+  Future<PagedResponse<Booking>> paginated(PaginationParams params);
+
+  /// A specific driver's bookings (`POST /api/Booking/driver/{driverId}/paginated`).
+  /// Server-scoped to the driver — no client-side filtering needed.
+  Future<PagedResponse<Booking>> driverPaginated(int driverId, PaginationParams params);
+
   /// Single booking (`GET /api/Booking/{id}`), or null when not found.
   Future<Booking?> getById(int id);
 
@@ -31,6 +39,17 @@ abstract class BookingRemoteDataSource {
   /// (`GET /api/Booking/{id}/pay/ompay/verify?orderId=`). Returns true on a
   /// successful/paid result.
   Future<bool> omPayVerify(int bookingId, String orderId);
+
+  /// Driver/owner approves (confirms) a booking request
+  /// (`POST /api/Booking/approve`). [confirmedBy] is the acting user's id.
+  Future<bool> approve({required int id, required int confirmedBy});
+
+  /// Driver/owner rejects a booking request (`POST /api/Booking/reject`) with
+  /// an optional [reason]. [confirmedBy] is the acting user's id.
+  Future<bool> reject({required int id, required int confirmedBy, String? reason});
+
+  /// Marks an in-progress booking as completed (`POST /api/Booking/{id}/complete`).
+  Future<bool> complete(int id);
 }
 
 class BookingRemoteDataSourceImpl implements BookingRemoteDataSource {
@@ -56,6 +75,37 @@ class BookingRemoteDataSourceImpl implements BookingRemoteDataSource {
   Future<PagedResponse<Booking>> myPaginated(PaginationParams params) async {
     try {
       final res = await apiClient.post(ApiEndpoints.bookingMyPaginated, data: params.toJson());
+      final body = res.data as Map<String, dynamic>;
+      if (body['isSuccess'] == true && body['data'] is Map<String, dynamic>) {
+        return PagedResponse.fromJson(body['data'] as Map<String, dynamic>, Booking.fromJson);
+      }
+      return PagedResponse.empty<Booking>();
+    } catch (e) {
+      throw ErrorHandler.handleError(e);
+    }
+  }
+
+  @override
+  Future<PagedResponse<Booking>> paginated(PaginationParams params) async {
+    try {
+      final res = await apiClient.post(ApiEndpoints.bookingPaginated, data: params.toJson());
+      final body = res.data as Map<String, dynamic>;
+      if (body['isSuccess'] == true && body['data'] is Map<String, dynamic>) {
+        return PagedResponse.fromJson(body['data'] as Map<String, dynamic>, Booking.fromJson);
+      }
+      return PagedResponse.empty<Booking>();
+    } catch (e) {
+      throw ErrorHandler.handleError(e);
+    }
+  }
+
+  @override
+  Future<PagedResponse<Booking>> driverPaginated(int driverId, PaginationParams params) async {
+    try {
+      final res = await apiClient.post(
+        ApiEndpoints.bookingDriverPaginated(driverId),
+        data: params.toJson(),
+      );
       final body = res.data as Map<String, dynamic>;
       if (body['isSuccess'] == true && body['data'] is Map<String, dynamic>) {
         return PagedResponse.fromJson(body['data'] as Map<String, dynamic>, Booking.fromJson);
@@ -121,6 +171,52 @@ class BookingRemoteDataSourceImpl implements BookingRemoteDataSource {
       );
       final body = res.data as Map<String, dynamic>;
       return body['isSuccess'] == true;
+    } catch (e) {
+      throw ErrorHandler.handleError(e);
+    }
+  }
+
+  @override
+  Future<bool> approve({required int id, required int confirmedBy}) async {
+    try {
+      final res = await apiClient.post(
+        ApiEndpoints.bookingApprove,
+        data: {'id': id, 'confirmedBy': confirmedBy},
+      );
+      final body = res.data as Map<String, dynamic>;
+      if (body['isSuccess'] == true) return true;
+      throw AppException(message: _message(body) ?? 'Could not approve booking');
+    } catch (e) {
+      throw ErrorHandler.handleError(e);
+    }
+  }
+
+  @override
+  Future<bool> reject({required int id, required int confirmedBy, String? reason}) async {
+    try {
+      final res = await apiClient.post(
+        ApiEndpoints.bookingReject,
+        data: {
+          'id': id,
+          'confirmedBy': confirmedBy,
+          if (reason != null && reason.trim().isNotEmpty) 'rejectionReason': reason.trim(),
+        },
+      );
+      final body = res.data as Map<String, dynamic>;
+      if (body['isSuccess'] == true) return true;
+      throw AppException(message: _message(body) ?? 'Could not reject booking');
+    } catch (e) {
+      throw ErrorHandler.handleError(e);
+    }
+  }
+
+  @override
+  Future<bool> complete(int id) async {
+    try {
+      final res = await apiClient.post(ApiEndpoints.bookingComplete(id));
+      final body = res.data as Map<String, dynamic>;
+      if (body['isSuccess'] == true) return true;
+      throw AppException(message: _message(body) ?? 'Could not complete trip');
     } catch (e) {
       throw ErrorHandler.handleError(e);
     }

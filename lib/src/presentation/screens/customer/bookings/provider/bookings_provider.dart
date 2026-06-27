@@ -154,11 +154,21 @@ class BookingsProvider extends ChangeNotifier {
   int get tabIndex => _tabIndex;
   List<BookingItem> get bookings => List.unmodifiable(_bookings);
 
+  /// Corporate-approved bookings live under the "approved" tab.
+  bool _matchesTab(BookingItem b, int index) {
+    final target = statusMap[index];
+    if (target == BookingStatus.approved) {
+      return b.status == BookingStatus.approved ||
+          b.status == BookingStatus.corporateApproved;
+    }
+    return b.status == target;
+  }
+
   List<BookingItem> get filteredBookings =>
-      _bookings.where((b) => b.status == statusMap[_tabIndex]).toList();
+      _bookings.where((b) => _matchesTab(b, _tabIndex)).toList();
 
   int countForTab(int index) =>
-      _bookings.where((b) => b.status == statusMap[index]).length;
+      _bookings.where((b) => _matchesTab(b, index)).length;
 
   void setTab(int index) {
     if (_tabIndex == index) return;

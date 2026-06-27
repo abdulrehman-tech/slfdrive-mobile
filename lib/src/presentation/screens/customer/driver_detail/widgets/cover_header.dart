@@ -16,17 +16,16 @@ class CoverHeader extends StatelessWidget {
   final ColorScheme cs;
   final bool isDesktop;
 
-  const CoverHeader({
-    super.key,
-    required this.isDark,
-    required this.cs,
-    this.isDesktop = false,
-  });
+  const CoverHeader({super.key, required this.isDark, required this.cs, this.isDesktop = false});
 
   @override
   Widget build(BuildContext context) {
     final provider = context.watch<DriverDetailProvider>();
     final profile = provider.profile!;
+    // Backend has no per-driver cover yet → fall back to a bundled asset.
+    final ImageProvider coverImage = profile.coverUrl.isEmpty
+        ? const AssetImage('assets/images/pre-login.gif')
+        : CachedNetworkImageProvider(profile.coverUrl);
     return Stack(
       clipBehavior: Clip.none,
       children: [
@@ -35,7 +34,7 @@ class CoverHeader extends StatelessWidget {
           decoration: BoxDecoration(
             borderRadius: isDesktop ? BorderRadius.circular(20.r) : null,
             image: DecorationImage(
-              image: CachedNetworkImageProvider(profile.coverUrl),
+              image: coverImage,
               fit: BoxFit.cover,
               colorFilter: ColorFilter.mode(Colors.black.withValues(alpha: 0.45), BlendMode.darken),
             ),

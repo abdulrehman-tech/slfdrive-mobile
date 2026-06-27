@@ -21,6 +21,7 @@ import 'widgets/pay_booking_sheet.dart';
 import 'widgets/price_card.dart';
 import 'widgets/ref_card.dart';
 import 'widgets/schedule_card.dart';
+import 'widgets/timeline_card.dart';
 
 class BookingDetailScreen extends StatelessWidget {
   final String bookingId;
@@ -30,10 +31,7 @@ class BookingDetailScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (_) => BookingDetailProvider(
-        bookingId: int.tryParse(bookingId) ?? 0,
-        seed: seed,
-      ),
+      create: (_) => BookingDetailProvider(bookingId: int.tryParse(bookingId) ?? 0, seed: seed),
       child: const _BookingDetailView(),
     );
   }
@@ -44,8 +42,7 @@ class _BookingDetailView extends StatelessWidget {
 
   bool _isDark(BuildContext context) {
     final tp = context.watch<ThemeProvider>();
-    return tp.isDarkMode ||
-        (tp.isSystemMode && MediaQuery.of(context).platformBrightness == Brightness.dark);
+    return tp.isDarkMode || (tp.isSystemMode && MediaQuery.of(context).platformBrightness == Brightness.dark);
   }
 
   Widget _payButton(BuildContext context, BookingDetail b, bool isDark) {
@@ -60,6 +57,41 @@ class _BookingDetailView extends StatelessWidget {
         },
         icon: const Icon(CupertinoIcons.creditcard_fill, size: 18),
         label: Text('pay_now'.tr()),
+      ),
+    );
+  }
+
+  /// Corporate bookings are billed to the company; instead of a pay action the
+  /// customer sees an informational "Billed to {company}" badge.
+  Widget _billedBadge(BuildContext context, BookingDetail b, bool isDark) {
+    const accent = Color(0xFF00BFA5);
+    final company = (b.corporateCompanyName ?? '').trim();
+    final text = company.isEmpty
+        ? 'booking_detail_billed_corporate'.tr()
+        : 'booking_detail_billed_to_company'.tr(namedArgs: {'company': company});
+    return Container(
+      width: double.infinity,
+      padding: EdgeInsets.symmetric(horizontal: 16.r, vertical: 14.r),
+      decoration: BoxDecoration(
+        color: accent.withValues(alpha: isDark ? 0.14 : 0.10),
+        borderRadius: BorderRadius.circular(14.r),
+        border: Border.all(color: accent.withValues(alpha: 0.4)),
+      ),
+      child: Row(
+        children: [
+          Icon(CupertinoIcons.building_2_fill, size: 18.r, color: accent),
+          SizedBox(width: 10.r),
+          Expanded(
+            child: Text(
+              text,
+              style: TextStyle(
+                fontSize: 13.r,
+                fontWeight: FontWeight.w600,
+                color: isDark ? Colors.white : const Color(0xFF0A3D33),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -106,27 +138,17 @@ class _BookingDetailView extends StatelessWidget {
 
     Widget body;
     if (booking == null && provider.isLoading) {
-      body = const Stack(
-        children: [
-          BookingDetailSkeleton(),
-          BookingDetailSkeletonClose(),
-        ],
-      );
+      body = const Stack(children: [BookingDetailSkeleton(), BookingDetailSkeletonClose()]);
     } else if (booking == null) {
       body = _BookingErrorState(
         message: provider.error ?? 'booking_not_found'.tr(),
         onRetry: () => context.read<BookingDetailProvider>().load(),
       );
     } else {
-      body = isDesktop
-          ? _buildDesktop(context, isDark, cs, booking)
-          : _buildMobile(context, isDark, cs, booking);
+      body = isDesktop ? _buildDesktop(context, isDark, cs, booking) : _buildMobile(context, isDark, cs, booking);
     }
 
-    return Scaffold(
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      body: body,
-    );
+    return Scaffold(backgroundColor: Theme.of(context).scaffoldBackgroundColor, body: body);
   }
 
   Widget _buildMobile(BuildContext context, bool isDark, ColorScheme cs, BookingDetail b) {
@@ -142,14 +164,10 @@ class _BookingDetailView extends StatelessWidget {
                 children: [
                   BookingRefCard(booking: b, isDark: isDark, cs: cs),
                   SizedBox(height: 14.r),
-                  if (b.hasVehicle) ...[
-                    BookingCarCard(booking: b, isDark: isDark, cs: cs),
-                    SizedBox(height: 14.r),
-                  ],
-                  if (b.hasDriver) ...[
-                    BookingDriverCard(booking: b, isDark: isDark, cs: cs),
-                    SizedBox(height: 14.r),
-                  ],
+                  BookingTimelineCard(booking: b, isDark: isDark, cs: cs),
+                  SizedBox(height: 14.r),
+                  if (b.hasVehicle) ...[BookingCarCard(booking: b, isDark: isDark, cs: cs), SizedBox(height: 14.r)],
+                  if (b.hasDriver) ...[BookingDriverCard(booking: b, isDark: isDark, cs: cs), SizedBox(height: 14.r)],
                   BookingScheduleCard(booking: b, isDark: isDark, cs: cs),
                   SizedBox(height: 14.r),
                   BookingLocationMapCard(booking: b, isDark: isDark, cs: cs),
@@ -159,12 +177,12 @@ class _BookingDetailView extends StatelessWidget {
                   if (b.canPay) ...[
                     _payButton(context, b, isDark),
                     SizedBox(height: 14.r),
-                  ],
-                  if (b.isCompleted) ...[
-                    _reviewButton(context, b, isDark),
+                  ] else if (b.isCorporate && !b.isPaid) ...[
+                    _billedBadge(context, b, isDark),
                     SizedBox(height: 14.r),
                   ],
-                  BookingCancelButton(isDark: isDark, onTap: () => _confirmCancel(context)),
+                  if (b.isCompleted) ...[_reviewButton(context, b, isDark), SizedBox(height: 14.r)],
+                  // BookingCancelButton(isDark: isDark, onTap: () => _confirmCancel(context)),
                 ],
               ),
             ),
@@ -198,9 +216,7 @@ class _BookingDetailView extends StatelessWidget {
                       width: 40.r,
                       height: 40.r,
                       decoration: BoxDecoration(
-                        color: isDark
-                            ? Colors.white.withValues(alpha: 0.08)
-                            : Colors.black.withValues(alpha: 0.05),
+                        color: isDark ? Colors.white.withValues(alpha: 0.08) : Colors.black.withValues(alpha: 0.05),
                         borderRadius: BorderRadius.circular(12.r),
                       ),
                       child: Icon(CupertinoIcons.back, size: 17.r, color: cs.onSurface),
@@ -209,11 +225,7 @@ class _BookingDetailView extends StatelessWidget {
                   SizedBox(width: 14.r),
                   Text(
                     'booking_detail_title'.tr(),
-                    style: TextStyle(
-                      fontSize: 24.r,
-                      fontWeight: FontWeight.bold,
-                      color: cs.onSurface,
-                    ),
+                    style: TextStyle(fontSize: 24.r, fontWeight: FontWeight.bold, color: cs.onSurface),
                   ),
                 ],
               ),
@@ -226,6 +238,8 @@ class _BookingDetailView extends StatelessWidget {
                     child: Column(
                       children: [
                         BookingRefCard(booking: b, isDark: isDark, cs: cs),
+                        SizedBox(height: 16.r),
+                        BookingTimelineCard(booking: b, isDark: isDark, cs: cs),
                         SizedBox(height: 16.r),
                         if (b.hasVehicle) ...[
                           BookingCarCard(booking: b, isDark: isDark, cs: cs),
@@ -253,11 +267,11 @@ class _BookingDetailView extends StatelessWidget {
                         if (b.canPay) ...[
                           _payButton(context, b, isDark),
                           SizedBox(height: 12.r),
-                        ],
-                        if (b.isCompleted) ...[
-                          _reviewButton(context, b, isDark),
+                        ] else if (b.isCorporate && !b.isPaid) ...[
+                          _billedBadge(context, b, isDark),
                           SizedBox(height: 12.r),
                         ],
+                        if (b.isCompleted) ...[_reviewButton(context, b, isDark), SizedBox(height: 12.r)],
                         BookingCancelButton(isDark: isDark, onTap: () => _confirmCancel(context)),
                       ],
                     ),

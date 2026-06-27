@@ -69,21 +69,23 @@ class CompletedTripCard extends StatelessWidget {
                 SizedBox(height: 4.r),
                 Row(
                   children: [
-                    Icon(
-                      Iconsax.star_1,
-                      size: 14.r,
-                      color: const Color(0xFFFFA000),
-                    ),
-                    SizedBox(width: 4.r),
-                    Text(
-                      (trip.rating ?? 0).toString(),
-                      style: TextStyle(
-                        fontSize: 12.r,
-                        fontWeight: FontWeight.w600,
+                    if (trip.rating != null) ...[
+                      Icon(
+                        Iconsax.star_1,
+                        size: 14.r,
                         color: const Color(0xFFFFA000),
                       ),
-                    ),
-                    SizedBox(width: 8.r),
+                      SizedBox(width: 4.r),
+                      Text(
+                        trip.rating!.toString(),
+                        style: TextStyle(
+                          fontSize: 12.r,
+                          fontWeight: FontWeight.w600,
+                          color: const Color(0xFFFFA000),
+                        ),
+                      ),
+                      SizedBox(width: 8.r),
+                    ],
                     Text(
                       trip.time,
                       style: TextStyle(

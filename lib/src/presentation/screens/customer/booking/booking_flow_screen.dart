@@ -8,6 +8,7 @@ import '../../../providers/theme_provider.dart';
 import 'models/booking_data.dart';
 import 'provider/booking_flow_provider.dart';
 import 'provider/corporate_companies_provider.dart';
+import '../corporate/provider/corporate_membership_provider.dart';
 import 'steps/success_screen.dart';
 import 'widgets/booking_flow_bottom_bar.dart';
 import 'widgets/booking_flow_desktop_sidebar.dart';
@@ -45,6 +46,9 @@ class BookingFlowScreen extends StatelessWidget {
         ),
         ChangeNotifierProvider<CorporateCompaniesProvider>(
           create: (_) => CorporateCompaniesProvider(),
+        ),
+        ChangeNotifierProvider<CorporateMembershipProvider>(
+          create: (_) => CorporateMembershipProvider(),
         ),
       ],
       child: const _BookingFlowView(),

@@ -108,7 +108,10 @@ class _DriverHomeView extends StatelessWidget {
   Widget _buildBody(BuildContext context, bool isDark) {
     if (tabBody != null) return tabBody!;
     return RefreshIndicator(
-      onRefresh: () => context.read<AuthProvider>().refreshDriverStatus(),
+      onRefresh: () => Future.wait([
+        context.read<AuthProvider>().refreshDriverStatus(),
+        context.read<DriverHomeProvider>().load(),
+      ]),
       child: CustomScrollView(
         physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
         slivers: [

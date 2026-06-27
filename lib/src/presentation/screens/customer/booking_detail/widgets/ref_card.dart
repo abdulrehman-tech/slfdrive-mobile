@@ -2,8 +2,8 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
+import '../../bookings/models/booking_item.dart';
 import '../models/booking_detail.dart';
-import 'stage_meta.dart';
 
 class BookingRefCard extends StatelessWidget {
   final BookingDetail booking;
@@ -50,9 +50,9 @@ class BookingRefCard extends StatelessWidget {
                   Container(
                     padding: EdgeInsets.symmetric(horizontal: 8.r, vertical: 4.r),
                     decoration: BoxDecoration(
-                      color: const Color(0xFF4CAF50).withValues(alpha: 0.2),
+                      color: booking.status.color.withValues(alpha: 0.22),
                       borderRadius: BorderRadius.circular(6.r),
-                      border: Border.all(color: const Color(0xFF4CAF50).withValues(alpha: 0.4)),
+                      border: Border.all(color: booking.status.color.withValues(alpha: 0.5)),
                     ),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
@@ -60,17 +60,17 @@ class BookingRefCard extends StatelessWidget {
                         Container(
                           width: 6.r,
                           height: 6.r,
-                          decoration: const BoxDecoration(
-                            color: Color(0xFF81C784),
+                          decoration: BoxDecoration(
+                            color: booking.status.color,
                             shape: BoxShape.circle,
                           ),
                         ),
                         SizedBox(width: 5.r),
                         Text(
-                          bookingStageLabelKey(booking.stage).tr(),
+                          booking.status.label,
                           style: TextStyle(
                             fontSize: 10.r,
-                            color: const Color(0xFF81C784),
+                            color: Colors.white,
                             fontWeight: FontWeight.w700,
                           ),
                         ),

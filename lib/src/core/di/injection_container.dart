@@ -3,7 +3,9 @@ import 'package:get_it/get_it.dart';
 
 import '../data/datasources/auth_remote_data_source.dart';
 import '../data/datasources/booking_remote_data_source.dart';
+import '../data/datasources/corporate_membership_remote_data_source.dart';
 import '../data/datasources/customer_remote_data_source.dart';
+import '../data/datasources/delivery_fee_remote_data_source.dart';
 import '../data/datasources/driver_remote_data_source.dart';
 import '../data/datasources/driver_listing_remote_data_source.dart';
 import '../data/datasources/lookup_remote_data_source.dart';
@@ -11,7 +13,9 @@ import '../data/datasources/review_remote_data_source.dart';
 import '../data/datasources/vehicle_remote_data_source.dart';
 import '../data/repositories/auth_repository.dart';
 import '../data/repositories/booking_repository.dart';
+import '../data/repositories/corporate_membership_repository.dart';
 import '../data/repositories/customer_repository.dart';
+import '../data/repositories/delivery_fee_repository.dart';
 import '../data/repositories/driver_repository.dart';
 import '../data/repositories/driver_listing_repository.dart';
 import '../data/repositories/lookup_repository.dart';
@@ -19,6 +23,9 @@ import '../data/repositories/review_repository.dart';
 import '../data/repositories/vehicle_repository.dart';
 import '../network/api_client.dart';
 import '../services/booking_lookups.dart';
+import '../services/customer_avatars.dart';
+import '../services/driver_session.dart';
+import '../services/place_namer.dart';
 import '../../presentation/providers/auth_provider.dart';
 
 final getIt = GetIt.instance;
@@ -58,6 +65,12 @@ Future<void> setupDependencyInjection() async {
   getIt.registerLazySingleton<BookingRemoteDataSource>(
     () => BookingRemoteDataSourceImpl(getIt<ApiClient>()),
   );
+  getIt.registerLazySingleton<CorporateMembershipRemoteDataSource>(
+    () => CorporateMembershipRemoteDataSourceImpl(getIt<ApiClient>()),
+  );
+  getIt.registerLazySingleton<DeliveryFeeRemoteDataSource>(
+    () => DeliveryFeeRemoteDataSourceImpl(getIt<ApiClient>()),
+  );
   getIt.registerLazySingleton<ReviewRemoteDataSource>(
     () => ReviewRemoteDataSourceImpl(getIt<ApiClient>()),
   );
@@ -87,6 +100,14 @@ Future<void> setupDependencyInjection() async {
   getIt.registerLazySingleton<BookingRepository>(
     () => BookingRepositoryImpl(getIt<BookingRemoteDataSource>()),
   );
+  getIt.registerLazySingleton<CorporateMembershipRepository>(
+    () => CorporateMembershipRepositoryImpl(
+      getIt<CorporateMembershipRemoteDataSource>(),
+    ),
+  );
+  getIt.registerLazySingleton<DeliveryFeeRepository>(
+    () => DeliveryFeeRepositoryImpl(getIt<DeliveryFeeRemoteDataSource>()),
+  );
   getIt.registerLazySingleton<ReviewRepository>(
     () => ReviewRepositoryImpl(getIt<ReviewRemoteDataSource>()),
   );
@@ -94,6 +115,15 @@ Future<void> setupDependencyInjection() async {
   // Services
   getIt.registerLazySingleton<BookingLookups>(
     () => BookingLookups(getIt<LookupRepository>()),
+  );
+  getIt.registerLazySingleton<DriverSession>(
+    () => DriverSession(getIt<DriverRepository>(), getIt<FlutterSecureStorage>()),
+  );
+  getIt.registerLazySingleton<PlaceNamer>(
+    () => PlaceNamer(getIt<LookupRepository>()),
+  );
+  getIt.registerLazySingleton<CustomerAvatars>(
+    () => CustomerAvatars(getIt<CustomerRepository>()),
   );
 
   // Providers

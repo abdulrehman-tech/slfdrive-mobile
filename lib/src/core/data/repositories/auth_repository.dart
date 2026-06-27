@@ -254,6 +254,7 @@ class AuthRepositoryImpl implements AuthRepository {
       StorageKeys.accessToken,
       StorageKeys.refreshToken,
       StorageKeys.userId,
+      StorageKeys.driverId,
       StorageKeys.userRole,
       StorageKeys.userEmail,
       StorageKeys.userPhone,

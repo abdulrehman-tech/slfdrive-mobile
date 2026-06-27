@@ -5,11 +5,6 @@ import '../../../../../constants/endpoints.dart';
 import '../../../../../core/models/driver/driver_details.dart';
 import 'driver_review.dart';
 
-/// Generic banner used for the cover header until the backend serves a
-/// per-driver cover image.
-const String _kDefaultCoverUrl =
-    'https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?w=1200&q=80';
-
 class DriverProfile {
   final String id;
   /// The driver's own id for `Booking/create` (`driverId`), distinct from the
@@ -79,7 +74,8 @@ class DriverProfile {
       id: d.id.toString(),
       bookingDriverId: (d.driverId ?? d.id).toString(),
       name: d.fullName ?? '',
-      coverUrl: _kDefaultCoverUrl,
+      // Empty → the cover header falls back to a bundled asset image.
+      coverUrl: '',
       avatarUrl: ApiEndpoints.resolveMediaUrl(d.photoUrl) ?? '',
       rating: 0, // no per-driver aggregate endpoint yet
       trips: 0,

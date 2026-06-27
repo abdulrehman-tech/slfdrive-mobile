@@ -44,6 +44,14 @@ class AccountSection extends StatelessWidget {
           isDark: isDark,
           onTap: () => context.push('/profile/kyc'),
         ),
+        ProfileTile(
+          icon: Iconsax.briefcase_copy,
+          iconColor: const Color(0xFF00BFA5),
+          title: 'corporate_membership_title'.tr(),
+          value: 'corporate_membership_subtitle'.tr(),
+          isDark: isDark,
+          onTap: () => context.push('/profile/corporate'),
+        ),
       ],
     );
   }

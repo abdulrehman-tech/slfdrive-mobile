@@ -176,15 +176,22 @@ class BookingFlowProvider extends ChangeNotifier {
       // Pickup point = where the vehicle is (its own location). Drop-off is set
       // only when the customer chose delivery.
       final car = data.car;
-      final dropOff =
-          data.pickupMode == PickupMode.delivery ? data.deliveryLocation : null;
+      final isDelivery = data.pickupMode == PickupMode.delivery;
+      final dropOff = isDelivery ? data.deliveryLocation : null;
+      // The server derives delivery from the ABSENCE of pickup coordinates on
+      // the row. So for delivery we must omit pickUpLat/Lon (and send the
+      // drop-off + area); for self-pickup we send the vehicle's coords and no
+      // drop-off.
       final detail = BookingDetailsCreationRequest(
         fromDateTime: start.toIso8601String(),
         toDateTime: end.toIso8601String(),
-        pickUpLat: car?.lat,
-        pickUpLon: car?.lon,
+        pickUpLat: isDelivery ? null : car?.lat,
+        pickUpLon: isDelivery ? null : car?.lon,
         dropOffLat: dropOff?.latitude,
         dropOffLon: dropOff?.longitude,
+        // Delivery area drives the server-side fee lookup.
+        locationId: isDelivery ? data.deliveryArea?.id : null,
+        isDelivery: isDelivery ? true : null,
       );
 
       // No statusId / paymentTypeId / totalAmount: the backend defaults the

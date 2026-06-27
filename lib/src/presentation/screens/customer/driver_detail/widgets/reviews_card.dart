@@ -19,6 +19,7 @@ class ReviewsCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final total = profile.totalReviews;
+    final hasData = profile.reviews.isNotEmpty || total > 0 || profile.rating > 0;
     return DriverGlassCard(
       isDark: isDark,
       child: Padding(
@@ -34,128 +35,172 @@ class ReviewsCard extends StatelessWidget {
               isDark: isDark,
             ),
             SizedBox(height: 14.r),
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Column(
-                  children: [
-                    Text(
-                      '${profile.rating}',
-                      style: TextStyle(fontSize: 34.r, fontWeight: FontWeight.w900, color: cs.onSurface, height: 1),
-                    ),
-                    SizedBox(height: 4.r),
-                    Row(
-                      children: List.generate(
-                        5,
-                        (i) => Icon(
-                          i < profile.rating.round() ? Iconsax.star_1_copy : Iconsax.star_1,
-                          size: 11.r,
-                          color: const Color(0xFFFFC107),
+            if (!hasData)
+              _EmptyReviews(isDark: isDark, cs: cs)
+            else ...[
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Column(
+                    children: [
+                      Text(
+                        '${profile.rating}',
+                        style: TextStyle(fontSize: 34.r, fontWeight: FontWeight.w900, color: cs.onSurface, height: 1),
+                      ),
+                      SizedBox(height: 4.r),
+                      Row(
+                        children: List.generate(
+                          5,
+                          (i) => Icon(
+                            i < profile.rating.round() ? Iconsax.star_1_copy : Iconsax.star_1,
+                            size: 11.r,
+                            color: const Color(0xFFFFC107),
+                          ),
                         ),
                       ),
-                    ),
-                    SizedBox(height: 4.r),
-                    Text(
-                      '$total ${'driver_detail_reviews_count'.tr()}',
-                      style: TextStyle(fontSize: 10.r, color: cs.onSurface.withValues(alpha: 0.5)),
-                    ),
-                  ],
-                ),
-                SizedBox(width: 20.r),
-                Expanded(
-                  child: Column(
-                    children: List.generate(5, (i) {
-                      final star = 5 - i;
-                      final count = profile.reviewCounts[i];
-                      final frac = total == 0 ? 0.0 : count / total;
-                      return Padding(
-                        padding: EdgeInsets.symmetric(vertical: 1.5.r),
-                        child: Row(
-                          children: [
-                            SizedBox(
-                              width: 14.r,
-                              child: Text(
-                                '$star',
-                                style: TextStyle(
-                                  fontSize: 10.r,
-                                  fontWeight: FontWeight.w700,
-                                  color: cs.onSurface.withValues(alpha: 0.7),
+                      SizedBox(height: 4.r),
+                      Text(
+                        '$total ${'driver_detail_reviews_count'.tr()}',
+                        style: TextStyle(fontSize: 10.r, color: cs.onSurface.withValues(alpha: 0.5)),
+                      ),
+                    ],
+                  ),
+                  SizedBox(width: 20.r),
+                  Expanded(
+                    child: Column(
+                      children: List.generate(5, (i) {
+                        final star = 5 - i;
+                        final count = profile.reviewCounts[i];
+                        final frac = total == 0 ? 0.0 : count / total;
+                        return Padding(
+                          padding: EdgeInsets.symmetric(vertical: 1.5.r),
+                          child: Row(
+                            children: [
+                              SizedBox(
+                                width: 14.r,
+                                child: Text(
+                                  '$star',
+                                  style: TextStyle(
+                                    fontSize: 10.r,
+                                    fontWeight: FontWeight.w700,
+                                    color: cs.onSurface.withValues(alpha: 0.7),
+                                  ),
                                 ),
                               ),
-                            ),
-                            Icon(Iconsax.star_1_copy, size: 10.r, color: const Color(0xFFFFC107)),
-                            SizedBox(width: 6.r),
-                            Expanded(
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(4.r),
-                                child: Stack(
-                                  children: [
-                                    Container(
-                                      height: 6.r,
-                                      color: isDark
-                                          ? Colors.white.withValues(alpha: 0.06)
-                                          : Colors.black.withValues(alpha: 0.05),
-                                    ),
-                                    FractionallySizedBox(
-                                      widthFactor: frac,
-                                      child: Container(
+                              Icon(Iconsax.star_1_copy, size: 10.r, color: const Color(0xFFFFC107)),
+                              SizedBox(width: 6.r),
+                              Expanded(
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(4.r),
+                                  child: Stack(
+                                    children: [
+                                      Container(
                                         height: 6.r,
-                                        decoration: BoxDecoration(
-                                          color: const Color(0xFFFFC107),
-                                          borderRadius: BorderRadius.circular(4.r),
+                                        color: isDark
+                                            ? Colors.white.withValues(alpha: 0.06)
+                                            : Colors.black.withValues(alpha: 0.05),
+                                      ),
+                                      FractionallySizedBox(
+                                        widthFactor: frac,
+                                        child: Container(
+                                          height: 6.r,
+                                          decoration: BoxDecoration(
+                                            color: const Color(0xFFFFC107),
+                                            borderRadius: BorderRadius.circular(4.r),
+                                          ),
                                         ),
                                       ),
-                                    ),
-                                  ],
+                                    ],
+                                  ),
                                 ),
                               ),
-                            ),
-                            SizedBox(width: 8.r),
-                            SizedBox(
-                              width: 30.r,
-                              child: Text(
-                                '$count',
-                                style: TextStyle(fontSize: 10.r, color: cs.onSurface.withValues(alpha: 0.5)),
-                                textAlign: TextAlign.right,
+                              SizedBox(width: 8.r),
+                              SizedBox(
+                                width: 30.r,
+                                child: Text(
+                                  '$count',
+                                  style: TextStyle(fontSize: 10.r, color: cs.onSurface.withValues(alpha: 0.5)),
+                                  textAlign: TextAlign.right,
+                                ),
                               ),
-                            ),
-                          ],
-                        ),
-                      );
-                    }),
+                            ],
+                          ),
+                        );
+                      }),
+                    ),
                   ),
-                ),
-              ],
-            ),
-            SizedBox(height: 16.r),
-            Divider(
-              height: 1,
-              color: isDark ? Colors.white.withValues(alpha: 0.06) : Colors.black.withValues(alpha: 0.05),
-            ),
-            SizedBox(height: 12.r),
-            ...profile.reviews.asMap().entries.map(
-                  (e) => ReviewTile(review: e.value, index: e.key, cs: cs, isDark: isDark),
-                ),
-            SizedBox(height: 6.r),
-            Center(
-              child: GestureDetector(
-                onTap: () => Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (_) => const ComingSoonScreen(titleKey: 'driver_detail_view_all_reviews'),
+                ],
+              ),
+              SizedBox(height: 16.r),
+              Divider(
+                height: 1,
+                color: isDark ? Colors.white.withValues(alpha: 0.06) : Colors.black.withValues(alpha: 0.05),
+              ),
+              SizedBox(height: 12.r),
+              ...profile.reviews.asMap().entries.map(
+                (e) => ReviewTile(review: e.value, index: e.key, cs: cs, isDark: isDark),
+              ),
+              SizedBox(height: 6.r),
+              Center(
+                child: GestureDetector(
+                  onTap: () => Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (_) => const ComingSoonScreen(titleKey: 'driver_detail_view_all_reviews'),
+                    ),
                   ),
-                ),
-                child: Container(
-                  padding: EdgeInsets.symmetric(horizontal: 18.r, vertical: 10.r),
-                  decoration: BoxDecoration(
-                    color: cs.primary.withValues(alpha: isDark ? 0.18 : 0.1),
-                    borderRadius: BorderRadius.circular(11.r),
-                  ),
-                  child: Text(
-                    'driver_detail_view_all_reviews'.tr(),
-                    style: TextStyle(fontSize: 12.r, fontWeight: FontWeight.w800, color: cs.primary),
+                  child: Container(
+                    padding: EdgeInsets.symmetric(horizontal: 18.r, vertical: 10.r),
+                    decoration: BoxDecoration(
+                      color: cs.primary.withValues(alpha: isDark ? 0.18 : 0.1),
+                      borderRadius: BorderRadius.circular(11.r),
+                    ),
+                    child: Text(
+                      'driver_detail_view_all_reviews'.tr(),
+                      style: TextStyle(fontSize: 12.r, fontWeight: FontWeight.w800, color: cs.primary),
+                    ),
                   ),
                 ),
               ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Empty placeholder for the reviews card when a driver has no ratings yet.
+class _EmptyReviews extends StatelessWidget {
+  final bool isDark;
+  final ColorScheme cs;
+  const _EmptyReviews({required this.isDark, required this.cs});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: 18.r),
+      child: Center(
+        child: Column(
+          children: [
+            Container(
+              width: 52.r,
+              height: 52.r,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: const Color(0xFFFFC107).withValues(alpha: isDark ? 0.16 : 0.10),
+              ),
+              child: Icon(Iconsax.star_1_copy, size: 24.r, color: const Color(0xFFFFC107)),
+            ),
+            SizedBox(height: 12.r),
+            Text(
+              'driver_detail_no_reviews'.tr(),
+              style: TextStyle(fontSize: 13.r, fontWeight: FontWeight.w700, color: cs.onSurface),
+            ),
+            SizedBox(height: 4.r),
+            Text(
+              'driver_detail_no_reviews_sub'.tr(),
+              textAlign: TextAlign.center,
+              style: TextStyle(fontSize: 11.r, color: cs.onSurface.withValues(alpha: 0.55), height: 1.4),
             ),
           ],
         ),

@@ -1,6 +1,7 @@
 import 'package:easy_localization/easy_localization.dart';
 
 import '../../../../../core/models/booking/booking.dart';
+import '../../bookings/models/booking_item.dart';
 
 enum BookingTimelineStage { confirmed, pickedUp, inTrip, returned }
 
@@ -49,9 +50,19 @@ class BookingDetail {
   final String? driverPhone;
   final BookingTimelineStage stage;
   final String statusLabel;
+
+  /// Real booking-lifecycle status (drives the prominent status chip).
+  final BookingStatus status;
   final bool isApproved;
   final bool isPending;
   final bool isPaid;
+
+  /// True when the booking is billed to a corporate company (customer doesn't pay).
+  final bool isCorporate;
+  final String? corporateCompanyName;
+
+  /// Free-text reason supplied when the booking was rejected.
+  final String? rejectionReason;
 
   /// Service label (e.g. "Vehicle rental"); shown alongside the enriched name.
   final String serviceLabel;
@@ -91,11 +102,15 @@ class BookingDetail {
     required this.deliveryFee,
     required this.paymentMethod,
     required this.stage,
+    this.status = BookingStatus.pending,
     this.statusLabel = '',
     this.serviceLabel = '',
     this.isApproved = false,
     this.isPending = false,
     this.isPaid = false,
+    this.isCorporate = false,
+    this.corporateCompanyName,
+    this.rejectionReason,
     this.vehicleId,
     this.driverId,
     this.driverName,
@@ -117,7 +132,8 @@ class BookingDetail {
   bool get hasDriver => driverId != null;
 
   /// Customer can pay once an admin has approved the booking and it isn't paid.
-  bool get canPay => isApproved && !isPaid;
+  /// Corporate bookings are billed to the company, so the customer never pays.
+  bool get canPay => isApproved && !isPaid && !isCorporate;
 
   BookingDetail copyWith({
     String? carName,
@@ -156,11 +172,15 @@ class BookingDetail {
       deliveryFee: deliveryFee,
       paymentMethod: paymentMethod,
       stage: stage,
+      status: status,
       statusLabel: statusLabel,
       serviceLabel: serviceLabel,
       isApproved: isApproved,
       isPending: isPending,
       isPaid: isPaid,
+      isCorporate: isCorporate,
+      corporateCompanyName: corporateCompanyName,
+      rejectionReason: rejectionReason,
       vehicleId: vehicleId,
       driverId: driverId,
       driverName: driverName ?? this.driverName,
@@ -201,8 +221,11 @@ class BookingDetail {
       final d = end.difference(start).inDays;
       return d < 1 ? 1 : d + 1;
     }();
+    final status = bookingStatusFromApi(b);
     final s = '${b.status ?? ''} ${b.statusType ?? ''}'.toLowerCase();
-    final stage = (b.completedAt != null || s.contains('complete'))
+    // Trip-progress timeline is independent of the lifecycle status: it only
+    // advances on pickup / in-trip / completion signals.
+    final stage = (status == BookingStatus.completed || b.completedAt != null || s.contains('complete'))
         ? BookingTimelineStage.returned
         : (s.contains('trip') || s.contains('progress') || s.contains('ongoing'))
             ? BookingTimelineStage.inTrip
@@ -210,9 +233,10 @@ class BookingDetail {
                 ? BookingTimelineStage.pickedUp
                 : BookingTimelineStage.confirmed;
     final pay = (b.paymentStatus ?? '').toLowerCase();
-    final isApproved = s.contains('approved'); // covers "approved" + "CorporateApproved"
-    final isPending = s.contains('pending');
-    final isPaid = pay.contains('paid');
+    final isApproved =
+        status == BookingStatus.approved || status == BookingStatus.corporateApproved;
+    final isPending = status == BookingStatus.pending;
+    final isPaid = b.paymentStatusId == 10 || pay.contains('paid');
     return BookingDetail(
       id: b.id,
       ref: b.bookingNo ?? 'SLF${b.id}',
@@ -231,11 +255,15 @@ class BookingDetail {
       deliveryFee: 0,
       paymentMethod: b.paymentStatus ?? '',
       stage: stage,
+      status: status,
       statusLabel: b.status ?? '',
       serviceLabel: _serviceLabel(b),
       isApproved: isApproved,
       isPending: isPending,
       isPaid: isPaid,
+      isCorporate: b.isCorporate,
+      corporateCompanyName: b.corporateCompanyName,
+      rejectionReason: b.rejectionReason,
       vehicleId: b.vehicleId,
       driverId: b.driverId,
       driverName: b.driverFullName,

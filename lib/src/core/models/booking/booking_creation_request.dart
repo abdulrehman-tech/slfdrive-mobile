@@ -59,6 +59,13 @@ class BookingDetailsCreationRequest {
   final double? dropOffLon;
   final double? amount;
 
+  /// Delivery area (`mst_location.id`) for this leg. The server looks up the
+  /// (company, area) delivery fee from this; required for a fee to be applied.
+  final int? locationId;
+
+  /// Whether this leg is a delivery (server also derives it; sent for clarity).
+  final bool? isDelivery;
+
   const BookingDetailsCreationRequest({
     required this.fromDateTime,
     required this.toDateTime,
@@ -67,6 +74,8 @@ class BookingDetailsCreationRequest {
     this.dropOffLat,
     this.dropOffLon,
     this.amount,
+    this.locationId,
+    this.isDelivery,
   });
 
   Map<String, dynamic> toJson() => {
@@ -77,6 +86,8 @@ class BookingDetailsCreationRequest {
         if (dropOffLat != null) 'dropOffLat': dropOffLat,
         if (dropOffLon != null) 'dropOffLon': dropOffLon,
         if (amount != null) 'amount': amount,
+        if (locationId != null) 'locationId': locationId,
+        if (isDelivery != null) 'isDelivery': isDelivery,
       };
 }
 
@@ -91,6 +102,13 @@ class BookingCreationResponse {
   final double? totalAmount;
   final double? commissionAmount;
 
+  /// Server-computed delivery fee in OMR included in [totalAmount] (0 for
+  /// pickups or when no fee is configured for the area).
+  final double? deliveryFee;
+
+  /// Whether the booking was treated as a delivery.
+  final bool? isDelivery;
+
   const BookingCreationResponse({
     this.bookingId,
     this.bookingNo,
@@ -99,6 +117,8 @@ class BookingCreationResponse {
     this.statusId,
     this.totalAmount,
     this.commissionAmount,
+    this.deliveryFee,
+    this.isDelivery,
   });
 
   factory BookingCreationResponse.fromJson(Map<String, dynamic> json) {
@@ -110,6 +130,8 @@ class BookingCreationResponse {
       statusId: (json['statusId'] as num?)?.toInt(),
       totalAmount: (json['totalAmount'] as num?)?.toDouble(),
       commissionAmount: (json['commissionAmount'] as num?)?.toDouble(),
+      deliveryFee: (json['deliveryFee'] as num?)?.toDouble(),
+      isDelivery: json['isDelivery'] as bool?,
     );
   }
 }

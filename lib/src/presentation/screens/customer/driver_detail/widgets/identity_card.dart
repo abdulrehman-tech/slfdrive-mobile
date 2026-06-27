@@ -46,19 +46,6 @@ class IdentityCard extends StatelessWidget {
                     ),
                   ),
                 ),
-                Positioned(
-                  right: 2.r,
-                  bottom: 2.r,
-                  child: Container(
-                    width: 20.r,
-                    height: 20.r,
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF4CAF50),
-                      shape: BoxShape.circle,
-                      border: Border.all(color: isDark ? const Color(0xFF1A1A28) : Colors.white, width: 2.5),
-                    ),
-                  ),
-                ),
               ],
             ),
             SizedBox(width: 14.r),
@@ -98,29 +85,6 @@ class IdentityCard extends StatelessWidget {
                         isDark: isDark,
                       ),
                     ],
-                  ),
-                ],
-              ),
-            ),
-            Container(
-              padding: EdgeInsets.symmetric(horizontal: 9.r, vertical: 5.r),
-              decoration: BoxDecoration(
-                color: const Color(0xFF4CAF50).withValues(alpha: 0.15),
-                borderRadius: BorderRadius.circular(8.r),
-                border: Border.all(color: const Color(0xFF4CAF50).withValues(alpha: 0.3)),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Container(
-                    width: 6.r,
-                    height: 6.r,
-                    decoration: const BoxDecoration(color: Color(0xFF4CAF50), shape: BoxShape.circle),
-                  ),
-                  SizedBox(width: 5.r),
-                  Text(
-                    'driver_detail_available'.tr(),
-                    style: TextStyle(fontSize: 10.r, color: const Color(0xFF4CAF50), fontWeight: FontWeight.w800),
                   ),
                 ],
               ),

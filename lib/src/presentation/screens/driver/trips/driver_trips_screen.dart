@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 
+import '../../../widgets/skeletons/list_skeleton.dart';
 import 'provider/driver_trips_provider.dart';
 import 'widgets/driver_trips_empty_state.dart';
 import 'widgets/driver_trips_list.dart';
@@ -62,17 +63,61 @@ class _DriverTripsView extends StatelessWidget {
             ),
             SliverToBoxAdapter(child: SizedBox(height: 20.r)),
             SliverToBoxAdapter(
-              child: trips.isEmpty
-                  ? DriverTripsEmptyState(
-                      title: DriverTripsProvider.emptyTitles[tabIndex].tr(),
-                      subtitle: DriverTripsProvider.emptySubs[tabIndex].tr(),
-                      isDark: isDark,
-                    )
-                  : DriverTripsList(trips: trips, isDark: isDark),
+              child: _buildContent(context, provider, trips, tabIndex, isDark),
             ),
             SliverToBoxAdapter(child: SizedBox(height: 100.r)),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildContent(
+    BuildContext context,
+    DriverTripsProvider provider,
+    List trips,
+    int tabIndex,
+    bool isDark,
+  ) {
+    if (provider.isLoading) {
+      return const ListSkeleton(itemCount: 4, itemHeight: 120);
+    }
+    if (provider.error != null && provider.trips.isEmpty) {
+      return _TripsError(isDark: isDark, onRetry: provider.load);
+    }
+    if (trips.isEmpty) {
+      return DriverTripsEmptyState(
+        title: DriverTripsProvider.emptyTitles[tabIndex].tr(),
+        subtitle: DriverTripsProvider.emptySubs[tabIndex].tr(),
+        isDark: isDark,
+      );
+    }
+    return DriverTripsList(trips: trips.cast(), isDark: isDark);
+  }
+}
+
+class _TripsError extends StatelessWidget {
+  final bool isDark;
+  final VoidCallback onRetry;
+
+  const _TripsError({required this.isDark, required this.onRetry});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.fromLTRB(20.r, 60.r, 20.r, 20.r),
+      child: Column(
+        children: [
+          Icon(Icons.cloud_off_rounded, size: 48.r, color: isDark ? Colors.white38 : Colors.black26),
+          SizedBox(height: 16.r),
+          Text(
+            'error_occurred'.tr(),
+            textAlign: TextAlign.center,
+            style: TextStyle(fontSize: 15.r, color: isDark ? Colors.white70 : Colors.black54),
+          ),
+          SizedBox(height: 16.r),
+          TextButton(onPressed: onRetry, child: Text('retry'.tr())),
+        ],
       ),
     );
   }

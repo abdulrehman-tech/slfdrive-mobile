@@ -39,6 +39,11 @@ class ApiEndpoints {
 
   // Lookups
   static const String activeLocations = '/api/Location/active';
+
+  /// Nearest active location(s) to a point (`POST`, body `{lat, lon, top}`),
+  /// sorted by great-circle distance. Used to resolve a delivery point to the
+  /// nearest serviceable area (its `id` becomes the booking `locationId`).
+  static const String locationNearest = '/api/Location/nearest';
   static const String activeVehicleBrands = '/api/VehicleBrand/active';
   static const String activeVehicleModels = '/api/VehicleModel/active';
   static String vehicleModelsByBrand(int brandId) => '/api/VehicleModel/brand/$brandId';
@@ -53,14 +58,38 @@ class ApiEndpoints {
   // Corporate companies (booking-time company picker)
   static const String activeAllCompanies = '/api/AllCompanies/active';
 
+  // Delivery fees (per company + area). Used to price vehicle delivery.
+  static const String deliveryFeeActive = '/api/DeliveryFee/active';
+  static String deliveryFeeByCompany(int companyId) => '/api/DeliveryFee/by-company/$companyId';
+  static String deliveryFeeByArea(int locationId) => '/api/DeliveryFee/by-area/$locationId';
+
+  // Corporate membership (apply + the signed-in user's memberships)
+  static const String corporateMembershipApply = '/api/CorporateMembership/apply';
+
+  /// The mobile user's own memberships. (`/my` is the corporate-admin view;
+  /// mobile clients use the per-user endpoint with their own id.)
+  static String corporateMembershipByUser(int userId) =>
+      '/api/CorporateMembership/user/$userId';
+
   // Branch (resolves a vehicle's branch -> owning company)
   static String branchById(int id) => '/api/Branch/$id';
 
   // Bookings
   static const String bookingCreate = '/api/Booking/create';
   static const String bookingMyPaginated = '/api/Booking/my/paginated';
+  static const String bookingPaginated = '/api/Booking/paginated';
+
+  /// A specific driver's bookings (`POST`, server-scoped to `driverId`). Same
+  /// response shape as `/paginated`; preferred over client-side filtering.
+  static String bookingDriverPaginated(int driverId) =>
+      '/api/Booking/driver/$driverId/paginated';
   static const String bookingPay = '/api/Booking/pay';
   static String bookingById(int id) => '/api/Booking/$id';
+
+  // Booking lifecycle (driver/owner side)
+  static const String bookingApprove = '/api/Booking/approve';
+  static const String bookingReject = '/api/Booking/reject';
+  static String bookingComplete(int id) => '/api/Booking/$id/complete';
   static String bookingOmPayInit(int id) => '/api/Booking/$id/pay/ompay/init';
   static String bookingOmPayVerify(int id) => '/api/Booking/$id/pay/ompay/verify';
 

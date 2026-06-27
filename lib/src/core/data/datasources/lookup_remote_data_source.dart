@@ -14,6 +14,10 @@ abstract class LookupRemoteDataSource {
   /// Active locations from `/api/Location/active`.
   Future<List<LocationOption>> getActiveLocations();
 
+  /// The nearest active location to a point (`POST /api/Location/nearest`),
+  /// or null when none. The closest record (smallest `distanceKm`) is returned.
+  Future<LocationOption?> getNearestLocation({required double lat, required double lon});
+
   /// Active vehicle brands from `/api/VehicleBrand/active`.
   Future<List<VehicleBrand>> getActiveBrands();
 
@@ -48,6 +52,26 @@ class LookupRemoteDataSourceImpl implements LookupRemoteDataSource {
   @override
   Future<List<LocationOption>> getActiveLocations() =>
       _getList(ApiEndpoints.activeLocations, LocationOption.fromJson);
+
+  @override
+  Future<LocationOption?> getNearestLocation({required double lat, required double lon}) async {
+    try {
+      final res = await apiClient.post(
+        ApiEndpoints.locationNearest,
+        data: {'lat': lat, 'lon': lon, 'top': 1},
+      );
+      final body = res.data as Map<String, dynamic>;
+      final data = body['data'];
+      if (data is List) {
+        // Server sorts by distance; the first row is the closest area.
+        final rows = data.whereType<Map<String, dynamic>>().toList();
+        if (rows.isNotEmpty) return LocationOption.fromJson(rows.first);
+      }
+      return null;
+    } catch (e) {
+      throw ErrorHandler.handleError(e);
+    }
+  }
 
   @override
   Future<List<VehicleBrand>> getActiveBrands() =>
