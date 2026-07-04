@@ -75,12 +75,14 @@ class _MobileLayout extends StatelessWidget {
             padding: EdgeInsets.fromLTRB(16.r, 8.r, 16.r, 100.r),
             sliver: SliverList(
               delegate: SliverChildBuilderDelegate(
-                (_, i) => Padding(
-                  padding: EdgeInsets.only(bottom: 14.r),
-                  child: BookingCard(
-                    booking: bookings[i],
-                    isDark: isDark,
-                    cs: cs,
+                (_, i) => RepaintBoundary(
+                  child: Padding(
+                    padding: EdgeInsets.only(bottom: 14.r),
+                    child: BookingCard(
+                      booking: bookings[i],
+                      isDark: isDark,
+                      cs: cs,
+                    ),
                   ),
                 ),
                 childCount: bookings.length,

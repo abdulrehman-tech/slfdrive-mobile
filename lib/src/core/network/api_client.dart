@@ -5,14 +5,16 @@ import 'package:dio/io.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import '../../constants/endpoints.dart';
+import '../services/session_manager.dart';
 import 'api_interceptor.dart';
 import 'auth_interceptor.dart';
 
 class ApiClient {
   late final Dio _dio;
   final FlutterSecureStorage _secureStorage;
+  final SessionManager _sessionManager;
 
-  ApiClient(this._secureStorage) {
+  ApiClient(this._secureStorage, this._sessionManager) {
     _dio = Dio(
       BaseOptions(
         baseUrl: ApiEndpoints.baseUrl,
@@ -43,7 +45,7 @@ class ApiClient {
 
     // Add interceptors
     _dio.interceptors.add(ApiInterceptor());
-    _dio.interceptors.add(AuthInterceptor(_dio, _secureStorage));
+    _dio.interceptors.add(AuthInterceptor(_dio, _secureStorage, _sessionManager));
   }
 
   Dio get dio => _dio;

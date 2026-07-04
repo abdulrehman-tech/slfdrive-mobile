@@ -6,7 +6,6 @@ import '../../../../widgets/skeletons/list_skeleton.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 
 import '../../../../../core/data/repositories/driver_listing_repository.dart';
-import '../../../../../core/data/repositories/lookup_repository.dart';
 import '../../../../../core/di/injection_container.dart';
 import '../../../../../core/errors/app_exception.dart';
 import '../../../../../core/models/common/pagination_params.dart';
@@ -28,7 +27,6 @@ class DriverSelectStep extends StatefulWidget {
 
 class _DriverSelectStepState extends State<DriverSelectStep> {
   final _repo = getIt<DriverListingRepository>();
-  final _lookup = getIt<LookupRepository>();
   List<DriverListingItem> _drivers = const [];
   bool _loading = false;
   bool _companyScoped = false; // list was filtered to the car's company
@@ -47,16 +45,13 @@ class _DriverSelectStepState extends State<DriverSelectStep> {
     });
     try {
       // For "Car + driver", scope the list to drivers of the company that owns
-      // the chosen car (vehicle → branch → allCompanyId). Best-effort: if the
-      // company can't be resolved, fall back to showing all drivers.
+      // the chosen car. The vehicle's own `companyId` is authoritative (a branch
+      // can hold vehicles from several companies, so branchId is NOT a company
+      // key). It matches a driver's `allCompanyId`.
       int? companyId;
       final car = widget.data.car;
-      if (widget.data.serviceType == BookingServiceType.carWithDriver && car?.branchId != null) {
-        try {
-          companyId = await _lookup.getBranchCompanyId(car!.branchId!);
-        } catch (_) {
-          companyId = null;
-        }
+      if (widget.data.serviceType == BookingServiceType.carWithDriver) {
+        companyId = car?.companyId;
       }
 
       final page = await _repo.getPaginated(const PaginationParams(pageNumber: 1, pageSize: 50));
@@ -95,6 +90,7 @@ class _DriverSelectStepState extends State<DriverSelectStep> {
       avatarUrl: d.resolvedPhotoUrl ?? '',
       rating: d.rating ?? 0,
       pricePerDay: d.amountPerDay ?? 0,
+      pricePerHour: d.amountPerHour ?? 0,
       speciality: d.locationName ?? '',
     ));
   }

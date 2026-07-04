@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:skeletonizer/skeletonizer.dart';
+
+import 'app_shimmer.dart';
 
 /// Beautiful skeleton loading widget for the customer home screen.
 class HomeSkeleton extends StatelessWidget {
@@ -13,13 +14,8 @@ class HomeSkeleton extends StatelessWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final baseColor = isDark ? const Color(0xFF1E1E2E) : const Color(0xFFE8E8E8);
 
-    return Skeletonizer(
-      enabled: true,
-      effect: ShimmerEffect(
-        baseColor: isDark ? const Color(0xFF1E1E2E) : const Color(0xFFE0E0E0),
-        highlightColor: isDark ? const Color(0xFF2A2A3E) : const Color(0xFFF5F5F5),
-        duration: const Duration(milliseconds: 1500),
-      ),
+    return AppShimmer(
+      baseColor: baseColor,
       child: isDesktop ? _buildDesktopSkeleton(baseColor) : _buildMobileSkeleton(baseColor),
     );
   }

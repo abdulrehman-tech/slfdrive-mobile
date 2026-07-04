@@ -64,6 +64,10 @@ class BookingCar {
   final String brand;
   final String imageUrl;
   final double pricePerDay;
+
+  /// Per-hour rate — used for same-day bookings, which the backend bills by the
+  /// hour. 0 when the vehicle has no hourly price configured.
+  final double pricePerHour;
   final String plateNumber;
   final String plateCode;
 
@@ -73,9 +77,14 @@ class BookingCar {
   final double? lon;
   final String? locationName;
 
-  /// The vehicle's branch — resolves (via Branch → allCompanyId) to the owning
-  /// company, used to scope the driver list in the vehicle-with-driver flow.
+  /// The vehicle's branch. NOTE: a branch can hold vehicles from several
+  /// companies, so it is NOT a reliable company key — use [companyId] instead.
   final int? branchId;
+
+  /// The vehicle's owning company (`AllCompany` id, from the vehicle DTO's
+  /// `companyId`). Used to scope the driver list in the car-with-driver flow —
+  /// it matches a driver's `allCompanyId`.
+  final int? companyId;
 
   const BookingCar({
     required this.id,
@@ -83,12 +92,14 @@ class BookingCar {
     required this.brand,
     required this.imageUrl,
     required this.pricePerDay,
+    this.pricePerHour = 0,
     this.plateNumber = '12345',
     this.plateCode = 'A',
     this.lat,
     this.lon,
     this.locationName,
     this.branchId,
+    this.companyId,
   });
 
   bool get hasLocation => lat != null && lon != null;
@@ -100,6 +111,9 @@ class BookingDriver {
   final String avatarUrl;
   final double rating;
   final double pricePerDay;
+
+  /// Per-hour rate — used for same-day bookings (billed hourly). 0 when unset.
+  final double pricePerHour;
   final String speciality;
 
   const BookingDriver({
@@ -108,6 +122,7 @@ class BookingDriver {
     required this.avatarUrl,
     required this.rating,
     required this.pricePerDay,
+    this.pricePerHour = 0,
     required this.speciality,
   });
 }
@@ -139,21 +154,28 @@ class BookingLocation {
 // ============================================================
 
 class BookingPricing {
-  final double basePerDay;
-  final int days;
+  /// Per-unit rate charged — per hour for same-day bookings, per day otherwise.
+  final double baseRate;
+
+  /// Billing units: hours for a same-day booking, days otherwise.
+  final int units;
+
+  /// True when billed by the hour (same-day booking).
+  final bool isHourly;
   final double deliveryFee;
-  final double vatRate; // 0..1
 
   const BookingPricing({
-    required this.basePerDay,
-    required this.days,
+    required this.baseRate,
+    required this.units,
+    required this.isHourly,
     required this.deliveryFee,
-    this.vatRate = 0.05,
   });
 
-  double get subtotal => basePerDay * days + deliveryFee;
-  double get vat => subtotal * vatRate;
-  double get total => subtotal + vat;
+  /// Translation key for the unit label ("hours" / "days").
+  String get unitLabelKey => isHourly ? 'booking_dates_hours' : 'booking_dates_days';
+
+  double get subtotal => baseRate * units + deliveryFee;
+  double get total => subtotal;
 }
 
 // ============================================================
@@ -186,10 +208,9 @@ class BookingData extends ChangeNotifier {
   bool _deliveryFeeLoading = false;
 
   PaymentMethod _paymentMethod = PaymentMethod.card;
-  String? _promoCode;
-  double _promoDiscount = 0;
 
-  // Computed booking reference (set on success)
+  // Backend booking id + reference (set on success).
+  int? _bookingId;
   String? _bookingRef;
 
   BookingData({
@@ -215,16 +236,40 @@ class BookingData extends ChangeNotifier {
   LocationOption? get deliveryArea => _deliveryArea;
   bool get deliveryFeeLoading => _deliveryFeeLoading;
   PaymentMethod get paymentMethod => _paymentMethod;
-  String? get promoCode => _promoCode;
-  double get promoDiscount => _promoDiscount;
   String? get bookingRef => _bookingRef;
+  int? get bookingId => _bookingId;
 
-  /// Number of rental days (inclusive). Minimum 1.
+  /// Number of rental days as whole 24-hour periods (minimum 1) — matches how
+  /// the backend bills, so the estimate equals the charged total. A Jul 4→6
+  /// span (48h) is 2 days, not 3.
   int get days {
     if (_startAt == null || _endAt == null) return 1;
     final d = _endAt!.difference(_startAt!).inDays;
-    return d < 1 ? 1 : d + 1;
+    return d < 1 ? 1 : d;
   }
+
+  /// Rental hours (minimum 1) between pickup and return — the dates step picks
+  /// both times, so a same-day booking spans real hours.
+  int get hours {
+    if (_startAt == null || _endAt == null) return 1;
+    final h = _endAt!.difference(_startAt!).inHours;
+    return h < 1 ? 1 : h;
+  }
+
+  /// A same-calendar-day booking is billed by the hour rather than the day —
+  /// but only when an hourly rate is available to price it.
+  bool get isHourly {
+    final s = _startAt, e = _endAt;
+    if (s == null || e == null) return false;
+    final sameDay = s.year == e.year && s.month == e.month && s.day == e.day;
+    return sameDay && basePerHour > 0;
+  }
+
+  /// Billing units: hours for a same-day booking, otherwise days.
+  int get units => isHourly ? hours : days;
+
+  /// Translation key for the unit label ("hours" / "days").
+  String get unitLabelKey => isHourly ? 'booking_dates_hours' : 'booking_dates_days';
 
   double get basePerDay {
     double base = 0;
@@ -233,18 +278,45 @@ class BookingData extends ChangeNotifier {
     return base;
   }
 
+  double get basePerHour {
+    double base = 0;
+    if (_serviceType?.needsCar == true && _car != null) base += _car!.pricePerHour;
+    if (_serviceType?.needsDriver == true && _driver != null) base += _driver!.pricePerHour;
+    return base;
+  }
+
+  /// Per-unit rate: per hour for a same-day booking, per day otherwise.
+  double get baseRate => isHourly ? basePerHour : basePerDay;
+
+  // ── Per-side breakdown (vehicle / driver shown as separate lines) ──
+  bool get hasCarCharge => _serviceType?.needsCar == true && _car != null;
+  bool get hasDriverCharge => _serviceType?.needsDriver == true && _driver != null;
+
+  /// Vehicle per-unit rate (per hour when [isHourly], else per day).
+  double get carRate =>
+      !hasCarCharge ? 0 : (isHourly ? _car!.pricePerHour : _car!.pricePerDay);
+
+  /// Driver per-unit rate (per hour when [isHourly], else per day).
+  double get driverRate =>
+      !hasDriverCharge ? 0 : (isHourly ? _driver!.pricePerHour : _driver!.pricePerDay);
+
+  /// Vehicle / driver line totals over the billing [units].
+  double get carAmount => carRate * units;
+  double get driverAmount => driverRate * units;
+
   /// Delivery fee in OMR. Resolved from the DeliveryFee API for the (vehicle
   /// company, selected area); 0 for self-pickup or when no fee is configured.
   /// The backend recomputes the authoritative fee on booking create.
   double get deliveryFee => _pickupMode == PickupMode.delivery ? _deliveryFee : 0;
 
   BookingPricing get pricing => BookingPricing(
-    basePerDay: basePerDay,
-    days: days,
+    baseRate: baseRate,
+    units: units,
+    isHourly: isHourly,
     deliveryFee: deliveryFee,
   );
 
-  double get totalPrice => pricing.total - _promoDiscount;
+  double get totalPrice => pricing.total;
 
   // ---- Setters ----
   void setServiceType(BookingServiceType type) {
@@ -327,14 +399,9 @@ class BookingData extends ChangeNotifier {
     notifyListeners();
   }
 
-  void applyPromo(String? code, double discount) {
-    _promoCode = code;
-    _promoDiscount = discount;
-    notifyListeners();
-  }
-
-  void assignBookingRef(String ref) {
+  void assignBookingRef(String ref, {int? id}) {
     _bookingRef = ref;
+    if (id != null) _bookingId = id;
     notifyListeners();
   }
 }

@@ -11,6 +11,8 @@ import '../screens/common/auth/login/phone_login_screen.dart';
 import '../screens/common/auth/otp/otp_verification_screen.dart';
 import '../screens/common/auth/profile_completion_screen.dart';
 import '../screens/common/coming_soon_screen.dart';
+import '../screens/common/legal/legal_document_screen.dart';
+import '../../constants/legal_constants.dart';
 import '../screens/common/profile_edit/edit_hub_screen.dart';
 import '../screens/common/profile_edit/edit_profile_screen.dart';
 import '../screens/common/profile_edit/provider/edit_profile_provider.dart';
@@ -126,8 +128,13 @@ const _sharedAuthedRoutes = {
 bool _isSharedAuthedRoute(String loc) =>
     _sharedAuthedRoutes.any((p) => loc == p || loc.startsWith('$p/'));
 
+/// Root navigator key — lets non-widget code (e.g. the session-expiry handler)
+/// reach a live [BuildContext] for provider reads and navigation.
+final GlobalKey<NavigatorState> rootNavigatorKey = GlobalKey<NavigatorState>();
+
 class AppRouter {
   static final GoRouter router = GoRouter(
+    navigatorKey: rootNavigatorKey,
     initialLocation: '/',
     redirect: (context, state) {
       final role = context.read<RoleProvider>().role;
@@ -447,13 +454,17 @@ class AppRouter {
       ),
       GoRoute(
         path: '/legal/terms',
-        pageBuilder: (context, state) =>
-            AppPageTransition(child: const ComingSoonScreen(titleKey: 'legal_terms_title'), name: state.name),
+        pageBuilder: (context, state) => AppPageTransition(
+          child: const LegalDocumentScreen(titleKey: 'legal_terms_title', url: LegalConstants.termsUrl),
+          name: state.name,
+        ),
       ),
       GoRoute(
         path: '/legal/privacy',
-        pageBuilder: (context, state) =>
-            AppPageTransition(child: const ComingSoonScreen(titleKey: 'legal_privacy_title'), name: state.name),
+        pageBuilder: (context, state) => AppPageTransition(
+          child: const LegalDocumentScreen(titleKey: 'legal_privacy_title', url: LegalConstants.privacyUrl),
+          name: state.name,
+        ),
       ),
       GoRoute(
         path: '/about',

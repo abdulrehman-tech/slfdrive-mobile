@@ -4,6 +4,7 @@ import '../../errors/error_handler.dart';
 import '../../models/booking/booking.dart';
 import '../../models/booking/booking_creation_request.dart';
 import '../../models/booking/ompay.dart';
+import '../../models/booking/payment_info.dart';
 import '../../models/common/paged_response.dart';
 import '../../models/common/pagination_params.dart';
 import '../../network/api_client.dart';
@@ -50,6 +51,11 @@ abstract class BookingRemoteDataSource {
 
   /// Marks an in-progress booking as completed (`POST /api/Booking/{id}/complete`).
   Future<bool> complete(int id);
+
+  /// The settled payment for a booking (`GET /api/Payment/booking/{id}`) — the
+  /// paid record when present, else the most recent. Null when none exists.
+  /// Exposes the payment method (cash / card / OmPay).
+  Future<PaymentInfo?> paymentForBooking(int bookingId);
 }
 
 class BookingRemoteDataSourceImpl implements BookingRemoteDataSource {
@@ -217,6 +223,25 @@ class BookingRemoteDataSourceImpl implements BookingRemoteDataSource {
       final body = res.data as Map<String, dynamic>;
       if (body['isSuccess'] == true) return true;
       throw AppException(message: _message(body) ?? 'Could not complete trip');
+    } catch (e) {
+      throw ErrorHandler.handleError(e);
+    }
+  }
+
+  @override
+  Future<PaymentInfo?> paymentForBooking(int bookingId) async {
+    try {
+      final res = await apiClient.get(ApiEndpoints.paymentByBooking(bookingId));
+      final body = res.data as Map<String, dynamic>;
+      final data = body['data'];
+      if (data is! List) return null;
+      final payments = data
+          .whereType<Map<String, dynamic>>()
+          .map(PaymentInfo.fromJson)
+          .toList();
+      if (payments.isEmpty) return null;
+      // Prefer a settled payment (carries the real method); else most recent.
+      return payments.firstWhere((p) => p.isPaid, orElse: () => payments.last);
     } catch (e) {
       throw ErrorHandler.handleError(e);
     }

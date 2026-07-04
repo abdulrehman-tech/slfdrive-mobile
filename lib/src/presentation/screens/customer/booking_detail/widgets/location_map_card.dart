@@ -1,8 +1,10 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 
+import '../../../../widgets/location_map_preview.dart';
 import '../models/booking_detail.dart';
 import 'glass_card.dart';
 import 'section_header.dart';
@@ -21,6 +23,30 @@ class BookingLocationMapCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final points = <MapPoint>[
+      if (booking.hasPickupCoords)
+        MapPoint(
+          lat: booking.pickupLat!,
+          lon: booking.pickupLon!,
+          label: 'booking_summary_pickup_at'.tr(),
+          color: const Color(0xFFE91E63),
+          markerHue: BitmapDescriptor.hueRose,
+        ),
+      if (booking.hasDropoffCoords)
+        MapPoint(
+          lat: booking.dropoffLat!,
+          lon: booking.dropoffLon!,
+          label: 'booking_summary_delivery_to'.tr(),
+          color: const Color(0xFF2196F3),
+          markerHue: BitmapDescriptor.hueAzure,
+        ),
+    ];
+
+    // No coordinates → hide the whole card (both the mobile and desktop layouts
+    // mount this widget, so hiding here keeps them consistent) instead of
+    // showing an empty map placeholder.
+    if (points.isEmpty) return const SizedBox.shrink();
+
     return BookingGlassCard(
       isDark: isDark,
       child: Padding(
@@ -36,63 +62,9 @@ class BookingLocationMapCard extends StatelessWidget {
               isDark: isDark,
             ),
             SizedBox(height: 12.r),
-            Container(
-              height: 160.r,
-              width: double.infinity,
-              decoration: BoxDecoration(
-                color: isDark ? Colors.white.withValues(alpha: 0.04) : Colors.black.withValues(alpha: 0.03),
-                borderRadius: BorderRadius.circular(14.r),
-                border: Border.all(
-                  color: isDark ? Colors.white.withValues(alpha: 0.06) : Colors.black.withValues(alpha: 0.05),
-                ),
-              ),
-              child: Stack(
-                children: [
-                  Center(
-                    child: Icon(Iconsax.map_1_copy, size: 48.r, color: cs.primary.withValues(alpha: 0.2)),
-                  ),
-                  Positioned(
-                    left: 12.r,
-                    bottom: 12.r,
-                    right: 12.r,
-                    child: Container(
-                      padding: EdgeInsets.all(10.r),
-                      decoration: BoxDecoration(
-                        color: isDark ? Colors.black.withValues(alpha: 0.7) : Colors.white.withValues(alpha: 0.9),
-                        borderRadius: BorderRadius.circular(10.r),
-                      ),
-                      child: Text(
-                        booking.pickupLocation,
-                        style: TextStyle(fontSize: 11.r, color: cs.onSurface, fontWeight: FontWeight.w600),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            SizedBox(height: 10.r),
-            _row(cs, 'booking_summary_pickup_at'.tr(), booking.pickupLocation),
-            _row(cs, 'booking_summary_delivery_to'.tr(), booking.dropoffLocation),
+            LocationMapPreview(points: points, isDark: isDark, cs: cs),
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _row(ColorScheme cs, String label, String value) {
-    return Padding(
-      padding: EdgeInsets.symmetric(vertical: 4.r),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          SizedBox(
-            width: 100.r,
-            child: Text(label, style: TextStyle(fontSize: 11.r, color: cs.onSurface.withValues(alpha: 0.55))),
-          ),
-          Expanded(
-            child: Text(value, style: TextStyle(fontSize: 12.r, fontWeight: FontWeight.w600, color: cs.onSurface)),
-          ),
-        ],
       ),
     );
   }

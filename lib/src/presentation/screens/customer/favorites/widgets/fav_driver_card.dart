@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -26,39 +24,34 @@ class FavDriverCard extends StatelessWidget {
     final cs = Theme.of(context).colorScheme;
     return GestureDetector(
       onTap: onTap,
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(16.r),
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
-          child: Container(
-            padding: EdgeInsets.all(14.r),
-            decoration: BoxDecoration(
-              color: isDark
-                  ? Colors.white.withValues(alpha: 0.07)
-                  : Colors.white.withValues(alpha: 0.82),
-              borderRadius: BorderRadius.circular(16.r),
-              border: Border.all(
-                color: isDark
-                    ? Colors.white.withValues(alpha: 0.1)
-                    : Colors.black.withValues(alpha: 0.06),
-              ),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.04),
-                  blurRadius: 14.r,
-                  offset: Offset(0, 4.r),
-                ),
-              ],
-            ),
-            child: Row(
-              children: [
-                _buildAvatar(cs),
-                SizedBox(width: 12.r),
-                Expanded(child: _buildInfo(cs)),
-                _buildRemoveButton(),
-              ],
-            ),
+      child: Container(
+        padding: EdgeInsets.all(14.r),
+        clipBehavior: Clip.antiAlias,
+        decoration: BoxDecoration(
+          color: isDark
+              ? Colors.white.withValues(alpha: 0.07)
+              : Colors.white.withValues(alpha: 0.82),
+          borderRadius: BorderRadius.circular(16.r),
+          border: Border.all(
+            color: isDark
+                ? Colors.white.withValues(alpha: 0.1)
+                : Colors.black.withValues(alpha: 0.06),
           ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.04),
+              blurRadius: 14.r,
+              offset: Offset(0, 4.r),
+            ),
+          ],
+        ),
+        child: Row(
+          children: [
+            _buildAvatar(cs),
+            SizedBox(width: 12.r),
+            Expanded(child: _buildInfo(cs)),
+            _buildRemoveButton(),
+          ],
         ),
       ),
     );

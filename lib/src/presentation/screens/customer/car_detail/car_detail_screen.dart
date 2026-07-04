@@ -39,11 +39,7 @@ class CarDetailScreen extends StatelessWidget {
     final vehicleId = int.tryParse(carId) ?? 0;
     final ar = context.locale.languageCode == 'ar';
     return ChangeNotifierProvider(
-      create: (_) => CarDetailProvider(
-        vehicleRepository: getIt<VehicleRepository>(),
-        vehicleId: vehicleId,
-        ar: ar,
-      ),
+      create: (_) => CarDetailProvider(vehicleRepository: getIt<VehicleRepository>(), vehicleId: vehicleId, ar: ar),
       child: const _CarDetailView(),
     );
   }
@@ -63,9 +59,11 @@ class _CarDetailView extends StatelessWidget {
     final car = BookingCar(
       id: vehicle.id.toString(),
       name: vehicle.displayTitle(ar: context.read<CarDetailProvider>().ar),
-      brand: (context.read<CarDetailProvider>().ar ? vehicle.brandNameAr : vehicle.brandName) ?? vehicle.brandName ?? '',
+      brand:
+          (context.read<CarDetailProvider>().ar ? vehicle.brandNameAr : vehicle.brandName) ?? vehicle.brandName ?? '',
       imageUrl: vehicle.primaryPhoto ?? '',
       pricePerDay: vehicle.pricePerDay ?? 0,
+      pricePerHour: vehicle.pricePerHour ?? 0,
       plateNumber: vehicle.plateNumber ?? '',
       plateCode: '',
       lat: vehicle.lat,
@@ -95,11 +93,7 @@ class _CarDetailView extends StatelessWidget {
     if (provider.error != null) {
       return Scaffold(
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-        body: _ErrorRetry(
-          message: provider.error!,
-          cs: cs,
-          onRetry: provider.load,
-        ),
+        body: _ErrorRetry(message: provider.error!, cs: cs, onRetry: provider.load),
       );
     }
 
@@ -119,38 +113,55 @@ class _CarDetailView extends StatelessWidget {
           slivers: [
             CarSliverAppBar(isDark: isDark, cs: cs),
             SliverToBoxAdapter(
-              child: Padding(padding: EdgeInsets.fromLTRB(16.r, 16.r, 16.r, 0), child: CarInfoHeader(isDark: isDark, cs: cs)),
+              child: Padding(
+                padding: EdgeInsets.fromLTRB(16.r, 16.r, 16.r, 0),
+                child: CarInfoHeader(isDark: isDark, cs: cs),
+              ),
             ),
             SliverToBoxAdapter(
-              child: Padding(padding: EdgeInsets.fromLTRB(16.r, 14.r, 16.r, 0), child: PlateSection(isDark: isDark, cs: cs)),
+              child: Padding(
+                padding: EdgeInsets.fromLTRB(16.r, 14.r, 16.r, 0),
+                child: PlateSection(isDark: isDark, cs: cs),
+              ),
             ),
             SliverToBoxAdapter(
-              child: Padding(padding: EdgeInsets.fromLTRB(16.r, 14.r, 16.r, 0), child: SpecsSection(isDark: isDark, cs: cs)),
+              child: Padding(
+                padding: EdgeInsets.fromLTRB(16.r, 14.r, 16.r, 0),
+                child: SpecsSection(isDark: isDark, cs: cs),
+              ),
             ),
             SliverToBoxAdapter(
-              child: Padding(padding: EdgeInsets.fromLTRB(16.r, 14.r, 16.r, 0), child: FeaturesSection(isDark: isDark, cs: cs)),
+              child: Padding(
+                padding: EdgeInsets.fromLTRB(16.r, 14.r, 16.r, 0),
+                child: FeaturesSection(isDark: isDark, cs: cs),
+              ),
             ),
             SliverToBoxAdapter(
-              child: Padding(padding: EdgeInsets.fromLTRB(16.r, 14.r, 16.r, 0), child: DescriptionSection(isDark: isDark, cs: cs)),
+              child: Padding(
+                padding: EdgeInsets.fromLTRB(16.r, 14.r, 16.r, 0),
+                child: DescriptionSection(isDark: isDark, cs: cs),
+              ),
             ),
             SliverToBoxAdapter(
-              child: Padding(padding: EdgeInsets.fromLTRB(16.r, 14.r, 16.r, 0), child: OwnerSection(isDark: isDark, cs: cs)),
+              child: Padding(
+                padding: EdgeInsets.fromLTRB(16.r, 14.r, 16.r, 0),
+                child: OwnerSection(isDark: isDark, cs: cs),
+              ),
             ),
             SliverToBoxAdapter(
-              child: Padding(padding: EdgeInsets.fromLTRB(16.r, 14.r, 16.r, 0), child: LocationSection(isDark: isDark, cs: cs)),
+              child: Padding(
+                padding: EdgeInsets.fromLTRB(16.r, 14.r, 16.r, 0),
+                child: LocationSection(isDark: isDark, cs: cs),
+              ),
             ),
-            SliverToBoxAdapter(child: SizedBox(height: 100.r)),
+            SliverToBoxAdapter(child: SizedBox(height: 150.r)),
           ],
         ),
         Positioned(
           left: 0,
           right: 0,
           bottom: 0,
-          child: BookingBar(
-            isDark: isDark,
-            cs: cs,
-            onBook: () => _launchBookingFlow(context, vehicle),
-          ),
+          child: BookingBar(isDark: isDark, cs: cs, onBook: () => _launchBookingFlow(context, vehicle)),
         ),
       ],
     );

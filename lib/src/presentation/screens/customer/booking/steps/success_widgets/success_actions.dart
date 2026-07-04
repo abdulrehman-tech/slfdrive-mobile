@@ -6,7 +6,10 @@ import 'package:go_router/go_router.dart';
 import '../../../../../../constants/color_constants.dart';
 
 class SuccessActions extends StatelessWidget {
-  const SuccessActions({super.key});
+  /// Backend id of the just-created booking; drives the "view booking" button.
+  final int? bookingId;
+
+  const SuccessActions({super.key, this.bookingId});
 
   @override
   Widget build(BuildContext context) {
@@ -40,8 +43,13 @@ class SuccessActions extends StatelessWidget {
         SizedBox(height: 10.r),
         GestureDetector(
           onTap: () {
-            context.go('/home');
-            // Further: navigate to bookings detail — wired in phase 3.
+            // Open the freshly-created booking's detail; if the id is somehow
+            // missing, fall back to the bookings list.
+            if (bookingId != null) {
+              context.goNamed('booking-detail', pathParameters: {'id': '$bookingId'});
+            } else {
+              context.goNamed('bookings');
+            }
           },
           child: Container(
             width: double.infinity,

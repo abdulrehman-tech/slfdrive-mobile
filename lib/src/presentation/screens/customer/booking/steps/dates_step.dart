@@ -17,8 +17,16 @@ class DatesStep extends StatefulWidget {
 }
 
 class _DatesStepState extends State<DatesStep> {
-  int _timeSlot = 1; // 0 morning 1 afternoon 2 evening 3 custom
+  int _timeSlot = 1; // pickup slot: 0 morning 1 afternoon 2 evening 3 custom
   TimeOfDay _pickupTime = const TimeOfDay(hour: 10, minute: 0);
+
+  int _returnSlot = 1; // drop-off slot (same slot semantics as pickup)
+  TimeOfDay _returnTime = const TimeOfDay(hour: 10, minute: 0);
+
+  // Picked calendar dates (date-only); the pickup/return times are layered on
+  // top when pushing to BookingData, so the payload carries the real times.
+  DateTime? _startDate;
+  DateTime? _endDate;
 
   static const _timeSlots = <(String, String, TimeOfDay)>[
     ('booking_time_morning', '7:00 – 11:00', TimeOfDay(hour: 9, minute: 0)),
@@ -30,27 +38,69 @@ class _DatesStepState extends State<DatesStep> {
   @override
   void initState() {
     super.initState();
-    // Note: default dates are seeded by BookingFlowScreen.initState BEFORE its
-    // listener is attached. We only provide a post-frame fallback in case this
-    // step is ever used outside the flow controller.
+    // Seed local date/time state from any dates already on BookingData (the flow
+    // controller seeds defaults before this step builds).
+    final s = widget.data.startAt;
+    final e = widget.data.endAt;
+    if (s != null) {
+      _startDate = DateTime(s.year, s.month, s.day);
+      // Recover the pickup time from the seeded start, matching it to a slot.
+      _pickupTime = TimeOfDay(hour: s.hour, minute: s.minute);
+      _timeSlot = _slotForTime(_pickupTime);
+    }
+    if (e != null) {
+      _endDate = DateTime(e.year, e.month, e.day);
+      _returnTime = TimeOfDay(hour: e.hour, minute: e.minute);
+      _returnSlot = _slotForTime(_returnTime);
+    }
+
     if (widget.data.startAt == null) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (!mounted || widget.data.startAt != null) return;
         final now = DateTime.now();
-        final start = DateTime(now.year, now.month, now.day);
-        widget.data.setDates(start, start.add(const Duration(days: 2)));
+        _startDate = DateTime(now.year, now.month, now.day);
+        _endDate = _startDate!.add(const Duration(days: 2));
+        _applyDateTime();
       });
     }
   }
 
-  Future<void> _pickCustomTime() async {
+  /// The pickup / return times in effect: the selected preset slot's time, or
+  /// the custom time when the custom slot is active.
+  TimeOfDay get _effectivePickup =>
+      _timeSlot < 3 ? _timeSlots[_timeSlot].$3 : _pickupTime;
+  TimeOfDay get _effectiveReturn =>
+      _returnSlot < 3 ? _timeSlots[_returnSlot].$3 : _returnTime;
+
+  int _slotForTime(TimeOfDay t) {
+    for (var i = 0; i < 3; i++) {
+      if (_timeSlots[i].$3.hour == t.hour && _timeSlots[i].$3.minute == t.minute) return i;
+    }
+    return 3; // custom
+  }
+
+  /// Combines the picked dates with the effective pickup time and pushes them to
+  /// BookingData, so fromDateTime/toDateTime carry the real time-of-day.
+  void _applyDateTime() {
+    final sd = _startDate;
+    final ed = _endDate;
+    if (sd == null || ed == null) return;
+    final p = _effectivePickup;
+    final r = _effectiveReturn;
+    final start = DateTime(sd.year, sd.month, sd.day, p.hour, p.minute);
+    final end = DateTime(ed.year, ed.month, ed.day, r.hour, r.minute);
+    widget.data.setDates(start, end);
+  }
+
+  Future<void> _pickCustomTime({required bool isReturn}) async {
     final picked = await showTimePicker(
       context: context,
-      initialTime: _pickupTime,
+      initialTime: isReturn ? _returnTime : _pickupTime,
       builder: (ctx, child) => Theme(data: Theme.of(ctx), child: child!),
     );
     if (picked != null) {
-      setState(() => _pickupTime = picked);
+      setState(() => isReturn ? _returnTime = picked : _pickupTime = picked);
+      _applyDateTime();
     }
   }
 
@@ -98,7 +148,9 @@ class _DatesStepState extends State<DatesStep> {
                     if (args.value is PickerDateRange) {
                       final r = args.value as PickerDateRange;
                       if (r.startDate != null && r.endDate != null) {
-                        widget.data.setDates(r.startDate!, r.endDate!);
+                        _startDate = r.startDate;
+                        _endDate = r.endDate;
+                        _applyDateTime();
                       }
                     }
                   },
@@ -150,7 +202,7 @@ class _DatesStepState extends State<DatesStep> {
                     ),
                     SizedBox(height: 2.r),
                     Text(
-                      '${d.days} ${'booking_dates_days'.tr()}',
+                      '${d.units} ${d.unitLabelKey.tr()}',
                       style: TextStyle(fontSize: 17.r, fontWeight: FontWeight.w800, color: cs.onSurface),
                     ),
                   ],
@@ -167,80 +219,122 @@ class _DatesStepState extends State<DatesStep> {
 
         SizedBox(height: 14.r),
 
-        // Time slot chips
-        BookingGlassCard(
+        // Pickup time
+        _timeSection(
+          cs: cs,
           isDark: isDark,
-          padding: EdgeInsets.all(14.r),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              BookingSectionHeader(
-                icon: Iconsax.clock_copy,
-                iconColor: const Color(0xFFFFA726),
-                title: 'booking_time_pickup'.tr(),
-                isDark: isDark,
-              ),
-              SizedBox(height: 12.r),
-              Wrap(
-                spacing: 8.r,
-                runSpacing: 8.r,
-                children: List.generate(_timeSlots.length, (i) {
-                  final slot = _timeSlots[i];
-                  final active = _timeSlot == i;
-                  return GestureDetector(
-                    onTap: () {
-                      setState(() => _timeSlot = i);
-                      if (i == 3) _pickCustomTime();
-                    },
-                    child: AnimatedContainer(
-                      duration: const Duration(milliseconds: 200),
-                      padding: EdgeInsets.symmetric(horizontal: 14.r, vertical: 9.r),
-                      decoration: BoxDecoration(
-                        color: active
-                            ? cs.primary.withValues(alpha: isDark ? 0.22 : 0.12)
-                            : (isDark ? Colors.white.withValues(alpha: 0.05) : Colors.black.withValues(alpha: 0.03)),
-                        borderRadius: BorderRadius.circular(12.r),
-                        border: Border.all(
-                          color: active
-                              ? cs.primary.withValues(alpha: 0.4)
-                              : (isDark ? Colors.white.withValues(alpha: 0.08) : Colors.black.withValues(alpha: 0.05)),
-                        ),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(
-                            slot.$1.tr(),
-                            style: TextStyle(
-                              fontSize: 12.r,
-                              fontWeight: active ? FontWeight.w700 : FontWeight.w500,
-                              color: active ? cs.primary : cs.onSurface.withValues(alpha: 0.7),
-                            ),
-                          ),
-                          if (i < 3) ...[
-                            SizedBox(width: 6.r),
-                            Text(
-                              slot.$2,
-                              style: TextStyle(fontSize: 10.r, color: cs.onSurface.withValues(alpha: 0.4)),
-                            ),
-                          ],
-                          if (i == 3 && active) ...[
-                            SizedBox(width: 6.r),
-                            Text(
-                              _pickupTime.format(context),
-                              style: TextStyle(fontSize: 10.r, color: cs.primary, fontWeight: FontWeight.w700),
-                            ),
-                          ],
-                        ],
-                      ),
-                    ),
-                  );
-                }),
-              ),
-            ],
-          ),
+          titleKey: 'booking_time_pickup',
+          selectedSlot: _timeSlot,
+          customTime: _pickupTime,
+          onTapSlot: (i) {
+            setState(() => _timeSlot = i);
+            if (i == 3) {
+              _pickCustomTime(isReturn: false);
+            } else {
+              _applyDateTime();
+            }
+          },
+        ),
+
+        SizedBox(height: 14.r),
+
+        // Return (drop-off) time
+        _timeSection(
+          cs: cs,
+          isDark: isDark,
+          titleKey: 'booking_time_return',
+          selectedSlot: _returnSlot,
+          customTime: _returnTime,
+          onTapSlot: (i) {
+            setState(() => _returnSlot = i);
+            if (i == 3) {
+              _pickCustomTime(isReturn: true);
+            } else {
+              _applyDateTime();
+            }
+          },
         ),
       ],
+    );
+  }
+
+  /// A titled card of time-slot chips (Morning / Afternoon / Evening / Custom).
+  Widget _timeSection({
+    required ColorScheme cs,
+    required bool isDark,
+    required String titleKey,
+    required int selectedSlot,
+    required TimeOfDay customTime,
+    required ValueChanged<int> onTapSlot,
+  }) {
+    return BookingGlassCard(
+      isDark: isDark,
+      padding: EdgeInsets.all(14.r),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          BookingSectionHeader(
+            icon: Iconsax.clock_copy,
+            iconColor: const Color(0xFFFFA726),
+            title: titleKey.tr(),
+            isDark: isDark,
+          ),
+          SizedBox(height: 12.r),
+          Wrap(
+            spacing: 8.r,
+            runSpacing: 8.r,
+            children: List.generate(_timeSlots.length, (i) {
+              final slot = _timeSlots[i];
+              final active = selectedSlot == i;
+              return GestureDetector(
+                onTap: () => onTapSlot(i),
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 200),
+                  padding: EdgeInsets.symmetric(horizontal: 14.r, vertical: 9.r),
+                  decoration: BoxDecoration(
+                    color: active
+                        ? cs.primary.withValues(alpha: isDark ? 0.22 : 0.12)
+                        : (isDark ? Colors.white.withValues(alpha: 0.05) : Colors.black.withValues(alpha: 0.03)),
+                    borderRadius: BorderRadius.circular(12.r),
+                    border: Border.all(
+                      color: active
+                          ? cs.primary.withValues(alpha: 0.4)
+                          : (isDark ? Colors.white.withValues(alpha: 0.08) : Colors.black.withValues(alpha: 0.05)),
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        slot.$1.tr(),
+                        style: TextStyle(
+                          fontSize: 12.r,
+                          fontWeight: active ? FontWeight.w700 : FontWeight.w500,
+                          color: active ? cs.primary : cs.onSurface.withValues(alpha: 0.7),
+                        ),
+                      ),
+                      if (i < 3) ...[
+                        SizedBox(width: 6.r),
+                        Text(
+                          slot.$2,
+                          style: TextStyle(fontSize: 10.r, color: cs.onSurface.withValues(alpha: 0.4)),
+                        ),
+                      ],
+                      if (i == 3 && active) ...[
+                        SizedBox(width: 6.r),
+                        Text(
+                          customTime.format(context),
+                          style: TextStyle(fontSize: 10.r, color: cs.primary, fontWeight: FontWeight.w700),
+                        ),
+                      ],
+                    ],
+                  ),
+                ),
+              );
+            }),
+          ),
+        ],
+      ),
     );
   }
 

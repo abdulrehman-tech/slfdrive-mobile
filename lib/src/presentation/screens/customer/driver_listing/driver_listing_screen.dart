@@ -148,13 +148,15 @@ class _DriverListingView extends StatelessWidget {
             padding: EdgeInsets.symmetric(horizontal: 16.r),
             sliver: SliverList(
               delegate: SliverChildBuilderDelegate(
-                (_, i) => Padding(
-                  padding: EdgeInsets.only(bottom: 12.r),
-                  child: DriverListCard(
-                    driver: drivers[i],
-                    isDark: isDark,
-                    cs: cs,
-                    onTap: () => _navigateToDetail(context, drivers[i]),
+                (_, i) => RepaintBoundary(
+                  child: Padding(
+                    padding: EdgeInsets.only(bottom: 12.r),
+                    child: DriverListCard(
+                      driver: drivers[i],
+                      isDark: isDark,
+                      cs: cs,
+                      onTap: () => _navigateToDetail(context, drivers[i]),
+                    ),
                   ),
                 ),
                 childCount: drivers.length,

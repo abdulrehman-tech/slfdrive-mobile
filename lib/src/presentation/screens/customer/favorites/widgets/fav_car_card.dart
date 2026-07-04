@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
@@ -30,38 +28,33 @@ class FavCarCard extends StatelessWidget {
     final cs = Theme.of(context).colorScheme;
     return GestureDetector(
       onTap: onTap,
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(18.r),
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
-          child: Container(
-            decoration: BoxDecoration(
-              color: isDark
-                  ? Colors.white.withValues(alpha: 0.07)
-                  : Colors.white.withValues(alpha: 0.85),
-              borderRadius: BorderRadius.circular(18.r),
-              border: Border.all(
-                color: isDark
-                    ? Colors.white.withValues(alpha: 0.1)
-                    : Colors.black.withValues(alpha: 0.06),
-              ),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: isDark ? 0.22 : 0.06),
-                  blurRadius: 16.r,
-                  offset: Offset(0, 4.r),
-                ),
-              ],
+      child: Container(
+        clipBehavior: Clip.antiAlias,
+        decoration: BoxDecoration(
+          color: isDark
+              ? Colors.white.withValues(alpha: 0.07)
+              : Colors.white.withValues(alpha: 0.85),
+          borderRadius: BorderRadius.circular(18.r),
+          border: Border.all(
+            color: isDark
+                ? Colors.white.withValues(alpha: 0.1)
+                : Colors.black.withValues(alpha: 0.06),
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: isDark ? 0.22 : 0.06),
+              blurRadius: 16.r,
+              offset: Offset(0, 4.r),
             ),
-            child: SizedBox(
-              height: 120.r,
-              child: Row(
-                children: [
-                  _buildImage(cs),
-                  Expanded(child: _buildInfo(context, cs)),
-                ],
-              ),
-            ),
+          ],
+        ),
+        child: SizedBox(
+          height: 120.r,
+          child: Row(
+            children: [
+              _buildImage(cs),
+              Expanded(child: _buildInfo(context, cs)),
+            ],
           ),
         ),
       ),

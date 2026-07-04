@@ -70,7 +70,7 @@ class _BookingSuccessScreenState extends State<BookingSuccessScreen> with Single
                   SizedBox(height: 16.r),
                   SuccessSummaryCard(data: widget.data, isDark: isDark),
                   SizedBox(height: 22.r),
-                  const SuccessActions(),
+                  SuccessActions(bookingId: widget.data.bookingId),
                   SizedBox(height: 24.r),
                 ],
               ),

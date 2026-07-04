@@ -57,6 +57,7 @@ class _DriverDetailView extends StatelessWidget {
       avatarUrl: profile.avatarUrl,
       rating: profile.rating,
       pricePerDay: profile.dailyRate,
+      pricePerHour: profile.hourlyRate,
       speciality: 'Chauffeur',
     );
     context.pushNamed('booking', extra: {'service': BookingServiceType.driverOnly, 'driver': driver});

@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -41,25 +39,22 @@ class NotifTile extends StatelessWidget {
       onDismissed: (_) => provider.dismiss(item.id),
       child: GestureDetector(
         onTap: () => provider.toggleRead(item.id),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(16.r),
-          child: BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-            child: Container(
-              padding: EdgeInsets.all(14.r),
-              decoration: BoxDecoration(
-                color: isDark
-                    ? Colors.white.withValues(alpha: item.isRead ? 0.04 : 0.08)
-                    : Colors.white.withValues(alpha: item.isRead ? 0.7 : 0.9),
-                borderRadius: BorderRadius.circular(16.r),
-                border: Border.all(
-                  color: item.isRead
-                      ? (isDark ? Colors.white.withValues(alpha: 0.06) : Colors.black.withValues(alpha: 0.05))
-                      : meta.color.withValues(alpha: 0.25),
-                  width: item.isRead ? 1 : 1.2,
-                ),
-              ),
-              child: Row(
+        child: Container(
+          padding: EdgeInsets.all(14.r),
+          clipBehavior: Clip.antiAlias,
+          decoration: BoxDecoration(
+            color: isDark
+                ? Colors.white.withValues(alpha: item.isRead ? 0.04 : 0.08)
+                : Colors.white.withValues(alpha: item.isRead ? 0.7 : 0.9),
+            borderRadius: BorderRadius.circular(16.r),
+            border: Border.all(
+              color: item.isRead
+                  ? (isDark ? Colors.white.withValues(alpha: 0.06) : Colors.black.withValues(alpha: 0.05))
+                  : meta.color.withValues(alpha: 0.25),
+              width: item.isRead ? 1 : 1.2,
+            ),
+          ),
+          child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Container(
@@ -135,8 +130,6 @@ class NotifTile extends StatelessWidget {
               ),
             ),
           ),
-        ),
-      ),
     );
   }
 }

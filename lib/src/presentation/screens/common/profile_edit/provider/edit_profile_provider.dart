@@ -2,12 +2,15 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../../../../../constants/endpoints.dart';
+import '../../../../../constants/storage_keys.dart';
 import '../../../../../core/data/repositories/customer_repository.dart';
 import '../../../../../core/data/repositories/driver_repository.dart';
 import '../../../../../core/data/repositories/lookup_repository.dart';
+import '../../../../../core/di/injection_container.dart';
 import '../../../../../core/errors/app_exception.dart';
 import '../../../../../core/models/lookup/location_option.dart';
 import '../../../../providers/auth_provider.dart';
@@ -45,6 +48,7 @@ class EditProfileProvider extends ChangeNotifier {
   final DriverRepository _driverRepository;
   final LookupRepository _lookupRepository;
   final AuthProvider _authProvider;
+  final FlutterSecureStorage _storage = getIt<FlutterSecureStorage>();
 
   bool get isDriver => role == UserRole.driver;
 
@@ -211,7 +215,10 @@ class EditProfileProvider extends ChangeNotifier {
     nameArController.text = c.fullNameAr ?? '';
     emailController.text = c.email ?? '';
     _phoneNumber = c.phoneNumber;
-    _selectedGender = ProfileFieldCodecs.decodeGender(c.gender);
+    // The Customer GET DTO doesn't return gender — fall back to the value cached
+    // from the login/profile user so the dropdown pre-selects correctly.
+    _selectedGender = ProfileFieldCodecs.decodeGender(c.gender) ??
+        ProfileFieldCodecs.decodeGender(await _storage.read(key: StorageKeys.userGender));
     _setDob(c.dateOfBirth);
     _photoUrl = c.photoUrl;
     _civilIdUrlF = c.civilIdUrlF;
@@ -238,7 +245,8 @@ class EditProfileProvider extends ChangeNotifier {
     nameArController.text = d.fullNameAr ?? '';
     emailController.text = d.email ?? '';
     _phoneNumber = d.phoneNumber;
-    _selectedGender = ProfileFieldCodecs.decodeGender(d.gender);
+    _selectedGender = ProfileFieldCodecs.decodeGender(d.gender) ??
+        ProfileFieldCodecs.decodeGender(await _storage.read(key: StorageKeys.userGender));
     _setDob(d.dateOfBirth);
     licenseNumberController.text = d.licenceNumber ?? '';
     _setLicenseExpiry(d.licenceExpiryDate);
@@ -426,6 +434,13 @@ class EditProfileProvider extends ChangeNotifier {
       if (!ok) {
         _error = 'profile_edit_save_error'.tr();
         return false;
+      }
+
+      // Cache the saved gender so the form prefills next time (the Customer GET
+      // doesn't return gender, so this is the only fresh source post-edit).
+      final genderCode = ProfileFieldCodecs.encodeGender(_selectedGender);
+      if (genderCode.isNotEmpty) {
+        await _storage.write(key: StorageKeys.userGender, value: genderCode);
       }
 
       // Refresh cached identity (name/email/photo) so profile + home reflect it.

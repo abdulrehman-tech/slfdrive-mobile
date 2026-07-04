@@ -51,12 +51,9 @@ class BookingsProvider extends ChangeNotifier {
       _bookings
         ..clear()
         ..addAll(page.items.map(BookingItem.fromBooking));
-      // Show the list immediately, then layer in vehicle/driver thumbnails.
-      _isLoading = false;
-      notifyListeners();
+      // Wait for the vehicle/driver thumbnails to resolve before showing the
+      // list, so it renders complete rather than filling in behind the user.
       await _enrich();
-      notifyListeners();
-      return;
     } on AppException catch (e) {
       _error = e.message;
     } catch (e) {

@@ -26,6 +26,7 @@ import '../services/booking_lookups.dart';
 import '../services/customer_avatars.dart';
 import '../services/driver_session.dart';
 import '../services/place_namer.dart';
+import '../services/session_manager.dart';
 import '../../presentation/providers/auth_provider.dart';
 
 final getIt = GetIt.instance;
@@ -38,9 +39,14 @@ Future<void> setupDependencyInjection() async {
     ),
   );
 
+  // Global session-expiry signal (fired by the auth interceptor when a token
+  // can't be refreshed). Registered before ApiClient, which wires it into the
+  // interceptor.
+  getIt.registerLazySingleton<SessionManager>(() => SessionManager());
+
   // Network
   getIt.registerLazySingleton<ApiClient>(
-    () => ApiClient(getIt<FlutterSecureStorage>()),
+    () => ApiClient(getIt<FlutterSecureStorage>(), getIt<SessionManager>()),
   );
 
   // Data Sources

@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -23,26 +21,23 @@ class BrandTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () => context.pushNamed('car-listing', extra: {'brand': brand.name}),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(18.r),
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
-          child: Container(
-            decoration: BoxDecoration(
-              color: isDark ? Colors.white.withValues(alpha: 0.06) : Colors.white.withValues(alpha: 0.85),
-              borderRadius: BorderRadius.circular(18.r),
-              border: Border.all(
-                color: isDark ? Colors.white.withValues(alpha: 0.08) : Colors.black.withValues(alpha: 0.05),
-              ),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.04),
-                  blurRadius: 14.r,
-                  offset: Offset(0, 4.r),
-                ),
-              ],
+      child: Container(
+        clipBehavior: Clip.antiAlias,
+        decoration: BoxDecoration(
+          color: isDark ? Colors.white.withValues(alpha: 0.06) : Colors.white.withValues(alpha: 0.85),
+          borderRadius: BorderRadius.circular(18.r),
+          border: Border.all(
+            color: isDark ? Colors.white.withValues(alpha: 0.08) : Colors.black.withValues(alpha: 0.05),
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.04),
+              blurRadius: 14.r,
+              offset: Offset(0, 4.r),
             ),
-            child: Padding(
+          ],
+        ),
+        child: Padding(
               padding: EdgeInsets.all(10.r),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -99,8 +94,6 @@ class BrandTile extends StatelessWidget {
               ),
             ),
           ),
-        ),
-      ),
     );
   }
 }

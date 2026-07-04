@@ -2,7 +2,7 @@ name: slfdrive
 description: "SLF Drive - Car Rental & Driver Services Platform"
 publish_to: 'none'
 
-version: 1.0.0+1
+version: 1.0.0+2
 
 environment:
   sdk: ^3.10.0
@@ -32,17 +32,13 @@ dependencies:
   
   # UI & Responsive
   flutter_screenutil: ^5.9.3
-  responsive_framework: ^1.5.1
-  flutter_adaptive_scaffold: ^0.2.4
-  
+
   # UI Components
   flutter_svg: ^2.2.3
   cached_network_image: ^3.4.1
-  lottie: ^3.3.2
   iconsax_flutter: ^1.0.1
   shimmer: ^3.0.0
   skeletonizer: ^2.1.0
-  flutter_easyloading: ^3.0.5
   font_awesome_flutter: ^10.7.0
   
   # Maps & Location
@@ -58,30 +54,19 @@ dependencies:
   intl: ^0.20.2
   easy_localization: ^3.0.8
   syncfusion_flutter_datepicker: ^28.2.7
-  
-  # Payment
-  flutter_stripe: ^11.2.0
-  
+
   # Firebase
   firebase_core: ^3.13.0
   firebase_auth: ^5.3.6
   firebase_analytics: ^11.4.6
   firebase_crashlytics: ^4.3.6
   firebase_messaging: ^15.2.5
-  firebase_storage: ^12.3.8
-  firebase_performance: ^0.10.0+10
   flutter_local_notifications: ^18.0.1
-  
+
   # File Handling
   file_picker: ^8.0.0
   image_picker: ^1.2.0
-  image_cropper: ^8.0.2
-  
-  # PDF & Documents
-  pdf: ^3.11.1
-  printing: ^5.13.4
-  syncfusion_flutter_pdfviewer: ^28.2.7
-  
+
   # Utilities
   url_launcher: ^6.3.1
   share_plus: ^10.1.4
@@ -91,13 +76,7 @@ dependencies:
   intl_phone_field: ^3.2.0
   pinput: ^6.0.1
   flutter_displaymode: ^0.7.0
-  
-  # Rating & Reviews
-  flutter_rating_bar: ^4.0.1
-  
-  # Analytics
-  clarity_flutter: ^1.7.1
-  
+
   # Cache Management
   flutter_cache_manager: ^3.4.1
   flutter_inappwebview: ^6.1.5
@@ -111,10 +90,49 @@ dev_dependencies:
   flutter_native_splash: ^2.4.7
   build_runner: ^2.4.13
 
+# ---------------------------------------------------------------------------
+# App launcher icons (Android + iOS).
+# Master art: assets/icon/app_icon.png (1024×1024, no transparency for iOS).
+# Regenerate after changing the master:  dart run flutter_launcher_icons
+# ---------------------------------------------------------------------------
+flutter_launcher_icons:
+  image_path: "assets/icon/app_icon.png"
+  android: "ic_launcher"
+  ios: true
+  remove_alpha_ios: true
+  min_sdk_android: 21
+  adaptive_icon_background: "#FFFFFF"
+  adaptive_icon_foreground: "assets/icon/app_icon.png"
+  web:
+    generate: false
+  windows:
+    generate: false
+  macos:
+    generate: false
+
+# ---------------------------------------------------------------------------
+# Native launch splash. Regenerate after changing:
+#   dart run flutter_native_splash:create
+# ---------------------------------------------------------------------------
+flutter_native_splash:
+  color: "#FFFFFF"
+  image: assets/images/slf-logo.png
+  color_dark: "#0C2485"
+  image_dark: assets/images/slf-logo-white.png
+  android_12:
+    image: assets/images/slf-logo.png
+    color: "#FFFFFF"
+    image_dark: assets/images/slf-logo-white.png
+    color_dark: "#0C2485"
+  android: true
+  ios: true
+  web: false
+
 flutter:
   uses-material-design: true
 
   assets:
+    - assets/icon/
     - assets/icons/
     - assets/images/
     - assets/images/brands/

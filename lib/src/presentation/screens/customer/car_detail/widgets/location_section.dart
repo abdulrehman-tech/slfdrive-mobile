@@ -4,11 +4,12 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 import 'package:provider/provider.dart';
 
+import '../../../../widgets/location_map_preview.dart';
 import '../provider/car_detail_provider.dart';
 import 'car_glass_card.dart';
 import 'section_header.dart';
 
-/// Card showing the car pickup location name.
+/// Card showing the car pickup location — a tappable map + resolved place name.
 class LocationSection extends StatelessWidget {
   final bool isDark;
   final ColorScheme cs;
@@ -22,7 +23,11 @@ class LocationSection extends StatelessWidget {
     if (vehicle == null) return const SizedBox.shrink();
 
     final locationLabel = (provider.ar ? vehicle.locationNameAr : vehicle.locationName) ?? vehicle.locationName;
-    if (locationLabel == null || locationLabel.isEmpty) return const SizedBox.shrink();
+    final hasCoords = vehicle.lat != null && vehicle.lon != null;
+    // Nothing to show at all — no name and no coordinates.
+    if ((locationLabel == null || locationLabel.isEmpty) && !hasCoords) {
+      return const SizedBox.shrink();
+    }
 
     return CarGlassCard(
       isDark: isDark,
@@ -39,33 +44,37 @@ class LocationSection extends StatelessWidget {
               cs: cs,
             ),
             SizedBox(height: 12.r),
-            ClipRRect(
-              borderRadius: BorderRadius.circular(14.r),
-              child: Container(
-                height: 140.r,
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  color: isDark ? Colors.white.withValues(alpha: 0.04) : Colors.black.withValues(alpha: 0.03),
-                  borderRadius: BorderRadius.circular(14.r),
-                  border: Border.all(
-                    color: isDark ? Colors.white.withValues(alpha: 0.06) : Colors.black.withValues(alpha: 0.04),
-                  ),
-                ),
-                child: Center(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(Iconsax.map, size: 28.r, color: cs.onSurface.withValues(alpha: 0.2)),
-                      SizedBox(height: 6.r),
-                      Text(
-                        locationLabel,
-                        style: TextStyle(fontSize: 11.r, color: cs.onSurface.withValues(alpha: 0.4)),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
+            if (hasCoords)
+              LocationMapPreview(
+                points: [MapPoint(lat: vehicle.lat!, lon: vehicle.lon!)],
+                isDark: isDark,
+                cs: cs,
+                height: 140,
+              )
+            else
+              _placeholder(locationLabel),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _placeholder(String? label) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(14.r),
+      child: Container(
+        height: 140.r,
+        width: double.infinity,
+        color: isDark ? Colors.white.withValues(alpha: 0.04) : Colors.black.withValues(alpha: 0.03),
+        alignment: Alignment.center,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Iconsax.map, size: 28.r, color: cs.onSurface.withValues(alpha: 0.2)),
+            if (label != null && label.isNotEmpty) ...[
+              SizedBox(height: 6.r),
+              Text(label, style: TextStyle(fontSize: 11.r, color: cs.onSurface.withValues(alpha: 0.4))),
+            ],
           ],
         ),
       ),

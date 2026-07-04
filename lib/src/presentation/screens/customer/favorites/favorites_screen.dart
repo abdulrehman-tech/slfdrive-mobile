@@ -68,13 +68,15 @@ class _FavoritesView extends StatelessWidget {
               padding: EdgeInsets.symmetric(horizontal: 16.r, vertical: 8.r),
               sliver: SliverList(
                 delegate: SliverChildBuilderDelegate(
-                  (_, i) => Padding(
-                    padding: EdgeInsets.only(bottom: 14.r),
-                    child: FavCarCard(
-                      car: cars[i],
-                      isDark: isDark,
-                      onRemove: () => context.read<FavoritesProvider>().removeCarAt(i),
-                      onTap: () => context.pushNamed('car-detail', pathParameters: {'id': cars[i].id}),
+                  (_, i) => RepaintBoundary(
+                    child: Padding(
+                      padding: EdgeInsets.only(bottom: 14.r),
+                      child: FavCarCard(
+                        car: cars[i],
+                        isDark: isDark,
+                        onRemove: () => context.read<FavoritesProvider>().removeCarAt(i),
+                        onTap: () => context.pushNamed('car-detail', pathParameters: {'id': cars[i].id}),
+                      ),
                     ),
                   ),
                   childCount: cars.length,
@@ -93,13 +95,15 @@ class _FavoritesView extends StatelessWidget {
               padding: EdgeInsets.symmetric(horizontal: 16.r),
               sliver: SliverList(
                 delegate: SliverChildBuilderDelegate(
-                  (_, i) => Padding(
-                    padding: EdgeInsets.only(bottom: 12.r),
-                    child: FavDriverCard(
-                      driver: drivers[i],
-                      isDark: isDark,
-                      onRemove: () => context.read<FavoritesProvider>().removeDriverAt(i),
-                      onTap: () => context.pushNamed('driver-detail', pathParameters: {'id': drivers[i].id}),
+                  (_, i) => RepaintBoundary(
+                    child: Padding(
+                      padding: EdgeInsets.only(bottom: 12.r),
+                      child: FavDriverCard(
+                        driver: drivers[i],
+                        isDark: isDark,
+                        onRemove: () => context.read<FavoritesProvider>().removeDriverAt(i),
+                        onTap: () => context.pushNamed('driver-detail', pathParameters: {'id': drivers[i].id}),
+                      ),
                     ),
                   ),
                   childCount: drivers.length,

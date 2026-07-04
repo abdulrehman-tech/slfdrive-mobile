@@ -259,6 +259,7 @@ class AuthRepositoryImpl implements AuthRepository {
       StorageKeys.userEmail,
       StorageKeys.userPhone,
       StorageKeys.userName,
+      StorageKeys.userGender,
       StorageKeys.userProfileImage,
       StorageKeys.isLoggedIn,
       StorageKeys.isVerified,
@@ -298,6 +299,9 @@ class AuthRepositoryImpl implements AuthRepository {
     }
     if (user.fullName != null) {
       await storage.write(key: StorageKeys.userName, value: user.fullName);
+    }
+    if (user.gender != null && user.gender!.isNotEmpty) {
+      await storage.write(key: StorageKeys.userGender, value: user.gender);
     }
     if (user.photoUrl != null) {
       await storage.write(key: StorageKeys.userProfileImage, value: user.photoUrl);

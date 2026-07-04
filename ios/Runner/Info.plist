@@ -1,95 +1,112 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
-<dict>
-	<key>CFBundleDevelopmentRegion</key>
-	<string>$(DEVELOPMENT_LANGUAGE)</string>
-	<key>CFBundleDisplayName</key>
-	<string>Slfdrive</string>
-	<key>CFBundleExecutable</key>
-	<string>$(EXECUTABLE_NAME)</string>
-	<key>CFBundleIdentifier</key>
-	<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
-	<key>CFBundleInfoDictionaryVersion</key>
-	<string>6.0</string>
-	<key>CFBundleName</key>
-	<string>slfdrive</string>
-	<key>CFBundlePackageType</key>
-	<string>APPL</string>
-	<key>CFBundleShortVersionString</key>
-	<string>$(FLUTTER_BUILD_NAME)</string>
-	<key>CFBundleSignature</key>
-	<string>????</string>
-	<key>CFBundleVersion</key>
-	<string>$(FLUTTER_BUILD_NUMBER)</string>
-	<key>LSRequiresIPhoneOS</key>
-	<true/>
-	<key>UILaunchStoryboardName</key>
-	<string>LaunchScreen</string>
-	<key>UIMainStoryboardFile</key>
-	<string>Main</string>
-	<key>UISupportedInterfaceOrientations</key>
-	<array>
-		<string>UIInterfaceOrientationPortrait</string>
-		<string>UIInterfaceOrientationLandscapeLeft</string>
-		<string>UIInterfaceOrientationLandscapeRight</string>
-	</array>
-	<key>UISupportedInterfaceOrientations~ipad</key>
-	<array>
-		<string>UIInterfaceOrientationPortrait</string>
-		<string>UIInterfaceOrientationPortraitUpsideDown</string>
-		<string>UIInterfaceOrientationLandscapeLeft</string>
-		<string>UIInterfaceOrientationLandscapeRight</string>
-	</array>
-	<key>CADisableMinimumFrameDurationOnPhone</key>
-	<true/>
-	<key>UIApplicationSupportsIndirectInputEvents</key>
-	<true/>
-	<!-- Resolved from `ios/Flutter/Secrets.xcconfig` (gitignored). Consumed by
+	<dict>
+		<key>CFBundleDevelopmentRegion</key>
+		<string>$(DEVELOPMENT_LANGUAGE)</string>
+		<key>CFBundleDisplayName</key>
+		<string>SLF Drive</string>
+		<key>CFBundleExecutable</key>
+		<string>$(EXECUTABLE_NAME)</string>
+		<key>CFBundleIdentifier</key>
+		<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
+		<key>CFBundleInfoDictionaryVersion</key>
+		<string>6.0</string>
+		<key>CFBundleName</key>
+		<string>slfdrive</string>
+		<key>CFBundlePackageType</key>
+		<string>APPL</string>
+		<key>CFBundleShortVersionString</key>
+		<string>$(FLUTTER_BUILD_NAME)</string>
+		<key>CFBundleSignature</key>
+		<string>????</string>
+		<key>CFBundleVersion</key>
+		<string>$(FLUTTER_BUILD_NUMBER)</string>
+		<key>LSRequiresIPhoneOS</key>
+		<true/>
+		<key>UILaunchStoryboardName</key>
+		<string>LaunchScreen</string>
+		<key>UIMainStoryboardFile</key>
+		<string>Main</string>
+		<key>UISupportedInterfaceOrientations</key>
+		<array>
+			<string>UIInterfaceOrientationPortrait</string>
+			<string>UIInterfaceOrientationLandscapeLeft</string>
+			<string>UIInterfaceOrientationLandscapeRight</string>
+		</array>
+		<key>UISupportedInterfaceOrientations~ipad</key>
+		<array>
+			<string>UIInterfaceOrientationPortrait</string>
+			<string>UIInterfaceOrientationPortraitUpsideDown</string>
+			<string>UIInterfaceOrientationLandscapeLeft</string>
+			<string>UIInterfaceOrientationLandscapeRight</string>
+		</array>
+		<key>CADisableMinimumFrameDurationOnPhone</key>
+		<true/>
+		<key>UIApplicationSupportsIndirectInputEvents</key>
+		<true/>
+		<!-- Resolved from `ios/Flutter/Secrets.xcconfig` (gitignored). Consumed by
 	     `AppDelegate.swift` at startup to init GoogleMaps. -->
-	<key>GMSApiKey</key>
-	<string>$(MAPS_API_KEY)</string>
-	<!-- Foreground location: captured during profile completion and used by the
+		<key>GMSApiKey</key>
+		<string>$(MAPS_API_KEY)</string>
+		<!-- Foreground location: captured during profile completion and used by the
 	     booking location picker. App Store requires a non-empty purpose string. -->
-	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>SLF Drive uses your location to set your pickup point and show nearby cars and drivers.</string>
-	<!-- Avatar selection uses the photo library. -->
-	<key>NSPhotoLibraryUsageDescription</key>
-	<string>SLF Drive needs access to your photos so you can set a profile picture.</string>
-	<!-- App Transport Security: the OmPay checkout page is served from the
+		<key>NSLocationWhenInUseUsageDescription</key>
+		<string>SLF Drive uses your location to set your pickup point and show nearby cars and drivers.</string>
+		<!-- The location plugin references the "always" symbol, so App Store
+		     static analysis (error 90683) requires this key even though the app
+		     only uses foreground ("while in use") location. -->
+		<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+		<string>SLF Drive uses your location to set your pickup point and show nearby cars and drivers.</string>
+		<!-- Avatar selection uses the photo library. -->
+		<key>NSPhotoLibraryUsageDescription</key>
+		<string>SLF Drive needs access to your photos so you can set a profile picture.</string>
+		<!-- The in-app web view (and image-picker) reference the camera API, so a
+		     purpose string is required by App Store static analysis (90683) even
+		     when access is only requested if a feature you open needs a photo. -->
+		<key>NSCameraUsageDescription</key>
+		<string>SLF Drive uses the camera when you choose to take a photo, such as your profile picture.</string>
+		<!-- App Transport Security: the OmPay checkout page is served from the
 	     backend's self-signed-cert host (161.97.144.112). WKWebView enforces ATS
 	     before the server-trust callback can run, so allow insecure loads in web
 	     content for that host. The WebView still validates every other host;
 	     Dio handles the same host for API calls separately. -->
-	<key>NSAppTransportSecurity</key>
-	<dict>
-		<key>NSAllowsArbitraryLoadsInWebContent</key>
-		<true/>
-		<key>NSExceptionDomains</key>
+		<key>NSAppTransportSecurity</key>
 		<dict>
-			<key>161.97.144.112</key>
+			<key>NSAllowsArbitraryLoadsInWebContent</key>
+			<true/>
+			<key>NSExceptionDomains</key>
 			<dict>
-				<key>NSExceptionAllowsInsecureHTTPLoads</key>
-				<true/>
-				<key>NSIncludesSubdomains</key>
-				<true/>
+				<key>161.97.144.112</key>
+				<dict>
+					<key>NSExceptionAllowsInsecureHTTPLoads</key>
+					<true/>
+					<key>NSIncludesSubdomains</key>
+					<true/>
+				</dict>
 			</dict>
 		</dict>
-	</dict>
-	<!-- OmPay payment-gateway return deep link (slfdrive://payment/...). The
+		<!-- OmPay payment-gateway return deep link (slfdrive://payment/...). The
 	     checkout runs in an in-app WebView that intercepts this URL; this
 	     registration only matters if the gateway bounces to an external
 	     browser, so the return can re-open the app. -->
-	<key>CFBundleURLTypes</key>
-	<array>
-		<dict>
-			<key>CFBundleURLName</key>
-			<string>com.gmq.slfdrive</string>
-			<key>CFBundleURLSchemes</key>
-			<array>
-				<string>slfdrive</string>
-			</array>
-		</dict>
-	</array>
-</dict>
+		<key>CFBundleURLTypes</key>
+		<array>
+			<dict>
+				<key>CFBundleURLName</key>
+				<string>com.gmq.slfdrive</string>
+				<key>CFBundleURLSchemes</key>
+				<array>
+					<string>slfdrive</string>
+				</array>
+			</dict>
+		</array>
+		<key>UIStatusBarHidden</key>
+		<false/>
+		<!-- App uses only standard HTTPS/TLS encryption (no custom/proprietary
+		     crypto), so it is exempt from U.S. export documentation. This skips
+		     the export-compliance question on every App Store Connect upload. -->
+		<key>ITSAppUsesNonExemptEncryption</key>
+		<false/>
+	</dict>
 </plist>

@@ -1,7 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:skeletonizer/skeletonizer.dart';
+
+import '../../../../widgets/skeletons/app_shimmer.dart';
 
 /// Shimmer skeleton shown while the booking detail loads — mirrors the real
 /// layout (header, vehicle/driver, schedule, location, price, action).
@@ -14,13 +15,8 @@ class BookingDetailSkeleton extends StatelessWidget {
     final base = isDark ? const Color(0xFF1E1E2E) : const Color(0xFFE0E0E0);
 
     return SafeArea(
-      child: Skeletonizer(
-        enabled: true,
-        effect: ShimmerEffect(
-          baseColor: isDark ? const Color(0xFF1E1E2E) : const Color(0xFFE0E0E0),
-          highlightColor: isDark ? const Color(0xFF2A2A3E) : const Color(0xFFF5F5F5),
-          duration: const Duration(milliseconds: 1500),
-        ),
+      child: AppShimmer(
+        baseColor: base,
         child: Center(
           child: Container(
             constraints: BoxConstraints(maxWidth: 1100.r),

@@ -5,6 +5,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../../widgets/skeletons/list_skeleton.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 
+import '../../../../../core/data/repositories/driver_listing_repository.dart';
 import '../../../../../core/data/repositories/vehicle_repository.dart';
 import '../../../../../core/di/injection_container.dart';
 import '../../../../../core/errors/app_exception.dart';
@@ -27,8 +28,10 @@ class VehicleSelectStep extends StatefulWidget {
 
 class _VehicleSelectStepState extends State<VehicleSelectStep> {
   final _repo = getIt<VehicleRepository>();
+  final _driverRepo = getIt<DriverListingRepository>();
   List<Vehicle> _vehicles = const [];
   bool _loading = false;
+  bool _companyScoped = false; // filtered to companies that have drivers
   String? _error;
 
   @override
@@ -44,8 +47,28 @@ class _VehicleSelectStepState extends State<VehicleSelectStep> {
     });
     try {
       final page = await _repo.getPaginated(const PaginationParams(pageNumber: 1, pageSize: 50));
+      var vehicles = page.items;
+      var scoped = false;
+      // Car + driver: only offer cars whose owning company also has drivers,
+      // since the next step assigns a driver from that same company.
+      if (widget.data.serviceType == BookingServiceType.carWithDriver) {
+        final drivers = await _driverRepo.getPaginated(
+          const PaginationParams(pageNumber: 1, pageSize: 50),
+        );
+        final companiesWithDrivers = drivers.items
+            .map((d) => d.allCompanyId)
+            .whereType<int>()
+            .toSet();
+        vehicles = vehicles
+            .where((v) => v.companyId != null && companiesWithDrivers.contains(v.companyId))
+            .toList();
+        scoped = true;
+      }
       if (!mounted) return;
-      setState(() => _vehicles = page.items);
+      setState(() {
+        _vehicles = vehicles;
+        _companyScoped = scoped;
+      });
     } on AppException catch (e) {
       if (!mounted) return;
       setState(() => _error = e.message);
@@ -64,11 +87,13 @@ class _VehicleSelectStepState extends State<VehicleSelectStep> {
       brand: v.brandName ?? '',
       imageUrl: v.primaryPhoto ?? '',
       pricePerDay: v.pricePerDay ?? 0,
+      pricePerHour: v.pricePerHour ?? 0,
       plateNumber: v.plateNumber ?? '',
       lat: v.lat,
       lon: v.lon,
       locationName: v.locationName,
       branchId: v.branchId,
+      companyId: v.companyId,
     ));
   }
 
@@ -100,7 +125,8 @@ class _VehicleSelectStepState extends State<VehicleSelectStep> {
             padding: EdgeInsets.symmetric(vertical: 30.r),
             child: Center(
               child: Text(
-                'search_no_results'.tr(),
+                (_companyScoped ? 'booking_vehicle_none_with_driver' : 'search_no_results').tr(),
+                textAlign: TextAlign.center,
                 style: TextStyle(color: cs.onSurface.withValues(alpha: 0.6), fontSize: 13.r),
               ),
             ),

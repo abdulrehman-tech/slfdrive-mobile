@@ -57,13 +57,7 @@ class _SearchView extends StatelessWidget {
         minRating: provider.minRating,
         brands: provider.availableBrands,
         onApply: (type, duration, price, brands, rating) {
-          provider.applyFilters(
-            type: type,
-            duration: duration,
-            price: price,
-            brands: brands,
-            rating: rating,
-          );
+          provider.applyFilters(type: type, duration: duration, price: price, brands: brands, rating: rating);
           Navigator.pop(context);
         },
       ),
@@ -87,9 +81,7 @@ class _SearchView extends StatelessWidget {
             end: Alignment.bottomCenter,
           ),
         ),
-        child: SafeArea(
-          child: isDesktop ? _buildDesktop(context, isDark, cs) : _buildMobile(context, isDark, cs),
-        ),
+        child: SafeArea(child: isDesktop ? _buildDesktop(context, isDark, cs) : _buildMobile(context, isDark, cs)),
       ),
     );
   }
@@ -102,11 +94,7 @@ class _SearchView extends StatelessWidget {
 
     return Column(
       children: [
-        SearchAppBar(
-          isDark: isDark,
-          cs: cs,
-          onFilterTap: () => _showFilterSheet(context, isDark, cs),
-        ),
+        SearchAppBar(isDark: isDark, cs: cs, onFilterTap: () => _showFilterSheet(context, isDark, cs)),
         Expanded(
           child: provider.isLoading && !hasResults
               ? const ListSkeleton()
@@ -133,16 +121,18 @@ class _SearchView extends StatelessWidget {
                     ),
                     if (cars.isNotEmpty)
                       SliverPadding(
-                        padding: EdgeInsets.symmetric(horizontal: 16.r),
+                        padding: EdgeInsets.symmetric(horizontal: 16.r, vertical: 16.r),
                         sliver: SliverList(
                           delegate: SliverChildBuilderDelegate(
-                            (_, i) => Padding(
-                              padding: EdgeInsets.only(bottom: 12.r),
-                              child: SearchCarCard(
-                                car: cars[i],
-                                isDark: isDark,
-                                cs: cs,
-                                onTap: () => context.pushNamed('car-detail', pathParameters: {'id': cars[i].id}),
+                            (_, i) => RepaintBoundary(
+                              child: Padding(
+                                padding: EdgeInsets.only(bottom: 12.r),
+                                child: SearchCarCard(
+                                  car: cars[i],
+                                  isDark: isDark,
+                                  cs: cs,
+                                  onTap: () => context.pushNamed('car-detail', pathParameters: {'id': cars[i].id}),
+                                ),
                               ),
                             ),
                             childCount: cars.length,
@@ -167,14 +157,15 @@ class _SearchView extends StatelessWidget {
                         padding: EdgeInsets.symmetric(horizontal: 16.r),
                         sliver: SliverList(
                           delegate: SliverChildBuilderDelegate(
-                            (_, i) => Padding(
-                              padding: EdgeInsets.only(bottom: 12.r),
-                              child: SearchDriverCard(
-                                driver: drivers[i],
-                                isDark: isDark,
-                                cs: cs,
-                                onTap: () =>
-                                    context.pushNamed('driver-detail', pathParameters: {'id': drivers[i].id}),
+                            (_, i) => RepaintBoundary(
+                              child: Padding(
+                                padding: EdgeInsets.only(bottom: 12.r),
+                                child: SearchDriverCard(
+                                  driver: drivers[i],
+                                  isDark: isDark,
+                                  cs: cs,
+                                  onTap: () => context.pushNamed('driver-detail', pathParameters: {'id': drivers[i].id}),
+                                ),
                               ),
                             ),
                             childCount: drivers.length,
@@ -197,11 +188,7 @@ class _SearchView extends StatelessWidget {
 
     return Column(
       children: [
-        SearchAppBar(
-          isDark: isDark,
-          cs: cs,
-          onFilterTap: () => _showFilterSheet(context, isDark, cs),
-        ),
+        SearchAppBar(isDark: isDark, cs: cs, onFilterTap: () => _showFilterSheet(context, isDark, cs)),
         Expanded(
           child: Center(
             child: Container(
@@ -210,86 +197,83 @@ class _SearchView extends StatelessWidget {
               child: provider.query.isEmpty && !provider.hasActiveFilters && !hasResults
                   ? InitialState(isDark: isDark, cs: cs)
                   : provider.isLoading && !hasResults
-                      ? const ListSkeleton()
-                      : !hasResults
-                      ? EmptyResults(
-                          isDark: isDark,
-                          cs: cs,
-                          hasActiveFilters: provider.hasActiveFilters,
-                          onClearFilters: provider.resetFilters,
-                        )
-                      : Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            if (provider.typeFilter != 2)
-                              Expanded(
-                                flex: 3,
-                                child: ListView(
-                                  physics: const BouncingScrollPhysics(),
-                                  padding: EdgeInsets.only(top: 16.r, bottom: 40.r),
-                                  children: [
-                                    ResultsHeader(
-                                      cs: cs,
-                                      count: cars.length + drivers.length,
-                                      hasActiveFilters: provider.hasActiveFilters,
-                                      onClearFilters: provider.resetFilters,
-                                    ),
-                                    SizedBox(height: 12.r),
-                                    Wrap(
-                                      spacing: 16.r,
-                                      runSpacing: 16.r,
-                                      children: cars
-                                          .map(
-                                            (c) => SizedBox(
-                                              width: 340.r,
-                                              child: SearchCarCard(
-                                                car: c,
-                                                isDark: isDark,
-                                                cs: cs,
-                                                onTap: () =>
-                                                    context.pushNamed('car-detail', pathParameters: {'id': c.id}),
-                                              ),
-                                            ),
-                                          )
-                                          .toList(),
-                                    ),
-                                  ],
+                  ? const ListSkeleton()
+                  : !hasResults
+                  ? EmptyResults(
+                      isDark: isDark,
+                      cs: cs,
+                      hasActiveFilters: provider.hasActiveFilters,
+                      onClearFilters: provider.resetFilters,
+                    )
+                  : Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        if (provider.typeFilter != 2)
+                          Expanded(
+                            flex: 3,
+                            child: ListView(
+                              physics: const BouncingScrollPhysics(),
+                              padding: EdgeInsets.only(top: 16.r, bottom: 40.r),
+                              children: [
+                                ResultsHeader(
+                                  cs: cs,
+                                  count: cars.length + drivers.length,
+                                  hasActiveFilters: provider.hasActiveFilters,
+                                  onClearFilters: provider.resetFilters,
                                 ),
-                              ),
-                            if (provider.typeFilter == 0 && cars.isNotEmpty && drivers.isNotEmpty)
-                              SizedBox(width: 24.r),
-                            if (provider.typeFilter != 1 && drivers.isNotEmpty)
-                              SizedBox(
-                                width: 300.r,
-                                child: ListView(
-                                  physics: const BouncingScrollPhysics(),
-                                  padding: EdgeInsets.only(top: 16.r, bottom: 40.r),
-                                  children: [
-                                    SectionLabel(
+                                SizedBox(height: 12.r),
+                                Wrap(
+                                  spacing: 16.r,
+                                  runSpacing: 16.r,
+                                  children: cars
+                                      .map(
+                                        (c) => SizedBox(
+                                          width: 340.r,
+                                          child: SearchCarCard(
+                                            car: c,
+                                            isDark: isDark,
+                                            cs: cs,
+                                            onTap: () => context.pushNamed('car-detail', pathParameters: {'id': c.id}),
+                                          ),
+                                        ),
+                                      )
+                                      .toList(),
+                                ),
+                              ],
+                            ),
+                          ),
+                        if (provider.typeFilter == 0 && cars.isNotEmpty && drivers.isNotEmpty) SizedBox(width: 24.r),
+                        if (provider.typeFilter != 1 && drivers.isNotEmpty)
+                          SizedBox(
+                            width: 300.r,
+                            child: ListView(
+                              physics: const BouncingScrollPhysics(),
+                              padding: EdgeInsets.only(top: 16.r, bottom: 40.r),
+                              children: [
+                                SectionLabel(
+                                  isDark: isDark,
+                                  cs: cs,
+                                  title: 'search_drivers_section'.tr(),
+                                  icon: Iconsax.profile_2user_copy,
+                                  color: const Color(0xFF00BCD4),
+                                ),
+                                SizedBox(height: 12.r),
+                                ...drivers.map(
+                                  (d) => Padding(
+                                    padding: EdgeInsets.only(bottom: 12.r),
+                                    child: SearchDriverCard(
+                                      driver: d,
                                       isDark: isDark,
                                       cs: cs,
-                                      title: 'search_drivers_section'.tr(),
-                                      icon: Iconsax.profile_2user_copy,
-                                      color: const Color(0xFF00BCD4),
+                                      onTap: () => context.pushNamed('driver-detail', pathParameters: {'id': d.id}),
                                     ),
-                                    SizedBox(height: 12.r),
-                                    ...drivers.map(
-                                      (d) => Padding(
-                                        padding: EdgeInsets.only(bottom: 12.r),
-                                        child: SearchDriverCard(
-                                          driver: d,
-                                          isDark: isDark,
-                                          cs: cs,
-                                          onTap: () =>
-                                              context.pushNamed('driver-detail', pathParameters: {'id': d.id}),
-                                        ),
-                                      ),
-                                    ),
-                                  ],
+                                  ),
                                 ),
-                              ),
-                          ],
-                        ),
+                              ],
+                            ),
+                          ),
+                      ],
+                    ),
             ),
           ),
         ),

@@ -1,6 +1,7 @@
 import '../../models/booking/booking.dart';
 import '../../models/booking/booking_creation_request.dart';
 import '../../models/booking/ompay.dart';
+import '../../models/booking/payment_info.dart';
 import '../../models/common/paged_response.dart';
 import '../../models/common/pagination_params.dart';
 import '../datasources/booking_remote_data_source.dart';
@@ -18,6 +19,7 @@ abstract class BookingRepository {
   Future<bool> approve({required int id, required int confirmedBy});
   Future<bool> reject({required int id, required int confirmedBy, String? reason});
   Future<bool> complete(int id);
+  Future<PaymentInfo?> paymentForBooking(int bookingId);
 }
 
 class BookingRepositoryImpl implements BookingRepository {
@@ -66,4 +68,8 @@ class BookingRepositoryImpl implements BookingRepository {
 
   @override
   Future<bool> complete(int id) => remote.complete(id);
+
+  @override
+  Future<PaymentInfo?> paymentForBooking(int bookingId) =>
+      remote.paymentForBooking(bookingId);
 }

@@ -102,7 +102,7 @@ class _BrandsViewState extends State<_BrandsView> {
                     childAspectRatio: 0.82,
                   ),
                   delegate: SliverChildBuilderDelegate(
-                    (_, i) => BrandTile(brand: brands[i], isDark: isDark, cs: cs),
+                    (_, i) => RepaintBoundary(child: BrandTile(brand: brands[i], isDark: isDark, cs: cs)),
                     childCount: brands.length,
                   ),
                 ),

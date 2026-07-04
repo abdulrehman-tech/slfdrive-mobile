@@ -50,7 +50,10 @@ class SummaryScheduleCard extends StatelessWidget {
           SizedBox(height: 10.r),
           SummaryInfoRow(label: 'booking_summary_pickup_date'.tr(), value: _formatDate(d.startAt)),
           SummaryInfoRow(label: 'booking_summary_return_date'.tr(), value: _formatDate(d.endAt)),
-          SummaryInfoRow(label: 'booking_summary_days'.tr(), value: '${d.days}'),
+          SummaryInfoRow(
+            label: 'booking_summary_duration'.tr(),
+            value: '${d.units} ${d.unitLabelKey.tr()}',
+          ),
         ],
       ),
     );

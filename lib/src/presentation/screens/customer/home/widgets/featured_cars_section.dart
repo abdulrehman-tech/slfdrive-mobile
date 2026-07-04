@@ -81,19 +81,22 @@ class FeaturedCarsSection extends StatelessWidget {
               scrollDirection: Axis.horizontal,
               physics: const BouncingScrollPhysics(),
               padding: EdgeInsets.symmetric(horizontal: 16.r),
+              itemExtent: 236.r,
               itemCount: home.featuredCars.length,
               itemBuilder: (_, i) {
                 final car = home.featuredCars[i]..isFavourite = fav.isCarFav(home.featuredCars[i].id);
-                return Padding(
-                  padding: EdgeInsetsDirectional.only(end: 16.r),
-                  child: SizedBox(
-                    width: 220.r,
-                    child: CarCard(
-                      car: car,
-                      isDark: isDark,
-                      cs: cs,
-                      onFavourite: () => _onFavourite(context, fav, car),
-                      onTap: () => context.pushNamed('car-detail', pathParameters: {'id': car.id}),
+                return RepaintBoundary(
+                  child: Padding(
+                    padding: EdgeInsetsDirectional.only(end: 16.r),
+                    child: SizedBox(
+                      width: 220.r,
+                      child: CarCard(
+                        car: car,
+                        isDark: isDark,
+                        cs: cs,
+                        onFavourite: () => _onFavourite(context, fav, car),
+                        onTap: () => context.pushNamed('car-detail', pathParameters: {'id': car.id}),
+                      ),
                     ),
                   ),
                 );

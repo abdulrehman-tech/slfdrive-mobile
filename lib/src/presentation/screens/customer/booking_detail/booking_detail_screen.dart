@@ -1,6 +1,7 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 
@@ -148,7 +149,16 @@ class _BookingDetailView extends StatelessWidget {
       body = isDesktop ? _buildDesktop(context, isDark, cs, booking) : _buildMobile(context, isDark, cs, booking);
     }
 
-    return Scaffold(backgroundColor: Theme.of(context).scaffoldBackgroundColor, body: body);
+    // When reached by replacing the stack (e.g. from the booking-success
+    // screen), there's nothing to pop — send a system/gesture back to home
+    // instead of blanking to a black screen.
+    return PopScope(
+      canPop: context.canPop(),
+      onPopInvokedWithResult: (didPop, _) {
+        if (!didPop) context.go('/home');
+      },
+      child: Scaffold(backgroundColor: Theme.of(context).scaffoldBackgroundColor, body: body),
+    );
   }
 
   Widget _buildMobile(BuildContext context, bool isDark, ColorScheme cs, BookingDetail b) {

@@ -86,6 +86,10 @@ class ApiEndpoints {
   static const String bookingPay = '/api/Booking/pay';
   static String bookingById(int id) => '/api/Booking/$id';
 
+  /// Payment records for a booking (`GET`). Exposes the settled payment's
+  /// method (cash / card / OmPay) — the booking DTO itself only carries status.
+  static String paymentByBooking(int bookingId) => '/api/Payment/booking/$bookingId';
+
   // Booking lifecycle (driver/owner side)
   static const String bookingApprove = '/api/Booking/approve';
   static const String bookingReject = '/api/Booking/reject';

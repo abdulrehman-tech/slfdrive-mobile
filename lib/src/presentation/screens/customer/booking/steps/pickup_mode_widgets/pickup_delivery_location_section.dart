@@ -19,15 +19,8 @@ class PickupDeliveryLocationSection extends StatelessWidget {
     required this.onOpenMap,
   });
 
-  static const _savedPickups = <(IconData, String, String)>[
-    (Iconsax.house_2, 'Home', 'Al Khuwair, Muscat'),
-    (Iconsax.briefcase, 'Work', 'Ruwi High Street, Muscat'),
-    (Iconsax.airplane, 'Airport', 'Muscat International Airport'),
-  ];
-
   @override
   Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
     return BookingGlassCard(
       isDark: isDark,
       padding: EdgeInsets.all(14.r),
@@ -47,63 +40,6 @@ class PickupDeliveryLocationSection extends StatelessWidget {
             fallbackAddress: 'booking_delivery_placeholder_desc'.tr(),
             isDark: isDark,
             onTap: onOpenMap,
-          ),
-          SizedBox(height: 12.r),
-          // Saved addresses quick picker
-          Text(
-            'booking_delivery_saved'.tr(),
-            style: TextStyle(
-              fontSize: 11.r,
-              fontWeight: FontWeight.w700,
-              color: cs.onSurface.withValues(alpha: 0.55),
-              letterSpacing: 0.2,
-            ),
-          ),
-          SizedBox(height: 8.r),
-          Wrap(
-            spacing: 8.r,
-            runSpacing: 8.r,
-            children: _savedPickups
-                .map((e) => GestureDetector(
-                      onTap: () => data.setDeliveryLocation(
-                        BookingLocation(
-                          latitude: 23.5880,
-                          longitude: 58.3829,
-                          address: e.$3,
-                          label: e.$2,
-                        ),
-                      ),
-                      child: Container(
-                        padding: EdgeInsets.symmetric(horizontal: 12.r, vertical: 8.r),
-                        decoration: BoxDecoration(
-                          color: isDark
-                              ? Colors.white.withValues(alpha: 0.05)
-                              : Colors.black.withValues(alpha: 0.03),
-                          borderRadius: BorderRadius.circular(11.r),
-                          border: Border.all(
-                            color: isDark
-                                ? Colors.white.withValues(alpha: 0.08)
-                                : Colors.black.withValues(alpha: 0.06),
-                          ),
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(e.$1, size: 14.r, color: cs.primary),
-                            SizedBox(width: 6.r),
-                            Text(
-                              e.$2,
-                              style: TextStyle(
-                                fontSize: 11.r,
-                                fontWeight: FontWeight.w600,
-                                color: cs.onSurface.withValues(alpha: 0.75),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ))
-                .toList(),
           ),
           SizedBox(height: 12.r),
           GestureDetector(

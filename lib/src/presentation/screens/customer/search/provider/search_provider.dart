@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:flutter/material.dart';
 
@@ -80,30 +81,53 @@ class SearchProvider extends ChangeNotifier {
     _isLoading = true;
     _error = null;
     notifyListeners();
-    final params = PaginationParams(
+    final q = _query.trim();
+    // Backend expects searchFilter as a JSON object keyed by the searchable
+    // column: vehicles match on `name`, drivers on `fullName`.
+    final vehicleParams = PaginationParams(
       pageNumber: 1,
       pageSize: _pageSize,
-      searchFilter: _query.trim().isEmpty ? null : _query.trim(),
+      searchFilter: q.isEmpty ? null : jsonEncode({'name': q}),
     );
-    try {
-      // Kick off both requests concurrently, keep their generic types.
-      final vehiclesFuture = _vehicles.getPaginated(params);
-      final driversFuture = _drivers.getPaginated(params);
-      final vehiclePage = await vehiclesFuture;
-      final driverPage = await driversFuture;
-      _carResults = vehiclePage.items.map(_mapCar).toList();
+    final driverParams = PaginationParams(
+      pageNumber: 1,
+      pageSize: _pageSize,
+      searchFilter: q.isEmpty ? null : jsonEncode({'fullName': q}),
+    );
+    // Run both concurrently but isolate failures: a driver-side error must not
+    // wipe car results (and vice-versa). Only surface an error if BOTH fail.
+    Object? vehicleError;
+    Object? driverError;
+
+    final vehicleFuture = _vehicles.getPaginated(vehicleParams).then((page) {
+      _carResults = page.items.map(_mapCar).toList();
+    }).catchError((Object e) {
+      vehicleError = e;
+      _carResults = const [];
+    });
+
+    final driverFuture = _drivers.getPaginated(driverParams).then((page) {
       // Customers can only hire freelance drivers; company-affiliated drivers
       // (allCompanyId != null) are excluded from search results.
       _driverResults =
-          driverPage.items.where((d) => d.allCompanyId == null).map(_mapDriver).toList();
-    } on AppException catch (e) {
-      _error = e.message;
-    } catch (e) {
-      _error = e.toString();
-    } finally {
-      _isLoading = false;
-      notifyListeners();
+          page.items.where((d) => d.allCompanyId == null).map(_mapDriver).toList();
+    }).catchError((Object e) {
+      driverError = e;
+      _driverResults = const [];
+    });
+
+    await Future.wait([vehicleFuture, driverFuture]);
+
+    // Only show a blocking error when nothing at all could be loaded.
+    if (vehicleError != null && driverError != null) {
+      final e = vehicleError!;
+      _error = e is AppException ? e.message : e.toString();
+    } else {
+      _error = null;
     }
+
+    _isLoading = false;
+    notifyListeners();
   }
 
   Future<void> retry() => _fetch();

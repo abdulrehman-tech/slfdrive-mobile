@@ -42,9 +42,11 @@ class NotifGroupedList {
           padding: EdgeInsets.symmetric(horizontal: 16.r),
           sliver: SliverList.builder(
             itemCount: entries.length,
-            itemBuilder: (_, i) => Padding(
-              padding: EdgeInsets.only(bottom: 10.r),
-              child: NotifTile(item: entries[i], isDark: isDark, cs: cs),
+            itemBuilder: (_, i) => RepaintBoundary(
+              child: Padding(
+                padding: EdgeInsets.only(bottom: 10.r),
+                child: NotifTile(item: entries[i], isDark: isDark, cs: cs),
+              ),
             ),
           ),
         ),

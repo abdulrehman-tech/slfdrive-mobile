@@ -60,6 +60,27 @@ class BookingCarCard extends StatelessWidget {
                         booking.brand,
                         style: TextStyle(fontSize: 11.r, color: cs.onSurface.withValues(alpha: 0.55)),
                       ),
+                      if ((booking.companyName ?? '').isNotEmpty) ...[
+                        SizedBox(height: 4.r),
+                        Row(
+                          children: [
+                            Icon(Iconsax.building_copy, size: 12.r, color: cs.primary),
+                            SizedBox(width: 4.r),
+                            Flexible(
+                              child: Text(
+                                booking.companyName!,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  fontSize: 11.r,
+                                  fontWeight: FontWeight.w600,
+                                  color: cs.onSurface.withValues(alpha: 0.7),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
                       SizedBox(height: 6.r),
                       Row(
                         children: [

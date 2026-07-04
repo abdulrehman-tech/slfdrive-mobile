@@ -7,8 +7,8 @@ import 'package:provider/provider.dart';
 import '../../../../../../constants/icon_constants.dart';
 import '../provider/phone_login_provider.dart';
 import 'phone_login_back_button.dart';
+import 'phone_login_consent.dart';
 import 'phone_login_continue_button.dart';
-import 'phone_login_delivery_selector.dart';
 import 'phone_login_phone_input.dart';
 import 'phone_login_section_label.dart';
 
@@ -71,20 +71,14 @@ class PhoneLoginMobileLayout extends StatelessWidget {
                   ),
                   SizedBox(height: 12.r),
                   PhoneLoginPhoneInput(isDark: isDark),
-                  SizedBox(height: 24.r),
-                  PhoneLoginSectionLabel(
-                    text: 'otp_delivery_method'.tr(),
-                    isDark: isDark,
-                    fontSize: 14.r,
-                  ),
-                  SizedBox(height: 12.r),
-                  PhoneLoginDeliverySelector(isDark: isDark, spacing: 12.r),
                   SizedBox(height: 32.r),
                   PhoneLoginContinueButton(
                     isDark: isDark,
                     height: 56.r,
                     onContinue: onContinue,
                   ),
+                  SizedBox(height: 16.r),
+                  PhoneLoginConsent(isDark: isDark),
                   SizedBox(height: 24.r),
                 ],
               ),

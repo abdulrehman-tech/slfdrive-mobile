@@ -35,6 +35,9 @@ class Vehicle {
 
   // Resolved lookup names (EN + AR)
   final String? ownerName;
+  final int? companyId;
+  final String? companyName;
+  final String? companyNameAr;
   final String? brandName;
   final String? brandNameAr;
   final String? modelName;
@@ -80,6 +83,9 @@ class Vehicle {
     this.mileage,
     this.distanceKm,
     this.ownerName,
+    this.companyId,
+    this.companyName,
+    this.companyNameAr,
     this.brandName,
     this.brandNameAr,
     this.modelName,
@@ -153,6 +159,9 @@ class Vehicle {
       mileage: json['mileage'] as String?,
       distanceKm: (json['distanceKm'] as num?)?.toDouble(),
       ownerName: json['ownerName'] as String?,
+      companyId: (json['companyId'] as num?)?.toInt(),
+      companyName: json['companyName'] as String?,
+      companyNameAr: json['companyNameAr'] as String?,
       brandName: json['brandName'] as String?,
       brandNameAr: json['brandNameAr'] as String?,
       modelName: json['modelName'] as String?,

@@ -9,6 +9,20 @@ class Booking {
   final int? rentalCompanyId;
   final int? corporateCompanyId;
   final double? totalAmount;
+  final double? vehicleAmount;
+  final double? driverAmount;
+
+  /// Delivery fee charged for this booking, in OMR. `BookingResponseDto` does
+  /// NOT expose this today — the backend must add `deliveryFee` (and
+  /// `isDelivery`) to the read DTO for it to be non-null. Until then the detail
+  /// screen shows no delivery line even when a fee was charged (it's still baked
+  /// into `totalAmount`). Parsed defensively so it lights up automatically once
+  /// the backend ships the field.
+  final double? deliveryFee;
+
+  /// Whether this booking is a delivery. Also absent from `BookingResponseDto`
+  /// today; see [deliveryFee].
+  final bool? isDelivery;
   final int? statusId;
   final String? status;
   final String? statusType;
@@ -45,6 +59,10 @@ class Booking {
     this.rentalCompanyId,
     this.corporateCompanyId,
     this.totalAmount,
+    this.vehicleAmount,
+    this.driverAmount,
+    this.deliveryFee,
+    this.isDelivery,
     this.statusId,
     this.status,
     this.statusType,
@@ -90,9 +108,14 @@ class Booking {
   DateTime? get fromDate => DateTime.tryParse(fromDateTime ?? '');
   DateTime? get toDate => DateTime.tryParse(toDateTime ?? '');
 
-  /// Rental duration in days (minimum 1). Matches the backend's day count used
-  /// for pricing (a 2-night range bills 2 days), so `totalAmount / durationDays`
-  /// yields the per-day rate.
+  /// Rental duration as whole 24-hour periods (minimum 1) — a Jul 4→6 span
+  /// (48h) is 2 days. Kept identical to the customer detail view's `days` so the
+  /// driver and customer see the SAME count for one booking (previously this
+  /// added +1, so the driver read 3 days while the customer read 2).
+  /// NOTE: this is a client-side derivation from the two timestamps. The backend
+  /// does not return a day count today — once `BookingResponseDto.numberOfDays`
+  /// exists, display it directly and delete this. `totalAmount / durationDays`
+  /// is the per-day rate.
   int get durationDays {
     final f = fromDate;
     final t = toDate;
@@ -120,6 +143,10 @@ class Booking {
       rentalCompanyId: i('rentalCompanyId'),
       corporateCompanyId: i('corporateCompanyId'),
       totalAmount: d('totalAmount') ?? d('amount'),
+      vehicleAmount: d('vehicleAmount'),
+      driverAmount: d('driverAmount'),
+      deliveryFee: d('deliveryFee'),
+      isDelivery: json['isDelivery'] as bool?,
       statusId: i('statusId'),
       status: json['status'] as String?,
       statusType: json['statusType'] as String?,

@@ -39,11 +39,27 @@ class BookingDetail {
   final String plateCode;
   final String pickupLocation;
   final String dropoffLocation;
+
+  /// Pickup / drop-off coordinates from the booking (`BookingResponseDto`).
+  /// Self-pickup carries pickup coords; delivery carries drop-off coords.
+  final double? pickupLat;
+  final double? pickupLon;
+  final double? dropoffLat;
+  final double? dropoffLon;
+
   final DateTime start;
   final DateTime end;
   final double pricePerDay;
   final double extrasPerDay;
   final double deliveryFee;
+
+  /// Backend price breakdown (`BookingResponseDto`): the vehicle- and driver-side
+  /// charges, and the authoritative grand total. When the booking is same-day
+  /// these represent per-hour billing (see [isHourly]).
+  final double vehicleAmount;
+  final double driverAmount;
+  final double totalAmount;
+
   final String paymentMethod;
   final String? driverName;
   final String? driverAvatar;
@@ -71,6 +87,13 @@ class BookingDetail {
   final int? vehicleId;
   final int? driverId;
 
+  /// Owning company of the vehicle (from Vehicle/{id}), shown on the car card.
+  final String? companyName;
+
+  /// The settled payment method (cash / card / OmPay) from the Payment record,
+  /// shown once the booking is paid. Null while unpaid / unknown.
+  final String? paymentMethodName;
+
   // Vehicle specs (from Vehicle/{id}).
   final String? color;
   final int? year;
@@ -95,11 +118,18 @@ class BookingDetail {
     required this.plateCode,
     required this.pickupLocation,
     required this.dropoffLocation,
+    this.pickupLat,
+    this.pickupLon,
+    this.dropoffLat,
+    this.dropoffLon,
     required this.start,
     required this.end,
     required this.pricePerDay,
     required this.extrasPerDay,
     required this.deliveryFee,
+    this.vehicleAmount = 0,
+    this.driverAmount = 0,
+    this.totalAmount = 0,
     required this.paymentMethod,
     required this.stage,
     this.status = BookingStatus.pending,
@@ -113,6 +143,8 @@ class BookingDetail {
     this.rejectionReason,
     this.vehicleId,
     this.driverId,
+    this.companyName,
+    this.paymentMethodName,
     this.driverName,
     this.driverAvatar,
     this.driverPhone,
@@ -131,6 +163,14 @@ class BookingDetail {
   bool get hasVehicle => vehicleId != null;
   bool get hasDriver => driverId != null;
 
+  bool get hasPickupCoords => pickupLat != null && pickupLon != null;
+  bool get hasDropoffCoords => dropoffLat != null && dropoffLon != null;
+  bool get hasAnyCoords => hasPickupCoords || hasDropoffCoords;
+
+  /// True when the booking is delivered (drop-off coords present) rather than
+  /// self-pickup.
+  bool get isDelivery => hasDropoffCoords;
+
   /// Customer can pay once an admin has approved the booking and it isn't paid.
   /// Corporate bookings are billed to the company, so the customer never pays.
   bool get canPay => isApproved && !isPaid && !isCorporate;
@@ -141,6 +181,8 @@ class BookingDetail {
     String? brand,
     String? plateNumber,
     String? plateCode,
+    String? companyName,
+    String? paymentMethodName,
     String? driverName,
     String? driverAvatar,
     String? driverPhone,
@@ -165,11 +207,18 @@ class BookingDetail {
       plateCode: plateCode ?? this.plateCode,
       pickupLocation: pickupLocation,
       dropoffLocation: dropoffLocation,
+      pickupLat: pickupLat,
+      pickupLon: pickupLon,
+      dropoffLat: dropoffLat,
+      dropoffLon: dropoffLon,
       start: start,
       end: end,
       pricePerDay: pricePerDay,
       extrasPerDay: extrasPerDay,
       deliveryFee: deliveryFee,
+      vehicleAmount: vehicleAmount,
+      driverAmount: driverAmount,
+      totalAmount: totalAmount,
       paymentMethod: paymentMethod,
       stage: stage,
       status: status,
@@ -183,6 +232,8 @@ class BookingDetail {
       rejectionReason: rejectionReason,
       vehicleId: vehicleId,
       driverId: driverId,
+      companyName: companyName ?? this.companyName,
+      paymentMethodName: paymentMethodName ?? this.paymentMethodName,
       driverName: driverName ?? this.driverName,
       driverAvatar: driverAvatar ?? this.driverAvatar,
       driverPhone: driverPhone ?? this.driverPhone,
@@ -199,14 +250,37 @@ class BookingDetail {
     );
   }
 
+  /// Rental days as whole 24-hour periods (minimum 1) — matches the backend's
+  /// billing so the breakdown units line up with the charged total.
   int get days {
     final d = end.difference(start).inDays;
-    return d < 1 ? 1 : d + 1;
+    return d < 1 ? 1 : d;
   }
 
+  /// A same-calendar-day booking is billed by the hour, not the day.
+  bool get isHourly =>
+      start.year == end.year && start.month == end.month && start.day == end.day;
+
+  /// Rental hours (minimum 1) — only meaningful when [isHourly].
+  int get hours {
+    final h = end.difference(start).inHours;
+    return h < 1 ? 1 : h;
+  }
+
+  /// Billing units: hours for a same-day booking, otherwise days.
+  int get units => isHourly ? hours : days;
+
+  /// Translation key for the unit label ("hours" / "days").
+  String get unitLabelKey => isHourly ? 'booking_dates_hours' : 'booking_dates_days';
+
+  /// Per-unit vehicle / driver rate derived from the backend amount.
+  double get vehicleUnitRate => units > 0 ? vehicleAmount / units : vehicleAmount;
+  double get driverUnitRate => units > 0 ? driverAmount / units : driverAmount;
+
   double get subtotal => (pricePerDay + extrasPerDay) * days + deliveryFee;
-  double get vat => subtotal * 0.05;
-  double get total => subtotal + vat;
+
+  /// Prefer the backend's grand total; fall back to the derived subtotal.
+  double get total => totalAmount > 0 ? totalAmount : subtotal;
 
   /// True when the booking is completed and eligible for a customer review.
   bool get isCompleted => stage == BookingTimelineStage.returned;
@@ -215,11 +289,13 @@ class BookingDetail {
   /// doesn't carry vehicle display/plate fields or a price breakdown, so those
   /// fall back to empty/derived values; the amount is shown as the lump total.
   factory BookingDetail.fromBooking(Booking b) {
-    final start = b.fromDate ?? DateTime.now();
-    final end = b.toDate ?? start;
+    // Backend timestamps are UTC — convert to local so the displayed calendar
+    // dates match what the customer picked (else they read one day less).
+    final start = b.fromDate?.toLocal() ?? DateTime.now();
+    final end = b.toDate?.toLocal() ?? start;
     final dayCount = () {
       final d = end.difference(start).inDays;
-      return d < 1 ? 1 : d + 1;
+      return d < 1 ? 1 : d;
     }();
     final status = bookingStatusFromApi(b);
     final s = '${b.status ?? ''} ${b.statusType ?? ''}'.toLowerCase();
@@ -247,12 +323,22 @@ class BookingDetail {
       plateCode: '',
       pickupLocation: '',
       dropoffLocation: '',
+      pickupLat: b.pickupLat,
+      pickupLon: b.pickupLon,
+      dropoffLat: b.dropoffLat,
+      dropoffLon: b.dropoffLon,
       start: start,
       end: end,
       // Backend returns a lump total; spread it across days with no VAT split.
       pricePerDay: dayCount == 0 ? (b.totalAmount ?? 0) : (b.totalAmount ?? 0) / dayCount,
       extrasPerDay: 0,
-      deliveryFee: 0,
+      // Backend `BookingResponseDto` omits deliveryFee today, so this is 0 until
+      // it ships the field; the price card's delivery line then appears on its own.
+      deliveryFee: b.deliveryFee ?? 0,
+      // Real price breakdown from the response.
+      vehicleAmount: b.vehicleAmount ?? 0,
+      driverAmount: b.driverAmount ?? 0,
+      totalAmount: b.totalAmount ?? 0,
       paymentMethod: b.paymentStatus ?? '',
       stage: stage,
       status: status,

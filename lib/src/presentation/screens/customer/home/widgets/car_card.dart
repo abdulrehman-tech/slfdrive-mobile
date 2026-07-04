@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
@@ -99,28 +97,22 @@ class CarCard extends StatelessWidget {
                 Positioned(
                   bottom: 10.r,
                   right: 10.r,
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(10.r),
-                    child: BackdropFilter(
-                      filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-                      child: Container(
-                        padding: EdgeInsets.symmetric(horizontal: 8.r, vertical: 4.r),
-                        decoration: BoxDecoration(
-                          color: Colors.black.withValues(alpha: 0.45),
-                          borderRadius: BorderRadius.circular(10.r),
+                  child: Container(
+                    padding: EdgeInsets.symmetric(horizontal: 8.r, vertical: 4.r),
+                    decoration: BoxDecoration(
+                      color: Colors.black.withValues(alpha: 0.50),
+                      borderRadius: BorderRadius.circular(10.r),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        OmrIcon(size: 12.r, color: Colors.white),
+                        SizedBox(width: 3.r),
+                        Text(
+                          '${car.pricePerDay.toInt()}/${'day'.tr()}',
+                          style: TextStyle(fontSize: 14.r, fontWeight: FontWeight.bold, color: Colors.white),
                         ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            OmrIcon(size: 12.r, color: Colors.white),
-                            SizedBox(width: 3.r),
-                            Text(
-                              '${car.pricePerDay.toInt()}/${'day'.tr()}',
-                              style: TextStyle(fontSize: 14.r, fontWeight: FontWeight.bold, color: Colors.white),
-                            ),
-                          ],
-                        ),
-                      ),
+                      ],
                     ),
                   ),
                 ),

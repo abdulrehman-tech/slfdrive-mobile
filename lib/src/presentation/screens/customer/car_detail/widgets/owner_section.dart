@@ -19,10 +19,13 @@ class OwnerSection extends StatelessWidget {
     final vehicle = context.watch<CarDetailProvider>().vehicle;
     if (vehicle == null) return const SizedBox.shrink();
 
-    final ownerName = vehicle.ownerName;
-    if (ownerName == null || ownerName.isEmpty) return const SizedBox.shrink();
+    // Prefer the owning company name over the individual owner name.
+    final name = (vehicle.companyName?.trim().isNotEmpty ?? false)
+        ? vehicle.companyName!.trim()
+        : vehicle.ownerName;
+    if (name == null || name.isEmpty) return const SizedBox.shrink();
 
-    final initial = ownerName.isNotEmpty ? ownerName[0].toUpperCase() : '?';
+    final initial = name[0].toUpperCase();
 
     return CarGlassCard(
       isDark: isDark,
@@ -47,7 +50,7 @@ class OwnerSection extends StatelessWidget {
             SizedBox(width: 12.r),
             Expanded(
               child: Text(
-                ownerName,
+                name,
                 style: TextStyle(fontSize: 13.r, fontWeight: FontWeight.w700, color: cs.onSurface),
               ),
             ),

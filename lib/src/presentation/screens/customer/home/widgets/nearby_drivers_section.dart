@@ -60,13 +60,15 @@ class NearbyDriversSection extends StatelessWidget {
               physics: const BouncingScrollPhysics(),
               padding: EdgeInsets.symmetric(horizontal: 16.r),
               itemCount: home.nearbyDrivers.length,
-              itemBuilder: (_, i) => Padding(
-                padding: EdgeInsetsDirectional.only(end: 12.r),
-                child: DriverCard(
-                  driver: home.nearbyDrivers[i],
-                  isDark: isDark,
-                  cs: cs,
-                  onTap: () => context.pushNamed('driver-detail', pathParameters: {'id': home.nearbyDrivers[i].id}),
+              itemBuilder: (_, i) => RepaintBoundary(
+                child: Padding(
+                  padding: EdgeInsetsDirectional.only(end: 12.r),
+                  child: DriverCard(
+                    driver: home.nearbyDrivers[i],
+                    isDark: isDark,
+                    cs: cs,
+                    onTap: () => context.pushNamed('driver-detail', pathParameters: {'id': home.nearbyDrivers[i].id}),
+                  ),
                 ),
               ),
             ),

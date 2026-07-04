@@ -29,6 +29,9 @@ class BookingItem {
   final String? driverName;
   final String? driverPhotoUrl;
 
+  /// Free-text reason supplied when the booking was rejected.
+  final String? rejectionReason;
+
   const BookingItem({
     required this.id,
     required this.bookingNo,
@@ -45,11 +48,16 @@ class BookingItem {
     this.vehicleImageUrl,
     this.driverName,
     this.driverPhotoUrl,
+    this.rejectionReason,
   });
 
   /// Customer can pay once approved and not yet paid. Corporate bookings are
   /// billed to the company, so the customer never pays.
   bool get canPay => status == BookingStatus.approved && !isPaid && !isCorporate;
+
+  /// A rejected booking has no payment to make, so the card hides the payment
+  /// pill for it (the rejection is communicated by the status badge + reason).
+  bool get showPaymentStatus => status != BookingStatus.rejected;
 
   /// Headline for the card: vehicle name when known; for a driver hire, the
   /// driver name; otherwise the service label.
@@ -89,11 +97,21 @@ class BookingItem {
       vehicleImageUrl: vehicleImageUrl ?? this.vehicleImageUrl,
       driverName: driverName ?? this.driverName,
       driverPhotoUrl: driverPhotoUrl ?? this.driverPhotoUrl,
+      rejectionReason: rejectionReason,
     );
   }
 
   factory BookingItem.fromBooking(Booking b) {
-    String date(String? iso) => (iso == null || iso.length < 10) ? '' : iso.substring(0, 10);
+    // The backend returns timestamps in UTC; convert to local before taking the
+    // calendar date, else a +tz user sees the previous day (one day less).
+    // Formatted as "27 Jun 2026".
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    String date(String? iso) {
+      final dt = DateTime.tryParse(iso ?? '');
+      if (dt == null) return '';
+      final l = dt.toLocal();
+      return '${l.day} ${months[l.month - 1]} ${l.year}';
+    }
     return BookingItem(
       id: b.id,
       bookingNo: b.bookingNo ?? 'SLF${b.id}',
@@ -107,6 +125,7 @@ class BookingItem {
       vehicleId: b.vehicleId,
       driverId: b.driverId,
       driverName: b.driverFullName,
+      rejectionReason: b.rejectionReason,
     );
   }
 }

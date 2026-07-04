@@ -12,6 +12,7 @@
 .swiftpm/
 migrate_working_dir/
 .claude-flow/
+.playwright-mcp/
 # IntelliJ related
 *.iml
 *.ipr

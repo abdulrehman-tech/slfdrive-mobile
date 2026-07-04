@@ -120,15 +120,18 @@ class _CarListingView extends StatelessWidget {
         else
           SliverPadding(
             padding: EdgeInsets.symmetric(horizontal: 16.r),
-            sliver: SliverList(
+            sliver: SliverFixedExtentList(
+              itemExtent: 154.r,
               delegate: SliverChildBuilderDelegate(
-                (_, i) => Padding(
-                  padding: EdgeInsets.only(bottom: 14.r),
-                  child: CarListCard(
-                    car: cars[i],
-                    isDark: isDark,
-                    cs: cs,
-                    onTap: () => _navigateToDetail(context, cars[i]),
+                (_, i) => RepaintBoundary(
+                  child: Padding(
+                    padding: EdgeInsets.only(bottom: 14.r),
+                    child: CarListCard(
+                      car: cars[i],
+                      isDark: isDark,
+                      cs: cs,
+                      onTap: () => _navigateToDetail(context, cars[i]),
+                    ),
                   ),
                 ),
                 childCount: cars.length,

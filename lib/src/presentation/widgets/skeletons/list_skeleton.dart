@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:skeletonizer/skeletonizer.dart';
+
+import 'app_shimmer.dart';
 
 /// Reusable shimmer skeleton for list/grid loading states — a column of rounded
 /// placeholder cards. Drop-in replacement for a `CircularProgressIndicator` in
@@ -25,13 +26,8 @@ class ListSkeleton extends StatelessWidget {
     final base = isDark ? const Color(0xFF1E1E2E) : const Color(0xFFE0E0E0);
     final pad = padding ?? EdgeInsets.fromLTRB(16.r, 12.r, 16.r, 16.r);
 
-    return Skeletonizer(
-      enabled: true,
-      effect: ShimmerEffect(
-        baseColor: isDark ? const Color(0xFF1E1E2E) : const Color(0xFFE0E0E0),
-        highlightColor: isDark ? const Color(0xFF2A2A3E) : const Color(0xFFF5F5F5),
-        duration: const Duration(milliseconds: 1500),
-      ),
+    return AppShimmer(
+      baseColor: base,
       child: SingleChildScrollView(
         physics: const NeverScrollableScrollPhysics(),
         padding: pad,

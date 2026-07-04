@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/cupertino.dart';
@@ -50,40 +48,40 @@ class BookingCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(20.r),
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
-        child: Container(
-          padding: EdgeInsets.all(14.r),
-          decoration: BoxDecoration(
-            color: isDark ? Colors.white.withValues(alpha: 0.07) : Colors.white.withValues(alpha: 0.82),
-            borderRadius: BorderRadius.circular(20.r),
-            border: Border.all(
-              color: isDark ? Colors.white.withValues(alpha: 0.1) : Colors.black.withValues(alpha: 0.06),
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: isDark ? 0.25 : 0.05),
-                blurRadius: 20.r,
-                offset: Offset(0, 6.r),
-              ),
-            ],
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              _header(),
-              SizedBox(height: 12.r),
-              _dateRange(),
-              SizedBox(height: 12.r),
-              _footer(),
-              SizedBox(height: 14.r),
-              _actions(context),
-            ],
-          ),
+    return Container(
+      padding: EdgeInsets.all(14.r),
+      clipBehavior: Clip.antiAlias,
+      decoration: BoxDecoration(
+        color: isDark ? Colors.white.withValues(alpha: 0.07) : Colors.white.withValues(alpha: 0.82),
+        borderRadius: BorderRadius.circular(20.r),
+        border: Border.all(
+          color: isDark ? Colors.white.withValues(alpha: 0.1) : Colors.black.withValues(alpha: 0.06),
         ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: isDark ? 0.25 : 0.05),
+            blurRadius: 20.r,
+            offset: Offset(0, 6.r),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          _header(),
+          SizedBox(height: 12.r),
+          _dateRange(),
+          SizedBox(height: 12.r),
+          _footer(),
+          if (booking.status == BookingStatus.rejected &&
+              (booking.rejectionReason?.trim().isNotEmpty ?? false)) ...[
+            SizedBox(height: 10.r),
+            _rejectionRow(),
+          ],
+          SizedBox(height: 14.r),
+          _actions(context),
+        ],
       ),
     );
   }
@@ -195,7 +193,8 @@ class BookingCard extends StatelessWidget {
   Widget _footer() {
     return Row(
       children: [
-        _paymentBadge(),
+        // Rejected bookings have no payment to make — omit the pill entirely.
+        if (booking.showPaymentStatus) _paymentBadge(),
         const Spacer(),
         OmrIcon(size: 13.r, color: cs.primary),
         SizedBox(width: 3.r),
@@ -208,8 +207,24 @@ class BookingCard extends StatelessWidget {
   }
 
   Widget _paymentBadge() {
+    // Corporate bookings are billed to the company, not the customer.
+    if (booking.isCorporate && !booking.isPaid) {
+      return _badge(
+        const Color(0xFF00BFA5),
+        Iconsax.building_copy,
+        'booking_payment_bill_to_company'.tr(),
+      );
+    }
     final paid = booking.isPaid;
     final color = paid ? const Color(0xFF4CAF50) : const Color(0xFFFFA726);
+    return _badge(
+      color,
+      paid ? Iconsax.tick_circle_copy : Iconsax.wallet_money_copy,
+      paid ? 'bookings_paid'.tr() : 'bookings_awaiting_payment'.tr(),
+    );
+  }
+
+  Widget _badge(Color color, IconData icon, String label) {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 9.r, vertical: 4.r),
       decoration: BoxDecoration(
@@ -219,11 +234,37 @@ class BookingCard extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(paid ? Iconsax.tick_circle_copy : Iconsax.wallet_money_copy, size: 12.r, color: color),
+          Icon(icon, size: 12.r, color: color),
           SizedBox(width: 4.r),
           Text(
-            paid ? 'bookings_paid'.tr() : 'bookings_awaiting_payment'.tr(),
+            label,
             style: TextStyle(fontSize: 10.r, fontWeight: FontWeight.w700, color: color),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// Shown on a rejected booking: the reason the rental company gave.
+  Widget _rejectionRow() {
+    final reason = booking.rejectionReason?.trim() ?? '';
+    const color = Color(0xFFE53935);
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 10.r, vertical: 8.r),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: isDark ? 0.14 : 0.08),
+        borderRadius: BorderRadius.circular(10.r),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(Iconsax.info_circle_copy, size: 13.r, color: color),
+          SizedBox(width: 6.r),
+          Expanded(
+            child: Text(
+              '${'bookings_reject_reason'.tr()}: $reason',
+              style: TextStyle(fontSize: 11.r, color: color, height: 1.3),
+            ),
           ),
         ],
       ),

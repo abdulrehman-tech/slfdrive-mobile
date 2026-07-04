@@ -182,9 +182,15 @@ class BookingFlowProvider extends ChangeNotifier {
       // the row. So for delivery we must omit pickUpLat/Lon (and send the
       // drop-off + area); for self-pickup we send the vehicle's coords and no
       // drop-off.
+      // Send the times as canonical UTC (trailing `Z`) so the backend never has
+      // to guess the zone. A bare local ISO string (no `Z`, no offset) was
+      // ambiguous and got mis-shifted (a Jul-4 pickup landed on Jul-3 in the
+      // confirmation email). The picker builds LOCAL DateTimes, so `.toUtc()`
+      // preserves the correct instant; backend must parse as UTC and convert
+      // back to local for display/email.
       final detail = BookingDetailsCreationRequest(
-        fromDateTime: start.toIso8601String(),
-        toDateTime: end.toIso8601String(),
+        fromDateTime: start.toUtc().toIso8601String(),
+        toDateTime: end.toUtc().toIso8601String(),
         pickUpLat: isDelivery ? null : car?.lat,
         pickUpLon: isDelivery ? null : car?.lon,
         dropOffLat: dropOff?.latitude,
@@ -214,7 +220,7 @@ class BookingFlowProvider extends ChangeNotifier {
         return false;
       }
 
-      data.assignBookingRef(created.bookingNo ?? 'SLF$bookingId');
+      data.assignBookingRef(created.bookingNo ?? 'SLF$bookingId', id: bookingId);
       return true;
     } on AppException catch (e) {
       _error = e.message;

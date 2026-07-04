@@ -63,8 +63,8 @@ class BookingScheduleCard extends StatelessWidget {
             BookingMiniBlock(
               cs: cs,
               isDark: isDark,
-              label: 'booking_summary_days'.tr(),
-              value: '${booking.days} ${'booking_dates_days'.tr()}',
+              label: 'booking_summary_duration'.tr(),
+              value: '${booking.units} ${booking.unitLabelKey.tr()}',
             ),
           ],
         ),

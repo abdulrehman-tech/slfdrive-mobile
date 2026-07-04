@@ -53,7 +53,8 @@ class BookingDetailProvider extends ChangeNotifier {
         _error = 'booking_not_found';
       } else {
         var detail = BookingDetail.fromBooking(b);
-        // Apply the list-supplied seed so the image/name paint instantly.
+        // Apply the list-supplied seed so the image/name are present even if
+        // enrichment can't add more.
         if (seed != null) {
           detail = detail.copyWith(
             carName: seed!.vehicleName,
@@ -62,14 +63,10 @@ class BookingDetailProvider extends ChangeNotifier {
             driverAvatar: seed!.driverPhotoUrl,
           );
         }
-        // Show the booking immediately, then layer in vehicle/driver details.
-        _booking = detail;
-        _isLoading = false;
-        notifyListeners();
-        detail = await _enrich(detail);
-        _booking = detail;
-        notifyListeners();
-        return;
+        // Wait for vehicle/driver/payment enrichment to finish before the first
+        // paint so the screen renders complete instead of filling in behind the
+        // user. The skeleton stays up for the whole chain.
+        _booking = await _enrich(detail);
       }
     } on AppException catch (e) {
       _error = e.message;
@@ -93,6 +90,7 @@ class BookingDetailProvider extends ChangeNotifier {
             carImageUrl: v.primaryPhoto ?? '',
             brand: v.brandName ?? '',
             plateNumber: v.plateNumber ?? '',
+            companyName: v.companyName,
             color: v.color,
             year: v.year,
             seats: v.seats,
@@ -121,6 +119,16 @@ class BookingDetailProvider extends ChangeNotifier {
             driverLanguages: d.languagesKnown,
             driverLocation: d.locationName,
           );
+        }
+      } catch (_) {/* keep base */}
+    }
+    // Payment method (cash / card / OmPay): the booking DTO only carries payment
+    // status, so read the settled payment record when the booking is paid.
+    if (out.isPaid) {
+      try {
+        final payment = await _repository.paymentForBooking(out.id);
+        if (payment?.paymentTypeName != null) {
+          out = out.copyWith(paymentMethodName: payment!.paymentTypeName);
         }
       } catch (_) {/* keep base */}
     }

@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
@@ -27,21 +25,18 @@ class SearchCarCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: onTap,
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(16.r),
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
-          child: Container(
-            decoration: BoxDecoration(
-              color: isDark ? Colors.white.withValues(alpha: 0.07) : Colors.white.withValues(alpha: 0.85),
-              borderRadius: BorderRadius.circular(16.r),
-              border: Border.all(
-                color: isDark ? Colors.white.withValues(alpha: 0.1) : Colors.black.withValues(alpha: 0.06),
-              ),
-            ),
-            child: SizedBox(
-              height: 120.r,
-              child: Row(
+      child: Container(
+        clipBehavior: Clip.antiAlias,
+        decoration: BoxDecoration(
+          color: isDark ? Colors.white.withValues(alpha: 0.07) : Colors.white.withValues(alpha: 0.85),
+          borderRadius: BorderRadius.circular(16.r),
+          border: Border.all(
+            color: isDark ? Colors.white.withValues(alpha: 0.1) : Colors.black.withValues(alpha: 0.06),
+          ),
+        ),
+        child: SizedBox(
+          height: 120.r,
+          child: Row(
                 children: [
                   ClipRRect(
                     borderRadius: BorderRadius.only(
@@ -125,8 +120,6 @@ class SearchCarCard extends StatelessWidget {
               ),
             ),
           ),
-        ),
-      ),
     );
   }
 

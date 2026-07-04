@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
@@ -34,22 +32,17 @@ class ProfileSection extends StatelessWidget {
             ),
           ),
         ),
-        ClipRRect(
-          borderRadius: BorderRadius.circular(16.r),
-          child: BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-            child: Container(
-              padding: EdgeInsets.all(4.r),
-              decoration: BoxDecoration(
-                color: isDark ? Colors.white.withValues(alpha: 0.055) : Colors.white.withValues(alpha: 0.82),
-                borderRadius: BorderRadius.circular(16.r),
-                border: Border.all(
-                  color: isDark ? Colors.white.withValues(alpha: 0.08) : Colors.black.withValues(alpha: 0.05),
-                ),
-              ),
-              child: Column(children: children),
+        Container(
+          padding: EdgeInsets.all(4.r),
+          clipBehavior: Clip.antiAlias,
+          decoration: BoxDecoration(
+            color: isDark ? Colors.white.withValues(alpha: 0.055) : Colors.white.withValues(alpha: 0.82),
+            borderRadius: BorderRadius.circular(16.r),
+            border: Border.all(
+              color: isDark ? Colors.white.withValues(alpha: 0.08) : Colors.black.withValues(alpha: 0.05),
             ),
           ),
+          child: Column(children: children),
         ),
       ],
     );

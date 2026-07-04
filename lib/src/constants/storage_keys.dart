@@ -9,6 +9,9 @@ class StorageKeys {
   static const String userEmail = 'user_email';
   static const String userPhone = 'user_phone';
   static const String userName = 'user_name';
+  // Backend gender code (M/F/O). Cached from the login/profile user because the
+  // Customer GET DTO doesn't return gender — used to prefill the edit form.
+  static const String userGender = 'user_gender';
   static const String userProfileImage = 'user_profile_image';
   static const String userLat = 'user_lat';
   static const String userLon = 'user_lon';

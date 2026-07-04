@@ -4,6 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 
 import '../../../../widgets/omr_icon.dart';
+import '../../bookings/models/booking_item.dart' show BookingStatus;
 import '../models/booking_detail.dart';
 import 'glass_card.dart';
 import 'section_header.dart';
@@ -32,15 +33,10 @@ class BookingPriceCard extends StatelessWidget {
               isDark: isDark,
             ),
             SizedBox(height: 12.r),
-            _priceRow(
-              cs,
-              '${booking.pricePerDay.toInt()} × ${booking.days} ${'booking_dates_days'.tr()}',
-              booking.pricePerDay * booking.days,
-            ),
+            ..._breakdownRows(cs),
             if (booking.extrasPerDay > 0)
               _priceRow(cs, 'booking_summary_extras'.tr(), booking.extrasPerDay * booking.days),
             if (booking.deliveryFee > 0) _priceRow(cs, 'booking_summary_delivery_fee'.tr(), booking.deliveryFee),
-            _priceRow(cs, 'booking_summary_vat'.tr(), booking.vat),
             Divider(
               height: 20.r,
               color: isDark ? Colors.white.withValues(alpha: 0.08) : Colors.black.withValues(alpha: 0.06),
@@ -60,16 +56,34 @@ class BookingPriceCard extends StatelessWidget {
                 ),
               ],
             ),
-            SizedBox(height: 10.r),
-            _paymentStatusBadge(),
+            // A rejected booking has no payment to make — hide the status pill.
+            if (booking.status != BookingStatus.rejected) ...[
+              SizedBox(height: 10.r),
+              _paymentStatusBadge(),
+            ],
           ],
         ),
       ),
     );
   }
 
-  /// Payment-status pill: green "Paid" once settled, amber "Awaiting payment"
-  /// while pending. Corporate bookings read "Billed to company".
+  /// Localized label for a backend payment-type name (cash / card / OmPay).
+  /// Returns null for an unknown/empty method so the badge stays just "Paid".
+  String? _methodLabel(String? name) {
+    switch ((name ?? '').toLowerCase()) {
+      case 'cash':
+        return 'pay_method_cash'.tr();
+      case 'card':
+        return 'pay_method_card'.tr();
+      case 'ompay':
+        return 'OmPay';
+      default:
+        return (name != null && name.trim().isNotEmpty) ? name.trim() : null;
+    }
+  }
+
+  /// Payment-status pill: green "Paid · {method}" once settled, amber "Awaiting
+  /// payment" while pending. Corporate bookings read "Billed to company".
   Widget _paymentStatusBadge() {
     final Color color;
     final IconData icon;
@@ -81,7 +95,8 @@ class BookingPriceCard extends StatelessWidget {
     } else if (booking.isPaid) {
       color = const Color(0xFF4CAF50);
       icon = Iconsax.tick_circle_copy;
-      label = 'bookings_paid'.tr();
+      final method = _methodLabel(booking.paymentMethodName);
+      label = method == null ? 'bookings_paid'.tr() : '${'bookings_paid'.tr()} · $method';
     } else {
       color = const Color(0xFFFFA726);
       icon = Iconsax.clock_copy;
@@ -106,6 +121,38 @@ class BookingPriceCard extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  /// Price breakdown lines. Shows the vehicle and driver charges separately
+  /// when the backend supplies them (`vehicleAmount` / `driverAmount`), each as
+  /// `rate × units {days|hours}`. Same-day bookings are billed per hour. Falls
+  /// back to a single derived line when no breakdown is present.
+  List<Widget> _breakdownRows(ColorScheme cs) {
+    final unit = booking.unitLabelKey.tr();
+    final units = booking.units;
+    final rows = <Widget>[];
+
+    if (booking.vehicleAmount > 0) {
+      rows.add(_priceRow(
+        cs,
+        '${'booking_summary_vehicle'.tr()} · ${booking.vehicleUnitRate.toStringAsFixed(2)} × $units $unit',
+        booking.vehicleAmount,
+      ));
+    }
+    if (booking.driverAmount > 0) {
+      rows.add(_priceRow(
+        cs,
+        '${'booking_summary_driver'.tr()} · ${booking.driverUnitRate.toStringAsFixed(2)} × $units $unit',
+        booking.driverAmount,
+      ));
+    }
+
+    // No per-side breakdown from the backend — show the derived lump line.
+    if (rows.isEmpty) {
+      final rate = units > 0 ? booking.total / units : booking.total;
+      rows.add(_priceRow(cs, '${rate.toStringAsFixed(2)} × $units $unit', booking.total));
+    }
+    return rows;
   }
 
   Widget _priceRow(ColorScheme cs, String label, double amount) {
