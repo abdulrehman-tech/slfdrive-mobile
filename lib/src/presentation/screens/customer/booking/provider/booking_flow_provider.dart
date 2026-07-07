@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
@@ -98,7 +100,10 @@ class BookingFlowProvider extends ChangeNotifier {
       case BookingStepId.driver:
         return data.driver != null;
       case BookingStepId.summary:
-        return !_submitting;
+        // Block confirm while submitting or while the backend fare is still
+        // being fetched — the customer shouldn't confirm before the real total
+        // is shown.
+        return !_submitting && !data.quoteLoading;
     }
   }
 
@@ -115,6 +120,7 @@ class BookingFlowProvider extends ChangeNotifier {
     if (index < 0 || index >= steps.length || index == _currentIndex) return;
     _currentIndex = index;
     notifyListeners();
+    _maybeFetchQuote();
   }
 
   /// Advances to the next step. Returns `true` when the caller should trigger
@@ -125,8 +131,14 @@ class BookingFlowProvider extends ChangeNotifier {
     if (_currentIndex < steps.length - 1) {
       _currentIndex++;
       notifyListeners();
+      _maybeFetchQuote();
     }
     return false;
+  }
+
+  /// When the summary step becomes visible, fetch the backend fare quote.
+  void _maybeFetchQuote() {
+    if (currentStep == BookingStepId.summary) unawaited(refreshQuote());
   }
 
   /// Moves back one step. Returns `true` when already at the first step —
@@ -152,68 +164,13 @@ class BookingFlowProvider extends ChangeNotifier {
     _error = null;
     notifyListeners();
     try {
-      final repo = getIt<BookingRepository>();
-      final lookups = getIt<BookingLookups>();
-      final storage = getIt<FlutterSecureStorage>();
-      await lookups.ensureLoaded();
-
-      final userId = int.tryParse(await storage.read(key: StorageKeys.userId) ?? '');
-      if (userId == null) {
-        _error = 'not_signed_in';
+      final (request, errorKey) = await _buildRequest();
+      if (request == null) {
+        _error = errorKey;
         return false;
       }
 
-      final service = data.serviceType ?? BookingServiceType.rentCar;
-      final serviceTypeId = lookups.serviceTypeId(service);
-      final bookingTypeId = lookups.bookingTypeId(corporate: data.isCorporate);
-      if (serviceTypeId == null || bookingTypeId == null) {
-        _error = 'booking_config_unavailable';
-        return false;
-      }
-
-      final start = data.startAt ?? DateTime.now();
-      final end = data.endAt ?? start;
-      // Pickup point = where the vehicle is (its own location). Drop-off is set
-      // only when the customer chose delivery.
-      final car = data.car;
-      final isDelivery = data.pickupMode == PickupMode.delivery;
-      final dropOff = isDelivery ? data.deliveryLocation : null;
-      // The server derives delivery from the ABSENCE of pickup coordinates on
-      // the row. So for delivery we must omit pickUpLat/Lon (and send the
-      // drop-off + area); for self-pickup we send the vehicle's coords and no
-      // drop-off.
-      // Send the times as canonical UTC (trailing `Z`) so the backend never has
-      // to guess the zone. A bare local ISO string (no `Z`, no offset) was
-      // ambiguous and got mis-shifted (a Jul-4 pickup landed on Jul-3 in the
-      // confirmation email). The picker builds LOCAL DateTimes, so `.toUtc()`
-      // preserves the correct instant; backend must parse as UTC and convert
-      // back to local for display/email.
-      final detail = BookingDetailsCreationRequest(
-        fromDateTime: start.toUtc().toIso8601String(),
-        toDateTime: end.toUtc().toIso8601String(),
-        pickUpLat: isDelivery ? null : car?.lat,
-        pickUpLon: isDelivery ? null : car?.lon,
-        dropOffLat: dropOff?.latitude,
-        dropOffLon: dropOff?.longitude,
-        // Delivery area drives the server-side fee lookup.
-        locationId: isDelivery ? data.deliveryArea?.id : null,
-        isDelivery: isDelivery ? true : null,
-      );
-
-      // No statusId / paymentTypeId / totalAmount: the backend defaults the
-      // status to pending and computes the amount; payment is taken after
-      // admin approval.
-      final request = BookingCreationRequest(
-        userId: userId,
-        vehicleId: int.tryParse(data.car?.id ?? ''),
-        driverId: int.tryParse(data.driver?.id ?? ''),
-        corporateCompanyId: data.isCorporate ? data.company?.id : null,
-        bookingTypeId: bookingTypeId,
-        serviceTypeId: serviceTypeId,
-        bookingDetails: [detail],
-      );
-
-      final created = await repo.create(request);
+      final created = await getIt<BookingRepository>().create(request);
       final bookingId = created.bookingId;
       if (bookingId == null) {
         _error = 'booking_failed';
@@ -232,6 +189,88 @@ class BookingFlowProvider extends ChangeNotifier {
       _submitting = false;
       notifyListeners();
     }
+  }
+
+  /// Fetches the authoritative fare from `POST /api/Booking/pre-booking` for the
+  /// current selection and stores it on [data]. Never throws — errors surface
+  /// via [BookingData.quoteError] so the summary can fall back gracefully.
+  Future<void> refreshQuote() async {
+    data.setQuoteLoading();
+    try {
+      final (request, errorKey) = await _buildRequest();
+      if (request == null) {
+        data.setQuoteError(errorKey ?? 'booking_failed');
+        return;
+      }
+      final quote = await getIt<BookingRepository>().quote(request);
+      data.setQuote(quote);
+    } on AppException catch (e) {
+      data.setQuoteError(e.message);
+    } catch (e) {
+      data.setQuoteError(e.toString());
+    }
+  }
+
+  /// Builds the `BookingCreationRequest` from the current [data]. Shared by the
+  /// quote and create calls (same payload shape). Returns `(request, null)` on
+  /// success or `(null, errorKey)` when prerequisites are missing.
+  Future<(BookingCreationRequest?, String?)> _buildRequest() async {
+    final lookups = getIt<BookingLookups>();
+    final storage = getIt<FlutterSecureStorage>();
+    await lookups.ensureLoaded();
+
+    final userId = int.tryParse(await storage.read(key: StorageKeys.userId) ?? '');
+    if (userId == null) return (null, 'not_signed_in');
+
+    final service = data.serviceType ?? BookingServiceType.rentCar;
+    final serviceTypeId = lookups.serviceTypeId(service);
+    final bookingTypeId = lookups.bookingTypeId(corporate: data.isCorporate);
+    if (serviceTypeId == null || bookingTypeId == null) {
+      return (null, 'booking_config_unavailable');
+    }
+
+    final start = data.startAt ?? DateTime.now();
+    final end = data.endAt ?? start;
+    // Pickup point = where the vehicle is (its own location). Drop-off is set
+    // only when the customer chose delivery.
+    final car = data.car;
+    final isDelivery = data.pickupMode == PickupMode.delivery;
+    final dropOff = isDelivery ? data.deliveryLocation : null;
+    // The server derives delivery from the ABSENCE of pickup coordinates on
+    // the row. So for delivery we must omit pickUpLat/Lon (and send the
+    // drop-off + area); for self-pickup we send the vehicle's coords and no
+    // drop-off.
+    // Send the times as canonical UTC (trailing `Z`) so the backend never has
+    // to guess the zone. A bare local ISO string (no `Z`, no offset) was
+    // ambiguous and got mis-shifted (a Jul-4 pickup landed on Jul-3 in the
+    // confirmation email). The picker builds LOCAL DateTimes, so `.toUtc()`
+    // preserves the correct instant; backend must parse as UTC and convert
+    // back to local for display/email.
+    final detail = BookingDetailsCreationRequest(
+      fromDateTime: start.toUtc().toIso8601String(),
+      toDateTime: end.toUtc().toIso8601String(),
+      pickUpLat: isDelivery ? null : car?.lat,
+      pickUpLon: isDelivery ? null : car?.lon,
+      dropOffLat: dropOff?.latitude,
+      dropOffLon: dropOff?.longitude,
+      // Delivery area drives the server-side fee lookup.
+      locationId: isDelivery ? data.deliveryArea?.id : null,
+      isDelivery: isDelivery ? true : null,
+    );
+
+    // No statusId / paymentTypeId / totalAmount: the backend defaults the
+    // status to pending and computes the amount; payment is taken after
+    // admin approval.
+    final request = BookingCreationRequest(
+      userId: userId,
+      vehicleId: int.tryParse(data.car?.id ?? ''),
+      driverId: int.tryParse(data.driver?.id ?? ''),
+      corporateCompanyId: data.isCorporate ? data.company?.id : null,
+      bookingTypeId: bookingTypeId,
+      serviceTypeId: serviceTypeId,
+      bookingDetails: [detail],
+    );
+    return (request, null);
   }
 
   void _onDataChange() => notifyListeners();

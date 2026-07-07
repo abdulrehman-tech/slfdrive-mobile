@@ -1,5 +1,6 @@
 import '../../models/booking/booking.dart';
 import '../../models/booking/booking_creation_request.dart';
+import '../../models/booking/booking_quote.dart';
 import '../../models/booking/ompay.dart';
 import '../../models/booking/payment_info.dart';
 import '../../models/common/paged_response.dart';
@@ -9,6 +10,7 @@ import '../datasources/booking_remote_data_source.dart';
 /// Exposes customer bookings to the presentation layer.
 abstract class BookingRepository {
   Future<BookingCreationResponse> create(BookingCreationRequest request);
+  Future<BookingQuote> quote(BookingCreationRequest request);
   Future<PagedResponse<Booking>> myPaginated(PaginationParams params);
   Future<PagedResponse<Booking>> paginated(PaginationParams params);
   Future<PagedResponse<Booking>> driverPaginated(int driverId, PaginationParams params);
@@ -30,6 +32,9 @@ class BookingRepositoryImpl implements BookingRepository {
   @override
   Future<BookingCreationResponse> create(BookingCreationRequest request) =>
       remote.create(request);
+
+  @override
+  Future<BookingQuote> quote(BookingCreationRequest request) => remote.quote(request);
 
   @override
   Future<PagedResponse<Booking>> myPaginated(PaginationParams params) =>

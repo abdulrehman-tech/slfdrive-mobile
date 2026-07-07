@@ -415,6 +415,7 @@
   "booking_summary_discount": "Discount",
   "booking_summary_total": "Total to pay",
   "booking_summary_estimate_note": "Estimate only — the final amount is confirmed by admin after approval.",
+  "booking_summary_calculating": "Calculating fare…",
   "booking_payment_title": "How will you pay?",
   "booking_payment_subtitle": "All transactions are secured end-to-end.",
   "booking_payment_card": "Credit / Debit",

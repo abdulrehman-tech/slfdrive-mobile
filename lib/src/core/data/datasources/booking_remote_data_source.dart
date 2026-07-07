@@ -3,6 +3,7 @@ import '../../errors/app_exception.dart';
 import '../../errors/error_handler.dart';
 import '../../models/booking/booking.dart';
 import '../../models/booking/booking_creation_request.dart';
+import '../../models/booking/booking_quote.dart';
 import '../../models/booking/ompay.dart';
 import '../../models/booking/payment_info.dart';
 import '../../models/common/paged_response.dart';
@@ -13,6 +14,11 @@ import '../../network/api_client.dart';
 abstract class BookingRemoteDataSource {
   /// Creates a booking (`POST /api/Booking/create`).
   Future<BookingCreationResponse> create(BookingCreationRequest request);
+
+  /// Backend-computed fare quote for a would-be booking
+  /// (`POST /api/Booking/pre-booking`). Same request shape as [create]; returns
+  /// the authoritative price breakdown without creating anything.
+  Future<BookingQuote> quote(BookingCreationRequest request);
 
   /// The signed-in customer's bookings (`POST /api/Booking/my/paginated`).
   Future<PagedResponse<Booking>> myPaginated(PaginationParams params);
@@ -72,6 +78,20 @@ class BookingRemoteDataSourceImpl implements BookingRemoteDataSource {
         return BookingCreationResponse.fromJson(body['data'] as Map<String, dynamic>);
       }
       throw AppException(message: _message(body) ?? 'Booking failed');
+    } catch (e) {
+      throw ErrorHandler.handleError(e);
+    }
+  }
+
+  @override
+  Future<BookingQuote> quote(BookingCreationRequest request) async {
+    try {
+      final res = await apiClient.post(ApiEndpoints.bookingPreBooking, data: request.toJson());
+      final body = res.data as Map<String, dynamic>;
+      if (body['isSuccess'] == true && body['data'] is Map<String, dynamic>) {
+        return BookingQuote.fromJson(body['data'] as Map<String, dynamic>);
+      }
+      throw AppException(message: _message(body) ?? 'Could not calculate fare');
     } catch (e) {
       throw ErrorHandler.handleError(e);
     }

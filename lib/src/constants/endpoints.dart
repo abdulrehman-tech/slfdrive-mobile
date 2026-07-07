@@ -76,6 +76,7 @@ class ApiEndpoints {
 
   // Bookings
   static const String bookingCreate = '/api/Booking/create';
+  static const String bookingPreBooking = '/api/Booking/pre-booking';
   static const String bookingMyPaginated = '/api/Booking/my/paginated';
   static const String bookingPaginated = '/api/Booking/paginated';
 

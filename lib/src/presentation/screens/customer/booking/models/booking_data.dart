@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 
+import '../../../../../core/models/booking/booking_quote.dart';
 import '../../../../../core/models/company/all_company.dart';
 import '../../../../../core/models/lookup/location_option.dart';
 
@@ -209,6 +210,12 @@ class BookingData extends ChangeNotifier {
 
   PaymentMethod _paymentMethod = PaymentMethod.card;
 
+  // Backend-computed fare quote (from /Booking/pre-booking), fetched when the
+  // summary step is shown. Null until the first fetch; drives the price card.
+  BookingQuote? _quote;
+  bool _quoteLoading = false;
+  String? _quoteError;
+
   // Backend booking id + reference (set on success).
   int? _bookingId;
   String? _bookingRef;
@@ -236,6 +243,9 @@ class BookingData extends ChangeNotifier {
   LocationOption? get deliveryArea => _deliveryArea;
   bool get deliveryFeeLoading => _deliveryFeeLoading;
   PaymentMethod get paymentMethod => _paymentMethod;
+  BookingQuote? get quote => _quote;
+  bool get quoteLoading => _quoteLoading;
+  String? get quoteError => _quoteError;
   String? get bookingRef => _bookingRef;
   int? get bookingId => _bookingId;
 
@@ -396,6 +406,27 @@ class BookingData extends ChangeNotifier {
 
   void setPaymentMethod(PaymentMethod m) {
     _paymentMethod = m;
+    notifyListeners();
+  }
+
+  /// Marks the fare quote as loading (clears any prior error). Called before
+  /// hitting /Booking/pre-booking.
+  void setQuoteLoading() {
+    _quoteLoading = true;
+    _quoteError = null;
+    notifyListeners();
+  }
+
+  void setQuote(BookingQuote quote) {
+    _quote = quote;
+    _quoteLoading = false;
+    _quoteError = null;
+    notifyListeners();
+  }
+
+  void setQuoteError(String message) {
+    _quoteError = message;
+    _quoteLoading = false;
     notifyListeners();
   }
 

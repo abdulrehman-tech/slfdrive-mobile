@@ -194,7 +194,9 @@ class _BookingFlowView extends StatelessWidget {
       isLastStep: provider.isLastStep,
       canGoNext: provider.canGoNext,
       submitting: provider.submitting,
-      totalPrice: provider.data.totalPrice,
+      // Prefer the authoritative backend quote; fall back to the client estimate
+      // while it loads or if it failed.
+      totalPrice: provider.data.quote?.totalAmount ?? provider.data.totalPrice,
       nextLabelKey: provider.nextLabelKey,
       onBack: () => _handleBack(context),
       onNext: () => _handleNext(context),

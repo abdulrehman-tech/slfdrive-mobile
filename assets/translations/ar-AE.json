@@ -415,6 +415,7 @@
   "booking_summary_discount": "خصم",
   "booking_summary_total": "المجموع للدفع",
   "booking_summary_estimate_note": "تقديري فقط — يتم تأكيد المبلغ النهائي من قبل الإدارة بعد الموافقة.",
+  "booking_summary_calculating": "جارٍ حساب السعر…",
   "booking_payment_title": "كيف ستدفع؟",
   "booking_payment_subtitle": "جميع المعاملات مؤمّنة من البداية إلى النهاية.",
   "booking_payment_card": "بطاقة ائتمان / خصم",

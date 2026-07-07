@@ -42,6 +42,7 @@ class SummaryStep extends StatelessWidget {
 
         SizedBox(height: 14.r),
         SummaryPricingCard(data: d, isDark: isDark),
+        SizedBox(height: 24.r),
       ],
     );
   }
