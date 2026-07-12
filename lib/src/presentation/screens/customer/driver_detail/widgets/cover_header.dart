@@ -24,7 +24,7 @@ class CoverHeader extends StatelessWidget {
     final profile = provider.profile!;
     // Backend has no per-driver cover yet → fall back to a bundled asset.
     final ImageProvider coverImage = profile.coverUrl.isEmpty
-        ? const AssetImage('assets/images/pre-login.gif')
+        ? const AssetImage('assets/images/pre-login.webp')
         : CachedNetworkImageProvider(profile.coverUrl);
     return Stack(
       clipBehavior: Clip.none,

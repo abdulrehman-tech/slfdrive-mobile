@@ -72,6 +72,10 @@ class _CarDetailView extends StatelessWidget {
           ? (vehicle.locationNameAr ?? vehicle.locationName)
           : vehicle.locationName,
       branchId: vehicle.branchId,
+      // Needed for the delivery-fee lookup (keyed on companyId). Without it the
+      // pickup step fell back to the branch's allCompanyId (wrong id) and the
+      // fee always showed Free.
+      companyId: vehicle.companyId,
     );
     context.pushNamed('booking', extra: {'service': BookingServiceType.rentCar, 'car': car});
   }

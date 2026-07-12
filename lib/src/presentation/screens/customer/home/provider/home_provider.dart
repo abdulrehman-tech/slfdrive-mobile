@@ -1,10 +1,10 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../../core/data/repositories/driver_listing_repository.dart';
 import '../../../../../core/data/repositories/lookup_repository.dart';
 import '../../../../../core/data/repositories/vehicle_repository.dart';
 import '../../../../../core/di/injection_container.dart';
-import '../../../../../core/errors/app_exception.dart';
 import '../../../../../core/models/common/pagination_params.dart';
 import '../models/ad_item.dart';
 import '../models/car_brand.dart';
@@ -112,10 +112,10 @@ class HomeProvider extends ChangeNotifier {
       _featuredCars = page.items
           .map((v) => CarItem.fromVehicle(v, ar: _ar))
           .toList();
-    } on AppException catch (e) {
-      _carsError = e.message;
     } catch (_) {
-      _carsError = 'Something went wrong';
+      // Never surface the raw exception (HTTP/cast/session text). A guest (no
+      // token) gets a 401 here — show a friendly, retryable message instead.
+      _carsError = 'home_section_load_error'.tr();
     } finally {
       _carsLoading = false;
       notifyListeners();
@@ -136,10 +136,10 @@ class HomeProvider extends ChangeNotifier {
           .where((d) => d.allCompanyId == null)
           .map((d) => DriverItem.fromDriver(d, ar: _ar))
           .toList();
-    } on AppException catch (e) {
-      _driversError = e.message;
     } catch (_) {
-      _driversError = 'Something went wrong';
+      // Friendly, retryable message — never the raw HTTP/cast/session text.
+      // A guest (no token) gets a 401 from this endpoint.
+      _driversError = 'home_section_load_error'.tr();
     } finally {
       _driversLoading = false;
       notifyListeners();

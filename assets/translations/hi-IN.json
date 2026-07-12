@@ -365,5 +365,7 @@
   "booking_summary_driver": "ड्राइवर",
   "booking_summary_duration": "अवधि",
   "location_open_maps": "मैप में खोलें",
-  "location_resolving": "स्थान खोजा जा रहा है…"
+  "location_resolving": "स्थान खोजा जा रहा है…",
+  "corporate_search_hint": "कंपनियां खोजें",
+  "corporate_search_no_results": "आपकी खोज से कोई कंपनी मेल नहीं खाती।"
 }

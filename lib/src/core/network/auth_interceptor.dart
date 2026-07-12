@@ -78,6 +78,14 @@ class AuthInterceptor extends Interceptor {
         ),
       );
 
+  // Single-flight guard: when the access token expires, the home screen fires
+  // several protected requests in parallel and they all 401 at once. Without
+  // this, each would call the refresh endpoint independently with the SAME
+  // refresh token; if the backend rotates refresh tokens (issues a new one and
+  // invalidates the old), only the first succeeds and the rest post a dead
+  // token → forced logout. We coalesce every concurrent refresh onto one call.
+  Future<String?>? _inflightRefresh;
+
   Future<Response?> _handleTokenRefresh(RequestOptions requestOptions) async {
     final accessToken = await _secureStorage.read(key: StorageKeys.accessToken);
     final refreshToken = await _secureStorage.read(key: StorageKeys.refreshToken);
@@ -93,6 +101,29 @@ class AuthInterceptor extends Interceptor {
       return null;
     }
 
+    // If this request was sent with a token that is no longer the stored one,
+    // another concurrent request already refreshed — skip the refresh entirely
+    // and just retry with the current token.
+    final sentAuth = requestOptions.headers['Authorization'];
+    if (accessToken != null &&
+        accessToken.isNotEmpty &&
+        sentAuth is String &&
+        sentAuth != 'Bearer $accessToken') {
+      return _retryWith(requestOptions, accessToken);
+    }
+
+    // Coalesce onto a single in-flight refresh. Concurrent 401s await the same
+    // future instead of each hitting the refresh endpoint.
+    final newAccessToken = await (_inflightRefresh ??= _performRefresh(refreshToken));
+    if (newAccessToken == null || newAccessToken.isEmpty) {
+      return null;
+    }
+    return _retryWith(requestOptions, newAccessToken);
+  }
+
+  /// Performs exactly one refresh call and persists the rotated tokens. Returns
+  /// the new access token, or null (after clearing the session) on failure.
+  Future<String?> _performRefresh(String refreshToken) async {
     try {
       final response = await _dio.post(ApiEndpoints.refresh, data: {'refreshToken': refreshToken});
 
@@ -114,21 +145,34 @@ class AuthInterceptor extends Interceptor {
       if (newRefreshToken != null && newRefreshToken.isNotEmpty) {
         await _secureStorage.write(key: StorageKeys.refreshToken, value: newRefreshToken);
       }
+      return newAccessToken;
+    } catch (e) {
+      await _clearTokens();
+      _sessionManager.notifyExpired();
+      return null;
+    } finally {
+      // Allow the next wave of expiries to start a fresh refresh.
+      _inflightRefresh = null;
+    }
+  }
 
-      final opts = Options(
-        method: requestOptions.method,
-        headers: {...requestOptions.headers, 'Authorization': 'Bearer $newAccessToken'},
-      );
-
+  /// Replays the original request with a valid bearer token.
+  Future<Response?> _retryWith(RequestOptions requestOptions, String accessToken) async {
+    final opts = Options(
+      method: requestOptions.method,
+      headers: {...requestOptions.headers, 'Authorization': 'Bearer $accessToken'},
+    );
+    try {
       return await _dio.request(
         requestOptions.path,
         options: opts,
         data: requestOptions.data,
         queryParameters: requestOptions.queryParameters,
       );
-    } catch (e) {
-      await _clearTokens();
-      _sessionManager.notifyExpired();
+    } catch (_) {
+      // The retry itself failed (network, or the new token was also rejected).
+      // Return null so the caller surfaces a clean auth error rather than a
+      // raw exception; don't force-logout on a transient network blip.
       return null;
     }
   }

@@ -31,13 +31,16 @@ class LegalConstants {
   /// Effective / last-updated date printed on the documents.
   static const String effectiveDate = '[EFFECTIVE_DATE]';
 
-  /// Public HTTPS URLs where the policies are hosted. These are opened in an
-  /// in-app browser from the login consent line and the Terms/Privacy tiles,
-  /// and are the exact URLs you enter in the App Store / Play Console listings.
-  ///
-  /// ⚠️ Replace with the real hosted URLs before submission — the stores reject
-  /// placeholder or unreachable links. Ready-to-host content lives in
-  /// `docs/legal/`.
-  static const String termsUrl = 'https://example.com/slfdrive/terms';
-  static const String privacyUrl = 'https://example.com/slfdrive/privacy';
+  /// Public marketing/legal site host.
+  static const String _siteBase = 'https://slf-drives.com';
+
+  /// The hosted policy pages exist in English and Arabic only; any other app
+  /// locale falls back to the English page.
+  static String _pathLang(String languageCode) => languageCode == 'ar' ? 'ar' : 'en';
+
+  /// Public HTTPS URLs where the policies are hosted, localized to the app's
+  /// current language. Opened in an in-app browser from the login consent line
+  /// and the Terms/Privacy tiles, and mirror the App Store / Play Console links.
+  static String termsUrl(String languageCode) => '$_siteBase/${_pathLang(languageCode)}/terms';
+  static String privacyUrl(String languageCode) => '$_siteBase/${_pathLang(languageCode)}/privacy';
 }

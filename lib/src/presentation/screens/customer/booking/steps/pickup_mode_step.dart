@@ -69,12 +69,21 @@ class _PickupModeStepState extends State<PickupModeStep> {
 
   Future<int?> _resolveCompanyId() async {
     if (_companyResolved) return _companyId;
-    final branchId = widget.data.car?.branchId;
-    if (branchId != null) {
-      try {
-        _companyId = await _lookup.getBranchCompanyId(branchId);
-      } catch (_) {
-        _companyId = null;
+    // The vehicle's `companyId` is the DeliveryFee key (verified against the
+    // live API: fees are stored per this id). Do NOT derive it from the branch —
+    // `GET /Branch/{id}.allCompanyId` returns a DIFFERENT id (e.g. branch 3 →
+    // allCompanyId 2) that has no delivery fees, so the lookup came back empty
+    // and the fee always showed as "Free". Fall back to the branch only when the
+    // vehicle carries no companyId.
+    _companyId = widget.data.car?.companyId;
+    if (_companyId == null) {
+      final branchId = widget.data.car?.branchId;
+      if (branchId != null) {
+        try {
+          _companyId = await _lookup.getBranchCompanyId(branchId);
+        } catch (_) {
+          _companyId = null;
+        }
       }
     }
     _companyResolved = true;

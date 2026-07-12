@@ -87,7 +87,11 @@ class BookingCarCard extends StatelessWidget {
                           OmrIcon(size: 11.r, color: cs.primary),
                           SizedBox(width: 3.r),
                           Text(
-                            '${booking.pricePerDay.toInt()}/d',
+                            // VEHICLE-only rate. `pricePerDay` is total/days, so
+                            // for a car+driver booking it wrongly bundled the
+                            // driver's charge into the vehicle price. Use the
+                            // backend `vehicleAmount` split over the billed units.
+                            '${(booking.vehicleAmount > 0 ? booking.vehicleUnitRate : booking.pricePerDay).toInt()}/${booking.isHourly ? 'h' : 'd'}',
                             style: TextStyle(fontSize: 13.r, fontWeight: FontWeight.w800, color: cs.primary),
                           ),
                         ],

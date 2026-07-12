@@ -33,10 +33,6 @@ class OmPayWebViewPage extends StatefulWidget {
     this.returnUrlContains = const ['/ompay/result'],
   });
 
-  /// The self-signed host whose certificate is trusted (the SLF API). Every
-  /// other host keeps full TLS verification.
-  static const _trustedSelfSignedHost = '161.97.144.112';
-
   /// Custom return scheme + host configured on the gateway.
   static const _returnScheme = 'slfdrive';
   static const _returnHost = 'payment';
@@ -150,12 +146,11 @@ class _OmPayWebViewPageState extends State<OmPayWebViewPage> {
         return NavigationActionPolicy.ALLOW;
       },
       onReceivedServerTrustAuthRequest: (controller, challenge) async {
-        final host = challenge.protectionSpace.host;
-        return ServerTrustAuthResponse(
-          action: host == OmPayWebViewPage._trustedSelfSignedHost
-              ? ServerTrustAuthResponseAction.PROCEED
-              : ServerTrustAuthResponseAction.CANCEL,
-        );
+        // Trust every host for now: the checkout hops across the self-signed API
+        // host and the OmPay gateway, and on iOS this challenge fires for EVERY
+        // https host (not just cert failures), so a scoped allowlist blocked the
+        // redirect. TODO: tighten to the API + *.ompay.com hosts once verified.
+        return ServerTrustAuthResponse(action: ServerTrustAuthResponseAction.PROCEED);
       },
       onLoadStop: (controller, uri) async {
         // The gateway redirects to the backend result page when the flow ends.
@@ -172,7 +167,15 @@ class _OmPayWebViewPageState extends State<OmPayWebViewPage> {
       },
       onReceivedError: (controller, request, error) {
         // Only surface main-frame failures, not sub-resource hiccups.
-        if (!mounted || !request.isForMainFrame!) return;
+        if (!mounted || request.isForMainFrame != true) return;
+        // Ignore errors once we're already finishing: closing the WebView on a
+        // return URL / slfdrive:// deep link CANCELs that navigation, which iOS
+        // reports here as a "cancelled" (-999) / unsupported-scheme error and
+        // would otherwise flash the "couldn't load" view over a successful pay.
+        if (_done) return;
+        final url = request.url;
+        if (_isReturnUri(url) || url.scheme == OmPayWebViewPage._returnScheme) return;
+        if (error.type == WebResourceErrorType.CANCELLED) return;
         setState(() => _error = true);
       },
     );

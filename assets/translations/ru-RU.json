@@ -365,5 +365,7 @@
   "booking_summary_driver": "Водитель",
   "booking_summary_duration": "Длительность",
   "location_open_maps": "Открыть на карте",
-  "location_resolving": "Определение места…"
+  "location_resolving": "Определение места…",
+  "corporate_search_hint": "Поиск компаний",
+  "corporate_search_no_results": "Нет компаний по вашему запросу."
 }

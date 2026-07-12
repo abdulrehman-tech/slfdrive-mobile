@@ -52,10 +52,14 @@ class DriverListingRemoteDataSourceImpl implements DriverListingRemoteDataSource
   }
 
   PagedResponse<DriverListingItem> _parsePaged(dynamic responseData) {
-    final body = responseData as Map<String, dynamic>;
-    if (body['isSuccess'] == true && body['data'] is Map<String, dynamic>) {
+    // Defensive: a 401/empty or otherwise unexpected body must not throw a raw
+    // cast error (that leaked to the UI as "Map<String, dynamic> is not a
+    // subtype of …"). Anything that isn't the expected success envelope → empty.
+    if (responseData is Map<String, dynamic> &&
+        responseData['isSuccess'] == true &&
+        responseData['data'] is Map<String, dynamic>) {
       return PagedResponse.fromJson(
-        body['data'] as Map<String, dynamic>,
+        responseData['data'] as Map<String, dynamic>,
         DriverListingItem.fromJson,
       );
     }

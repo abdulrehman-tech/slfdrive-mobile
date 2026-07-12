@@ -30,7 +30,7 @@ Future<AllCompany?> showCompanyPickerSheet(
   );
 }
 
-class _CompanyPickerSheet extends StatelessWidget {
+class _CompanyPickerSheet extends StatefulWidget {
   final List<AllCompany> companies;
   final bool isDark;
   final AllCompany? selected;
@@ -46,9 +46,39 @@ class _CompanyPickerSheet extends StatelessWidget {
   });
 
   @override
+  State<_CompanyPickerSheet> createState() => _CompanyPickerSheetState();
+}
+
+class _CompanyPickerSheetState extends State<_CompanyPickerSheet> {
+  final TextEditingController _searchController = TextEditingController();
+  String _query = '';
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  /// Case-insensitive local filter over the loaded companies — matches the
+  /// display name or address. No network call; filters the in-memory list.
+  List<AllCompany> get _filtered {
+    final q = _query.trim().toLowerCase();
+    if (q.isEmpty) return widget.companies;
+    return widget.companies.where((c) {
+      final name = c.displayName().toLowerCase();
+      final address = (c.address ?? '').toLowerCase();
+      return name.contains(q) || address.contains(q);
+    }).toList();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
-    final bg = isDark ? const Color(0xFF15151F) : Colors.white;
+    final bg = widget.isDark ? const Color(0xFF15151F) : Colors.white;
+    // The search bar is only useful once companies have loaded.
+    final showSearch = !widget.isLoading && widget.error == null && widget.companies.isNotEmpty;
+    final filtered = _filtered;
+
     return Container(
       constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height * 0.7),
       decoration: BoxDecoration(
@@ -76,19 +106,31 @@ class _CompanyPickerSheet extends StatelessWidget {
             style: TextStyle(fontSize: 18.r, fontWeight: FontWeight.bold, color: cs.onSurface),
           ),
           SizedBox(height: 14.r),
-          if (isLoading)
+          if (showSearch) ...[
+            _SearchField(
+              controller: _searchController,
+              isDark: widget.isDark,
+              onChanged: (v) => setState(() => _query = v),
+              onClear: () => setState(() {
+                _searchController.clear();
+                _query = '';
+              }),
+            ),
+            SizedBox(height: 12.r),
+          ],
+          if (widget.isLoading)
             Padding(
               padding: EdgeInsets.symmetric(vertical: 30.r),
               child: const ListSkeleton(itemCount: 4, itemHeight: 58, padding: EdgeInsets.zero),
             )
-          else if (error != null)
+          else if (widget.error != null)
             Padding(
               padding: EdgeInsets.symmetric(vertical: 24.r),
               child: Center(
-                child: Text(error!, style: TextStyle(color: cs.error, fontSize: 13.r)),
+                child: Text(widget.error!, style: TextStyle(color: cs.error, fontSize: 13.r)),
               ),
             )
-          else if (companies.isEmpty)
+          else if (widget.companies.isEmpty)
             Padding(
               padding: EdgeInsets.symmetric(vertical: 24.r),
               child: Center(
@@ -98,26 +140,82 @@ class _CompanyPickerSheet extends StatelessWidget {
                 ),
               ),
             )
+          else if (filtered.isEmpty)
+            Padding(
+              padding: EdgeInsets.symmetric(vertical: 24.r),
+              child: Center(
+                child: Text(
+                  'corporate_search_no_results'.tr(),
+                  style: TextStyle(color: cs.onSurface.withValues(alpha: 0.6), fontSize: 13.r),
+                ),
+              ),
+            )
           else
             Flexible(
               child: ListView.separated(
                 shrinkWrap: true,
                 physics: const BouncingScrollPhysics(),
-                itemCount: companies.length,
+                keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+                itemCount: filtered.length,
                 separatorBuilder: (_, _) => SizedBox(height: 8.r),
                 itemBuilder: (_, i) {
-                  final c = companies[i];
-                  final isSel = selected?.id == c.id;
+                  final c = filtered[i];
+                  final isSel = widget.selected?.id == c.id;
                   return _CompanyTile(
                     company: c,
                     isSelected: isSel,
-                    isDark: isDark,
+                    isDark: widget.isDark,
                     onTap: () => Navigator.of(context).pop(c),
                   );
                 },
               ),
             ),
         ],
+      ),
+    );
+  }
+}
+
+class _SearchField extends StatelessWidget {
+  final TextEditingController controller;
+  final bool isDark;
+  final ValueChanged<String> onChanged;
+  final VoidCallback onClear;
+
+  const _SearchField({
+    required this.controller,
+    required this.isDark,
+    required this.onChanged,
+    required this.onClear,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    final fill = isDark ? Colors.white.withValues(alpha: 0.05) : Colors.black.withValues(alpha: 0.04);
+    return TextField(
+      controller: controller,
+      onChanged: onChanged,
+      textInputAction: TextInputAction.search,
+      style: TextStyle(fontSize: 14.r, color: cs.onSurface),
+      decoration: InputDecoration(
+        isDense: true,
+        hintText: 'corporate_search_hint'.tr(),
+        hintStyle: TextStyle(fontSize: 14.r, color: cs.onSurface.withValues(alpha: 0.45)),
+        prefixIcon: Icon(Iconsax.search_normal_copy, size: 18.r, color: cs.onSurface.withValues(alpha: 0.5)),
+        suffixIcon: controller.text.isEmpty
+            ? null
+            : IconButton(
+                icon: Icon(Iconsax.close_circle_copy, size: 18.r, color: cs.onSurface.withValues(alpha: 0.5)),
+                onPressed: onClear,
+              ),
+        filled: true,
+        fillColor: fill,
+        contentPadding: EdgeInsets.symmetric(vertical: 12.r, horizontal: 12.r),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12.r),
+          borderSide: BorderSide.none,
+        ),
       ),
     );
   }

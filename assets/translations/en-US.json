@@ -836,6 +836,7 @@
   "driver_filter_has_vehicle": "Has Vehicle",
   "home_no_cars": "No cars available",
   "home_no_drivers": "No drivers nearby",
+  "home_section_load_error": "Couldn't load. Please try again.",
   "trips_complete_failed": "Couldn't complete the trip. Please try again.",
   "driver_no_requests": "No new trip requests right now.",
   "driver_decline_snack": "Request declined",
@@ -882,5 +883,7 @@
   "booking_summary_driver": "Driver",
   "booking_summary_duration": "Duration",
   "location_open_maps": "Open in Maps",
-  "location_resolving": "Locating…"
+  "location_resolving": "Locating…",
+  "corporate_search_hint": "Search companies",
+  "corporate_search_no_results": "No companies match your search."
 }

@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
@@ -125,6 +126,9 @@ const _sharedAuthedRoutes = {
   '/my-vehicles',
 };
 
+/// Legal pages are public (reachable pre-auth from the login consent line).
+bool _isLegalRoute(String loc) => loc == '/legal' || loc.startsWith('/legal/');
+
 bool _isSharedAuthedRoute(String loc) =>
     _sharedAuthedRoutes.any((p) => loc == p || loc.startsWith('$p/'));
 
@@ -139,6 +143,12 @@ class AppRouter {
     redirect: (context, state) {
       final role = context.read<RoleProvider>().role;
       final loc = state.matchedLocation;
+
+      // Legal pages (Terms / Privacy) are public — reachable from the login
+      // consent line BEFORE auth, so allow them FIRST, before any gate. Checked
+      // against both matchedLocation and the raw uri path so a pushed sub-route
+      // can never fall through to the `role == null → /auth` bounce.
+      if (_isLegalRoute(loc) || _isLegalRoute(state.uri.path)) return null;
 
       if (_preAuthRoutes.contains(loc)) return null;
 
@@ -455,14 +465,20 @@ class AppRouter {
       GoRoute(
         path: '/legal/terms',
         pageBuilder: (context, state) => AppPageTransition(
-          child: const LegalDocumentScreen(titleKey: 'legal_terms_title', url: LegalConstants.termsUrl),
+          child: LegalDocumentScreen(
+            titleKey: 'legal_terms_title',
+            url: LegalConstants.termsUrl(context.locale.languageCode),
+          ),
           name: state.name,
         ),
       ),
       GoRoute(
         path: '/legal/privacy',
         pageBuilder: (context, state) => AppPageTransition(
-          child: const LegalDocumentScreen(titleKey: 'legal_privacy_title', url: LegalConstants.privacyUrl),
+          child: LegalDocumentScreen(
+            titleKey: 'legal_privacy_title',
+            url: LegalConstants.privacyUrl(context.locale.languageCode),
+          ),
           name: state.name,
         ),
       ),

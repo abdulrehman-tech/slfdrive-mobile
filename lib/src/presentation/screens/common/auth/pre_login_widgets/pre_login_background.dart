@@ -23,7 +23,7 @@ class PreLoginBackground extends StatelessWidget {
     return Stack(
       fit: StackFit.expand,
       children: [
-        Image.asset(ImageConstants.preloginGif, fit: BoxFit.cover),
+        Image.asset(ImageConstants.preloginImage, fit: BoxFit.cover),
         Container(
           decoration: BoxDecoration(
             gradient: LinearGradient(

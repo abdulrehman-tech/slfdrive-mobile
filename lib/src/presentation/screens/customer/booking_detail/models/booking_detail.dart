@@ -332,9 +332,16 @@ class BookingDetail {
       // Backend returns a lump total; spread it across days with no VAT split.
       pricePerDay: dayCount == 0 ? (b.totalAmount ?? 0) : (b.totalAmount ?? 0) / dayCount,
       extrasPerDay: 0,
-      // Backend `BookingResponseDto` omits deliveryFee today, so this is 0 until
-      // it ships the field; the price card's delivery line then appears on its own.
-      deliveryFee: b.deliveryFee ?? 0,
+      // `BookingResponseDto` doesn't return deliveryFee, but `totalAmount`
+      // INCLUDES it — so when it's absent, derive the delivery portion as the
+      // residual (total − vehicle − driver, commission is excluded from total)
+      // so the breakdown reconciles to the total instead of leaving a silent gap.
+      // Only when there IS a per-side split; otherwise the lump line already
+      // covers the whole total and a residual would double-count.
+      deliveryFee: b.deliveryFee ??
+          (((b.vehicleAmount ?? 0) > 0 || (b.driverAmount ?? 0) > 0)
+              ? (((b.totalAmount ?? 0) - (b.vehicleAmount ?? 0) - (b.driverAmount ?? 0)).clamp(0, double.infinity))
+              : 0),
       // Real price breakdown from the response.
       vehicleAmount: b.vehicleAmount ?? 0,
       driverAmount: b.driverAmount ?? 0,

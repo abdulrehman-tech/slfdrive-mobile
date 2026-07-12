@@ -24,9 +24,14 @@ class DeliveryFeeRepositoryImpl implements DeliveryFeeRepository {
 
   @override
   Future<double?> resolveFee({required int companyId, required int locationId}) async {
-    final fees = await remote.byCompany(companyId);
+    // Query by the SELECTED AREA (`by-area/{locationId}`) — the area is what the
+    // customer picks. That endpoint returns one row per company that configured
+    // the area, so filter to this booking's vehicle company. (Previously used
+    // `by-company` then matched the area; switched per the area being the
+    // primary key.)
+    final fees = await remote.byArea(locationId);
     for (final f in fees) {
-      if (f.locationId == locationId && f.isActive) return f.fee;
+      if (f.companyId == companyId && f.isActive) return f.fee;
     }
     return null;
   }

@@ -31,12 +31,7 @@ class NearbyDriversSection extends StatelessWidget {
         if (home.driversLoading)
           _SectionSpinner(isDark: isDark)
         else if (home.driversError != null)
-          _SectionError(
-            message: home.driversError!,
-            isDark: isDark,
-            cs: cs,
-            onRetry: home.load,
-          )
+          _SectionError(message: home.driversError!, isDark: isDark, cs: cs, onRetry: home.load)
         else if (home.nearbyDrivers.isEmpty)
           _SectionEmpty(label: 'home_no_drivers'.tr(), isDark: isDark, cs: cs)
         else if (isDesktop)
@@ -90,9 +85,7 @@ class _SectionSpinner extends StatelessWidget {
       height: 100.r,
       child: Center(
         child: CircularProgressIndicator.adaptive(
-          valueColor: AlwaysStoppedAnimation<Color>(
-            Theme.of(context).colorScheme.primary,
-          ),
+          valueColor: AlwaysStoppedAnimation<Color>(Theme.of(context).colorScheme.primary),
           strokeWidth: 2.5,
         ),
       ),
@@ -106,35 +99,37 @@ class _SectionError extends StatelessWidget {
   final ColorScheme cs;
   final VoidCallback onRetry;
 
-  const _SectionError({
-    required this.message,
-    required this.isDark,
-    required this.cs,
-    required this.onRetry,
-  });
+  const _SectionError({required this.message, required this.isDark, required this.cs, required this.onRetry});
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: 90.r,
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(Iconsax.warning_2_copy, color: cs.error, size: 22.r),
-          SizedBox(height: 6.r),
-          Text(
-            message,
-            style: TextStyle(fontSize: 12.r, color: cs.onSurface.withValues(alpha: 0.6)),
-            textAlign: TextAlign.center,
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
-          ),
-          SizedBox(height: 8.r),
-          TextButton(
-            onPressed: onRetry,
-            child: Text('retry'.tr(), style: TextStyle(fontSize: 12.r, color: cs.primary)),
-          ),
-        ],
+    // No fixed height — icon + (up to 2 lines) + retry button can exceed a
+    // hardcoded box (was overflowing ~6px). Let it size to its content.
+    return Center(
+      child: Padding(
+        padding: EdgeInsets.symmetric(vertical: 12.r),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Iconsax.warning_2_copy, color: cs.error, size: 22.r),
+            SizedBox(height: 6.r),
+            Text(
+              message,
+              style: TextStyle(fontSize: 12.r, color: cs.onSurface.withValues(alpha: 0.6)),
+              textAlign: TextAlign.center,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+            ),
+            SizedBox(height: 4.r),
+            TextButton(
+              onPressed: onRetry,
+              child: Text(
+                'retry'.tr(),
+                style: TextStyle(fontSize: 12.r, color: cs.primary),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

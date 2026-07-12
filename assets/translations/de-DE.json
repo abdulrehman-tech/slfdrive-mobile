@@ -365,5 +365,7 @@
   "booking_summary_driver": "Fahrer",
   "booking_summary_duration": "Dauer",
   "location_open_maps": "In Karten öffnen",
-  "location_resolving": "Standort wird ermittelt…"
+  "location_resolving": "Standort wird ermittelt…",
+  "corporate_search_hint": "Unternehmen suchen",
+  "corporate_search_no_results": "Keine Unternehmen entsprechen deiner Suche."
 }

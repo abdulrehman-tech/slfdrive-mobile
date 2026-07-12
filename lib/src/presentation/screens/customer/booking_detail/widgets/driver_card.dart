@@ -5,6 +5,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 
 import '../../../../utils/contact_launcher.dart';
+import '../../../../widgets/omr_icon.dart';
 import '../models/booking_detail.dart';
 import 'glass_card.dart';
 
@@ -87,6 +88,21 @@ class BookingDriverCard extends StatelessWidget {
                       style: TextStyle(fontSize: 11.r, color: cs.onSurface.withValues(alpha: 0.55)),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
+                  // Driver-only rate (backend `driverAmount` split over the
+                  // billed units), shown when the driver is a paid line.
+                  if (booking.driverAmount > 0) ...[
+                    SizedBox(height: 6.r),
+                    Row(
+                      children: [
+                        OmrIcon(size: 11.r, color: cs.primary),
+                        SizedBox(width: 3.r),
+                        Text(
+                          '${booking.driverUnitRate.toInt()}/${booking.isHourly ? 'h' : 'd'}',
+                          style: TextStyle(fontSize: 13.r, fontWeight: FontWeight.w800, color: cs.primary),
+                        ),
+                      ],
                     ),
                   ],
                 ],

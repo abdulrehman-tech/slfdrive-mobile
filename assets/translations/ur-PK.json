@@ -365,5 +365,7 @@
   "booking_summary_driver": "ڈرائیور",
   "booking_summary_duration": "مدت",
   "location_open_maps": "نقشے میں کھولیں",
-  "location_resolving": "مقام تلاش ہو رہا ہے…"
+  "location_resolving": "مقام تلاش ہو رہا ہے…",
+  "corporate_search_hint": "کمپنیاں تلاش کریں",
+  "corporate_search_no_results": "آپ کی تلاش سے کوئی کمپنی مماثل نہیں۔"
 }

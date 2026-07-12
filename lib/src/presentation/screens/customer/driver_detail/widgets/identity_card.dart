@@ -23,7 +23,7 @@ class IdentityCard extends StatelessWidget {
         padding: EdgeInsets.all(14.r),
         child: Row(
           children: [
-            Stack(
+            Stack(;h
               children: [
                 Container(
                   width: 76.r,

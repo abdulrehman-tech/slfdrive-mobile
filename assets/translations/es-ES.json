@@ -365,5 +365,7 @@
   "booking_summary_driver": "Conductor",
   "booking_summary_duration": "Duración",
   "location_open_maps": "Abrir en Mapas",
-  "location_resolving": "Localizando…"
+  "location_resolving": "Localizando…",
+  "corporate_search_hint": "Buscar empresas",
+  "corporate_search_no_results": "Ninguna empresa coincide con tu búsqueda."
 }

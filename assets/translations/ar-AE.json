@@ -836,6 +836,7 @@
   "driver_filter_has_vehicle": "لديه مركبة",
   "home_no_cars": "لا توجد سيارات متاحة",
   "home_no_drivers": "لا يوجد سائقون قريبون",
+  "home_section_load_error": "تعذّر التحميل. يرجى المحاولة مرة أخرى.",
   "trips_complete_failed": "تعذّر إكمال الرحلة. حاول مرة أخرى.",
   "driver_no_requests": "لا توجد طلبات رحلات جديدة الآن.",
   "driver_decline_snack": "تم رفض الطلب",
@@ -882,5 +883,7 @@
   "booking_summary_driver": "السائق",
   "booking_summary_duration": "المدة",
   "location_open_maps": "فتح في الخرائط",
-  "location_resolving": "جارٍ تحديد الموقع…"
+  "location_resolving": "جارٍ تحديد الموقع…",
+  "corporate_search_hint": "ابحث عن الشركات",
+  "corporate_search_no_results": "لا توجد شركات مطابقة لبحثك."
 }
