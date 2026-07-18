@@ -32,6 +32,11 @@ class ApiEndpoints {
   // Driver
   static const String driver = '/api/Driver';
   static String driverById(int id) => '/api/Driver/$id';
+  // Aggregated driver stats (rating/bookings/earnings). `id` = driver user id.
+  static String driverStats(int id) => '/api/Driver/$id/stats';
+  // Flips is_online on mst_driver; returns the new state. `userId` = user id.
+  static String driverToggleOnline(int userId) =>
+      '/api/Driver/toggle-online/$userId';
 
   // Customer
   static const String customer = '/api/Customer';
@@ -100,6 +105,8 @@ class ApiEndpoints {
 
   // Reviews
   static const String review = '/api/Review';
+  // All active (non-deleted) reviews — the customer-facing list.
+  static const String reviewActive = '/api/Review/active';
   static String reviewsByBooking(int bookingId) => '/api/Review/booking/$bookingId';
   static String reviewAverageByBooking(int bookingId) =>
       '/api/Review/booking/$bookingId/average';

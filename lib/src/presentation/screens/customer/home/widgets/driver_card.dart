@@ -48,7 +48,7 @@ class DriverCard extends StatelessWidget {
                     width: 10.r,
                     height: 10.r,
                     decoration: BoxDecoration(
-                      color: const Color(0xFF4CAF50),
+                      color: driver.isOnline ? const Color(0xFF4CAF50) : const Color(0xFF9E9E9E),
                       shape: BoxShape.circle,
                       border: Border.all(color: isDark ? const Color(0xFF1A1A2A) : Colors.white, width: 1.5),
                     ),
@@ -124,7 +124,7 @@ class DriverCard extends StatelessWidget {
                   width: 10.r,
                   height: 10.r,
                   decoration: BoxDecoration(
-                    color: const Color(0xFF4CAF50),
+                    color: driver.isOnline ? const Color(0xFF4CAF50) : const Color(0xFF9E9E9E),
                     shape: BoxShape.circle,
                     border: Border.all(color: isDark ? const Color(0xFF1A1A2A) : Colors.white, width: 1.5),
                   ),
@@ -166,17 +166,21 @@ class DriverCard extends StatelessWidget {
                 ],
               ),
             ),
-            Container(
-              padding: EdgeInsets.symmetric(horizontal: 8.r, vertical: 4.r),
-              decoration: BoxDecoration(
-                color: const Color(0xFF4CAF50).withValues(alpha: 0.12),
-                borderRadius: BorderRadius.circular(7.r),
-              ),
-              child: Text(
-                'available'.tr(),
-                style: TextStyle(fontSize: 10.r, color: const Color(0xFF4CAF50), fontWeight: FontWeight.w700),
-              ),
-            ),
+            Builder(builder: (_) {
+              final statusColor =
+                  driver.isOnline ? const Color(0xFF4CAF50) : const Color(0xFF9E9E9E);
+              return Container(
+                padding: EdgeInsets.symmetric(horizontal: 8.r, vertical: 4.r),
+                decoration: BoxDecoration(
+                  color: statusColor.withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(7.r),
+                ),
+                child: Text(
+                  (driver.isOnline ? 'driver_online' : 'driver_offline').tr(),
+                  style: TextStyle(fontSize: 10.r, color: statusColor, fontWeight: FontWeight.w700),
+                ),
+              );
+            }),
           ],
         ),
       ),

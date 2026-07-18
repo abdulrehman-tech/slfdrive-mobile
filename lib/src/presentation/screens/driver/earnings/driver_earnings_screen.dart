@@ -4,6 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 
 import 'provider/driver_earnings_provider.dart';
+import 'widgets/earnings_chart_card.dart';
 import 'widgets/earnings_period_selector.dart';
 import 'widgets/earnings_stats_grid.dart';
 import 'widgets/earnings_total_card.dart';
@@ -62,7 +63,11 @@ class _DriverEarningsView extends StatelessWidget {
             ),
             SliverToBoxAdapter(child: SizedBox(height: 20.r)),
             SliverToBoxAdapter(
-              child: EarningsTotalCard(snapshot: snapshot),
+              child: EarningsTotalCard(snapshot: snapshot, trendPercent: provider.trendPercent),
+            ),
+            SliverToBoxAdapter(child: SizedBox(height: 20.r)),
+            SliverToBoxAdapter(
+              child: EarningsChartCard(isDark: isDark),
             ),
             SliverToBoxAdapter(child: SizedBox(height: 20.r)),
             SliverToBoxAdapter(

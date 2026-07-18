@@ -7,6 +7,9 @@ class SearchResultDriver {
   final String speciality;
   final double pricePerDay;
 
+  /// Live presence — drives the green/grey dot on the search result card.
+  final bool isOnline;
+
   const SearchResultDriver({
     required this.id,
     required this.name,
@@ -15,5 +18,6 @@ class SearchResultDriver {
     required this.trips,
     required this.speciality,
     required this.pricePerDay,
+    this.isOnline = false,
   });
 }

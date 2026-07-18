@@ -1,0 +1,132 @@
+import 'dart:ui';
+import 'package:easy_localization/easy_localization.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:iconsax_flutter/iconsax_flutter.dart';
+
+/// Confirmation sheet shown before a driver flips their availability.
+/// [isCurrentlyOnline] decides the wording/colours (going offline vs online);
+/// [onConfirm] runs when the driver confirms.
+void showOnlineStatusDialog(
+  BuildContext context, {
+  required bool isDark,
+  required bool isCurrentlyOnline,
+  required VoidCallback onConfirm,
+}) {
+  // The action is the *opposite* of the current state.
+  final goingOnline = !isCurrentlyOnline;
+  final accent = goingOnline ? const Color(0xFF4CAF50) : const Color(0xFF9E9E9E);
+
+  showDialog(
+    context: context,
+    builder: (dialogContext) => Dialog(
+      backgroundColor: Colors.transparent,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(24.r),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+          child: Container(
+            padding: EdgeInsets.all(24.r),
+            decoration: BoxDecoration(
+              color: isDark ? Colors.white.withValues(alpha: 0.08) : Colors.white.withValues(alpha: 0.9),
+              borderRadius: BorderRadius.circular(24.r),
+              border: Border.all(
+                color: isDark ? Colors.white.withValues(alpha: 0.1) : Colors.black.withValues(alpha: 0.06),
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: isDark ? 0.3 : 0.08),
+                  blurRadius: 24.r,
+                  offset: Offset(0, 8.r),
+                ),
+              ],
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Concentric status halo around a presence dot.
+                Container(
+                  padding: EdgeInsets.all(16.r),
+                  decoration: BoxDecoration(
+                    color: accent.withValues(alpha: 0.12),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Container(
+                    padding: EdgeInsets.all(10.r),
+                    decoration: BoxDecoration(
+                      color: accent.withValues(alpha: 0.18),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      goingOnline ? Iconsax.flash_1 : Iconsax.moon,
+                      color: accent,
+                      size: 30.r,
+                    ),
+                  ),
+                ),
+                SizedBox(height: 20.r),
+                Text(
+                  (goingOnline ? 'driver_go_online_title' : 'driver_go_offline_title').tr(),
+                  style: TextStyle(
+                    fontSize: 20.r,
+                    fontWeight: FontWeight.w700,
+                    color: isDark ? Colors.white : Colors.black87,
+                  ),
+                ),
+                SizedBox(height: 8.r),
+                Text(
+                  (goingOnline ? 'driver_go_online_message' : 'driver_go_offline_message').tr(),
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 14.r, color: isDark ? Colors.white70 : Colors.black54, height: 1.4),
+                ),
+                SizedBox(height: 24.r),
+                Row(
+                  children: [
+                    Expanded(
+                      child: TextButton(
+                        onPressed: () => Navigator.of(dialogContext).pop(),
+                        style: TextButton.styleFrom(
+                          padding: EdgeInsets.symmetric(vertical: 14.r),
+                          backgroundColor: isDark
+                              ? Colors.white.withValues(alpha: 0.08)
+                              : Colors.black.withValues(alpha: 0.04),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
+                        ),
+                        child: Text(
+                          'driver_status_cancel'.tr(),
+                          style: TextStyle(
+                            fontSize: 15.r,
+                            fontWeight: FontWeight.w600,
+                            color: isDark ? Colors.white70 : Colors.black54,
+                          ),
+                        ),
+                      ),
+                    ),
+                    SizedBox(width: 12.r),
+                    Expanded(
+                      child: TextButton(
+                        onPressed: () {
+                          Navigator.of(dialogContext).pop();
+                          onConfirm();
+                        },
+                        style: TextButton.styleFrom(
+                          padding: EdgeInsets.symmetric(vertical: 14.r),
+                          backgroundColor: accent,
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
+                        ),
+                        child: Text(
+                          (goingOnline ? 'driver_go_online_confirm' : 'driver_go_offline_confirm').tr(),
+                          style: TextStyle(fontSize: 15.r, fontWeight: FontWeight.w700, color: Colors.white),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    ),
+  );
+}

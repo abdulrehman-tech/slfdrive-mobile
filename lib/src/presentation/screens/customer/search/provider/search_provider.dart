@@ -152,6 +152,7 @@ class SearchProvider extends ChangeNotifier {
         trips: 0,
         speciality: d.locationName ?? '',
         pricePerDay: d.amountPerDay ?? 0,
+        isOnline: d.isOnline,
       );
 
   // ── Filters ──────────────────────────────────────

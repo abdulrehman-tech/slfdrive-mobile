@@ -3,6 +3,7 @@ import 'package:iconsax_flutter/iconsax_flutter.dart';
 
 import '../../../../../constants/endpoints.dart';
 import '../../../../../core/models/driver/driver_details.dart';
+import '../../../../../core/models/driver/driver_stats.dart';
 import 'driver_review.dart';
 
 class DriverProfile {
@@ -29,6 +30,14 @@ class DriverProfile {
   final List<int> reviewCounts;
   final List<DriverReview> reviews;
 
+  /// Live presence (`is_online`) — drives the header status dot/chip.
+  final bool isOnline;
+
+  /// Authoritative review count from the stats aggregate. Used for the header
+  /// count so it stays correct even when the review-LIST endpoint fails (the
+  /// per-star histogram derives from the loaded list, which may be empty).
+  final int reviewCount;
+
   const DriverProfile({
     required this.id,
     this.bookingDriverId = '',
@@ -50,9 +59,13 @@ class DriverProfile {
     required this.availability,
     required this.reviewCounts,
     required this.reviews,
+    this.isOnline = false,
+    this.reviewCount = 0,
   });
 
-  int get totalReviews => reviewCounts.fold(0, (a, b) => a + b);
+  /// Prefers the stats aggregate; falls back to the loaded list's histogram.
+  int get totalReviews =>
+      reviewCount > 0 ? reviewCount : reviewCounts.fold(0, (a, b) => a + b);
 
   /// Maps a backend `DriverDetails` record onto the screen's view model.
   ///
@@ -60,7 +73,12 @@ class DriverProfile {
   /// weekly availability, per-driver review aggregate, cover image) fall back to
   /// safe empty/placeholder values rather than the old mock content. See the
   /// `listings-rating-backend-gap` note for the missing rating aggregate.
-  factory DriverProfile.fromDetails(DriverDetails d) {
+  factory DriverProfile.fromDetails(
+    DriverDetails d, {
+    DriverStats? stats,
+    List<DriverReview> reviews = const [],
+    List<int>? reviewCounts,
+  }) {
     final languages = (d.languagesKnown ?? '')
         .split(RegExp(r'[,/|]'))
         .map((s) => s.trim())
@@ -77,8 +95,9 @@ class DriverProfile {
       // Empty → the cover header falls back to a bundled asset image.
       coverUrl: '',
       avatarUrl: ApiEndpoints.resolveMediaUrl(d.photoUrl) ?? '',
-      rating: 0, // no per-driver aggregate endpoint yet
-      trips: 0,
+      // Rating + trip count come from GET /api/Driver/{id}/stats when available.
+      rating: stats?.averageRating ?? 0,
+      trips: stats?.completedBookings ?? 0,
       years: d.yearsOfExperience ?? 0,
       responseTime: '',
       hourlyRate: d.amountPerHour ?? 0,
@@ -90,8 +109,10 @@ class DriverProfile {
       services: const [],
       vehicles: vehicles,
       availability: const [],
-      reviewCounts: const [0, 0, 0, 0, 0],
-      reviews: const [],
+      reviewCounts: reviewCounts ?? const [0, 0, 0, 0, 0],
+      reviews: reviews,
+      reviewCount: stats?.totalReviews ?? 0,
+      isOnline: d.isOnline ?? false,
     );
   }
 }

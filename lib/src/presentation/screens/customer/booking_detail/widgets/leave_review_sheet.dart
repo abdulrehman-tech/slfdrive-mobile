@@ -6,6 +6,7 @@ import 'package:iconsax_flutter/iconsax_flutter.dart';
 import '../../../../../core/data/repositories/review_repository.dart';
 import '../../../../../core/di/injection_container.dart';
 import '../../../../../core/errors/app_exception.dart';
+import '../../../../widgets/confirm_dialog.dart';
 
 /// Bottom sheet that lets a customer rate + comment a completed booking and
 /// submits it via `POST /api/Review`.
@@ -124,7 +125,18 @@ class _LeaveReviewSheetState extends State<LeaveReviewSheet> {
             SizedBox(
               width: double.infinity,
               child: FilledButton(
-                onPressed: _submitting ? null : _submit,
+                onPressed: _submitting
+                    ? null
+                    : () => showConfirmDialog(
+                          context,
+                          isDark: widget.isDark,
+                          icon: Iconsax.star_1,
+                          accent: const Color(0xFF4D63DD),
+                          title: 'review_confirm_title',
+                          message: 'review_confirm_msg',
+                          confirmLabelKey: 'review_submit',
+                          onConfirm: _submit,
+                        ),
                 child: _submitting
                     ? SizedBox(width: 18.r, height: 18.r, child: const CircularProgressIndicator(strokeWidth: 2))
                     : Text('review_submit'.tr()),

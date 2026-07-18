@@ -12,6 +12,10 @@ abstract class ReviewRemoteDataSource {
   /// Reviews for a booking (`GET /api/Review/booking/{bookingId}`).
   Future<List<Review>> forBooking(int bookingId);
 
+  /// All active reviews (`GET /api/Review/active`). There's no per-driver
+  /// reviews endpoint, so callers filter by [Review.driverName] client-side.
+  Future<List<Review>> active();
+
   /// Average rating for a booking (`GET /api/Review/booking/{bookingId}/average`).
   Future<double?> averageForBooking(int bookingId);
 }
@@ -42,6 +46,21 @@ class ReviewRemoteDataSourceImpl implements ReviewRemoteDataSource {
   Future<List<Review>> forBooking(int bookingId) async {
     try {
       final res = await apiClient.get(ApiEndpoints.reviewsByBooking(bookingId));
+      final body = res.data as Map<String, dynamic>;
+      final data = body['data'];
+      if (data is List) {
+        return data.whereType<Map<String, dynamic>>().map(Review.fromJson).toList();
+      }
+      return const [];
+    } catch (e) {
+      throw ErrorHandler.handleError(e);
+    }
+  }
+
+  @override
+  Future<List<Review>> active() async {
+    try {
+      final res = await apiClient.get(ApiEndpoints.reviewActive);
       final body = res.data as Map<String, dynamic>;
       final data = body['data'];
       if (data is List) {

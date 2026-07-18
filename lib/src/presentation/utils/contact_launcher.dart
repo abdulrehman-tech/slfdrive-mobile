@@ -58,6 +58,9 @@ class ContactLauncher {
     return _launch(uri);
   }
 
+  /// Open a web URL (FAQ, socials, store pages) in the external browser.
+  static Future<bool> openWebsite(String url) => _launch(Uri.parse(url));
+
   static Future<bool> _launch(Uri uri) async {
     try {
       final canOpen = await canLaunchUrl(uri);

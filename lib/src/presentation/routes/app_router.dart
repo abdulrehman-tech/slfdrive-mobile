@@ -12,6 +12,7 @@ import '../screens/common/auth/login/phone_login_screen.dart';
 import '../screens/common/auth/otp/otp_verification_screen.dart';
 import '../screens/common/auth/profile_completion_screen.dart';
 import '../screens/common/coming_soon_screen.dart';
+import '../screens/common/help/help_center_screen.dart';
 import '../screens/common/legal/legal_document_screen.dart';
 import '../../constants/legal_constants.dart';
 import '../screens/common/profile_edit/edit_hub_screen.dart';
@@ -460,7 +461,7 @@ class AppRouter {
       GoRoute(
         path: '/help',
         pageBuilder: (context, state) =>
-            AppPageTransition(child: const ComingSoonScreen(titleKey: 'help_center_title'), name: state.name),
+            AppPageTransition(child: const HelpCenterScreen(), name: state.name),
       ),
       GoRoute(
         path: '/legal/terms',

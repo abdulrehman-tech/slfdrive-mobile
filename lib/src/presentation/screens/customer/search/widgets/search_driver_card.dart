@@ -56,7 +56,7 @@ class SearchDriverCard extends StatelessWidget {
                       width: 10.r,
                       height: 10.r,
                       decoration: BoxDecoration(
-                        color: const Color(0xFF4CAF50),
+                        color: driver.isOnline ? const Color(0xFF4CAF50) : const Color(0xFF9E9E9E),
                         shape: BoxShape.circle,
                         border: Border.all(color: isDark ? const Color(0xFF1A1A2A) : Colors.white, width: 1.5),
                       ),

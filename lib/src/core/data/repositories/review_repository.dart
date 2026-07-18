@@ -5,6 +5,7 @@ import '../datasources/review_remote_data_source.dart';
 abstract class ReviewRepository {
   Future<bool> submit({required int bookingId, required int rating, String? comment});
   Future<List<Review>> forBooking(int bookingId);
+  Future<List<Review>> active();
   Future<double?> averageForBooking(int bookingId);
 }
 
@@ -19,6 +20,9 @@ class ReviewRepositoryImpl implements ReviewRepository {
 
   @override
   Future<List<Review>> forBooking(int bookingId) => remote.forBooking(bookingId);
+
+  @override
+  Future<List<Review>> active() => remote.active();
 
   @override
   Future<double?> averageForBooking(int bookingId) => remote.averageForBooking(bookingId);

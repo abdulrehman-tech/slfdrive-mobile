@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 
 import '../../../../providers/auth_provider.dart';
 import '../provider/driver_home_provider.dart';
+import 'online_status_dialog.dart';
 
 class DriverHeader extends StatelessWidget {
   final bool isDark;
@@ -63,7 +64,12 @@ class DriverHeader extends StatelessWidget {
             ),
           ),
           GestureDetector(
-            onTap: () => context.read<DriverHomeProvider>().toggleOnline(),
+            onTap: () => showOnlineStatusDialog(
+              context,
+              isDark: isDark,
+              isCurrentlyOnline: isOnline,
+              onConfirm: () => context.read<DriverHomeProvider>().toggleOnline(),
+            ),
             child: AnimatedContainer(
               duration: const Duration(milliseconds: 300),
               padding: EdgeInsets.symmetric(horizontal: 16.r, vertical: 10.r),

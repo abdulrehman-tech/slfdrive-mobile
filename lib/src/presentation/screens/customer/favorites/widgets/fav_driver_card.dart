@@ -58,28 +58,13 @@ class FavDriverCard extends StatelessWidget {
   }
 
   Widget _buildAvatar(ColorScheme cs) {
-    return Stack(
-      alignment: Alignment.bottomRight,
-      children: [
-        CachedNetworkImage(
-          imageUrl: driver.avatarUrl,
-          imageBuilder: (_, img) => CircleAvatar(radius: 24.r, backgroundImage: img),
-          placeholder: (_, _) => _buildAvatarPlaceholder(cs),
-          errorWidget: (_, _, _) => _buildAvatarPlaceholder(cs),
-        ),
-        Container(
-          width: 10.r,
-          height: 10.r,
-          decoration: BoxDecoration(
-            color: const Color(0xFF4CAF50),
-            shape: BoxShape.circle,
-            border: Border.all(
-              color: isDark ? const Color(0xFF1A1A2A) : Colors.white,
-              width: 1.5,
-            ),
-          ),
-        ),
-      ],
+    // No presence dot here — favourites are a locally-persisted snapshot with no
+    // live online status, so a static dot would be misleading.
+    return CachedNetworkImage(
+      imageUrl: driver.avatarUrl,
+      imageBuilder: (_, img) => CircleAvatar(radius: 24.r, backgroundImage: img),
+      placeholder: (_, _) => _buildAvatarPlaceholder(cs),
+      errorWidget: (_, _, _) => _buildAvatarPlaceholder(cs),
     );
   }
 

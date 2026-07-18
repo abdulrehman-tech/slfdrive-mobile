@@ -7,6 +7,8 @@ import 'package:provider/provider.dart';
 
 import '../models/trip_request.dart';
 import '../provider/driver_home_provider.dart';
+import 'online_status_dialog.dart';
+import 'trip_action_dialog.dart';
 
 class TripRequestsSection extends StatelessWidget {
   final bool isDark;
@@ -32,22 +34,154 @@ class TripRequestsSection extends StatelessWidget {
             ),
           ),
           SizedBox(height: 16.r),
-          if (provider.isLoading)
-            Padding(
-              padding: EdgeInsets.symmetric(vertical: 24.r),
-              child: const Center(child: CircularProgressIndicator()),
-            )
-          else if (requests.isEmpty)
-            Padding(
-              padding: EdgeInsets.symmetric(vertical: 24.r),
-              child: Text(
-                'driver_no_requests'.tr(),
-                style: TextStyle(fontSize: 14.r, color: isDark ? Colors.white54 : const Color(0xFF9E9E9E)),
-              ),
-            )
+          if (requests.isEmpty)
+            _EmptyRequests(isDark: isDark, isOnline: provider.isOnline)
           else
             ...requests.map((trip) => TripRequestCard(trip: trip, isDark: isDark)),
         ],
+      ),
+    );
+  }
+}
+
+/// Illustrated empty state for the trip-requests list. Adapts to availability:
+/// while online it shows a live "listening" radar with a soft pulse; while
+/// offline it explains why nothing arrives and offers a one-tap way back online.
+class _EmptyRequests extends StatefulWidget {
+  final bool isDark;
+  final bool isOnline;
+
+  const _EmptyRequests({required this.isDark, required this.isOnline});
+
+  @override
+  State<_EmptyRequests> createState() => _EmptyRequestsState();
+}
+
+class _EmptyRequestsState extends State<_EmptyRequests> with SingleTickerProviderStateMixin {
+  late final AnimationController _pulse = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 1800),
+  )..repeat();
+
+  @override
+  void dispose() {
+    _pulse.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final online = widget.isOnline;
+    final accent = online ? const Color(0xFF4CAF50) : const Color(0xFF9E9E9E);
+    final title = (online ? 'driver_no_requests_online_title' : 'driver_no_requests_offline_title').tr();
+    final sub = (online ? 'driver_no_requests_online_sub' : 'driver_no_requests_offline_sub').tr();
+    final titleColor = widget.isDark ? Colors.white : Colors.black87;
+    final subColor = widget.isDark ? Colors.white54 : const Color(0xFF9E9E9E);
+
+    return Container(
+      width: double.infinity,
+      padding: EdgeInsets.symmetric(vertical: 36.r, horizontal: 24.r),
+      decoration: BoxDecoration(
+        color: widget.isDark ? const Color(0xFF1E1E2E) : Colors.white,
+        borderRadius: BorderRadius.circular(20.r),
+        border: Border.all(
+          color: widget.isDark ? Colors.white.withValues(alpha: 0.05) : Colors.black.withValues(alpha: 0.04),
+        ),
+      ),
+      child: Column(
+        children: [
+          SizedBox(
+            width: 108.r,
+            height: 108.r,
+            child: Stack(
+              alignment: Alignment.center,
+              children: [
+                // Pulsing rings — only while online (actively listening).
+                if (online)
+                  AnimatedBuilder(
+                    animation: _pulse,
+                    builder: (_, _) => Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        _ring(accent, (_pulse.value) % 1.0),
+                        _ring(accent, (_pulse.value + 0.5) % 1.0),
+                      ],
+                    ),
+                  ),
+                Container(
+                  width: 64.r,
+                  height: 64.r,
+                  decoration: BoxDecoration(
+                    color: accent.withValues(alpha: widget.isDark ? 0.18 : 0.12),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    online ? Iconsax.radar_2 : Iconsax.moon,
+                    color: accent,
+                    size: 30.r,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          SizedBox(height: 20.r),
+          Text(
+            title,
+            textAlign: TextAlign.center,
+            style: TextStyle(fontSize: 16.r, fontWeight: FontWeight.w700, color: titleColor),
+          ),
+          SizedBox(height: 6.r),
+          Text(
+            sub,
+            textAlign: TextAlign.center,
+            style: TextStyle(fontSize: 13.r, height: 1.4, color: subColor),
+          ),
+          if (!online) ...[
+            SizedBox(height: 20.r),
+            GestureDetector(
+              onTap: () => showOnlineStatusDialog(
+                context,
+                isDark: widget.isDark,
+                isCurrentlyOnline: false,
+                onConfirm: () => context.read<DriverHomeProvider>().toggleOnline(),
+              ),
+              child: Container(
+                padding: EdgeInsets.symmetric(horizontal: 24.r, vertical: 12.r),
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(colors: [Color(0xFF4D63DD), Color(0xFF677EF0)]),
+                  borderRadius: BorderRadius.circular(12.r),
+                  boxShadow: [
+                    BoxShadow(color: const Color(0xFF4D63DD).withValues(alpha: 0.3), blurRadius: 12.r, offset: Offset(0, 4.r)),
+                  ],
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Iconsax.flash_1, color: Colors.white, size: 16.r),
+                    SizedBox(width: 8.r),
+                    Text(
+                      'driver_go_online_confirm'.tr(),
+                      style: TextStyle(fontSize: 14.r, fontWeight: FontWeight.w700, color: Colors.white),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  /// A single expanding-and-fading ring; [t] is its 0→1 progress.
+  Widget _ring(Color color, double t) {
+    final size = 64.r + (44.r * t);
+    return Container(
+      width: size,
+      height: size,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        color: color.withValues(alpha: (1 - t) * 0.18),
       ),
     );
   }
@@ -157,6 +291,19 @@ class TripRequestCard extends StatelessWidget {
     );
   }
 
+  /// Opens the accept/decline confirmation; the actual call runs only if the
+  /// driver confirms.
+  void _confirm(BuildContext context, {required bool accept}) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    showTripActionDialog(
+      context,
+      isDark: isDark,
+      accept: accept,
+      customer: trip.customer,
+      onConfirm: () => _respond(context, accept: accept),
+    );
+  }
+
   Future<void> _respond(BuildContext context, {required bool accept}) async {
     final messenger = ScaffoldMessenger.of(context);
     final provider = context.read<DriverHomeProvider>();
@@ -240,7 +387,7 @@ class TripRequestCard extends StatelessWidget {
             children: [
               Expanded(
                 child: GestureDetector(
-                  onTap: () => _respond(context, accept: false),
+                  onTap: () => _confirm(context, accept: false),
                   child: Container(
                     padding: EdgeInsets.symmetric(vertical: 12.r),
                     decoration: BoxDecoration(
@@ -258,7 +405,7 @@ class TripRequestCard extends StatelessWidget {
               SizedBox(width: 12.r),
               Expanded(
                 child: GestureDetector(
-                  onTap: () => _respond(context, accept: true),
+                  onTap: () => _confirm(context, accept: true),
                   child: Container(
                     padding: EdgeInsets.symmetric(vertical: 12.r),
                     decoration: BoxDecoration(

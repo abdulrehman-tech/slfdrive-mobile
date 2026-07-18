@@ -9,6 +9,7 @@ import 'provider/driver_home_provider.dart';
 import 'widgets/driver_bottom_nav.dart';
 import 'widgets/driver_drawer.dart';
 import 'widgets/driver_header.dart';
+import 'widgets/driver_home_skeleton.dart';
 import 'widgets/driver_verification_banner.dart';
 import 'widgets/earnings_card.dart';
 import 'widgets/quick_stats_row.dart';
@@ -107,6 +108,9 @@ class _DriverHomeView extends StatelessWidget {
 
   Widget _buildBody(BuildContext context, bool isDark) {
     if (tabBody != null) return tabBody!;
+    if (context.watch<DriverHomeProvider>().isInitialLoading) {
+      return const DriverHomeSkeleton();
+    }
     return RefreshIndicator(
       onRefresh: () => Future.wait([
         context.read<AuthProvider>().refreshDriverStatus(),

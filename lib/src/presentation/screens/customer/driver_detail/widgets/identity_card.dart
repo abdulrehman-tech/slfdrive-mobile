@@ -46,6 +46,22 @@ class IdentityCard extends StatelessWidget {
                     ),
                   ),
                 ),
+                Positioned(
+                  bottom: 2.r,
+                  right: 2.r,
+                  child: Container(
+                    width: 18.r,
+                    height: 18.r,
+                    decoration: BoxDecoration(
+                      color: profile.isOnline ? const Color(0xFF4CAF50) : const Color(0xFF9E9E9E),
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        color: isDark ? const Color(0xFF1E1E2E) : Colors.white,
+                        width: 3,
+                      ),
+                    ),
+                  ),
+                ),
               ],
             ),
             SizedBox(width: 14.r),
@@ -72,6 +88,12 @@ class IdentityCard extends StatelessWidget {
                     spacing: 6.r,
                     runSpacing: 4.r,
                     children: [
+                      TinyChip(
+                        icon: profile.isOnline ? Iconsax.status_copy : Iconsax.status,
+                        label: (profile.isOnline ? 'driver_online' : 'driver_offline').tr(),
+                        color: profile.isOnline ? const Color(0xFF4CAF50) : const Color(0xFF9E9E9E),
+                        isDark: isDark,
+                      ),
                       TinyChip(
                         icon: Iconsax.tick_circle_copy,
                         label: 'driver_detail_verified_id'.tr(),

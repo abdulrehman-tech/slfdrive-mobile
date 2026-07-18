@@ -78,15 +78,14 @@ class DriverListCard extends StatelessWidget {
           )
         else
           _avatarFallback(),
-        if (driver.isAvailable)
-          Positioned(
+        Positioned(
             bottom: 0,
             right: 0,
             child: Container(
               width: 14.r,
               height: 14.r,
               decoration: BoxDecoration(
-                color: const Color(0xFF4CAF50),
+                color: driver.isOnline ? const Color(0xFF4CAF50) : const Color(0xFF9E9E9E),
                 shape: BoxShape.circle,
                 border: Border.all(
                   color: isDark ? const Color(0xFF1A1A2A) : Colors.white,
@@ -125,19 +124,19 @@ class DriverListCard extends StatelessWidget {
                 overflow: TextOverflow.ellipsis,
               ),
             ),
-            if (!driver.isAvailable)
+            if (!driver.isOnline)
               Container(
                 padding: EdgeInsets.symmetric(horizontal: 6.r, vertical: 2.r),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFE53935).withValues(alpha: 0.1),
+                  color: const Color(0xFF9E9E9E).withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(5.r),
                 ),
                 child: Text(
-                  'driver_status_busy'.tr(),
+                  'driver_offline'.tr(),
                   style: TextStyle(
                     fontSize: 9.r,
                     fontWeight: FontWeight.w700,
-                    color: const Color(0xFFE53935),
+                    color: const Color(0xFF757575),
                   ),
                 ),
               ),

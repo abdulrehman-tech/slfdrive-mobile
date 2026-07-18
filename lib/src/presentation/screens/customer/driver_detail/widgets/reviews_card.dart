@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 
-import '../../../common/coming_soon_screen.dart';
 import '../models/driver_profile.dart';
 import 'glass_card.dart';
 import 'review_tile.dart';
@@ -52,7 +51,7 @@ class ReviewsCard extends StatelessWidget {
                         children: List.generate(
                           5,
                           (i) => Icon(
-                            i < profile.rating.round() ? Iconsax.star_1_copy : Iconsax.star_1,
+                            i < profile.rating.round() ? Iconsax.star : Iconsax.star_copy,
                             size: 11.r,
                             color: const Color(0xFFFFC107),
                           ),
@@ -139,27 +138,6 @@ class ReviewsCard extends StatelessWidget {
               SizedBox(height: 12.r),
               ...profile.reviews.asMap().entries.map(
                 (e) => ReviewTile(review: e.value, index: e.key, cs: cs, isDark: isDark),
-              ),
-              SizedBox(height: 6.r),
-              Center(
-                child: GestureDetector(
-                  onTap: () => Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (_) => const ComingSoonScreen(titleKey: 'driver_detail_view_all_reviews'),
-                    ),
-                  ),
-                  child: Container(
-                    padding: EdgeInsets.symmetric(horizontal: 18.r, vertical: 10.r),
-                    decoration: BoxDecoration(
-                      color: cs.primary.withValues(alpha: isDark ? 0.18 : 0.1),
-                      borderRadius: BorderRadius.circular(11.r),
-                    ),
-                    child: Text(
-                      'driver_detail_view_all_reviews'.tr(),
-                      style: TextStyle(fontSize: 12.r, fontWeight: FontWeight.w800, color: cs.primary),
-                    ),
-                  ),
-                ),
               ),
             ],
           ],

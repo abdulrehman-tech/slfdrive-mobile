@@ -5,6 +5,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 import 'package:provider/provider.dart';
 
+import '../../../../widgets/confirm_dialog.dart';
 import '../models/driver_trip.dart';
 import '../provider/driver_trips_provider.dart';
 
@@ -194,9 +195,23 @@ class ActiveTripCard extends StatelessWidget {
     );
   }
 
+  void _confirmComplete(BuildContext context) {
+    showConfirmDialog(
+      context,
+      isDark: isDark,
+      icon: Iconsax.tick_circle,
+      accent: const Color(0xFF4CAF50),
+      title: 'trips_complete_confirm_title',
+      message: 'trips_complete_confirm_msg',
+      messageArgs: {'name': trip.customer},
+      confirmLabelKey: 'trips_complete',
+      onConfirm: () => _onComplete(context),
+    );
+  }
+
   Widget _buildCompleteButton(BuildContext context) {
     return GestureDetector(
-      onTap: () => _onComplete(context),
+      onTap: () => _confirmComplete(context),
       child: Container(
         width: double.infinity,
         padding: EdgeInsets.symmetric(vertical: 12.r),

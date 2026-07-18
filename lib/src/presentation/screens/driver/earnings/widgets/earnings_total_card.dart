@@ -8,7 +8,15 @@ import '../models/earnings_period.dart';
 class EarningsTotalCard extends StatelessWidget {
   final EarningsSnapshot snapshot;
 
-  const EarningsTotalCard({super.key, required this.snapshot});
+  /// Signed % change vs the previous equivalent period, or null when there's no
+  /// prior data — in which case the trend badge is hidden entirely.
+  final double? trendPercent;
+
+  const EarningsTotalCard({
+    super.key,
+    required this.snapshot,
+    this.trendPercent,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -44,35 +52,38 @@ class EarningsTotalCard extends StatelessWidget {
                     color: Colors.white.withValues(alpha: 0.8),
                   ),
                 ),
-                Container(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: 12.r,
-                    vertical: 6.r,
-                  ),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.2),
-                    borderRadius: BorderRadius.circular(20.r),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(
-                        CupertinoIcons.arrow_up,
-                        size: 14.r,
-                        color: Colors.white,
-                      ),
-                      SizedBox(width: 4.r),
-                      Text(
-                        '+12%',
-                        style: TextStyle(
-                          fontSize: 12.r,
-                          fontWeight: FontWeight.w600,
+                if (trendPercent != null)
+                  Container(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 12.r,
+                      vertical: 6.r,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withValues(alpha: 0.2),
+                      borderRadius: BorderRadius.circular(20.r),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          trendPercent! >= 0
+                              ? CupertinoIcons.arrow_up
+                              : CupertinoIcons.arrow_down,
+                          size: 14.r,
                           color: Colors.white,
                         ),
-                      ),
-                    ],
+                        SizedBox(width: 4.r),
+                        Text(
+                          '${trendPercent! >= 0 ? '+' : ''}${trendPercent!.round()}%',
+                          style: TextStyle(
+                            fontSize: 12.r,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                ),
               ],
             ),
             SizedBox(height: 12.r),
@@ -86,7 +97,12 @@ class EarningsTotalCard extends StatelessWidget {
             ),
             SizedBox(height: 8.r),
             Text(
-              '${snapshot.trips} trips • ${snapshot.hours} hours',
+              'earnings_trips_hours'.tr(
+                namedArgs: {
+                  'trips': '${snapshot.trips}',
+                  'hours': '${snapshot.hours}',
+                },
+              ),
               style: TextStyle(
                 fontSize: 14.r,
                 color: Colors.white.withValues(alpha: 0.8),

@@ -7,6 +7,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 import 'package:provider/provider.dart';
 
+import '../../../../widgets/confirm_dialog.dart';
 import '../provider/notifications_provider.dart';
 import 'unread_badge.dart';
 
@@ -99,7 +100,18 @@ class NotifAppBar extends StatelessWidget {
         Padding(
           padding: EdgeInsetsDirectional.only(end: 12.r),
           child: GestureDetector(
-            onTap: hasItems ? provider.clearAll : null,
+            onTap: hasItems
+                ? () => showConfirmDialog(
+                      context,
+                      isDark: isDark,
+                      icon: Iconsax.trash,
+                      accent: const Color(0xFFE53935),
+                      title: 'notif_clear_confirm_title',
+                      message: 'notif_clear_confirm_msg',
+                      confirmLabelKey: 'notif_clear_confirm_yes',
+                      onConfirm: () => context.read<NotificationsProvider>().clearAll(),
+                    )
+                : null,
             child: Container(
               width: 38.r,
               height: 38.r,

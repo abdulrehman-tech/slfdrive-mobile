@@ -1,11 +1,18 @@
 import 'package:image_picker/image_picker.dart' show XFile;
 
 import '../../models/driver/driver_details.dart';
+import '../../models/driver/driver_stats.dart';
 import '../datasources/driver_remote_data_source.dart';
 
 /// Exposes driver records to the presentation layer.
 abstract class DriverRepository {
   Future<DriverDetails?> getById(int id);
+
+  /// Aggregated stats for a driver (rating/bookings/earnings). `id` = user id.
+  Future<DriverStats?> getStats(int id);
+
+  /// Toggles the driver's online/offline availability. Returns the new state.
+  Future<bool> toggleOnline(int userId);
 
   /// Updates the driver profile via `PUT /api/Driver`. Returns true on success.
   Future<bool> updateProfile({
@@ -50,6 +57,12 @@ class DriverRepositoryImpl implements DriverRepository {
 
   @override
   Future<DriverDetails?> getById(int id) => remote.getById(id);
+
+  @override
+  Future<DriverStats?> getStats(int id) => remote.getStats(id);
+
+  @override
+  Future<bool> toggleOnline(int userId) => remote.toggleOnline(userId);
 
   @override
   Future<bool> updateProfile({

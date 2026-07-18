@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 
 import '../../../../constants/breakpoints.dart';
 import '../../../providers/theme_provider.dart';
+import '../../../widgets/confirm_dialog.dart';
 import 'provider/favorites_provider.dart';
 import 'widgets/drivers_section_header.dart';
 import 'widgets/empty_favorites.dart';
@@ -30,6 +31,21 @@ class _FavoritesView extends StatelessWidget {
   bool _isDark(BuildContext context) {
     final tp = context.watch<ThemeProvider>();
     return tp.isDarkMode || (tp.isSystemMode && MediaQuery.of(context).platformBrightness == Brightness.dark);
+  }
+
+  /// Confirms before removing a favourite — the removal is immediate and has no
+  /// undo, so it gets an are-you-sure gate.
+  void _confirmRemove(BuildContext context, bool isDark, VoidCallback onConfirm) {
+    showConfirmDialog(
+      context,
+      isDark: isDark,
+      icon: Icons.delete_outline_rounded,
+      accent: const Color(0xFFE53935),
+      title: 'fav_remove_confirm_title',
+      message: 'fav_remove_confirm_msg',
+      confirmLabelKey: 'fav_remove_confirm_yes',
+      onConfirm: onConfirm,
+    );
   }
 
   @override
@@ -74,7 +90,8 @@ class _FavoritesView extends StatelessWidget {
                       child: FavCarCard(
                         car: cars[i],
                         isDark: isDark,
-                        onRemove: () => context.read<FavoritesProvider>().removeCarAt(i),
+                        onRemove: () => _confirmRemove(
+                          context, isDark, () => context.read<FavoritesProvider>().removeCarAt(i)),
                         onTap: () => context.pushNamed('car-detail', pathParameters: {'id': cars[i].id}),
                       ),
                     ),
@@ -101,7 +118,8 @@ class _FavoritesView extends StatelessWidget {
                       child: FavDriverCard(
                         driver: drivers[i],
                         isDark: isDark,
-                        onRemove: () => context.read<FavoritesProvider>().removeDriverAt(i),
+                        onRemove: () => _confirmRemove(
+                          context, isDark, () => context.read<FavoritesProvider>().removeDriverAt(i)),
                         onTap: () => context.pushNamed('driver-detail', pathParameters: {'id': drivers[i].id}),
                       ),
                     ),
@@ -170,7 +188,8 @@ class _FavoritesView extends StatelessWidget {
                               child: FavCarCard(
                                 car: e.value,
                                 isDark: isDark,
-                                onRemove: () => context.read<FavoritesProvider>().removeCarAt(e.key),
+                                onRemove: () => _confirmRemove(
+                                  context, isDark, () => context.read<FavoritesProvider>().removeCarAt(e.key)),
                                 onTap: () => context.pushNamed('car-detail', pathParameters: {'id': e.value.id}),
                               ),
                             );
@@ -192,7 +211,8 @@ class _FavoritesView extends StatelessWidget {
                                 child: FavDriverCard(
                                   driver: e.value,
                                   isDark: isDark,
-                                  onRemove: () => context.read<FavoritesProvider>().removeDriverAt(e.key),
+                                  onRemove: () => _confirmRemove(
+                                    context, isDark, () => context.read<FavoritesProvider>().removeDriverAt(e.key)),
                                   onTap: () => context.pushNamed('driver-detail', pathParameters: {'id': e.value.id}),
                                 ),
                               );

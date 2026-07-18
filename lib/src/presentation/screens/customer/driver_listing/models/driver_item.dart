@@ -11,6 +11,10 @@ class DriverItem {
   final bool isAvailable;
   final bool hasVehicle;
 
+  /// Live presence (`is_online`) — drives the green/grey dot. Distinct from
+  /// [isAvailable], which reflects the account-enabled flag.
+  final bool isOnline;
+
   const DriverItem({
     required this.id,
     required this.name,
@@ -21,6 +25,7 @@ class DriverItem {
     this.yearsExperience,
     this.isAvailable = true,
     this.hasVehicle = false,
+    this.isOnline = false,
   });
 
   factory DriverItem.fromDriver(DriverListingItem d, {bool ar = false}) {
@@ -36,6 +41,7 @@ class DriverItem {
       yearsExperience: d.yearsOfExperience,
       isAvailable: d.isActive,
       hasVehicle: d.hasVehicle,
+      isOnline: d.isOnline,
     );
   }
 }

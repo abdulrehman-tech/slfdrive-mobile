@@ -7,6 +7,7 @@ import 'package:provider/provider.dart';
 import '../../../../core/models/company/all_company.dart';
 import '../../../../core/models/corporate/corporate_membership.dart';
 import '../../../providers/theme_provider.dart';
+import '../../../widgets/confirm_dialog.dart';
 import '../booking/provider/corporate_companies_provider.dart';
 import '../booking/steps/corporate_widgets/corporate_company_picker.dart';
 import 'provider/corporate_membership_provider.dart';
@@ -174,7 +175,21 @@ class _ApplyViewState extends State<_ApplyView> {
           SizedBox(
             width: double.infinity,
             child: FilledButton(
-              onPressed: _submitting ? null : () => _submit(context),
+              onPressed: _submitting
+                  ? null
+                  : () {
+                      if (!_validate()) return;
+                      showConfirmDialog(
+                        context,
+                        isDark: isDark,
+                        icon: Iconsax.building,
+                        accent: const Color(0xFF4D63DD),
+                        title: 'corporate_apply_confirm_title',
+                        message: 'corporate_apply_confirm_msg',
+                        confirmLabelKey: 'corporate_apply_submit',
+                        onConfirm: () => _submit(context),
+                      );
+                    },
               child: _submitting
                   ? SizedBox(
                       height: 18.r,

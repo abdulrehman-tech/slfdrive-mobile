@@ -29,6 +29,10 @@ class StorageKeys {
   
   static const String fcmToken = 'fcm_token';
   static const String notificationsEnabled = 'notifications_enabled';
+  // Driver notification-channel preferences (local-only; no backend endpoint).
+  static const String driverNotifPush = 'driver_notif_push';
+  static const String driverNotifEmail = 'driver_notif_email';
+  static const String driverNotifSms = 'driver_notif_sms';
   
   static const String lastSyncTime = 'last_sync_time';
   static const String cachedCars = 'cached_cars';

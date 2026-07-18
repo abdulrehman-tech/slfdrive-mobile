@@ -23,6 +23,9 @@ class DriverItem {
   /// Derived from [DriverListingItem.languagesKnown] or a generic fallback.
   final String speciality;
 
+  /// Live presence — drives the green (online) / grey (offline) dot.
+  final bool isOnline;
+
   const DriverItem({
     required this.id,
     required this.name,
@@ -30,6 +33,7 @@ class DriverItem {
     this.rating,
     this.trips = 0,
     this.speciality = '',
+    this.isOnline = false,
   });
 
   /// Maps a backend [DriverListingItem] to a home DriverItem.
@@ -45,6 +49,7 @@ class DriverItem {
       // Use the first listed language as the badge, or fall back to a generic
       // "Driver" label — both are user-visible only and not critical.
       speciality: _resolveSpeciality(d),
+      isOnline: d.isOnline,
     );
   }
 

@@ -23,6 +23,10 @@ class DriverListingItem {
   final bool hasVehicle;
   final bool isVerified;
   final bool isActive;
+  /// Live availability from `is_online` on `mst_driver` (driver-controlled).
+  /// Distinct from [isActive] (account enabled). Drives the green/grey presence
+  /// dot on customer-facing driver cards.
+  final bool isOnline;
   final double? lat;
   final double? lon;
   final double? distanceKm;
@@ -48,6 +52,7 @@ class DriverListingItem {
     this.hasVehicle = false,
     this.isVerified = false,
     this.isActive = true,
+    this.isOnline = false,
     this.lat,
     this.lon,
     this.distanceKm,
@@ -79,6 +84,7 @@ class DriverListingItem {
       hasVehicle: (json['hasVehicle'] as bool?) ?? false,
       isVerified: (json['isVerified'] as bool?) ?? false,
       isActive: (json['isActive'] as bool?) ?? true,
+      isOnline: (json['isOnline'] as bool?) ?? false,
       lat: (json['lat'] as num?)?.toDouble(),
       lon: (json['lon'] as num?)?.toDouble(),
       distanceKm: (json['distanceKm'] as num?)?.toDouble(),

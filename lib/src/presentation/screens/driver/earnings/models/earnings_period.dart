@@ -14,6 +14,21 @@ class EarningsSnapshot {
   });
 }
 
+/// One column of the earnings-screen revenue chart. [label] is already
+/// localized (day/week/month), [value] is OMR revenue, [highlight] marks the
+/// current day/week/month.
+class ChartBar {
+  final String label;
+  final double value;
+  final bool highlight;
+
+  const ChartBar({
+    required this.label,
+    required this.value,
+    this.highlight = false,
+  });
+}
+
 class RecentEarning {
   final String date;
   final String customer;

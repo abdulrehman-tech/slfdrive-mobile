@@ -17,16 +17,16 @@ class LegalConstants {
   static const String companyLegalName = '[COMPANY_LEGAL_NAME]';
 
   /// Registered business address (used in the policy footer).
-  static const String companyAddress = '[COMPANY_ADDRESS]';
+  static const String companyAddress = 'Muscat, Sultanate of Oman';
 
   /// Jurisdiction whose laws govern the Terms.
   static const String governingLaw = 'the Sultanate of Oman';
 
   /// General support / contact inbox.
-  static const String supportEmail = '[SUPPORT_EMAIL]';
+  static const String supportEmail = 'sales@slf-drives.com';
 
   /// Privacy / data-request inbox (may equal supportEmail).
-  static const String privacyEmail = '[PRIVACY_EMAIL]';
+  static const String privacyEmail = 'sales@slf-drives.com';
 
   /// Effective / last-updated date printed on the documents.
   static const String effectiveDate = '[EFFECTIVE_DATE]';

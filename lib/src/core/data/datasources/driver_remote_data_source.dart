@@ -4,6 +4,7 @@ import 'package:image_picker/image_picker.dart' show XFile;
 import '../../../constants/endpoints.dart';
 import '../../errors/error_handler.dart';
 import '../../models/driver/driver_details.dart';
+import '../../models/driver/driver_stats.dart';
 import '../../network/api_client.dart';
 
 /// Remote reads + updates for driver records.
@@ -11,6 +12,16 @@ abstract class DriverRemoteDataSource {
   /// Fetches a single driver by **user id** (`GET /api/Driver/{id}`), or null
   /// when the call doesn't succeed.
   Future<DriverDetails?> getById(int id);
+
+  /// Aggregated stats for a driver (`GET /api/Driver/{id}/stats`) — rating,
+  /// booking counts, earnings. `id` is the driver's user id. Null when the call
+  /// doesn't succeed.
+  Future<DriverStats?> getStats(int id);
+
+  /// Flips the driver's online/offline availability
+  /// (`POST /api/Driver/toggle-online/{userId}`). Returns the new state
+  /// (`true` = online).
+  Future<bool> toggleOnline(int userId);
 
   /// Updates an existing driver (`PUT /api/Driver`, multipart/form-data). File
   /// parts are optional; matching `*Url` values are round-tripped so the backend
@@ -66,6 +77,31 @@ class DriverRemoteDataSourceImpl implements DriverRemoteDataSource {
         return DriverDetails.fromJson(body['data'] as Map<String, dynamic>);
       }
       return null;
+    } catch (e) {
+      throw ErrorHandler.handleError(e);
+    }
+  }
+
+  @override
+  Future<DriverStats?> getStats(int id) async {
+    try {
+      final res = await apiClient.get(ApiEndpoints.driverStats(id));
+      final body = res.data as Map<String, dynamic>;
+      if (body['isSuccess'] == true && body['data'] is Map<String, dynamic>) {
+        return DriverStats.fromJson(body['data'] as Map<String, dynamic>);
+      }
+      return null;
+    } catch (e) {
+      throw ErrorHandler.handleError(e);
+    }
+  }
+
+  @override
+  Future<bool> toggleOnline(int userId) async {
+    try {
+      final res = await apiClient.post(ApiEndpoints.driverToggleOnline(userId));
+      final body = res.data as Map<String, dynamic>;
+      return body['isSuccess'] == true && body['data'] == true;
     } catch (e) {
       throw ErrorHandler.handleError(e);
     }

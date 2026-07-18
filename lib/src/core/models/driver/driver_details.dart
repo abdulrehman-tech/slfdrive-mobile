@@ -31,6 +31,9 @@ class DriverDetails {
   final double? lat;
   final double? lon;
   final int? allCompanyId;
+  /// Server-side availability flag (`is_online` on `mst_driver`); null when the
+  /// driver never toggled it (treated as offline). Seeds the home toggle.
+  final bool? isOnline;
 
   const DriverDetails({
     required this.id,
@@ -60,6 +63,7 @@ class DriverDetails {
     this.lat,
     this.lon,
     this.allCompanyId,
+    this.isOnline,
   });
 
   factory DriverDetails.fromJson(Map<String, dynamic> json) {
@@ -91,6 +95,7 @@ class DriverDetails {
       lat: (json['lat'] as num?)?.toDouble(),
       lon: (json['lon'] as num?)?.toDouble(),
       allCompanyId: (json['allCompanyId'] as num?)?.toInt(),
+      isOnline: json['isOnline'] as bool?,
     );
   }
 }

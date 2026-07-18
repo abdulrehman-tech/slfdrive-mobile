@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../providers/auth_provider.dart';
@@ -326,8 +327,12 @@ class _DrawerBottom extends StatelessWidget {
           SizedBox(height: 12.r),
           GestureDetector(
             onTap: () {
+              // Capture a context that stays mounted after the drawer closes —
+              // the drawer item's own context is deactivated by the pop, which
+              // would crash logout's GoRouter/Provider lookups.
+              final rootContext = Navigator.of(context, rootNavigator: true).context;
               Navigator.of(context).pop();
-              showDriverLogoutDialog(context, isDark);
+              showDriverLogoutDialog(rootContext, isDark);
             },
             child: Container(
               width: double.infinity,
@@ -350,8 +355,84 @@ class _DrawerBottom extends StatelessWidget {
               ),
             ),
           ),
+          SizedBox(height: 16.r),
+          _DriverLegalLinks(isDark: isDark),
+          SizedBox(height: 12.r),
+          const _DriverVersionFooter(),
         ],
       ),
+    );
+  }
+}
+
+/// Terms · Privacy · Help links row shown above the version footer. Closes the
+/// drawer first (capturing the router so the push survives the deactivated
+/// drawer context) then opens the target.
+class _DriverLegalLinks extends StatelessWidget {
+  final bool isDark;
+  const _DriverLegalLinks({required this.isDark});
+
+  void _go(BuildContext context, String path) {
+    final router = GoRouter.of(context);
+    Navigator.of(context).pop();
+    router.push(path);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final muted = Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.55);
+    Widget link(String key, String path) => GestureDetector(
+          onTap: () => _go(context, path),
+          child: Text(
+            key.tr(),
+            style: TextStyle(fontSize: 12.r, fontWeight: FontWeight.w600, color: muted),
+          ),
+        );
+    Widget dot() => Padding(
+          padding: EdgeInsets.symmetric(horizontal: 8.r),
+          child: Text('·', style: TextStyle(fontSize: 12.r, color: muted)),
+        );
+
+    return Wrap(
+      alignment: WrapAlignment.center,
+      crossAxisAlignment: WrapCrossAlignment.center,
+      children: [
+        link('legal_terms_title', '/legal/terms'),
+        dot(),
+        link('legal_privacy_title', '/legal/privacy'),
+      ],
+    );
+  }
+}
+
+/// App name + version/build + copyright at the very bottom of the driver drawer.
+class _DriverVersionFooter extends StatelessWidget {
+  const _DriverVersionFooter();
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    final year = DateTime.now().year;
+    return Column(
+      children: [
+        FutureBuilder<PackageInfo>(
+          future: PackageInfo.fromPlatform(),
+          builder: (context, snap) {
+            final info = snap.data;
+            final version = info == null ? '' : 'v${info.version} (${info.buildNumber})';
+            return Text(
+              version.isEmpty ? 'SLF Drive' : 'SLF Drive · $version',
+              style: TextStyle(fontSize: 11.r, fontWeight: FontWeight.w600, color: cs.onSurface.withValues(alpha: 0.4)),
+            );
+          },
+        ),
+        SizedBox(height: 3.r),
+        Text(
+          'drawer_copyright'.tr(namedArgs: {'year': '$year'}),
+          textAlign: TextAlign.center,
+          style: TextStyle(fontSize: 10.r, color: cs.onSurface.withValues(alpha: 0.3)),
+        ),
+      ],
     );
   }
 }

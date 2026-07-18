@@ -57,7 +57,7 @@ class _DriverTripsView extends StatelessWidget {
                 ),
               ),
               bottom: PreferredSize(
-                preferredSize: Size.fromHeight(80.r),
+                preferredSize: Size.fromHeight(100.r),
                 child: DriverTripsTabSelector(isDark: isDark),
               ),
             ),
