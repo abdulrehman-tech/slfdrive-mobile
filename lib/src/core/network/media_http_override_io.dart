@@ -2,7 +2,7 @@ import 'dart:io';
 
 /// Host that serves uploaded media over a self-signed cert. Kept in sync with
 /// `ApiEndpoints.mediaBaseUrl` / the trusted host in `api_client.dart`.
-const String _trustedSelfSignedHost = '161.97.144.112';
+const String _trustedSelfSignedHost = 'dashboard.slf-drives.com';
 
 /// Trusts the self-signed cert for the media host only — every other host stays
 /// fully verified. Mirrors the per-host bypass already applied to the Dio

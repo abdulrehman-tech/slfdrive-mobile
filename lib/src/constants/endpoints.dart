@@ -1,12 +1,13 @@
 class ApiEndpoints {
   /// Backend base URL — includes the `/api` segment. The path constants below
   /// also start with `/api`, so the full request URL intentionally contains
-  /// `/api/api/...`, which matches the backend routing.
-  static const String baseUrl = 'https://161.97.144.112/api';
+  /// `/api/api/...`, which matches the backend routing (verified: single
+  /// `/api/...` returns 404, `/api/api/...` returns the endpoint).
+  static const String baseUrl = 'https://dashboard.slf-drives.com/api';
 
   /// Host that serves uploaded media (no `/api` segment). Stored photo/document
   /// URLs are relative to this.
-  static const String mediaBaseUrl = 'https://161.97.144.112';
+  static const String mediaBaseUrl = 'https://dashboard.slf-drives.com';
 
   /// Resolves a stored media path into an absolute URL. Backend photo URLs are
   /// relative to `/Uploads/`; an already-absolute URL is returned untouched.

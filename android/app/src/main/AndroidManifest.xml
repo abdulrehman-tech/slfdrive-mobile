@@ -1,4 +1,12 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+    <!-- firebase_analytics auto-merges com.google.android.gms.permission.AD_ID
+         from its library manifest. This app does not use the advertising ID for
+         ads or attribution, so we strip it here and answer "No" to the Play
+         Console advertising-ID declaration. Analytics still works; only ad-ID
+         based features are disabled. -->
+    <uses-permission android:name="com.google.android.gms.permission.AD_ID"
+        tools:node="remove"/>
     <!-- Foreground ("while in use") location only — used to capture the user's
          coordinates during profile completion and for the booking location
          picker. No ACCESS_BACKGROUND_LOCATION: it isn't needed and would trigger

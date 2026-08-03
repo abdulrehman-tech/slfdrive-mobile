@@ -17,20 +17,6 @@ class MyDataSection extends StatelessWidget {
       isDark: isDark,
       children: [
         ProfileTile(
-          icon: Iconsax.location_copy,
-          iconColor: const Color(0xFF3D5AFE),
-          title: 'profile_section_addresses'.tr(),
-          isDark: isDark,
-          onTap: () => context.push('/profile/addresses'),
-        ),
-        ProfileTile(
-          icon: Iconsax.card_copy,
-          iconColor: const Color(0xFF4CAF50),
-          title: 'profile_section_payments'.tr(),
-          isDark: isDark,
-          onTap: () => context.push('/profile/payments'),
-        ),
-        ProfileTile(
           icon: Iconsax.personalcard_copy,
           iconColor: const Color(0xFF7C4DFF),
           title: 'profile_section_documents'.tr(),

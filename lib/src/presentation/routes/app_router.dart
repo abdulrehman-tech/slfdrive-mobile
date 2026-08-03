@@ -11,6 +11,7 @@ import '../screens/common/auth/pre_login_screen.dart';
 import '../screens/common/auth/login/phone_login_screen.dart';
 import '../screens/common/auth/otp/otp_verification_screen.dart';
 import '../screens/common/auth/profile_completion_screen.dart';
+import '../screens/common/about/about_screen.dart';
 import '../screens/common/coming_soon_screen.dart';
 import '../screens/common/help/help_center_screen.dart';
 import '../screens/common/legal/legal_document_screen.dart';
@@ -422,16 +423,6 @@ class AppRouter {
           name: state.name,
         ),
       ),
-      GoRoute(
-        path: '/profile/addresses',
-        pageBuilder: (context, state) =>
-            AppPageTransition(child: const ComingSoonScreen(titleKey: 'profile_addresses_title'), name: state.name),
-      ),
-      GoRoute(
-        path: '/profile/payments',
-        pageBuilder: (context, state) =>
-            AppPageTransition(child: const ComingSoonScreen(titleKey: 'profile_payments_title'), name: state.name),
-      ),
       // Corporate membership (customer): list + apply.
       GoRoute(
         path: '/profile/corporate',
@@ -452,11 +443,6 @@ class AppRouter {
           child: const EditProfileScreen(section: EditProfileSection.documents),
           name: state.name,
         ),
-      ),
-      GoRoute(
-        path: '/my-vehicles',
-        pageBuilder: (context, state) =>
-            AppPageTransition(child: const ComingSoonScreen(titleKey: 'drawer_my_vehicles_title'), name: state.name),
       ),
       GoRoute(
         path: '/help',
@@ -486,7 +472,7 @@ class AppRouter {
       GoRoute(
         path: '/about',
         pageBuilder: (context, state) =>
-            AppPageTransition(child: const ComingSoonScreen(titleKey: 'about_title'), name: state.name),
+            AppPageTransition(child: const AboutScreen(), name: state.name),
       ),
 
       // ── Driver shell tabs ───────────────────────────────────

@@ -1,8 +1,11 @@
 import 'package:easy_localization/easy_localization.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 
+import '../../../../../constants/url_constants.dart';
+import '../../../../utils/contact_launcher.dart';
 import '../widgets/profile_section.dart';
 import '../widgets/profile_tile.dart';
 
@@ -29,7 +32,11 @@ class SupportSection extends StatelessWidget {
           iconColor: const Color(0xFFFFC107),
           title: 'profile_rate_app'.tr(),
           isDark: isDark,
-          onTap: () => context.push('/about'),
+          onTap: () => ContactLauncher.openWebsite(
+            defaultTargetPlatform == TargetPlatform.iOS
+                ? UrlConstants.appStoreUrl
+                : UrlConstants.playStoreUrl,
+          ),
         ),
         ProfileTile(
           icon: Iconsax.document_text_copy,

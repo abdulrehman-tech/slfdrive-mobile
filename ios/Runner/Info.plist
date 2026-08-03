@@ -66,18 +66,19 @@
 		     when access is only requested if a feature you open needs a photo. -->
 		<key>NSCameraUsageDescription</key>
 		<string>SLF Drive uses the camera when you choose to take a photo, such as your profile picture.</string>
-		<!-- App Transport Security: the OmPay checkout page is served from the
-	     backend's self-signed-cert host (161.97.144.112). WKWebView enforces ATS
-	     before the server-trust callback can run, so allow insecure loads in web
-	     content for that host. The WebView still validates every other host;
-	     Dio handles the same host for API calls separately. -->
+		<!-- App Transport Security: the API + OmPay checkout are served from the
+	     backend host (dashboard.slf-drives.com) with a self-signed cert. WKWebView
+	     enforces ATS before the server-trust callback can run, so allow insecure
+	     loads in web content for that host. The WebView still validates every
+	     other host; Dio handles the same host for API calls separately.
+	     TODO: remove this exception once the backend has a valid CA TLS cert. -->
 		<key>NSAppTransportSecurity</key>
 		<dict>
 			<key>NSAllowsArbitraryLoadsInWebContent</key>
 			<true/>
 			<key>NSExceptionDomains</key>
 			<dict>
-				<key>161.97.144.112</key>
+				<key>dashboard.slf-drives.com</key>
 				<dict>
 					<key>NSExceptionAllowsInsecureHTTPLoads</key>
 					<true/>

@@ -17,7 +17,7 @@ class OmPayWebResult {
 /// `slfdrive://payment/{success,cancel,failure}` return redirect.
 ///
 /// TLS is fully verified except for the app's self-signed API host
-/// (`161.97.144.112`) — mirrors the allowlist in `core/network/api_client.dart`.
+/// (`dashboard.slf-drives.com`) — mirrors the allowlist in `core/network/api_client.dart`.
 class OmPayWebViewPage extends StatefulWidget {
   final String checkoutUrl;
 

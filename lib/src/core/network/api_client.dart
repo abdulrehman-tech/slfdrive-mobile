@@ -25,12 +25,14 @@ class ApiClient {
       ),
     );
 
-    // The backend is served over HTTPS on a raw IP with a self-signed cert, so
-    // its TLS handshake would fail in every build mode. Accept the bad cert for
-    // that single host only (every other host stays fully verified). Applied in
-    // all modes — not just debug — so release builds on device can connect.
-    // TODO: remove this host bypass once the backend has a valid TLS cert.
-    const trustedSelfSignedHost = '161.97.144.112';
+    // The backend is served over HTTPS with a self-signed cert, so its TLS
+    // handshake would fail in every build mode. Accept the bad cert for that
+    // single host only (every other host stays fully verified). Applied in all
+    // modes — not just debug — so release builds on device can connect.
+    // TODO: remove this host bypass once the backend has a valid CA TLS cert
+    // (Let's Encrypt) — a self-signed cert on a production host is a security
+    // risk (MITM) and can trigger App Store rejection.
+    const trustedSelfSignedHost = 'dashboard.slf-drives.com';
     (_dio.httpClientAdapter as IOHttpClientAdapter).createHttpClient = () {
       final client = HttpClient();
       client.badCertificateCallback = (X509Certificate cert, String host, int port) {
