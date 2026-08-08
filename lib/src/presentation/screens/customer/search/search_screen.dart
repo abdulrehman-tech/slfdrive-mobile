@@ -22,9 +22,11 @@ class SearchScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final ar = context.locale.languageCode == 'ar';
     return ChangeNotifierProvider(
+      key: ValueKey(context.locale.languageCode),
       create: (_) {
-        final p = SearchProvider();
+        final p = SearchProvider(ar: ar);
         WidgetsBinding.instance.addPostFrameCallback((_) => p.focusNode.requestFocus());
         return p;
       },

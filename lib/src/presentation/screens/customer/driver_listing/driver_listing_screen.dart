@@ -32,6 +32,7 @@ class DriverListingScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
+      key: ValueKey(context.locale.languageCode),
       create: (_) => DriverListingProvider(
         repository: getIt<DriverListingRepository>(),
         ar: context.locale.languageCode == 'ar',

@@ -40,6 +40,7 @@ class CustomerHomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final ar = context.locale.languageCode == 'ar';
     return ChangeNotifierProvider(
+      key: ValueKey(context.locale.languageCode),
       create: (_) => HomeProvider(
         vehicleRepository: getIt<VehicleRepository>(),
         driverRepository: getIt<DriverListingRepository>(),

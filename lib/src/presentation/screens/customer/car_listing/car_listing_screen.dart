@@ -34,6 +34,7 @@ class CarListingScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
+      key: ValueKey(context.locale.languageCode),
       create: (_) => CarListingProvider(
         vehicleRepository: getIt<VehicleRepository>(),
         lookupRepository: getIt<LookupRepository>(),

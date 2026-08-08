@@ -7,10 +7,13 @@ import '../models/brand.dart';
 /// Loads active vehicle brands from the backend (`VehicleBrand/active`) and
 /// filters them by the search query.
 class BrandsProvider extends ChangeNotifier {
-  BrandsProvider({LookupRepository? repository})
-      : _repository = repository ?? getIt<LookupRepository>() {
+  BrandsProvider({LookupRepository? repository, bool ar = false})
+      : _repository = repository ?? getIt<LookupRepository>(),
+        _ar = ar {
     load();
   }
+
+  final bool _ar;
 
   final LookupRepository _repository;
 
@@ -38,7 +41,7 @@ class BrandsProvider extends ChangeNotifier {
       _all
         ..clear()
         ..addAll(brands.map((b) => Brand(
-              name: b.displayName(),
+              name: b.displayName(ar: _ar),
               logoAsset: '',
               carsCount: 0,
               tagline: '',

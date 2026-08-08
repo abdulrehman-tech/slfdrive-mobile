@@ -23,10 +23,14 @@ class SearchProvider extends ChangeNotifier {
   SearchProvider({
     VehicleRepository? vehicleRepository,
     DriverListingRepository? driverRepository,
+    bool ar = false,
   })  : _vehicles = vehicleRepository ?? getIt<VehicleRepository>(),
-        _drivers = driverRepository ?? getIt<DriverListingRepository>() {
+        _drivers = driverRepository ?? getIt<DriverListingRepository>(),
+        _ar = ar {
     _fetch();
   }
+
+  final bool _ar;
 
   static const defaultPriceRange = RangeValues(0, 500);
   static const _pageSize = 30;
@@ -134,23 +138,23 @@ class SearchProvider extends ChangeNotifier {
 
   SearchResultCar _mapCar(Vehicle v) => SearchResultCar(
         id: v.id.toString(),
-        name: v.displayTitle(),
+        name: v.displayTitle(ar: _ar),
         imageUrl: v.primaryPhoto ?? '',
         pricePerDay: v.pricePerDay ?? 0,
-        brand: v.brandName ?? '',
+        brand: (_ar ? (v.brandNameAr ?? v.brandName) : v.brandName) ?? '',
         rating: v.rating ?? 0,
-        transmission: v.transmissionTypeName ?? '',
+        transmission: (_ar ? (v.transmissionTypeNameAr ?? v.transmissionTypeName) : v.transmissionTypeName) ?? '',
         seats: v.seats ?? 0,
-        fuelType: v.fuelTypeName ?? '',
+        fuelType: (_ar ? (v.fuelTypeNameAr ?? v.fuelTypeName) : v.fuelTypeName) ?? '',
       );
 
   SearchResultDriver _mapDriver(DriverListingItem d) => SearchResultDriver(
         id: d.id.toString(),
-        name: d.displayName(),
+        name: d.displayName(ar: _ar),
         avatarUrl: d.resolvedPhotoUrl ?? '',
         rating: d.rating ?? 0,
         trips: 0,
-        speciality: d.locationName ?? '',
+        speciality: (_ar ? (d.locationNameAr ?? d.locationName) : d.locationName) ?? '',
         pricePerDay: d.amountPerDay ?? 0,
         isOnline: d.isOnline,
       );

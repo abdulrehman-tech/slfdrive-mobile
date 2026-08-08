@@ -2,7 +2,7 @@ name: slfdrive
 description: "SLF Drive - Car Rental & Driver Services Platform"
 publish_to: 'none'
 
-version: 1.0.0+12
+version: 1.0.1+13
 
 environment:
   sdk: ^3.10.0

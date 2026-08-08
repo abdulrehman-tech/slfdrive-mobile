@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
@@ -18,8 +19,10 @@ class BrandsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final ar = context.locale.languageCode == 'ar';
     return ChangeNotifierProvider(
-      create: (_) => BrandsProvider(),
+      key: ValueKey(context.locale.languageCode),
+      create: (_) => BrandsProvider(ar: ar),
       child: const _BrandsView(),
     );
   }
