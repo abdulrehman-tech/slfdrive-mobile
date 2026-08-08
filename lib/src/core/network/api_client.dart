@@ -1,7 +1,5 @@
 // ignore_for_file: avoid_print
-import 'dart:io';
 import 'package:dio/dio.dart';
-import 'package:dio/io.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import '../../constants/endpoints.dart';
@@ -24,26 +22,6 @@ class ApiClient {
         validateStatus: (status) => status! < 500,
       ),
     );
-
-    // The backend is served over HTTPS with a self-signed cert, so its TLS
-    // handshake would fail in every build mode. Accept the bad cert for that
-    // single host only (every other host stays fully verified). Applied in all
-    // modes — not just debug — so release builds on device can connect.
-    // TODO: remove this host bypass once the backend has a valid CA TLS cert
-    // (Let's Encrypt) — a self-signed cert on a production host is a security
-    // risk (MITM) and can trigger App Store rejection.
-    const trustedSelfSignedHost = 'dashboard.slf-drives.com';
-    (_dio.httpClientAdapter as IOHttpClientAdapter).createHttpClient = () {
-      final client = HttpClient();
-      client.badCertificateCallback = (X509Certificate cert, String host, int port) {
-        final allow = host == trustedSelfSignedHost;
-        if (allow && kDebugMode) {
-          print('⚠️ WARNING: Bypassing SSL certificate verification for $host:$port');
-        }
-        return allow;
-      };
-      return client;
-    };
 
     // Add interceptors
     _dio.interceptors.add(ApiInterceptor());

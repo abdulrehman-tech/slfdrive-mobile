@@ -10,7 +10,6 @@ import 'package:provider/provider.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'src/core/data/repositories/auth_repository.dart';
 import 'src/core/di/injection_container.dart';
-import 'src/core/network/media_http_override.dart';
 import 'src/core/secrets/maps_loader.dart';
 import 'src/core/services/session_manager.dart';
 import 'src/presentation/providers/auth_provider.dart';
@@ -36,10 +35,6 @@ Future<void> _applyHighRefreshRate() async {
   WidgetsFlutterBinding.ensureInitialized();
   unawaited(_applyHighRefreshRate());
   await EasyLocalization.ensureInitialized();
-
-  // Trust the backend's self-signed cert for the media host so Image.network
-  // can load profile photos / documents (no-op on web). Mirrors the Dio bypass.
-  applySelfSignedMediaOverride();
 
   // Set up DI container (currently only registers FlutterSecureStorage).
   await setupDependencyInjection();

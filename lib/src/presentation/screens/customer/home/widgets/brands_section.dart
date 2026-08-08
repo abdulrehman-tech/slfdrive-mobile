@@ -99,11 +99,7 @@ class BrandsSection extends StatelessWidget {
                       SizedBox(height: 6.r),
                       Text(
                         brand.name,
-                        style: TextStyle(
-                          fontSize: 10.r,
-                          fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
-                          color: selected ? cs.primary : cs.onSurface.withValues(alpha: 0.7),
-                        ),
+                        style: TextStyle(fontSize: 11.r, fontWeight: FontWeight.w600, color: cs.onSurface),
                       ),
                     ],
                   ),
