@@ -68,7 +68,16 @@ class _BookingFlowView extends StatelessWidget {
   Future<void> _handleNext(BuildContext context) async {
     final provider = context.read<BookingFlowProvider>();
     final shouldSubmit = provider.advance();
-    if (!shouldSubmit) return;
+    if (!shouldSubmit) {
+      if (provider.error != null) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text(provider.error!.tr()),
+          backgroundColor: Colors.red,
+        ));
+        provider.clearError();
+      }
+      return;
+    }
     final ok = await provider.submitBooking();
     if (!context.mounted) return;
     if (!ok) {

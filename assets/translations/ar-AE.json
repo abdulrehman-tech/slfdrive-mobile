@@ -957,5 +957,14 @@
   "help_office_value": "مسقط، سلطنة عُمان",
   "about_tagline": "تأجير السيارات وخدمات السائقين",
   "about_description": "إس إل إف درايف منصة لتأجير السيارات واستئجار سائقين محترفين. احجز سيارة أو سائقاً خلال دقائق، وتابع رحلاتك، وأدر كل شيء من تطبيق واحد — لتجربة قيادة سلسة وموثوقة في كل مرة.",
-  "about_website": "زيارة موقعنا"
+  "about_website": "زيارة موقعنا",
+  "booking_dates_when_pickup": "متى يجب أن نجهزه؟",
+  "booking_dates_when_return": "متى ستعيده؟",
+  "booking_dates_choose_date": "اختر تاريخك",
+  "booking_dates_choose_dates": "اختر تواريخك",
+  "booking_dates_quick_trip": "بالساعة",
+  "booking_dates_hourly_active": "الوضع بالساعة نشط",
+  "booking_dates_switch_hourly": "قم بالتبديل إلى الفوترة بالساعة للمشاوير القصيرة.",
+  "booking_dates_booking_by_hour": "أنت تحجز بالساعة.",
+  "booking_dates_total_duration": "إجمالي المدة"
 }

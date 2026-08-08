@@ -27,9 +27,15 @@ class SummaryScheduleCard extends StatelessWidget {
     'Dec',
   ];
 
-  String _formatDate(DateTime? d) {
+  String _formatDate(DateTime? d, bool includeTime) {
     if (d == null) return '-';
-    return '${d.day} ${_months[d.month - 1]} ${d.year}';
+    final dateStr = '${d.day} ${_months[d.month - 1]} ${d.year}';
+    if (!includeTime) return dateStr;
+
+    final hour = d.hour == 0 ? 12 : (d.hour > 12 ? d.hour - 12 : d.hour);
+    final amPm = d.hour >= 12 ? 'PM' : 'AM';
+    final minute = d.minute.toString().padLeft(2, '0');
+    return '$dateStr, $hour:$minute $amPm';
   }
 
   @override
@@ -48,8 +54,8 @@ class SummaryScheduleCard extends StatelessWidget {
             isDark: isDark,
           ),
           SizedBox(height: 10.r),
-          SummaryInfoRow(label: 'booking_summary_pickup_date'.tr(), value: _formatDate(d.startAt)),
-          SummaryInfoRow(label: 'booking_summary_return_date'.tr(), value: _formatDate(d.endAt)),
+          SummaryInfoRow(label: 'booking_summary_pickup_date'.tr(), value: _formatDate(d.startAt, d.isHourly)),
+          SummaryInfoRow(label: 'booking_summary_return_date'.tr(), value: _formatDate(d.endAt, d.isHourly)),
           SummaryInfoRow(
             label: 'booking_summary_duration'.tr(),
             value: '${d.units} ${d.unitLabelKey.tr()}',

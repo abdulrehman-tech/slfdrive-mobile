@@ -957,5 +957,14 @@
   "help_office_value": "Muscat, Sultanate of Oman",
   "about_tagline": "Car rental & driver services",
   "about_description": "SLF Drive is a car rental and professional driver-hire platform. Book a vehicle or a chauffeur in minutes, track your trips, and manage everything from one app — built for a smooth, reliable ride every time.",
-  "about_website": "Visit our website"
+  "about_website": "Visit our website",
+  "booking_dates_when_pickup": "When should we have it ready?",
+  "booking_dates_when_return": "When will you return it?",
+  "booking_dates_choose_date": "Choose Your Date",
+  "booking_dates_choose_dates": "Choose Your Dates",
+  "booking_dates_quick_trip": "Hourly",
+  "booking_dates_hourly_active": "Hourly Mode Active",
+  "booking_dates_switch_hourly": "Switch to hourly billing for short errands.",
+  "booking_dates_booking_by_hour": "You are booking by the hour.",
+  "booking_dates_total_duration": "Total Duration"
 }

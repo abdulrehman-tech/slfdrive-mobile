@@ -29,7 +29,13 @@ IconData bookingStageIcon(BookingTimelineStage s) {
   }
 }
 
-String formatBookingDate(DateTime d) {
+String formatBookingDate(DateTime d, {bool includeTime = false}) {
   const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-  return '${d.day} ${months[d.month - 1]} ${d.year}';
+  final dateStr = '${d.day} ${months[d.month - 1]} ${d.year}';
+  if (!includeTime) return dateStr;
+
+  final hour = d.hour == 0 ? 12 : (d.hour > 12 ? d.hour - 12 : d.hour);
+  final amPm = d.hour >= 12 ? 'PM' : 'AM';
+  final minute = d.minute.toString().padLeft(2, '0');
+  return '$dateStr, $hour:$minute $amPm';
 }

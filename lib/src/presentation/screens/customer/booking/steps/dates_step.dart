@@ -1,4 +1,5 @@
 import 'package:easy_localization/easy_localization.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
@@ -17,41 +18,26 @@ class DatesStep extends StatefulWidget {
 }
 
 class _DatesStepState extends State<DatesStep> {
-  int _timeSlot = 1; // pickup slot: 0 morning 1 afternoon 2 evening 3 custom
-  TimeOfDay _pickupTime = const TimeOfDay(hour: 10, minute: 0);
-
-  int _returnSlot = 1; // drop-off slot (same slot semantics as pickup)
-  TimeOfDay _returnTime = const TimeOfDay(hour: 10, minute: 0);
-
-  // Picked calendar dates (date-only); the pickup/return times are layered on
-  // top when pushing to BookingData, so the payload carries the real times.
   DateTime? _startDate;
   DateTime? _endDate;
 
-  static const _timeSlots = <(String, String, TimeOfDay)>[
-    ('booking_time_morning', '7:00 – 11:00', TimeOfDay(hour: 9, minute: 0)),
-    ('booking_time_afternoon', '11:00 – 17:00', TimeOfDay(hour: 14, minute: 0)),
-    ('booking_time_evening', '17:00 – 22:00', TimeOfDay(hour: 19, minute: 0)),
-    ('booking_time_custom', 'Pick exact time', TimeOfDay(hour: 10, minute: 0)),
-  ];
+  TimeOfDay _pickupTime = const TimeOfDay(hour: 10, minute: 0);
+  TimeOfDay _returnTime = const TimeOfDay(hour: 10, minute: 0);
+
+  String? _timeError;
 
   @override
   void initState() {
     super.initState();
-    // Seed local date/time state from any dates already on BookingData (the flow
-    // controller seeds defaults before this step builds).
     final s = widget.data.startAt;
     final e = widget.data.endAt;
     if (s != null) {
       _startDate = DateTime(s.year, s.month, s.day);
-      // Recover the pickup time from the seeded start, matching it to a slot.
       _pickupTime = TimeOfDay(hour: s.hour, minute: s.minute);
-      _timeSlot = _slotForTime(_pickupTime);
     }
     if (e != null) {
       _endDate = DateTime(e.year, e.month, e.day);
       _returnTime = TimeOfDay(hour: e.hour, minute: e.minute);
-      _returnSlot = _slotForTime(_returnTime);
     }
 
     if (widget.data.startAt == null) {
@@ -60,48 +46,123 @@ class _DatesStepState extends State<DatesStep> {
         final now = DateTime.now();
         _startDate = DateTime(now.year, now.month, now.day);
         _endDate = _startDate!.add(const Duration(days: 2));
+        _pickupTime = const TimeOfDay(hour: 10, minute: 0);
+        _returnTime = const TimeOfDay(hour: 11, minute: 0);
         _applyDateTime();
       });
     }
   }
 
-  /// The pickup / return times in effect: the selected preset slot's time, or
-  /// the custom time when the custom slot is active.
-  TimeOfDay get _effectivePickup =>
-      _timeSlot < 3 ? _timeSlots[_timeSlot].$3 : _pickupTime;
-  TimeOfDay get _effectiveReturn =>
-      _returnSlot < 3 ? _timeSlots[_returnSlot].$3 : _returnTime;
+  void _validateAndAdjustTime({required bool changedPickup}) {
+    final sd = _startDate;
+    final ed = widget.data.isExplicitlyHourly ? _startDate : _endDate;
 
-  int _slotForTime(TimeOfDay t) {
-    for (var i = 0; i < 3; i++) {
-      if (_timeSlots[i].$3.hour == t.hour && _timeSlots[i].$3.minute == t.minute) return i;
+    if (sd != null && ed != null) {
+      final start = DateTime(sd.year, sd.month, sd.day, _pickupTime.hour, _pickupTime.minute);
+      final end = DateTime(ed.year, ed.month, ed.day, _returnTime.hour, _returnTime.minute);
+      final diff = end.difference(start).inMinutes;
+
+      if (widget.data.isExplicitlyHourly) {
+        if (diff < 60) {
+          _timeError = 'Drop-off must be at least 1 hour after pickup.';
+        } else {
+          _timeError = null;
+        }
+      } else {
+        if (diff <= 0) {
+          _timeError = 'Drop-off must be after pickup time.';
+        } else {
+          _timeError = null;
+        }
+      }
+    } else {
+      _timeError = null;
     }
-    return 3; // custom
   }
 
-  /// Combines the picked dates with the effective pickup time and pushes them to
-  /// BookingData, so fromDateTime/toDateTime carry the real time-of-day.
   void _applyDateTime() {
     final sd = _startDate;
     final ed = _endDate;
     if (sd == null || ed == null) return;
-    final p = _effectivePickup;
-    final r = _effectiveReturn;
-    final start = DateTime(sd.year, sd.month, sd.day, p.hour, p.minute);
-    final end = DateTime(ed.year, ed.month, ed.day, r.hour, r.minute);
+
+    final start = DateTime(sd.year, sd.month, sd.day, _pickupTime.hour, _pickupTime.minute);
+    // If hourly mode, force end date to be the same as start date.
+    final finalEd = widget.data.isExplicitlyHourly ? sd : ed;
+    
+    final end = DateTime(finalEd.year, finalEd.month, finalEd.day, _returnTime.hour, _returnTime.minute);
     widget.data.setDates(start, end);
   }
 
-  Future<void> _pickCustomTime({required bool isReturn}) async {
-    final picked = await showTimePicker(
+  void _pickTime({required bool isReturn}) {
+    final initialTime = isReturn ? _returnTime : _pickupTime;
+    final now = DateTime.now();
+    final initialDateTime = DateTime(now.year, now.month, now.day, initialTime.hour, initialTime.minute);
+
+    showCupertinoModalPopup(
       context: context,
-      initialTime: isReturn ? _returnTime : _pickupTime,
-      builder: (ctx, child) => Theme(data: Theme.of(ctx), child: child!),
+      builder: (ctx) => Material(
+        color: Colors.transparent,
+        child: Container(
+          height: 280.r,
+          color: widget.isDark ? Colors.grey[900] : Colors.white,
+          child: SafeArea(
+          top: false,
+          child: Column(
+            children: [
+              Container(
+                decoration: BoxDecoration(
+                  color: widget.isDark ? Colors.grey[850] : Colors.grey[100],
+                  border: Border(bottom: BorderSide(color: Colors.grey.withValues(alpha: 0.2))),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    CupertinoButton(
+                      child: Text('Cancel', style: TextStyle(color: Colors.red, fontSize: 15.r)),
+                      onPressed: () => Navigator.of(ctx).pop(),
+                    ),
+                    Text(
+                      isReturn ? 'booking_dates_when_return'.tr() : 'booking_dates_when_pickup'.tr(),
+                      style: TextStyle(fontSize: 15.r, fontWeight: FontWeight.w600, color: widget.isDark ? Colors.white : Colors.black),
+                    ),
+                    CupertinoButton(
+                      child: Text(isReturn ? 'Done' : 'Next', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15.r)),
+                      onPressed: () {
+                        Navigator.of(ctx).pop();
+                        if (!isReturn) {
+                          Future.delayed(const Duration(milliseconds: 250), () {
+                            if (mounted) _pickTime(isReturn: true);
+                          });
+                        }
+                      },
+                    )
+                  ],
+                ),
+              ),
+              Expanded(
+                child: CupertinoDatePicker(
+                  mode: CupertinoDatePickerMode.time,
+                  initialDateTime: initialDateTime,
+                  onDateTimeChanged: (DateTime newDateTime) {
+                    setState(() {
+                      if (isReturn) {
+                        _returnTime = TimeOfDay.fromDateTime(newDateTime);
+                        _validateAndAdjustTime(changedPickup: false);
+                      } else {
+                        _pickupTime = TimeOfDay.fromDateTime(newDateTime);
+                        _validateAndAdjustTime(changedPickup: true);
+                      }
+                    });
+                    _applyDateTime();
+                  },
+                ),
+              ),
+            ],
+          ),
+          ),
+        ),
+      ),
     );
-    if (picked != null) {
-      setState(() => isReturn ? _returnTime = picked : _pickupTime = picked);
-      _applyDateTime();
-    }
   }
 
   @override
@@ -109,6 +170,9 @@ class _DatesStepState extends State<DatesStep> {
     final cs = Theme.of(context).colorScheme;
     final isDark = widget.isDark;
     final d = widget.data;
+
+    final bool canHourly = d.supportsHourly;
+    final bool isHourly = d.isExplicitlyHourly;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -133,24 +197,36 @@ class _DatesStepState extends State<DatesStep> {
               BookingSectionHeader(
                 icon: Iconsax.calendar_2_copy,
                 iconColor: const Color(0xFF3D5AFE),
-                title: 'booking_dates_range'.tr(),
+                title: isHourly ? 'booking_dates_choose_date'.tr() : 'booking_dates_choose_dates'.tr(),
                 isDark: isDark,
               ),
               SizedBox(height: 8.r),
               SizedBox(
                 height: 340.r,
                 child: SfDateRangePicker(
+                  key: ValueKey(isHourly), // Remount when mode changes
                   view: DateRangePickerView.month,
-                  selectionMode: DateRangePickerSelectionMode.range,
+                  selectionMode: isHourly ? DateRangePickerSelectionMode.single : DateRangePickerSelectionMode.range,
                   minDate: DateTime.now(),
-                  initialSelectedRange: PickerDateRange(d.startAt, d.endAt),
+                  initialSelectedRange: !isHourly ? PickerDateRange(d.startAt, d.endAt) : null,
+                  initialSelectedDate: isHourly ? d.startAt : null,
                   onSelectionChanged: (args) {
-                    if (args.value is PickerDateRange) {
-                      final r = args.value as PickerDateRange;
-                      if (r.startDate != null && r.endDate != null) {
-                        _startDate = r.startDate;
-                        _endDate = r.endDate;
+                    if (isHourly) {
+                      if (args.value is DateTime) {
+                        _startDate = args.value as DateTime;
+                        _endDate = _startDate;
+                        _validateAndAdjustTime(changedPickup: true);
                         _applyDateTime();
+                      }
+                    } else {
+                      if (args.value is PickerDateRange) {
+                        final r = args.value as PickerDateRange;
+                        if (r.startDate != null && r.endDate != null) {
+                          _startDate = r.startDate;
+                          _endDate = r.endDate;
+                          _validateAndAdjustTime(changedPickup: true);
+                          _applyDateTime();
+                        }
                       }
                     }
                   },
@@ -176,6 +252,74 @@ class _DatesStepState extends State<DatesStep> {
 
         SizedBox(height: 14.r),
 
+        if (canHourly) ...[
+          BookingGlassCard(
+            isDark: isDark,
+            padding: EdgeInsets.symmetric(horizontal: 16.r, vertical: 12.r),
+            child: Row(
+              children: [
+                Container(
+                  width: 38.r,
+                  height: 38.r,
+                  decoration: BoxDecoration(
+                    color: cs.primary.withValues(alpha: isDark ? 0.2 : 0.12),
+                    borderRadius: BorderRadius.circular(10.r),
+                  ),
+                  child: Icon(Iconsax.clock_1_copy, size: 20.r, color: cs.primary),
+                ),
+                SizedBox(width: 14.r),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        isHourly ? 'booking_dates_hourly_active'.tr() : 'booking_dates_quick_trip'.tr(),
+                        style: TextStyle(fontSize: 15.r, fontWeight: FontWeight.w600, color: cs.onSurface),
+                      ),
+                      Text(
+                        isHourly 
+                           ? 'booking_dates_booking_by_hour'.tr() 
+                           : 'booking_dates_switch_hourly'.tr(),
+                        style: TextStyle(fontSize: 11.r, color: cs.onSurface.withValues(alpha: 0.55)),
+                      ),
+                    ],
+                  ),
+                ),
+                CupertinoSwitch(
+                  value: isHourly,
+                  activeTrackColor: cs.primary,
+                  onChanged: (val) {
+                    widget.data.setIsHourlyMode(val);
+                    if (val && _startDate != null) {
+                      _endDate = _startDate;
+                    }
+                    _validateAndAdjustTime(changedPickup: true);
+                    _applyDateTime();
+                  },
+                ),
+              ],
+            ),
+          ),
+          SizedBox(height: 14.r),
+        ],
+
+        if (_timeError != null)
+          Padding(
+            padding: EdgeInsets.only(bottom: 14.r),
+            child: Row(
+              children: [
+                Icon(Icons.error_outline, color: Colors.redAccent, size: 16.r),
+                SizedBox(width: 6.r),
+                Expanded(
+                  child: Text(
+                    _timeError!,
+                    style: TextStyle(color: Colors.redAccent, fontSize: 13.r, fontWeight: FontWeight.w500),
+                  ),
+                ),
+              ],
+            ),
+          ),
+
         // Duration summary
         BookingGlassCard(
           isDark: isDark,
@@ -197,7 +341,7 @@ class _DatesStepState extends State<DatesStep> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'booking_dates_duration'.tr(),
+                      'booking_dates_total_duration'.tr(),
                       style: TextStyle(fontSize: 11.r, color: cs.onSurface.withValues(alpha: 0.5)),
                     ),
                     SizedBox(height: 2.r),
@@ -219,121 +363,86 @@ class _DatesStepState extends State<DatesStep> {
 
         SizedBox(height: 14.r),
 
-        // Pickup time
-        _timeSection(
-          cs: cs,
+        // Time pickers grouped in a single card
+        BookingGlassCard(
           isDark: isDark,
-          titleKey: 'booking_time_pickup',
-          selectedSlot: _timeSlot,
-          customTime: _pickupTime,
-          onTapSlot: (i) {
-            setState(() => _timeSlot = i);
-            if (i == 3) {
-              _pickCustomTime(isReturn: false);
-            } else {
-              _applyDateTime();
-            }
-          },
+          padding: EdgeInsets.zero,
+          child: Column(
+            children: [
+              _timeRow(
+                cs: cs,
+                isDark: isDark,
+                titleKey: 'booking_time_pickup',
+                time: _pickupTime,
+                icon: Iconsax.clock_copy,
+                iconColor: const Color(0xFF4CAF50), // Green for start
+                onTap: () => _pickTime(isReturn: false),
+              ),
+              Divider(height: 1, color: cs.onSurface.withValues(alpha: 0.05), indent: 64.r),
+              _timeRow(
+                cs: cs,
+                isDark: isDark,
+                titleKey: 'booking_time_return',
+                time: _returnTime,
+                icon: Iconsax.timer_1_copy,
+                iconColor: const Color(0xFFFFA726), // Orange for end
+                onTap: () => _pickTime(isReturn: true),
+              ),
+            ],
+          ),
         ),
-
-        SizedBox(height: 14.r),
-
-        // Return (drop-off) time
-        _timeSection(
-          cs: cs,
-          isDark: isDark,
-          titleKey: 'booking_time_return',
-          selectedSlot: _returnSlot,
-          customTime: _returnTime,
-          onTapSlot: (i) {
-            setState(() => _returnSlot = i);
-            if (i == 3) {
-              _pickCustomTime(isReturn: true);
-            } else {
-              _applyDateTime();
-            }
-          },
-        ),
+        SizedBox(height: 80.r), // Extra padding so it doesn't clutter with the bottom bar
       ],
     );
   }
 
-  /// A titled card of time-slot chips (Morning / Afternoon / Evening / Custom).
-  Widget _timeSection({
+  Widget _timeRow({
     required ColorScheme cs,
     required bool isDark,
     required String titleKey,
-    required int selectedSlot,
-    required TimeOfDay customTime,
-    required ValueChanged<int> onTapSlot,
+    required TimeOfDay time,
+    required IconData icon,
+    required Color iconColor,
+    required VoidCallback onTap,
   }) {
-    return BookingGlassCard(
-      isDark: isDark,
-      padding: EdgeInsets.all(14.r),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          BookingSectionHeader(
-            icon: Iconsax.clock_copy,
-            iconColor: const Color(0xFFFFA726),
-            title: titleKey.tr(),
-            isDark: isDark,
-          ),
-          SizedBox(height: 12.r),
-          Wrap(
-            spacing: 8.r,
-            runSpacing: 8.r,
-            children: List.generate(_timeSlots.length, (i) {
-              final slot = _timeSlots[i];
-              final active = selectedSlot == i;
-              return GestureDetector(
-                onTap: () => onTapSlot(i),
-                child: AnimatedContainer(
-                  duration: const Duration(milliseconds: 200),
-                  padding: EdgeInsets.symmetric(horizontal: 14.r, vertical: 9.r),
-                  decoration: BoxDecoration(
-                    color: active
-                        ? cs.primary.withValues(alpha: isDark ? 0.22 : 0.12)
-                        : (isDark ? Colors.white.withValues(alpha: 0.05) : Colors.black.withValues(alpha: 0.03)),
-                    borderRadius: BorderRadius.circular(12.r),
-                    border: Border.all(
-                      color: active
-                          ? cs.primary.withValues(alpha: 0.4)
-                          : (isDark ? Colors.white.withValues(alpha: 0.08) : Colors.black.withValues(alpha: 0.05)),
-                    ),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        slot.$1.tr(),
-                        style: TextStyle(
-                          fontSize: 12.r,
-                          fontWeight: active ? FontWeight.w700 : FontWeight.w500,
-                          color: active ? cs.primary : cs.onSurface.withValues(alpha: 0.7),
-                        ),
-                      ),
-                      if (i < 3) ...[
-                        SizedBox(width: 6.r),
-                        Text(
-                          slot.$2,
-                          style: TextStyle(fontSize: 10.r, color: cs.onSurface.withValues(alpha: 0.4)),
-                        ),
-                      ],
-                      if (i == 3 && active) ...[
-                        SizedBox(width: 6.r),
-                        Text(
-                          customTime.format(context),
-                          style: TextStyle(fontSize: 10.r, color: cs.primary, fontWeight: FontWeight.w700),
-                        ),
-                      ],
-                    ],
-                  ),
-                ),
-              );
-            }),
-          ),
-        ],
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(16.r),
+      child: Padding(
+        padding: EdgeInsets.all(16.r),
+        child: Row(
+          children: [
+            Container(
+              width: 38.r,
+              height: 38.r,
+              decoration: BoxDecoration(
+                color: iconColor.withValues(alpha: isDark ? 0.2 : 0.12),
+                borderRadius: BorderRadius.circular(10.r),
+              ),
+              child: Icon(icon, size: 20.r, color: iconColor),
+            ),
+            SizedBox(width: 14.r),
+            Expanded(
+              child: Text(
+                titleKey.tr(),
+                style: TextStyle(fontSize: 15.r, fontWeight: FontWeight.w600, color: cs.onSurface),
+              ),
+            ),
+            Container(
+              padding: EdgeInsets.symmetric(horizontal: 12.r, vertical: 6.r),
+              decoration: BoxDecoration(
+                color: cs.primary.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(8.r),
+              ),
+              child: Text(
+                time.format(context),
+                style: TextStyle(fontSize: 14.r, fontWeight: FontWeight.bold, color: cs.primary),
+              ),
+            ),
+            SizedBox(width: 8.r),
+            Icon(Icons.chevron_right_rounded, size: 20.r, color: cs.onSurface.withValues(alpha: 0.3)),
+          ],
+        ),
       ),
     );
   }
@@ -341,5 +450,12 @@ class _DatesStepState extends State<DatesStep> {
   String _formatShort(DateTime d) {
     const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
     return '${d.day} ${months[d.month - 1]}';
+  }
+}
+
+extension StringExtension on String {
+  String capitalize() {
+    if (isEmpty) return this;
+    return "${this[0].toUpperCase()}${substring(1).toLowerCase()}";
   }
 }

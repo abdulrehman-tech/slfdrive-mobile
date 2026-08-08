@@ -30,7 +30,9 @@ class SuccessSummaryCard extends StatelessWidget {
           ),
           child: Column(
             children: [
-              _row(cs, 'booking_summary_pickup_date'.tr(), _formatDate(data.startAt)),
+              _row(cs, 'booking_summary_pickup_date'.tr(), _formatDate(data.startAt, data.isHourly)),
+              SizedBox(height: 8.r),
+              _row(cs, 'booking_summary_return_date'.tr(), _formatDate(data.endAt, data.isHourly)),
               Divider(
                 height: 18.r,
                 color: isDark ? Colors.white.withValues(alpha: 0.06) : Colors.black.withValues(alpha: 0.05),
@@ -78,9 +80,15 @@ class SuccessSummaryCard extends StatelessWidget {
     );
   }
 
-  String _formatDate(DateTime? d) {
+  String _formatDate(DateTime? d, bool includeTime) {
     if (d == null) return '-';
     const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-    return '${d.day} ${months[d.month - 1]} ${d.year}';
+    final dateStr = '${d.day} ${months[d.month - 1]} ${d.year}';
+    if (!includeTime) return dateStr;
+
+    final hour = d.hour == 0 ? 12 : (d.hour > 12 ? d.hour - 12 : d.hour);
+    final amPm = d.hour >= 12 ? 'PM' : 'AM';
+    final minute = d.minute.toString().padLeft(2, '0');
+    return '$dateStr, $hour:$minute $amPm';
   }
 }

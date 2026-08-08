@@ -208,6 +208,8 @@ class BookingData extends ChangeNotifier {
   double _deliveryFee = 0;
   bool _deliveryFeeLoading = false;
 
+  bool _isExplicitlyHourly = false;
+
   PaymentMethod _paymentMethod = PaymentMethod.card;
 
   // Backend-computed fare quote (from /Booking/pre-booking), fetched when the
@@ -248,6 +250,7 @@ class BookingData extends ChangeNotifier {
   String? get quoteError => _quoteError;
   String? get bookingRef => _bookingRef;
   int? get bookingId => _bookingId;
+  bool get isExplicitlyHourly => _isExplicitlyHourly;
 
   /// Number of rental days as whole 24-hour periods (minimum 1) — matches how
   /// the backend bills, so the estimate equals the charged total. A Jul 4→6
@@ -266,13 +269,25 @@ class BookingData extends ChangeNotifier {
     return h < 1 ? 1 : h;
   }
 
-  /// A same-calendar-day booking is billed by the hour rather than the day —
-  /// but only when an hourly rate is available to price it.
+  /// Checks if the currently selected car/driver supports hourly billing.
+  /// If no car/driver is selected yet, it assumes hourly is supported.
+  bool get supportsHourly {
+    final sType = _serviceType;
+    if (sType == null) return true;
+
+    if (sType.needsCar && _car != null && _car!.pricePerHour <= 0) return false;
+    if (sType.needsDriver && _driver != null && _driver!.pricePerHour <= 0) return false;
+
+    return true;
+  }
+
+  /// A booking is billed by the hour when explicitly toggled to Hourly mode,
+  /// provided they select the same day and the selected vehicle/driver supports it.
   bool get isHourly {
     final s = _startAt, e = _endAt;
     if (s == null || e == null) return false;
     final sameDay = s.year == e.year && s.month == e.month && s.day == e.day;
-    return sameDay && basePerHour > 0;
+    return _isExplicitlyHourly && sameDay && supportsHourly;
   }
 
   /// Billing units: hours for a same-day booking, otherwise days.
@@ -361,6 +376,11 @@ class BookingData extends ChangeNotifier {
   void setDates(DateTime start, DateTime end) {
     _startAt = start;
     _endAt = end;
+    notifyListeners();
+  }
+
+  void setIsHourlyMode(bool isHourly) {
+    _isExplicitlyHourly = isHourly;
     notifyListeners();
   }
 

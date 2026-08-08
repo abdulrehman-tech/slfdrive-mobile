@@ -36,7 +36,9 @@ class BookingFlowProvider extends ChangeNotifier {
     // by setDates doesn't trigger rebuilds during the initial build phase.
     if (data.startAt == null) {
       final now = DateTime.now();
-      final start = DateTime(now.year, now.month, now.day);
+      // Set default to 14:00 (Afternoon) so it aligns with DatesStep's default slot
+      // and doesn't fall back to 00:00 Custom slot.
+      final start = DateTime(now.year, now.month, now.day, 14, 0);
       data.setDates(start, start.add(const Duration(days: 2)));
     }
     data.addListener(_onDataChange);
@@ -127,6 +129,33 @@ class BookingFlowProvider extends ChangeNotifier {
   /// booking submission (i.e. we're on the final summary step).
   bool advance() {
     if (!canGoNext) return false;
+
+    if (data.isExplicitlyHourly && !data.supportsHourly) {
+       _error = 'Hourly rate is not available for this selection. Please select another option or switch to daily billing.';
+       notifyListeners();
+       return false;
+    }
+    _error = null;
+
+    if (currentStep == BookingStepId.dates) {
+      if (data.startAt != null && data.endAt != null) {
+        final diff = data.endAt!.difference(data.startAt!).inMinutes;
+        if (data.isExplicitlyHourly) {
+          if (diff < 60) {
+            _error = 'Drop-off time must be at least 1 hour after pickup.';
+            notifyListeners();
+            return false;
+          }
+        } else {
+          if (diff <= 0) {
+            _error = 'Drop-off must be after pickup time.';
+            notifyListeners();
+            return false;
+          }
+        }
+      }
+    }
+
     if (currentStep == BookingStepId.summary) return true;
     if (_currentIndex < steps.length - 1) {
       _currentIndex++;
@@ -154,6 +183,13 @@ class BookingFlowProvider extends ChangeNotifier {
 
   String? _error;
   String? get error => _error;
+
+  void clearError() {
+    if (_error != null) {
+      _error = null;
+      notifyListeners();
+    }
+  }
 
   /// Creates the booking in the backend's default (pending) state. No payment
   /// is taken here. Returns `true` once a booking reference has been assigned to
@@ -240,15 +276,19 @@ class BookingFlowProvider extends ChangeNotifier {
     // the row. So for delivery we must omit pickUpLat/Lon (and send the
     // drop-off + area); for self-pickup we send the vehicle's coords and no
     // drop-off.
-    // Send the times as canonical UTC (trailing `Z`) so the backend never has
-    // to guess the zone. A bare local ISO string (no `Z`, no offset) was
-    // ambiguous and got mis-shifted (a Jul-4 pickup landed on Jul-3 in the
-    // confirmation email). The picker builds LOCAL DateTimes, so `.toUtc()`
-    // preserves the correct instant; backend must parse as UTC and convert
-    // back to local for display/email.
+    // Helper to format local DateTime with its explicit timezone offset (e.g. +04:00 for Oman)
+    // This prevents the backend from guessing the zone or incorrectly shifting it.
+    String toIso8601WithOffset(DateTime dateTime) {
+      final offset = dateTime.timeZoneOffset;
+      final hours = offset.inHours.abs().toString().padLeft(2, '0');
+      final minutes = (offset.inMinutes.abs() % 60).toString().padLeft(2, '0');
+      final sign = offset.isNegative ? '-' : '+';
+      return '${dateTime.toIso8601String()}$sign$hours:$minutes';
+    }
+
     final detail = BookingDetailsCreationRequest(
-      fromDateTime: start.toUtc().toIso8601String(),
-      toDateTime: end.toUtc().toIso8601String(),
+      fromDateTime: toIso8601WithOffset(start),
+      toDateTime: toIso8601WithOffset(end),
       pickUpLat: isDelivery ? null : car?.lat,
       pickUpLon: isDelivery ? null : car?.lon,
       dropOffLat: dropOff?.latitude,
