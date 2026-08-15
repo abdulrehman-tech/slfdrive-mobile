@@ -7,6 +7,7 @@ import 'package:provider/provider.dart';
 
 import '../../../providers/auth_provider.dart';
 import '../../../providers/theme_provider.dart';
+import '../../common/profile/sections/danger_zone_section.dart';
 import '../../common/profile/sections/preferences_section.dart';
 import '../../common/profile/sections/sign_out_button.dart';
 import '../../common/profile/sections/support_section.dart';
@@ -89,30 +90,7 @@ class _DriverProfileView extends StatelessWidget {
             ),
             SizedBox(height: 16.r),
             SupportSection(isDark: isDark),
-            SizedBox(height: 16.r),
-            ProfileSection(
-              title: 'driver_section_danger'.tr(),
-              isDark: isDark,
-              children: [
-                // ProfileTile(
-                //   icon: Iconsax.logout_copy,
-                //   iconColor: const Color(0xFFE53935),
-                //   title: 'profile_sign_out'.tr(),
-                //   valueColor: const Color(0xFFE53935),
-                //   isDark: isDark,
-                //   onTap: () => showProfileLogoutDialog(context, isDark: isDark),
-                // ),
-                ProfileTile(
-                  icon: Iconsax.trash_copy,
-                  iconColor: const Color(0xFFE53935),
-                  title: 'driver_delete_account'.tr(),
-                  isDark: isDark,
-                  onTap: () => ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('coming_soon_message'.tr()), behavior: SnackBarBehavior.floating),
-                  ),
-                ),
-              ],
-            ),
+            DangerZoneSection(isDark: isDark),
             SizedBox(height: 16.r),
             SignOutButton(isDark: isDark),
           ],

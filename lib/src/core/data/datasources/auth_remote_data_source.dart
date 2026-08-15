@@ -37,6 +37,12 @@ abstract class AuthRemoteDataSource {
   /// tokens regardless of the result.
   Future<void> signout(String refreshToken);
 
+  /// Soft-deletes the signed-in user's account. Hits the role-specific endpoint
+  /// (`DELETE /api/Driver/{userId}` or `DELETE /api/Customer/{userId}`) — both
+  /// take the *user* id, not the role-entity id. Throws on failure so the UI
+  /// can keep the session when the server rejects the deletion.
+  Future<void> deleteAccount({required int userId, required bool isDriver});
+
   /// Update the user's last known coordinates.
   Future<void> setLocation({
     required int userId,
@@ -157,6 +163,17 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       await apiClient.post(
         ApiEndpoints.signout,
         data: {'refreshToken': refreshToken},
+      );
+    } catch (e) {
+      throw ErrorHandler.handleError(e);
+    }
+  }
+
+  @override
+  Future<void> deleteAccount({required int userId, required bool isDriver}) async {
+    try {
+      await apiClient.delete(
+        isDriver ? ApiEndpoints.driverById(userId) : ApiEndpoints.customerById(userId),
       );
     } catch (e) {
       throw ErrorHandler.handleError(e);

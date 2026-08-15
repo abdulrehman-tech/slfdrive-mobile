@@ -351,6 +351,30 @@ class AuthProvider extends ChangeNotifier {
 
   Future<void> logout() async {
     await _repository.logout();
+    _resetSessionState();
+  }
+
+  /// Permanently deletes the signed-in user's account (soft-delete server-side)
+  /// and clears the local session. Returns true on success; on failure the
+  /// session is kept and [error] carries a displayable message.
+  Future<bool> deleteAccount() async {
+    _error = null;
+    try {
+      await _repository.deleteAccount();
+      _resetSessionState();
+      return true;
+    } on AppException catch (e) {
+      _error = e.message;
+      notifyListeners();
+      return false;
+    } catch (e) {
+      _error = e.toString();
+      notifyListeners();
+      return false;
+    }
+  }
+
+  void _resetSessionState() {
     _user = null;
     _pendingUserId = null;
     _requiresOtp = false;

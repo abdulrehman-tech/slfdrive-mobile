@@ -1,10 +1,12 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../constants/breakpoints.dart';
 import '../../../providers/theme_provider.dart';
+import '../../common/profile/sections/danger_zone_section.dart';
 import '../../common/profile/sections/preferences_section.dart';
 import '../../common/profile/sections/sign_out_button.dart';
 import '../../common/profile/sections/support_section.dart';
@@ -84,17 +86,27 @@ class _ProfileView extends StatelessWidget {
                   MyDataSection(isDark: isDark),
                   SizedBox(height: 16.r),
                   SupportSection(isDark: isDark),
+                  DangerZoneSection(isDark: isDark),
                   SizedBox(height: 16.r),
                   SignOutButton(isDark: isDark),
                   SizedBox(height: 20.r),
                   Center(
-                    child: Text(
-                      'profile_version'.tr(),
-                      style: TextStyle(
-                        fontSize: 11.r,
-                        color: cs.onSurface.withValues(alpha: 0.35),
-                        fontWeight: FontWeight.w500,
-                      ),
+                    child: FutureBuilder<PackageInfo>(
+                      future: PackageInfo.fromPlatform(),
+                      builder: (context, snap) {
+                        final info = snap.data;
+                        if (info == null) return const SizedBox.shrink();
+                        return Text(
+                          'profile_version'.tr(
+                            namedArgs: {'version': '${info.version} (${info.buildNumber})'},
+                          ),
+                          style: TextStyle(
+                            fontSize: 11.r,
+                            color: cs.onSurface.withValues(alpha: 0.35),
+                            fontWeight: FontWeight.w500,
+                          ),
+                        );
+                      },
                     ),
                   ),
                 ],
@@ -154,6 +166,7 @@ class _ProfileView extends StatelessWidget {
                     child: Column(
                       children: [
                         _PreferencesSection(isDark: isDark),
+                        DangerZoneSection(isDark: isDark),
                         SizedBox(height: 16.r),
                         SignOutButton(isDark: isDark),
                       ],

@@ -69,6 +69,11 @@ abstract class AuthRepository {
   Future<void> setUserLocation({required int userId, required double lat, required double lon});
 
   Future<void> logout();
+
+  /// Soft-deletes the signed-in user's account server-side, then clears the
+  /// local session (same cleanup as [logout]). Throws [AppException] when the
+  /// server rejects the deletion — local state is left intact in that case.
+  Future<void> deleteAccount();
 }
 
 class AuthRepositoryImpl implements AuthRepository {
@@ -250,6 +255,33 @@ class AuthRepositoryImpl implements AuthRepository {
         // Revocation is best-effort — proceed to clear local state regardless.
       }
     }
+    await _clearLocalSession();
+  }
+
+  @override
+  Future<void> deleteAccount() async {
+    final idStr = await storage.read(key: StorageKeys.userId);
+    final userId = int.tryParse(idStr ?? '');
+    if (userId == null) {
+      throw AppException(message: 'No signed-in user to delete');
+    }
+    final isDriver = (await storage.read(key: StorageKeys.userRole)) == 'driver';
+    // Must succeed before any local cleanup — a failed server delete keeps the
+    // session so the user can retry.
+    await remote.deleteAccount(userId: userId, isDriver: isDriver);
+    // Revoke the refresh token too (best-effort; the account is already gone).
+    final refreshToken = await storage.read(key: StorageKeys.refreshToken);
+    if (refreshToken != null && refreshToken.isNotEmpty) {
+      try {
+        await remote.signout(refreshToken);
+      } catch (_) {
+        /* best-effort */
+      }
+    }
+    await _clearLocalSession();
+  }
+
+  Future<void> _clearLocalSession() async {
     const keys = [
       StorageKeys.accessToken,
       StorageKeys.refreshToken,
