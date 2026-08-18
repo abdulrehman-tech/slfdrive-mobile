@@ -449,5 +449,15 @@
   "help_office_value": "Mascate, Sultanato de Omán",
   "about_tagline": "Alquiler de coches y servicios de chófer",
   "about_description": "SLF Drive es una plataforma de alquiler de coches y contratación de chóferes profesionales. Reserva un vehículo o un chófer en minutos, sigue tus viajes y gestiona todo desde una sola app — para un trayecto fluido y fiable siempre.",
-  "about_website": "Visitar nuestro sitio web"
+  "about_website": "Visitar nuestro sitio web",
+  "driver_offline_warning_title": "El conductor está desconectado",
+  "driver_offline_warning_msg": "Este conductor está desconectado y puede tardar en responder. ¿Deseas continuar con la reserva?",
+  "driver_offline_continue": "Continuar",
+  "driver_error_account": "No se pudo cargar tu cuenta de conductor. Inténtalo de nuevo.",
+  "driver_toggle_failed": "No se pudo actualizar tu estado. Inténtalo de nuevo.",
+  "earnings_booked_hours": "Horas reservadas",
+  "earnings_no_recent": "Aún no hay ganancias",
+  "earnings_no_recent_desc": "Los viajes completados aparecerán aquí.",
+  "trips_to_label": "Hacia",
+  "error_occurred": "Algo salió mal"
 }

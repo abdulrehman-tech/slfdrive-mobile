@@ -4,7 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 import 'package:provider/provider.dart';
 
-import '../provider/driver_home_provider.dart';
+import '../../shell/driver_shell_provider.dart';
 
 class QuickStatsRow extends StatelessWidget {
   final bool isDark;
@@ -13,7 +13,7 @@ class QuickStatsRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final provider = context.watch<DriverHomeProvider>();
+    final provider = context.watch<DriverShellProvider>();
 
     return Padding(
       padding: EdgeInsets.all(20.r),

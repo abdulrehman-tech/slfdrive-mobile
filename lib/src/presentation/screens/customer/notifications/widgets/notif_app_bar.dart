@@ -71,10 +71,7 @@ class NotifAppBar extends StatelessWidget {
             'notif_title'.tr(),
             style: TextStyle(fontSize: 18.r, fontWeight: FontWeight.bold, color: cs.onSurface),
           ),
-          if (unread > 0) ...[
-            SizedBox(width: 8.r),
-            UnreadBadge(count: unread, cs: cs),
-          ],
+          if (unread > 0) ...[SizedBox(width: 8.r), UnreadBadge(count: unread, cs: cs)],
         ],
       ),
       actions: [
@@ -102,15 +99,15 @@ class NotifAppBar extends StatelessWidget {
           child: GestureDetector(
             onTap: hasItems
                 ? () => showConfirmDialog(
-                      context,
-                      isDark: isDark,
-                      icon: Iconsax.trash,
-                      accent: const Color(0xFFE53935),
-                      title: 'notif_clear_confirm_title',
-                      message: 'notif_clear_confirm_msg',
-                      confirmLabelKey: 'notif_clear_confirm_yes',
-                      onConfirm: () => context.read<NotificationsProvider>().clearAll(),
-                    )
+                    context,
+                    isDark: isDark,
+                    icon: Iconsax.trash,
+                    accent: const Color(0xFFE53935),
+                    title: 'notif_clear_confirm_title',
+                    message: 'notif_clear_confirm_msg',
+                    confirmLabelKey: 'notif_clear_confirm_yes',
+                    onConfirm: () => context.read<NotificationsProvider>().clearAll(),
+                  )
                 : null,
             child: Container(
               width: 38.r,

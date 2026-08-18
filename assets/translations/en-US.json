@@ -209,7 +209,7 @@
   "profile_terms": "Terms & Conditions",
   "profile_privacy_policy": "Privacy Policy",
   "profile_rate_app": "Rate the App",
-  "profile_section_danger": "Account Actions",
+  "profile_section_danger": "Danger Zone",
   "profile_sign_out": "Sign Out",
   "profile_delete_account": "Delete Account",
   "profile_delete_warning": "This action cannot be undone",
@@ -218,8 +218,6 @@
   "profile_logout_message": "Are you sure you want to sign out of your account?",
   "profile_logout_cancel": "Cancel",
   "profile_logout_confirm": "Sign Out",
-  "profile_section_danger": "Danger Zone",
-  "profile_delete_account": "Delete Account",
   "profile_delete_title": "Delete Account?",
   "profile_delete_message": "This will permanently delete your account and all associated data — profile, bookings, and preferences. This action cannot be undone.",
   "profile_delete_cancel": "Cancel",
@@ -973,5 +971,14 @@
   "booking_dates_hourly_active": "Hourly Mode Active",
   "booking_dates_switch_hourly": "Switch to hourly billing for short errands.",
   "booking_dates_booking_by_hour": "You are booking by the hour.",
-  "booking_dates_total_duration": "Total Duration"
+  "booking_dates_total_duration": "Total Duration",
+  "driver_offline_warning_title": "Driver is Offline",
+  "driver_offline_warning_msg": "This driver is currently offline and may take longer to respond. Do you want to continue with this booking?",
+  "driver_offline_continue": "Continue",
+  "driver_error_account": "We couldn't load your driver account. Please try again.",
+  "driver_toggle_failed": "Couldn't update your status. Please try again.",
+  "earnings_booked_hours": "Booked Hours",
+  "earnings_no_recent": "No earnings yet",
+  "earnings_no_recent_desc": "Completed trips will appear here.",
+  "trips_to_label": "To"
 }

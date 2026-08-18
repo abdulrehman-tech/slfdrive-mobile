@@ -105,12 +105,14 @@ class BookingRemoteDataSourceImpl implements BookingRemoteDataSource {
       if (body['isSuccess'] == true && body['data'] is Map<String, dynamic>) {
         return PagedResponse.fromJson(body['data'] as Map<String, dynamic>, Booking.fromJson);
       }
-      return PagedResponse.empty<Booking>();
+      throw AppException(message: _message(body) ?? 'Could not load bookings');
     } catch (e) {
       throw ErrorHandler.handleError(e);
     }
   }
 
+  // NOTE: currently unused — driver screens moved to [driverPaginated]. Kept
+  // for the unscoped listing the API exposes.
   @override
   Future<PagedResponse<Booking>> paginated(PaginationParams params) async {
     try {
@@ -119,7 +121,7 @@ class BookingRemoteDataSourceImpl implements BookingRemoteDataSource {
       if (body['isSuccess'] == true && body['data'] is Map<String, dynamic>) {
         return PagedResponse.fromJson(body['data'] as Map<String, dynamic>, Booking.fromJson);
       }
-      return PagedResponse.empty<Booking>();
+      throw AppException(message: _message(body) ?? 'Could not load bookings');
     } catch (e) {
       throw ErrorHandler.handleError(e);
     }
@@ -136,7 +138,8 @@ class BookingRemoteDataSourceImpl implements BookingRemoteDataSource {
       if (body['isSuccess'] == true && body['data'] is Map<String, dynamic>) {
         return PagedResponse.fromJson(body['data'] as Map<String, dynamic>, Booking.fromJson);
       }
-      return PagedResponse.empty<Booking>();
+      // A server-side "no" must not masquerade as an empty booking list.
+      throw AppException(message: _message(body) ?? 'Could not load bookings');
     } catch (e) {
       throw ErrorHandler.handleError(e);
     }

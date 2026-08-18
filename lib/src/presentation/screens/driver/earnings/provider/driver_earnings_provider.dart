@@ -2,40 +2,21 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/foundation.dart';
 
 import '../../../../../constants/date_label_keys.dart';
-import '../../../../../core/data/repositories/booking_repository.dart';
-import '../../../../../core/di/injection_container.dart';
-import '../../../../../core/errors/app_exception.dart';
 import '../../../../../core/models/booking/booking.dart';
-import '../../../../../core/models/common/pagination_params.dart';
-import '../../../../../core/services/driver_session.dart';
+import '../../../../../core/utils/safe_notifier.dart';
+import '../../shell/driver_shell_provider.dart';
 import '../models/earnings_period.dart';
 
-/// Derives the driver's earnings from completed bookings
-/// (`POST /api/Booking/paginated`, filtered client-side to the signed-in
-/// driver's `driverId`). The backend has no earnings-aggregate endpoint, so
-/// totals/trip-counts/hours are computed client-side per period.
-class DriverEarningsProvider extends ChangeNotifier {
-  DriverEarningsProvider({
-    BookingRepository? repository,
-    DriverSession? session,
-  })  : _repository = repository ?? getIt<BookingRepository>(),
-        _session = session ?? getIt<DriverSession>() {
-    load();
+/// Thin view-model over [DriverShellProvider] for the earnings tab. The
+/// completed-booking dataset and the selected period live in the shared shell
+/// (so they survive navigation and update after any action); everything here
+/// is pure client-side aggregation — the backend has no earnings endpoint.
+class DriverEarningsProvider extends ChangeNotifier with SafeNotifier {
+  DriverEarningsProvider(this._shell) {
+    _shell.addListener(safeNotify);
   }
 
-  final BookingRepository _repository;
-  final DriverSession _session;
-
-  EarningsPeriod _period = EarningsPeriod.today;
-
-  /// Completed bookings paired with their completion timestamp (best-effort).
-  final List<({Booking booking, DateTime when})> _completed = [];
-
-  bool _isLoading = false;
-  bool get isLoading => _isLoading;
-
-  String? _error;
-  String? get error => _error;
+  final DriverShellProvider _shell;
 
   static const periodKeys = [
     'earnings_today',
@@ -44,42 +25,21 @@ class DriverEarningsProvider extends ChangeNotifier {
     'earnings_year',
   ];
 
-  EarningsPeriod get period => _period;
-  int get periodIndex => _period.index;
+  bool get isLoading => _shell.isLoading;
+  bool get isInitialLoading => _shell.isInitialLoading;
+  String? get error => _shell.error;
+  bool get hasData => _shell.hasData;
 
-  Future<void> load() async {
-    _isLoading = true;
-    _error = null;
-    notifyListeners();
-    try {
-      final driverId = await _session.driverId();
-      final mine = driverId == null
-          ? const <Booking>[]
-          : (await _repository.driverPaginated(
-              driverId,
-              const PaginationParams(pageNumber: 1, pageSize: 200),
-            )).items;
-      _completed
-        ..clear()
-        ..addAll(mine.where(_isCompleted).map((b) {
-          final when = DateTime.tryParse(b.completedAt ?? b.toDateTime ?? b.fromDateTime ?? '')?.toLocal()
-              ?? DateTime.now();
-          return (booking: b, when: when);
-        }));
-      _completed.sort((a, b) => b.when.compareTo(a.when));
-    } on AppException catch (e) {
-      _error = e.message;
-    } catch (e) {
-      _error = e.toString();
-    }
-    _isLoading = false;
-    notifyListeners();
-  }
+  EarningsPeriod get period => _shell.earningsPeriod;
+  int get periodIndex => period.index;
 
-  bool _isCompleted(Booking b) {
-    final s = '${b.status ?? ''} ${b.statusType ?? ''}'.toLowerCase();
-    return b.completedAt != null || s.contains('complete');
-  }
+  void setPeriodIndex(int index) =>
+      _shell.setEarningsPeriod(EarningsPeriod.values[index]);
+
+  Future<void> load() => _shell.refresh();
+
+  /// Completed bookings paired with their completion timestamp, newest first.
+  List<({Booking booking, DateTime when})> get _completed => _shell.completedRows;
 
   bool _inPeriod(DateTime when, EarningsPeriod period) {
     final now = DateTime.now();
@@ -96,7 +56,7 @@ class DriverEarningsProvider extends ChangeNotifier {
   }
 
   EarningsSnapshot get snapshot {
-    final rows = _completed.where((r) => _inPeriod(r.when, _period)).toList();
+    final rows = _completed.where((r) => _inPeriod(r.when, period)).toList();
     var total = 0.0;
     var hours = 0.0;
     for (final r in rows) {
@@ -134,7 +94,7 @@ class DriverEarningsProvider extends ChangeNotifier {
   double? get trendPercent {
     final now = DateTime.now();
     late DateTime curStart, curEnd, prevStart, prevEnd;
-    switch (_period) {
+    switch (period) {
       case EarningsPeriod.today:
         final t = DateTime(now.year, now.month, now.day);
         curStart = t;
@@ -169,7 +129,7 @@ class DriverEarningsProvider extends ChangeNotifier {
   /// highlighted.
   List<ChartBar> get chartData {
     final now = DateTime.now();
-    switch (_period) {
+    switch (period) {
       case EarningsPeriod.today:
       case EarningsPeriod.week:
         final today = DateTime(now.year, now.month, now.day);
@@ -237,10 +197,9 @@ class DriverEarningsProvider extends ChangeNotifier {
     }).toList();
   }
 
-  void setPeriodIndex(int index) {
-    final next = EarningsPeriod.values[index];
-    if (_period == next) return;
-    _period = next;
-    notifyListeners();
+  @override
+  void dispose() {
+    _shell.removeListener(safeNotify);
+    super.dispose();
   }
 }

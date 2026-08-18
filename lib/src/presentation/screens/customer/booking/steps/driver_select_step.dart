@@ -10,6 +10,7 @@ import '../../../../../core/di/injection_container.dart';
 import '../../../../../core/errors/app_exception.dart';
 import '../../../../../core/models/common/pagination_params.dart';
 import '../../../../../core/models/driver/driver_listing_item.dart';
+import '../../../../widgets/confirm_dialog.dart';
 import '../../../../widgets/omr_icon.dart';
 import '../models/booking_data.dart';
 import '../widgets/booking_glass_card.dart';
@@ -82,6 +83,26 @@ class _DriverSelectStepState extends State<DriverSelectStep> {
   }
 
   void _select(DriverListingItem d) {
+    if (!d.isOnline) {
+      // Offline drivers can still be booked, but only after an explicit
+      // "continue anyway" confirmation.
+      showConfirmDialog(
+        context,
+        isDark: widget.isDark,
+        icon: Icons.wifi_off_rounded,
+        accent: const Color(0xFFEF6C00),
+        title: 'driver_offline_warning_title',
+        message: 'driver_offline_warning_msg',
+        confirmLabelKey: 'driver_offline_continue',
+        onConfirm: () => _applySelect(d),
+      );
+      return;
+    }
+    _applySelect(d);
+  }
+
+  void _applySelect(DriverListingItem d) {
+    if (!mounted) return; // dialog confirm can land after the flow is disposed
     widget.data.setDriver(BookingDriver(
       // Bookings reference the driver's own id (`driverId`), NOT the response
       // row `id` — sending `id` makes Booking/create 500.
@@ -214,11 +235,35 @@ class _DriverCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  driver.displayName(),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(fontSize: 14.r, fontWeight: FontWeight.w700, color: cs.onSurface),
+                Row(
+                  children: [
+                    Flexible(
+                      child: Text(
+                        driver.displayName(),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(fontSize: 14.r, fontWeight: FontWeight.w700, color: cs.onSurface),
+                      ),
+                    ),
+                    if (!driver.isOnline) ...[
+                      SizedBox(width: 6.r),
+                      Container(
+                        padding: EdgeInsets.symmetric(horizontal: 6.r, vertical: 2.r),
+                        decoration: BoxDecoration(
+                          color: cs.onSurface.withValues(alpha: 0.08),
+                          borderRadius: BorderRadius.circular(6.r),
+                        ),
+                        child: Text(
+                          'driver_offline'.tr(),
+                          style: TextStyle(
+                            fontSize: 9.r,
+                            fontWeight: FontWeight.w700,
+                            color: cs.onSurface.withValues(alpha: 0.5),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ],
                 ),
                 SizedBox(height: 4.r),
                 if (speciality.isNotEmpty)

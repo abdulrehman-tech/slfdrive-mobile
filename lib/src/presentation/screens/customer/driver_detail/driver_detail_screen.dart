@@ -9,6 +9,7 @@ import 'package:provider/provider.dart';
 import '../../../../constants/breakpoints.dart';
 import '../../../providers/theme_provider.dart';
 import '../../../widgets/auth_gate.dart';
+import '../../../widgets/confirm_dialog.dart';
 import '../booking/models/booking_data.dart';
 import 'models/driver_profile.dart';
 import 'provider/driver_detail_provider.dart';
@@ -60,7 +61,29 @@ class _DriverDetailView extends StatelessWidget {
       pricePerHour: profile.hourlyRate,
       speciality: 'Chauffeur',
     );
-    context.pushNamed('booking', extra: {'service': BookingServiceType.driverOnly, 'driver': driver});
+    void proceed() {
+      if (!context.mounted) return;
+      context.pushNamed(
+          'booking', extra: {'service': BookingServiceType.driverOnly, 'driver': driver});
+    }
+
+    if (!profile.isOnline) {
+      // The driver is offline — warn, but let the customer continue if they
+      // want. NOTE: _isDark() watches and must not be called from this tap
+      // handler; read the theme without subscribing instead.
+      showConfirmDialog(
+        context,
+        isDark: Theme.of(context).brightness == Brightness.dark,
+        icon: Icons.wifi_off_rounded,
+        accent: const Color(0xFFEF6C00),
+        title: 'driver_offline_warning_title',
+        message: 'driver_offline_warning_msg',
+        confirmLabelKey: 'driver_offline_continue',
+        onConfirm: proceed,
+      );
+      return;
+    }
+    proceed();
   }
 
   @override

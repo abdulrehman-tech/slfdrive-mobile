@@ -26,13 +26,22 @@ class PlaceNamer {
   List<LocationOption>? _areas;
   final Map<String, String> _cache = {};
 
+  final Map<String, Future<String>> _inFlight = {};
+
   /// Resolves [lat]/[lon] to a place name, or '' when either is missing.
-  Future<String> describe(double? lat, double? lon) async {
-    if (lat == null || lon == null) return '';
+  /// Concurrent callers for the same (4-dp) coordinate share one lookup — the
+  /// driver shell enriches whole booking pages in parallel, and platform
+  /// geocoders throttle hard under concurrent identical requests.
+  Future<String> describe(double? lat, double? lon) {
+    if (lat == null || lon == null) return Future.value('');
     final key = _key(lat, lon);
     final hit = _cache[key];
-    if (hit != null) return hit;
+    if (hit != null) return Future.value(hit);
+    return _inFlight[key] ??=
+        _resolve(lat, lon, key).whenComplete(() => _inFlight.remove(key));
+  }
 
+  Future<String> _resolve(double lat, double lon, String key) async {
     String? name = await _reverseGeocode(lat, lon);
     if (name == null) {
       await _ensureAreas();
@@ -80,8 +89,16 @@ class PlaceNamer {
     return best?.label;
   }
 
-  Future<void> _ensureAreas() async {
-    if (_areas != null) return;
+  Future<void>? _areasLoading;
+
+  /// Loads the serviceable-area list once; concurrent geocode misses share a
+  /// single `GET /api/Location/active` instead of each firing their own.
+  Future<void> _ensureAreas() {
+    if (_areas != null) return Future.value();
+    return _areasLoading ??= _loadAreas().whenComplete(() => _areasLoading = null);
+  }
+
+  Future<void> _loadAreas() async {
     try {
       _areas = await _lookup.getActiveLocations();
     } catch (_) {

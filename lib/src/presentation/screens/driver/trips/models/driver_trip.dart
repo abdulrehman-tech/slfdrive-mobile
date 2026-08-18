@@ -1,4 +1,5 @@
 import '../../../../../core/models/booking/booking.dart';
+import '../../../../../core/utils/booking_status.dart';
 
 enum DriverTripStatus { active, completed, cancelled }
 
@@ -72,14 +73,20 @@ class DriverTrip {
   }
 }
 
-/// Maps the backend booking_status onto the driver's three trip buckets.
-/// `pending` returns null — it's a request, not a trip yet.
+/// Maps the backend booking_status onto the driver's three trip buckets via
+/// the shared statusId-first classifier. `pending` returns null — it's a
+/// request, not a trip yet.
 DriverTripStatus? _statusFromBooking(Booking b) {
-  final s = '${b.status ?? ''} ${b.statusType ?? ''}'.toLowerCase();
-  if (s.contains('reject') || s.contains('cancel')) return DriverTripStatus.cancelled;
-  if (b.completedAt != null || s.contains('complete')) return DriverTripStatus.completed;
-  if (s.contains('approved')) return DriverTripStatus.active; // incl. CorporateApproved
-  return null; // pending → handled as a request on home
+  switch (classifyBooking(b)) {
+    case BookingBucket.cancelled:
+      return DriverTripStatus.cancelled;
+    case BookingBucket.completed:
+      return DriverTripStatus.completed;
+    case BookingBucket.active:
+      return DriverTripStatus.active; // incl. CorporateApproved
+    case BookingBucket.pending:
+      return null; // pending → handled as a request on home
+  }
 }
 
 /// Formats a stored lat/lon pair as a compact coordinate label, or null when

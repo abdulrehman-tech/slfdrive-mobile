@@ -140,7 +140,7 @@ class ActiveTripCard extends StatelessWidget {
               ),
               SizedBox(height: 4.r),
               Text(
-                trip.distance ?? '',
+                trip.bookingNo,
                 style: TextStyle(
                   fontSize: 13.r,
                   color: isDark ? Colors.white60 : const Color(0xFF757575),
@@ -185,11 +185,15 @@ class ActiveTripCard extends StatelessWidget {
 
   Future<void> _onComplete(BuildContext context) async {
     final messenger = ScaffoldMessenger.of(context);
-    final ok = await context.read<DriverTripsProvider>().completeTrip(trip.bookingId);
+    final provider = context.read<DriverTripsProvider>();
+    final ok = await provider.completeTrip(trip.bookingId);
     if (!context.mounted) return;
+    // Prefer the server's actual failure message over the generic key.
     messenger.showSnackBar(
       SnackBar(
-        content: Text(ok ? 'trips_complete_snack'.tr() : 'trips_complete_failed'.tr()),
+        content: Text(ok
+            ? 'trips_complete_snack'.tr()
+            : (provider.actionError?.tr() ?? 'trips_complete_failed'.tr())),
         behavior: SnackBarBehavior.floating,
       ),
     );
@@ -210,26 +214,39 @@ class ActiveTripCard extends StatelessWidget {
   }
 
   Widget _buildCompleteButton(BuildContext context) {
+    // Busy state blocks double taps and shows visible progress until the
+    // shell refresh moves the trip to its new tab.
+    final isBusy = context.watch<DriverTripsProvider>().isBusy(trip.bookingId);
     return GestureDetector(
-      onTap: () => _confirmComplete(context),
+      onTap: isBusy ? null : () => _confirmComplete(context),
       child: Container(
         width: double.infinity,
         padding: EdgeInsets.symmetric(vertical: 12.r),
         decoration: BoxDecoration(
-          gradient: const LinearGradient(
-            colors: [Color(0xFF4D63DD), Color(0xFF677EF0)],
+          gradient: LinearGradient(
+            colors: isBusy
+                ? [const Color(0xFF4D63DD).withValues(alpha: 0.6), const Color(0xFF677EF0).withValues(alpha: 0.6)]
+                : const [Color(0xFF4D63DD), Color(0xFF677EF0)],
           ),
           borderRadius: BorderRadius.circular(12.r),
         ),
-        child: Text(
-          'trips_complete'.tr(),
-          textAlign: TextAlign.center,
-          style: TextStyle(
-            fontSize: 14.r,
-            fontWeight: FontWeight.w600,
-            color: Colors.white,
-          ),
-        ),
+        child: isBusy
+            ? Center(
+                child: SizedBox(
+                  width: 18.r,
+                  height: 18.r,
+                  child: const CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                ),
+              )
+            : Text(
+                'trips_complete'.tr(),
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 14.r,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.white,
+                ),
+              ),
       ),
     );
   }

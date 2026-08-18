@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
@@ -56,7 +57,7 @@ class CancelledTripCard extends StatelessWidget {
                 ),
                 SizedBox(height: 4.r),
                 Text(
-                  'To: ${trip.destination}',
+                  '${'trips_to_label'.tr()}: ${trip.destination}',
                   style: TextStyle(
                     fontSize: 13.r,
                     color: isDark ? Colors.white60 : const Color(0xFF757575),

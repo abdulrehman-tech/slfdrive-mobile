@@ -4,7 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../widgets/charts/revenue_bar_chart.dart';
-import '../provider/driver_home_provider.dart';
+import '../../shell/driver_shell_provider.dart';
 
 class EarningsCard extends StatelessWidget {
   final bool isDark;
@@ -13,7 +13,7 @@ class EarningsCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final provider = context.watch<DriverHomeProvider>();
+    final provider = context.watch<DriverShellProvider>();
     final earnings = provider.todayEarnings;
     final bars = provider.weekly
         .map((d) => RevenueBar(

@@ -28,6 +28,7 @@ import '../services/driver_session.dart';
 import '../services/place_namer.dart';
 import '../services/session_manager.dart';
 import '../../presentation/providers/auth_provider.dart';
+import '../../presentation/screens/driver/shell/driver_shell_provider.dart';
 
 final getIt = GetIt.instance;
 
@@ -133,6 +134,9 @@ Future<void> setupDependencyInjection() async {
   );
 
   // Providers
+  // App-lifetime driver-role state shared across the driver tabs; reset on
+  // logout/account-switch alongside DriverSession.clear().
+  getIt.registerLazySingleton<DriverShellProvider>(() => DriverShellProvider());
   getIt.registerFactory<AuthProvider>(
     () => AuthProvider(
       getIt<AuthRepository>(),

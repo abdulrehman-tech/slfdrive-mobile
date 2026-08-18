@@ -449,5 +449,15 @@
   "help_office_value": "Muscat, Sultanat Oman",
   "about_tagline": "Autovermietung & Fahrerservice",
   "about_description": "SLF Drive ist eine Plattform für Autovermietung und professionelle Fahrerbuchung. Buchen Sie in Minuten ein Fahrzeug oder einen Chauffeur, verfolgen Sie Ihre Fahrten und verwalten Sie alles in einer App — für eine reibungslose, zuverlässige Fahrt.",
-  "about_website": "Website besuchen"
+  "about_website": "Website besuchen",
+  "driver_offline_warning_title": "Fahrer ist offline",
+  "driver_offline_warning_msg": "Dieser Fahrer ist derzeit offline und antwortet möglicherweise verzögert. Möchten Sie mit der Buchung fortfahren?",
+  "driver_offline_continue": "Fortfahren",
+  "driver_error_account": "Ihr Fahrerkonto konnte nicht geladen werden. Bitte versuchen Sie es erneut.",
+  "driver_toggle_failed": "Status konnte nicht aktualisiert werden. Bitte versuchen Sie es erneut.",
+  "earnings_booked_hours": "Gebuchte Stunden",
+  "earnings_no_recent": "Noch keine Einnahmen",
+  "earnings_no_recent_desc": "Abgeschlossene Fahrten erscheinen hier.",
+  "trips_to_label": "Nach",
+  "error_occurred": "Etwas ist schiefgelaufen"
 }

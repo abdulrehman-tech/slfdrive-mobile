@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:image_picker/image_picker.dart' show XFile;
 
 import '../../../constants/endpoints.dart';
+import '../../errors/app_exception.dart';
 import '../../errors/error_handler.dart';
 import '../../models/driver/driver_details.dart';
 import '../../models/driver/driver_stats.dart';
@@ -101,7 +102,12 @@ class DriverRemoteDataSourceImpl implements DriverRemoteDataSource {
     try {
       final res = await apiClient.post(ApiEndpoints.driverToggleOnline(userId));
       final body = res.data as Map<String, dynamic>;
-      return body['isSuccess'] == true && body['data'] == true;
+      // Failure must throw — returning false here would be indistinguishable
+      // from a successful toggle to offline.
+      if (body['isSuccess'] != true) {
+        throw AppException(message: (body['message'] as String?) ?? 'Could not update status');
+      }
+      return body['data'] == true;
     } catch (e) {
       throw ErrorHandler.handleError(e);
     }

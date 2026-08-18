@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 
 import '../../../../constants/breakpoints.dart';
 import '../../../providers/theme_provider.dart';
+import '../../../widgets/app_error_state.dart';
 import 'provider/bookings_provider.dart';
 import 'widgets/booking_card.dart';
 import 'widgets/bookings_app_bar.dart';
@@ -52,13 +53,25 @@ class _MobileLayout extends StatelessWidget {
     final bookings = provider.filteredBookings;
     final tabIndex = provider.tabIndex;
 
-    return CustomScrollView(
-      physics: const BouncingScrollPhysics(),
+    return RefreshIndicator(
+      onRefresh: () => context.read<BookingsProvider>().load(),
+      child: CustomScrollView(
+      physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
       slivers: [
         BookingsAppBar(isDark: isDark, cs: cs),
         SliverToBoxAdapter(child: BookingsTabBar(isDark: isDark, cs: cs)),
         if (provider.isLoading && provider.bookings.isEmpty)
           const SliverFillRemaining(child: ListSkeleton(itemCount: 4, itemHeight: 150))
+        // A failed load must not masquerade as "no bookings yet".
+        else if (provider.error != null && provider.bookings.isEmpty)
+          SliverFillRemaining(
+            hasScrollBody: false,
+            child: AppErrorState(
+              message: provider.error,
+              onRetry: provider.load,
+              isDark: isDark,
+            ),
+          )
         else if (bookings.isEmpty)
           SliverFillRemaining(
             child: BookingsEmpty(
@@ -90,6 +103,7 @@ class _MobileLayout extends StatelessWidget {
             ),
           ),
       ],
+      ),
     );
   }
 }
@@ -131,6 +145,15 @@ class _DesktopLayout extends StatelessWidget {
               SizedBox(height: 24.r),
               if (provider.isLoading && provider.bookings.isEmpty)
                 SizedBox(height: 400.r, child: const ListSkeleton(itemCount: 3, itemHeight: 150))
+              else if (provider.error != null && provider.bookings.isEmpty)
+                SizedBox(
+                  height: 400.r,
+                  child: AppErrorState(
+                    message: provider.error,
+                    onRetry: provider.load,
+                    isDark: isDark,
+                  ),
+                )
               else if (bookings.isEmpty)
                 SizedBox(
                   height: 400.r,

@@ -1,45 +1,19 @@
 import 'package:flutter/foundation.dart';
 
-import '../../../../../core/data/repositories/booking_repository.dart';
-import '../../../../../core/di/injection_container.dart';
-import '../../../../../core/errors/app_exception.dart';
-import '../../../../../core/models/booking/booking.dart';
-import '../../../../../core/models/common/pagination_params.dart';
-import '../../../../../core/services/customer_avatars.dart';
-import '../../../../../core/services/driver_session.dart';
-import '../../../../../core/services/place_namer.dart';
+import '../../../../../core/utils/safe_notifier.dart';
+import '../../shell/driver_shell_provider.dart';
 import '../models/driver_trip.dart';
 
-/// Drives the driver's trips screen from `POST /api/Booking/paginated`,
-/// keeping only rows whose `driverId` matches the signed-in driver (filtered
-/// client-side — the backend list isn't driver-scoped). Bookings still pending
-/// the driver's approval are excluded here — they appear as requests on home.
-class DriverTripsProvider extends ChangeNotifier {
-  DriverTripsProvider({
-    BookingRepository? repository,
-    DriverSession? session,
-    PlaceNamer? placeNamer,
-    CustomerAvatars? avatars,
-  })  : _repository = repository ?? getIt<BookingRepository>(),
-        _session = session ?? getIt<DriverSession>(),
-        _placeNamer = placeNamer ?? getIt<PlaceNamer>(),
-        _avatars = avatars ?? getIt<CustomerAvatars>() {
-    load();
+/// Thin view-model over [DriverShellProvider] for the trips tab. Holds no data
+/// of its own — trips, loading/error state and the selected tab all live in
+/// the shared shell so they survive navigation and stay in sync with actions
+/// taken on any driver screen.
+class DriverTripsProvider extends ChangeNotifier with SafeNotifier {
+  DriverTripsProvider(this._shell) {
+    _shell.addListener(safeNotify);
   }
 
-  final BookingRepository _repository;
-  final DriverSession _session;
-  final PlaceNamer _placeNamer;
-  final CustomerAvatars _avatars;
-
-  final List<DriverTrip> _trips = [];
-  int _tabIndex = 0; // 0=active, 1=completed, 2=cancelled
-
-  bool _isLoading = false;
-  bool get isLoading => _isLoading;
-
-  String? _error;
-  String? get error => _error;
+  final DriverShellProvider _shell;
 
   static const tabKeys = [
     'trips_active',
@@ -65,68 +39,33 @@ class DriverTripsProvider extends ChangeNotifier {
     'trips_no_cancelled_desc',
   ];
 
-  int get tabIndex => _tabIndex;
-  List<DriverTrip> get trips => List.unmodifiable(_trips);
+  bool get isLoading => _shell.isLoading;
+  bool get isInitialLoading => _shell.isInitialLoading;
+  String? get error => _shell.error;
+  String? get actionError => _shell.actionError;
+
+  int get tabIndex => _shell.tripsTabIndex;
+  void setTab(int index) => _shell.setTripsTab(index);
+
+  List<DriverTrip> get trips => _shell.allTrips;
 
   List<DriverTrip> get filteredTrips =>
-      _trips.where((t) => t.status == statusMap[_tabIndex]).toList();
+      trips.where((t) => t.status == statusMap[tabIndex]).toList();
 
   int countForTab(int index) =>
-      _trips.where((t) => t.status == statusMap[index]).length;
+      trips.where((t) => t.status == statusMap[index]).length;
 
-  void setTab(int index) {
-    if (_tabIndex == index) return;
-    _tabIndex = index;
-    notifyListeners();
-  }
+  bool isBusy(int bookingId) => _shell.isBusy(bookingId);
 
-  Future<void> load() async {
-    _isLoading = true;
-    _error = null;
-    notifyListeners();
-    try {
-      final driverId = await _session.driverId();
-      final mine = driverId == null
-          ? const <Booking>[]
-          : (await _repository.driverPaginated(
-              driverId,
-              const PaginationParams(pageNumber: 1, pageSize: 100),
-            )).items;
-      final built = <DriverTrip>[];
-      for (final b in mine) {
-        final pickup = await _placeNamer.describe(b.pickupLat, b.pickupLon);
-        final dropoff = await _placeNamer.describe(b.dropoffLat, b.dropoffLon);
-        final avatar = await _avatars.photoUrl(b.userId);
-        final t = DriverTrip.fromBooking(b, pickupName: pickup, dropoffName: dropoff, avatarUrl: avatar);
-        if (t != null) built.add(t);
-      }
-      _trips
-        ..clear()
-        ..addAll(built);
-    } on AppException catch (e) {
-      _error = e.message;
-    } catch (e) {
-      _error = e.toString();
-    }
-    _isLoading = false;
-    notifyListeners();
-  }
+  Future<void> load() => _shell.refresh();
 
-  /// Marks an active trip complete (`POST /api/Booking/{id}/complete`), then
-  /// refreshes. Returns true on success; on failure [error] holds the message.
-  Future<bool> completeTrip(int bookingId) async {
-    try {
-      await _repository.complete(bookingId);
-      await load();
-      return true;
-    } on AppException catch (e) {
-      _error = e.message;
-      notifyListeners();
-      return false;
-    } catch (e) {
-      _error = e.toString();
-      notifyListeners();
-      return false;
-    }
+  /// Marks an active trip complete; the shell refresh moves it across tabs on
+  /// every driver screen at once. On failure [error] holds the message.
+  Future<bool> completeTrip(int bookingId) => _shell.complete(bookingId);
+
+  @override
+  void dispose() {
+    _shell.removeListener(safeNotify);
+    super.dispose();
   }
 }

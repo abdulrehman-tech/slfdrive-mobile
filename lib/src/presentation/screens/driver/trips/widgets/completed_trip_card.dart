@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
@@ -60,42 +61,19 @@ class CompletedTripCard extends StatelessWidget {
                 ),
                 SizedBox(height: 4.r),
                 Text(
-                  'To: ${trip.destination}',
+                  '${'trips_to_label'.tr()}: ${trip.destination}',
                   style: TextStyle(
                     fontSize: 13.r,
                     color: isDark ? Colors.white60 : const Color(0xFF757575),
                   ),
                 ),
                 SizedBox(height: 4.r),
-                Row(
-                  children: [
-                    if (trip.rating != null) ...[
-                      Icon(
-                        Iconsax.star_1,
-                        size: 14.r,
-                        color: const Color(0xFFFFA000),
-                      ),
-                      SizedBox(width: 4.r),
-                      Text(
-                        trip.rating!.toString(),
-                        style: TextStyle(
-                          fontSize: 12.r,
-                          fontWeight: FontWeight.w600,
-                          color: const Color(0xFFFFA000),
-                        ),
-                      ),
-                      SizedBox(width: 8.r),
-                    ],
-                    Text(
-                      trip.time,
-                      style: TextStyle(
-                        fontSize: 12.r,
-                        color: isDark
-                            ? Colors.white60
-                            : const Color(0xFF757575),
-                      ),
-                    ),
-                  ],
+                Text(
+                  trip.time,
+                  style: TextStyle(
+                    fontSize: 12.r,
+                    color: isDark ? Colors.white60 : const Color(0xFF757575),
+                  ),
                 ),
               ],
             ),

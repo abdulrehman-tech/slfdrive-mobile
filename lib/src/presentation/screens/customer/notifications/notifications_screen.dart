@@ -16,10 +16,7 @@ class NotificationsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (_) => NotificationsProvider(),
-      child: const _NotificationsView(),
-    );
+    return ChangeNotifierProvider(create: (_) => NotificationsProvider(), child: const _NotificationsView());
   }
 }
 
@@ -28,8 +25,7 @@ class _NotificationsView extends StatelessWidget {
 
   bool _isDark(BuildContext context) {
     final tp = context.watch<ThemeProvider>();
-    return tp.isDarkMode ||
-        (tp.isSystemMode && MediaQuery.of(context).platformBrightness == Brightness.dark);
+    return tp.isDarkMode || (tp.isSystemMode && MediaQuery.of(context).platformBrightness == Brightness.dark);
   }
 
   @override
@@ -50,7 +46,13 @@ class _NotificationsView extends StatelessWidget {
       physics: const BouncingScrollPhysics(),
       slivers: [
         NotifAppBar(isDark: isDark, cs: cs),
-        SliverToBoxAdapter(child: NotifTabStrip(isDark: isDark, cs: cs)),
+
+        SliverToBoxAdapter(
+          child: Padding(
+            padding: EdgeInsets.symmetric(vertical: 12.r),
+            child: NotifTabStrip(isDark: isDark, cs: cs),
+          ),
+        ),
         ...NotifGroupedList.buildSlivers(items: items, isDark: isDark, cs: cs),
         SliverToBoxAdapter(child: SizedBox(height: 40.r)),
       ],
@@ -64,7 +66,7 @@ class _NotificationsView extends StatelessWidget {
 
     return SingleChildScrollView(
       physics: const BouncingScrollPhysics(),
-      padding: EdgeInsets.symmetric(horizontal: 40.r, vertical: 28.r),
+      padding: EdgeInsets.symmetric(horizontal: 40.r, vertical: 32.r),
       child: Center(
         child: Container(
           constraints: BoxConstraints(maxWidth: 900.r),
@@ -76,13 +78,12 @@ class _NotificationsView extends StatelessWidget {
               NotifTabStrip(isDark: isDark, cs: cs, compact: true),
               SizedBox(height: 8.r),
               items.isEmpty
-                  ? SizedBox(height: 420.r, child: NotifEmpty(isDark: isDark, cs: cs))
+                  ? SizedBox(
+                      height: 420.r,
+                      child: NotifEmpty(isDark: isDark, cs: cs),
+                    )
                   : Column(
-                      children: NotifGroupedList.buildSections(
-                        items: items,
-                        isDark: isDark,
-                        cs: cs,
-                      ),
+                      children: NotifGroupedList.buildSections(items: items, isDark: isDark, cs: cs),
                     ),
               SizedBox(height: 32.r),
             ],

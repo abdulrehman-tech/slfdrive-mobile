@@ -12,6 +12,7 @@ import '../../core/services/driver_session.dart';
 import '../../core/errors/app_exception.dart';
 import '../../core/models/auth/auth_session.dart';
 import '../../core/models/user/user_model.dart';
+import '../screens/driver/shell/driver_shell_provider.dart';
 
 /// UI-facing auth state. Follows the [RoleProvider] pattern.
 ///
@@ -113,6 +114,7 @@ class AuthProvider extends ChangeNotifier {
     _isAuthenticated = false;
     _isVerified = false;
     getIt<DriverSession>().clear();
+    getIt<DriverShellProvider>().reset();
     notifyListeners();
   }
 
@@ -120,10 +122,10 @@ class AuthProvider extends ChangeNotifier {
   /// cached verification status, photo, and profile fields — so admin approval
   /// shows up without a re-login. Best-effort: silently no-ops on failure.
   Future<void> refreshDriverStatus() async {
-    final idStr = await _storage.read(key: StorageKeys.userId);
-    final id = int.tryParse(idStr ?? '');
-    if (id == null) return;
     try {
+      final idStr = await _storage.read(key: StorageKeys.userId);
+      final id = int.tryParse(idStr ?? '');
+      if (id == null) return;
       final d = await _driverRepository.getById(id);
       if (d == null) return;
       _isVerified = d.isVerified;
@@ -152,10 +154,10 @@ class AuthProvider extends ChangeNotifier {
   /// Re-fetches the customer record (`GET /api/Customer/{id}`) and refreshes
   /// the cached profile fields. Best-effort: silently no-ops on failure.
   Future<void> refreshCustomerStatus() async {
-    final idStr = await _storage.read(key: StorageKeys.userId);
-    final id = int.tryParse(idStr ?? '');
-    if (id == null) return;
     try {
+      final idStr = await _storage.read(key: StorageKeys.userId);
+      final id = int.tryParse(idStr ?? '');
+      if (id == null) return;
       final c = await _customerRepository.getById(id);
       if (c == null) return;
       _displayName = c.fullName ?? _displayName;
@@ -385,6 +387,7 @@ class AuthProvider extends ChangeNotifier {
     _isAuthenticated = false;
     _isVerified = false;
     getIt<DriverSession>().clear();
+    getIt<DriverShellProvider>().reset();
     notifyListeners();
   }
 

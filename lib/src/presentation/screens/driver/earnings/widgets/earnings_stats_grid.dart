@@ -37,7 +37,7 @@ class EarningsStatsGrid extends StatelessWidget {
               Expanded(
                 child: EarningsStatCard(
                   icon: Iconsax.clock,
-                  label: 'earnings_hours'.tr(),
+                  label: 'earnings_booked_hours'.tr(),
                   value: snapshot.hours.toString(),
                   color: const Color(0xFFFFA000),
                   isDark: isDark,

@@ -1,11 +1,14 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../constants/breakpoints.dart';
+import '../../../../core/di/injection_container.dart';
 import '../../../providers/auth_provider.dart';
-import 'provider/driver_home_provider.dart';
+import '../../../widgets/app_error_state.dart';
+import '../shell/driver_shell_provider.dart';
 import 'widgets/driver_bottom_nav.dart';
 import 'widgets/driver_drawer.dart';
 import 'widgets/driver_header.dart';
@@ -25,8 +28,13 @@ class DriverHomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (_) => DriverHomeProvider(),
+    // The shell state is an app-lifetime singleton shared by every driver tab:
+    // one dataset feeds home/trips/earnings, and actions on any tab update all
+    // of them. ensureLoaded() is an idempotent no-op once fresh data exists, so
+    // tab switches don't refetch; it silently refreshes stale data.
+    final shell = getIt<DriverShellProvider>()..ensureLoaded();
+    return ChangeNotifierProvider<DriverShellProvider>.value(
+      value: shell,
       child: _DriverHomeView(tabBody: tabBody),
     );
   }
@@ -108,23 +116,48 @@ class _DriverHomeView extends StatelessWidget {
 
   Widget _buildBody(BuildContext context, bool isDark) {
     if (tabBody != null) return tabBody!;
-    if (context.watch<DriverHomeProvider>().isInitialLoading) {
+    final shell = context.watch<DriverShellProvider>();
+    if (shell.isInitialLoading) {
       return const DriverHomeSkeleton();
     }
+    final showFullError = shell.error != null && !shell.hasData;
     return RefreshIndicator(
-      onRefresh: () => Future.wait([
-        context.read<AuthProvider>().refreshDriverStatus(),
-        context.read<DriverHomeProvider>().load(),
-      ]),
+      onRefresh: () async {
+        final provider = context.read<DriverShellProvider>();
+        final messenger = ScaffoldMessenger.of(context);
+        await Future.wait([
+          context.read<AuthProvider>().refreshDriverStatus(),
+          provider.refresh(),
+        ]);
+        // A failed refresh with data still on screen shouldn't blank the page —
+        // surface it as a snackbar instead.
+        if (provider.error != null && provider.hasData) {
+          messenger.showSnackBar(SnackBar(
+            content: Text(provider.error!.tr()),
+            behavior: SnackBarBehavior.floating,
+          ));
+        }
+      },
       child: CustomScrollView(
         physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
         slivers: [
-          SliverToBoxAdapter(child: DriverHeader(isDark: isDark)),
-          SliverToBoxAdapter(child: DriverVerificationBanner(isDark: isDark)),
-          SliverToBoxAdapter(child: EarningsCard(isDark: isDark)),
-          SliverToBoxAdapter(child: QuickStatsRow(isDark: isDark)),
-          SliverToBoxAdapter(child: TripRequestsSection(isDark: isDark)),
-          SliverToBoxAdapter(child: SizedBox(height: 100.r)),
+          if (showFullError)
+            SliverFillRemaining(
+              hasScrollBody: false,
+              child: AppErrorState(
+                message: shell.error,
+                onRetry: shell.refresh,
+                isDark: isDark,
+              ),
+            )
+          else ...[
+            SliverToBoxAdapter(child: DriverHeader(isDark: isDark)),
+            SliverToBoxAdapter(child: DriverVerificationBanner(isDark: isDark)),
+            SliverToBoxAdapter(child: EarningsCard(isDark: isDark)),
+            SliverToBoxAdapter(child: QuickStatsRow(isDark: isDark)),
+            SliverToBoxAdapter(child: TripRequestsSection(isDark: isDark)),
+            SliverToBoxAdapter(child: SizedBox(height: 100.r)),
+          ],
         ],
       ),
     );

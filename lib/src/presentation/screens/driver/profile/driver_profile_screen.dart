@@ -25,12 +25,35 @@ class DriverProfileScreen extends StatelessWidget {
   }
 }
 
-class _DriverProfileView extends StatelessWidget {
+class _DriverProfileView extends StatefulWidget {
   const _DriverProfileView();
+
+  @override
+  State<_DriverProfileView> createState() => _DriverProfileViewState();
+}
+
+class _DriverProfileViewState extends State<_DriverProfileView> {
+  @override
+  void initState() {
+    super.initState();
+    // Keep the verification chip and identity fields fresh even when the
+    // driver lands here without ever visiting home (whose banner also
+    // refreshes) — e.g. admin approval while sitting on this tab.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) context.read<AuthProvider>().refreshDriverStatus();
+    });
+  }
 
   bool _isDark(BuildContext context) {
     final tp = context.watch<ThemeProvider>();
     return tp.isDarkMode || (tp.isSystemMode && MediaQuery.of(context).platformBrightness == Brightness.dark);
+  }
+
+  /// Opens the shared edit screen, then re-syncs identity on return so the
+  /// tiles/header reflect the change immediately.
+  Future<void> _openEdit(BuildContext context) async {
+    await context.push('/profile/edit');
+    if (context.mounted) context.read<AuthProvider>().refreshDriverStatus();
   }
 
   @override
@@ -38,14 +61,16 @@ class _DriverProfileView extends StatelessWidget {
     final isDark = _isDark(context);
     final provider = context.watch<DriverProfileProvider>();
     final auth = context.watch<AuthProvider>();
-    final topPad = MediaQuery.of(context).padding.top;
 
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      body: SingleChildScrollView(
-        physics: const BouncingScrollPhysics(),
-        padding: EdgeInsets.fromLTRB(16.r, topPad + 12.r, 16.r, 100.r),
-        child: Column(
+      body: RefreshIndicator(
+        onRefresh: () => context.read<AuthProvider>().refreshDriverStatus(),
+        child: SingleChildScrollView(
+          physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
+          // The shell's SafeArea already consumes the status-bar inset.
+          padding: EdgeInsets.fromLTRB(16.r, 12.r, 16.r, 100.r),
+          child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             ProfileHeaderCard(
@@ -62,7 +87,7 @@ class _DriverProfileView extends StatelessWidget {
                   iconColor: const Color(0xFF3D5AFE),
                   title: 'profile_edit_profile'.tr(),
                   isDark: isDark,
-                  onTap: () => context.push('/profile/edit'),
+                  onTap: () => _openEdit(context),
                 ),
                 ProfileTile(
                   icon: Iconsax.call_copy,
@@ -70,7 +95,7 @@ class _DriverProfileView extends StatelessWidget {
                   title: 'profile_phone'.tr(),
                   value: auth.displayPhone ?? '',
                   isDark: isDark,
-                  onTap: () => context.push('/profile/edit'),
+                  onTap: () => _openEdit(context),
                 ),
                 ProfileTile(
                   icon: Iconsax.sms_copy,
@@ -78,7 +103,7 @@ class _DriverProfileView extends StatelessWidget {
                   title: 'profile_email_address'.tr(),
                   value: auth.displayEmail ?? '',
                   isDark: isDark,
-                  onTap: () => context.push('/profile/edit'),
+                  onTap: () => _openEdit(context),
                 ),
               ],
             ),
@@ -94,6 +119,7 @@ class _DriverProfileView extends StatelessWidget {
             SizedBox(height: 16.r),
             SignOutButton(isDark: isDark),
           ],
+          ),
         ),
       ),
     );

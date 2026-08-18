@@ -218,8 +218,6 @@
   "profile_logout_message": "هل أنت متأكد أنك تريد تسجيل الخروج من حسابك؟",
   "profile_logout_cancel": "إلغاء",
   "profile_logout_confirm": "تسجيل الخروج",
-  "profile_section_danger": "منطقة الخطر",
-  "profile_delete_account": "حذف الحساب",
   "profile_delete_title": "حذف الحساب؟",
   "profile_delete_message": "سيؤدي هذا إلى حذف حسابك وجميع البيانات المرتبطة به نهائيًا — الملف الشخصي والحجوزات والتفضيلات. لا يمكن التراجع عن هذا الإجراء.",
   "profile_delete_cancel": "إلغاء",
@@ -973,5 +971,14 @@
   "booking_dates_hourly_active": "الوضع بالساعة نشط",
   "booking_dates_switch_hourly": "قم بالتبديل إلى الفوترة بالساعة للمشاوير القصيرة.",
   "booking_dates_booking_by_hour": "أنت تحجز بالساعة.",
-  "booking_dates_total_duration": "إجمالي المدة"
+  "booking_dates_total_duration": "إجمالي المدة",
+  "driver_offline_warning_title": "السائق غير متصل",
+  "driver_offline_warning_msg": "هذا السائق غير متصل حاليًا وقد يتأخر في الرد. هل تريد متابعة الحجز؟",
+  "driver_offline_continue": "متابعة",
+  "driver_error_account": "تعذر تحميل حساب السائق الخاص بك. يرجى المحاولة مرة أخرى.",
+  "driver_toggle_failed": "تعذر تحديث حالتك. يرجى المحاولة مرة أخرى.",
+  "earnings_booked_hours": "ساعات الحجز",
+  "earnings_no_recent": "لا توجد أرباح بعد",
+  "earnings_no_recent_desc": "ستظهر الرحلات المكتملة هنا.",
+  "trips_to_label": "إلى"
 }

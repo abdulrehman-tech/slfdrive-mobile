@@ -5,8 +5,9 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 import 'package:provider/provider.dart';
 
+import '../../shell/driver_shell_provider.dart';
 import '../models/trip_request.dart';
-import '../provider/driver_home_provider.dart';
+import 'driver_header.dart';
 import 'online_status_dialog.dart';
 import 'trip_action_dialog.dart';
 
@@ -17,7 +18,7 @@ class TripRequestsSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final provider = context.watch<DriverHomeProvider>();
+    final provider = context.watch<DriverShellProvider>();
     final requests = provider.requests;
 
     return Padding(
@@ -139,12 +140,16 @@ class _EmptyRequestsState extends State<_EmptyRequests> with SingleTickerProvide
           if (!online) ...[
             SizedBox(height: 20.r),
             GestureDetector(
-              onTap: () => showOnlineStatusDialog(
-                context,
-                isDark: widget.isDark,
-                isCurrentlyOnline: false,
-                onConfirm: () => context.read<DriverHomeProvider>().toggleOnline(),
-              ),
+              // Same guarded flow as the header pill: no re-tap while a toggle
+              // is in flight, and failures surface a snackbar.
+              onTap: context.watch<DriverShellProvider>().isTogglingOnline
+                  ? null
+                  : () => showOnlineStatusDialog(
+                        context,
+                        isDark: widget.isDark,
+                        isCurrentlyOnline: false,
+                        onConfirm: () => DriverHeader.runToggle(context),
+                      ),
               child: Container(
                 padding: EdgeInsets.symmetric(horizontal: 24.r, vertical: 12.r),
                 decoration: BoxDecoration(
@@ -306,12 +311,15 @@ class TripRequestCard extends StatelessWidget {
 
   Future<void> _respond(BuildContext context, {required bool accept}) async {
     final messenger = ScaffoldMessenger.of(context);
-    final provider = context.read<DriverHomeProvider>();
-    final ok = accept ? await provider.accept(trip) : await provider.decline(trip);
+    final provider = context.read<DriverShellProvider>();
+    final ok = accept
+        ? await provider.accept(trip.bookingId)
+        : await provider.decline(trip.bookingId);
     if (!context.mounted) return;
+    // Prefer the server's actual failure message over the generic key.
     final msg = ok
         ? (accept ? 'driver_accept_snack'.tr() : 'driver_decline_snack'.tr())
-        : 'driver_request_failed'.tr();
+        : (provider.actionError?.tr() ?? 'driver_request_failed'.tr());
     messenger.showSnackBar(
       SnackBar(content: Text(msg), behavior: SnackBarBehavior.floating),
     );
@@ -383,45 +391,66 @@ class TripRequestCard extends StatelessWidget {
           SizedBox(height: 14.r),
           _priceBlock(muted),
           SizedBox(height: 16.r),
-          Row(
-            children: [
-              Expanded(
-                child: GestureDetector(
-                  onTap: () => _confirm(context, accept: false),
-                  child: Container(
-                    padding: EdgeInsets.symmetric(vertical: 12.r),
-                    decoration: BoxDecoration(
-                      color: Colors.red.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(12.r),
-                    ),
-                    child: Text(
-                      'driver_decline'.tr(),
-                      textAlign: TextAlign.center,
-                      style: TextStyle(fontSize: 14.r, fontWeight: FontWeight.w600, color: Colors.red),
+          // While this booking's accept/decline call is in flight, both buttons
+          // collapse into one disabled bar with a spinner — visible progress
+          // and no double taps.
+          if (context.watch<DriverShellProvider>().isBusy(trip.bookingId))
+            Container(
+              width: double.infinity,
+              // Matches the buttons row's height so the card doesn't jump.
+              height: 44.r,
+              decoration: BoxDecoration(
+                color: const Color(0xFF4D63DD).withValues(alpha: 0.12),
+                borderRadius: BorderRadius.circular(12.r),
+              ),
+              child: Center(
+                child: SizedBox(
+                  width: 18.r,
+                  height: 18.r,
+                  child: const CircularProgressIndicator(strokeWidth: 2, color: Color(0xFF4D63DD)),
+                ),
+              ),
+            )
+          else
+            Row(
+              children: [
+                Expanded(
+                  child: GestureDetector(
+                    onTap: () => _confirm(context, accept: false),
+                    child: Container(
+                      padding: EdgeInsets.symmetric(vertical: 12.r),
+                      decoration: BoxDecoration(
+                        color: Colors.red.withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(12.r),
+                      ),
+                      child: Text(
+                        'driver_decline'.tr(),
+                        textAlign: TextAlign.center,
+                        style: TextStyle(fontSize: 14.r, fontWeight: FontWeight.w600, color: Colors.red),
+                      ),
                     ),
                   ),
                 ),
-              ),
-              SizedBox(width: 12.r),
-              Expanded(
-                child: GestureDetector(
-                  onTap: () => _confirm(context, accept: true),
-                  child: Container(
-                    padding: EdgeInsets.symmetric(vertical: 12.r),
-                    decoration: BoxDecoration(
-                      gradient: const LinearGradient(colors: [Color(0xFF4D63DD), Color(0xFF677EF0)]),
-                      borderRadius: BorderRadius.circular(12.r),
-                    ),
-                    child: Text(
-                      'driver_accept'.tr(),
-                      textAlign: TextAlign.center,
-                      style: TextStyle(fontSize: 14.r, fontWeight: FontWeight.w600, color: Colors.white),
+                SizedBox(width: 12.r),
+                Expanded(
+                  child: GestureDetector(
+                    onTap: () => _confirm(context, accept: true),
+                    child: Container(
+                      padding: EdgeInsets.symmetric(vertical: 12.r),
+                      decoration: BoxDecoration(
+                        gradient: const LinearGradient(colors: [Color(0xFF4D63DD), Color(0xFF677EF0)]),
+                        borderRadius: BorderRadius.circular(12.r),
+                      ),
+                      child: Text(
+                        'driver_accept'.tr(),
+                        textAlign: TextAlign.center,
+                        style: TextStyle(fontSize: 14.r, fontWeight: FontWeight.w600, color: Colors.white),
+                      ),
                     ),
                   ),
                 ),
-              ),
-            ],
-          ),
+              ],
+            ),
         ],
       ),
     );

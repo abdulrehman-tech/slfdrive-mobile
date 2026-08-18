@@ -10,12 +10,7 @@ class NotifTabStrip extends StatelessWidget {
   final ColorScheme cs;
   final bool compact;
 
-  const NotifTabStrip({
-    super.key,
-    required this.isDark,
-    required this.cs,
-    this.compact = false,
-  });
+  const NotifTabStrip({super.key, required this.isDark, required this.cs, this.compact = false});
 
   @override
   Widget build(BuildContext context) {

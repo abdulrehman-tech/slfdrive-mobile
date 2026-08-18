@@ -63,6 +63,9 @@ Future<void> _applyHighRefreshRate() async {
       ],
       path: 'assets/translations',
       fallbackLocale: const Locale('en', 'US'),
+      // Back-fill keys missing from a locale with the English text instead of
+      // rendering the raw key (several locales lag behind en-US/ar-AE).
+      useFallbackTranslations: true,
       startLocale: const Locale('en', 'US'),
       child: MultiProvider(
         providers: [

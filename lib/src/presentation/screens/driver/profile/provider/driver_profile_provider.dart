@@ -3,11 +3,12 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 import '../../../../../constants/storage_keys.dart';
 import '../../../../../core/di/injection_container.dart';
+import '../../../../../core/utils/safe_notifier.dart';
 
-/// Holds the driver's notification-channel preferences. There is no backend
-/// endpoint for these, so they're persisted locally in secure storage and
-/// survive app restarts (previously they were dead in-memory state).
-class DriverProfileProvider extends ChangeNotifier {
+/// Holds the driver's push-notification preference. There is no backend
+/// endpoint for it, so it's persisted locally in secure storage and survives
+/// app restarts.
+class DriverProfileProvider extends ChangeNotifier with SafeNotifier {
   DriverProfileProvider({FlutterSecureStorage? storage})
       : _storage = storage ?? getIt<FlutterSecureStorage>() {
     _load();
@@ -16,43 +17,24 @@ class DriverProfileProvider extends ChangeNotifier {
   final FlutterSecureStorage _storage;
 
   bool _pushNotifications = true;
-  bool _emailNotifications = true;
-  bool _smsNotifications = false;
-
   bool get pushNotifications => _pushNotifications;
-  bool get emailNotifications => _emailNotifications;
-  bool get smsNotifications => _smsNotifications;
 
   Future<void> _load() async {
-    Future<bool> read(String key, bool fallback) async =>
-        (await _storage.read(key: key)) == null
-            ? fallback
-            : (await _storage.read(key: key)) == 'true';
-
-    _pushNotifications = await read(StorageKeys.driverNotifPush, true);
-    _emailNotifications = await read(StorageKeys.driverNotifEmail, true);
-    _smsNotifications = await read(StorageKeys.driverNotifSms, false);
-    notifyListeners();
+    final stored = await _storage.read(key: StorageKeys.driverNotifPush);
+    if (stored != null) _pushNotifications = stored == 'true';
+    safeNotify();
   }
 
-  void setPushNotifications(bool value) {
+  Future<void> setPushNotifications(bool value) async {
     if (_pushNotifications == value) return;
     _pushNotifications = value;
-    _storage.write(key: StorageKeys.driverNotifPush, value: '$value');
-    notifyListeners();
-  }
-
-  void setEmailNotifications(bool value) {
-    if (_emailNotifications == value) return;
-    _emailNotifications = value;
-    _storage.write(key: StorageKeys.driverNotifEmail, value: '$value');
-    notifyListeners();
-  }
-
-  void setSmsNotifications(bool value) {
-    if (_smsNotifications == value) return;
-    _smsNotifications = value;
-    _storage.write(key: StorageKeys.driverNotifSms, value: '$value');
-    notifyListeners();
+    safeNotify();
+    try {
+      await _storage.write(key: StorageKeys.driverNotifPush, value: '$value');
+    } catch (_) {
+      // Persistence failed — revert so the UI never lies about a saved state.
+      _pushNotifications = !value;
+      safeNotify();
+    }
   }
 }
