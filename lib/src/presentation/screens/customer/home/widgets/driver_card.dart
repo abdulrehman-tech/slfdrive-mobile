@@ -149,7 +149,7 @@ class DriverCard extends StatelessWidget {
                         Icon(Iconsax.star_1_copy, color: const Color(0xFFFFC107), size: 11.r),
                         SizedBox(width: 2.r),
                         Text(
-                          '${driver.rating!.toStringAsFixed(1)}  ·  ${driver.trips} trips',
+                          '${driver.rating!.toStringAsFixed(1)}  ·  ${'trips_count_label'.tr(namedArgs: {'n': '${driver.trips}'})}',
                           style: TextStyle(fontSize: 10.r, color: cs.onSurface.withValues(alpha: 0.55)),
                         ),
                       ],

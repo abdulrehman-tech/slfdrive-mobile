@@ -118,7 +118,7 @@ class _DatesStepState extends State<DatesStep> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     CupertinoButton(
-                      child: Text('Cancel', style: TextStyle(color: Colors.red, fontSize: 15.r)),
+                      child: Text('common_cancel'.tr(), style: TextStyle(color: Colors.red, fontSize: 15.r)),
                       onPressed: () => Navigator.of(ctx).pop(),
                     ),
                     Text(
@@ -126,7 +126,7 @@ class _DatesStepState extends State<DatesStep> {
                       style: TextStyle(fontSize: 15.r, fontWeight: FontWeight.w600, color: widget.isDark ? Colors.white : Colors.black),
                     ),
                     CupertinoButton(
-                      child: Text(isReturn ? 'Done' : 'Next', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15.r)),
+                      child: Text((isReturn ? 'done' : 'next').tr(), style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15.r)),
                       onPressed: () {
                         Navigator.of(ctx).pop();
                         if (!isReturn) {

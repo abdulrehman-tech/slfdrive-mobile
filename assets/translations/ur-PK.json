@@ -459,5 +459,9 @@
   "earnings_no_recent": "ابھی تک کوئی کمائی نہیں",
   "earnings_no_recent_desc": "مکمل شدہ سفر یہاں دکھائی دیں گے۔",
   "trips_to_label": "منزل",
-  "error_occurred": "کچھ غلط ہو گیا"
+  "error_occurred": "کچھ غلط ہو گیا",
+  "sort_experience": "سب سے زیادہ تجربہ کار",
+  "trips_count_label": "{n} سفر",
+  "years_short_label": "{n} سال",
+  "common_customer": "کسٹمر"
 }

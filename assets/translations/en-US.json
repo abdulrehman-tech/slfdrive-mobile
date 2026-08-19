@@ -731,7 +731,7 @@
   "bookings_awaiting_payment": "Awaiting payment",
   "bookings_reject_reason": "Reason",
   "booking_pickup_provider_location": "Provider location",
-  "booking_pickup_location_pending": "Location confirmed by provider",
+  "booking_pickup_location_pending": "Location will be confirmed by the provider",
   "booking_pickup_self_note": "You'll collect the vehicle from the provider's location above.",
   "location_service_disabled": "Location services are off. Enable them to use your current location.",
   "location_permission_denied": "Location permission denied.",
@@ -980,5 +980,9 @@
   "earnings_booked_hours": "Booked Hours",
   "earnings_no_recent": "No earnings yet",
   "earnings_no_recent_desc": "Completed trips will appear here.",
-  "trips_to_label": "To"
+  "trips_to_label": "To",
+  "sort_experience": "Most Experienced",
+  "trips_count_label": "{n} trips",
+  "years_short_label": "{n} yr",
+  "common_customer": "Customer"
 }

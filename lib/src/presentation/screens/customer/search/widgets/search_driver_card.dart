@@ -91,7 +91,7 @@ class SearchDriverCard extends StatelessWidget {
                           Text('·', style: TextStyle(fontSize: 10.r, color: cs.onSurface.withValues(alpha: 0.3))),
                           SizedBox(width: 6.r),
                           Text(
-                            '${driver.trips} trips',
+                            'trips_count_label'.tr(namedArgs: {'n': '${driver.trips}'}),
                             style: TextStyle(fontSize: 10.r, color: cs.onSurface.withValues(alpha: 0.5)),
                           ),
                         ],

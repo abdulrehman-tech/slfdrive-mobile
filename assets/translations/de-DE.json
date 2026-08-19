@@ -459,5 +459,9 @@
   "earnings_no_recent": "Noch keine Einnahmen",
   "earnings_no_recent_desc": "Abgeschlossene Fahrten erscheinen hier.",
   "trips_to_label": "Nach",
-  "error_occurred": "Etwas ist schiefgelaufen"
+  "error_occurred": "Etwas ist schiefgelaufen",
+  "sort_experience": "Erfahrenste zuerst",
+  "trips_count_label": "{n} Fahrten",
+  "years_short_label": "{n} J.",
+  "common_customer": "Kunde"
 }

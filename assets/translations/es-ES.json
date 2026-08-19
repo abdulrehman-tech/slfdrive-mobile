@@ -459,5 +459,9 @@
   "earnings_no_recent": "Aún no hay ganancias",
   "earnings_no_recent_desc": "Los viajes completados aparecerán aquí.",
   "trips_to_label": "Hacia",
-  "error_occurred": "Algo salió mal"
+  "error_occurred": "Algo salió mal",
+  "sort_experience": "Más experimentados",
+  "trips_count_label": "{n} viajes",
+  "years_short_label": "{n} años",
+  "common_customer": "Cliente"
 }

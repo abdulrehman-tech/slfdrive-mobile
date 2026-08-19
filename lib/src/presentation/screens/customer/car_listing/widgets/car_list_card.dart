@@ -91,7 +91,7 @@ class CarListCard extends StatelessWidget {
                       borderRadius: BorderRadius.circular(6.r),
                     ),
                     child: Text(
-                      'Unavailable',
+                      'car_status_unavailable'.tr(),
                       style: TextStyle(fontSize: 9.r, fontWeight: FontWeight.w700, color: Colors.white),
                     ),
                   ),

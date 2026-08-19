@@ -9,9 +9,10 @@ class SortOption {
   const SortOption({required this.id, required this.icon, required this.label});
 }
 
+// `label` holds a translation KEY — render with `.tr()`.
 const kDriverSortOptions = <SortOption>[
-  SortOption(id: 'popular', icon: Iconsax.star_1, label: 'Most Popular'),
-  SortOption(id: 'price_low', icon: CupertinoIcons.arrow_down, label: 'Price: Low to High'),
-  SortOption(id: 'price_high', icon: CupertinoIcons.arrow_up, label: 'Price: High to Low'),
-  SortOption(id: 'experience', icon: Iconsax.medal_star, label: 'Most Experienced'),
+  SortOption(id: 'popular', icon: Iconsax.star_1, label: 'sort_popular'),
+  SortOption(id: 'price_low', icon: CupertinoIcons.arrow_down, label: 'sort_price_low'),
+  SortOption(id: 'price_high', icon: CupertinoIcons.arrow_up, label: 'sort_price_high'),
+  SortOption(id: 'experience', icon: Iconsax.medal_star, label: 'sort_experience'),
 ];

@@ -170,7 +170,7 @@ class DriverListCard extends StatelessWidget {
               Icon(Iconsax.medal_star, size: 11.r, color: cs.onSurface.withValues(alpha: 0.4)),
               SizedBox(width: 3.r),
               Text(
-                '${driver.yearsExperience} yr',
+                'years_short_label'.tr(namedArgs: {'n': '${driver.yearsExperience}'}),
                 style: TextStyle(fontSize: 11.r, color: cs.onSurface.withValues(alpha: 0.5)),
               ),
             ],

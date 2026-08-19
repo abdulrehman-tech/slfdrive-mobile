@@ -59,7 +59,7 @@ class _DriverDetailView extends StatelessWidget {
       rating: profile.rating,
       pricePerDay: profile.dailyRate,
       pricePerHour: profile.hourlyRate,
-      speciality: 'Chauffeur',
+      speciality: 'driver_service_chauffeur'.tr(),
     );
     void proceed() {
       if (!context.mounted) return;

@@ -1,4 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
@@ -62,7 +63,7 @@ class SummarySubjectCard extends StatelessWidget {
                     OmrIcon(size: 12.r, color: cs.primary),
                     SizedBox(width: 3.r),
                     Text(
-                      '${d.car!.pricePerDay.toStringAsFixed(0)}/d',
+                      '${d.car!.pricePerDay.toStringAsFixed(0)}${'car_detail_per_day'.tr()}',
                       style: TextStyle(fontSize: 13.r, fontWeight: FontWeight.w800, color: cs.primary),
                     ),
                   ],
@@ -124,7 +125,7 @@ class SummarySubjectCard extends StatelessWidget {
                     OmrIcon(size: 11.r, color: cs.primary),
                     SizedBox(width: 3.r),
                     Text(
-                      '${d.driver!.pricePerDay.toStringAsFixed(0)}/d',
+                      '${d.driver!.pricePerDay.toStringAsFixed(0)}${'driver_detail_per_day'.tr()}',
                       style: TextStyle(fontSize: 12.r, fontWeight: FontWeight.w800, color: cs.primary),
                     ),
                   ],

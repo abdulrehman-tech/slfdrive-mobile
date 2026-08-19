@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/theme_provider.dart';
@@ -58,21 +59,21 @@ class ThemeModeSelector extends StatelessWidget {
     final themeProvider = context.watch<ThemeProvider>();
 
     return SegmentedButton<ThemeMode>(
-      segments: const [
+      segments: [
         ButtonSegment(
           value: ThemeMode.light,
-          icon: Icon(Icons.light_mode),
-          label: Text('Light'),
+          icon: const Icon(Icons.light_mode),
+          label: Text('settings_theme_light'.tr()),
         ),
         ButtonSegment(
           value: ThemeMode.dark,
-          icon: Icon(Icons.dark_mode),
-          label: Text('Dark'),
+          icon: const Icon(Icons.dark_mode),
+          label: Text('settings_theme_dark'.tr()),
         ),
         ButtonSegment(
           value: ThemeMode.system,
-          icon: Icon(Icons.brightness_auto),
-          label: Text('System'),
+          icon: const Icon(Icons.brightness_auto),
+          label: Text('settings_theme_system'.tr()),
         ),
       ],
       selected: {themeProvider.themeMode},

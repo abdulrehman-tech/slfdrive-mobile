@@ -1,3 +1,5 @@
+import 'package:easy_localization/easy_localization.dart';
+
 import '../../../../../core/models/booking/booking.dart';
 import '../../../../../core/utils/booking_status.dart';
 
@@ -61,7 +63,7 @@ class DriverTrip {
       id: b.id.toString(),
       bookingId: b.id,
       bookingNo: b.bookingNo ?? 'SLF${b.id}',
-      customer: (b.customerFullName?.trim().isNotEmpty ?? false) ? b.customerFullName!.trim() : 'Customer',
+      customer: (b.customerFullName?.trim().isNotEmpty ?? false) ? b.customerFullName!.trim() : 'common_customer'.tr(),
       avatarUrl: avatarUrl,
       destination: dropoff ?? b.serviceType ?? '',
       pickup: pickup,

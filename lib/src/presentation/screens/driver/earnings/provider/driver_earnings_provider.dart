@@ -190,7 +190,7 @@ class DriverEarningsProvider extends ChangeNotifier with SafeNotifier {
       final b = r.booking;
       return RecentEarning(
         date: date(r.when),
-        customer: (b.customerFullName?.trim().isNotEmpty ?? false) ? b.customerFullName!.trim() : 'Customer',
+        customer: (b.customerFullName?.trim().isNotEmpty ?? false) ? b.customerFullName!.trim() : 'common_customer'.tr(),
         amount: b.totalAmount ?? 0,
         status: 'completed',
       );

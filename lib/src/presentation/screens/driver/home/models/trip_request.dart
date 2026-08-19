@@ -1,3 +1,6 @@
+import 'package:easy_localization/easy_localization.dart';
+
+import '../../../../../constants/date_label_keys.dart';
 import '../../../../../core/models/booking/booking.dart';
 
 /// A pending booking awaiting the driver's accept/decline decision, enriched
@@ -56,7 +59,7 @@ class TripRequest {
     return TripRequest(
       bookingId: b.id,
       reference: b.bookingNo ?? 'SLF${b.id}',
-      customer: (b.customerFullName?.trim().isNotEmpty ?? false) ? b.customerFullName!.trim() : 'Customer',
+      customer: (b.customerFullName?.trim().isNotEmpty ?? false) ? b.customerFullName!.trim() : 'common_customer'.tr(),
       customerPhone: (b.customerPhoneNumber?.trim().isNotEmpty ?? false) ? b.customerPhoneNumber!.trim() : null,
       avatarUrl: avatarUrl,
       serviceKey: serviceKeyFor(b.serviceType),
@@ -87,15 +90,10 @@ String serviceKeyFor(String? serviceType) {
   }
 }
 
-const _months = [
-  'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-  'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
-];
-
-/// "28 Jun – 30 Jun", or a single date when the range collapses, or '' when
-/// dates are missing.
+/// "28 Jun – 30 Jun" (localized month abbreviations), or a single date when
+/// the range collapses, or '' when dates are missing.
 String dateRangeLabel(DateTime? from, DateTime? to) {
-  String one(DateTime d) => '${d.day} ${_months[d.month - 1]}';
+  String one(DateTime d) => '${d.day} ${DateLabelKeys.months[d.month - 1].tr()}';
   if (from == null && to == null) return '';
   if (from == null) return one(to!.toLocal());
   if (to == null) return one(from.toLocal());

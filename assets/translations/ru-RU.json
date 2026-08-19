@@ -459,5 +459,9 @@
   "earnings_no_recent": "Пока нет заработка",
   "earnings_no_recent_desc": "Завершённые поездки появятся здесь.",
   "trips_to_label": "Куда",
-  "error_occurred": "Что-то пошло не так"
+  "error_occurred": "Что-то пошло не так",
+  "sort_experience": "Самые опытные",
+  "trips_count_label": "{n} поездок",
+  "years_short_label": "{n} лет",
+  "common_customer": "Клиент"
 }

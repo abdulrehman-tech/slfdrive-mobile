@@ -114,7 +114,7 @@ class _SortOptionTile extends StatelessWidget {
             SizedBox(width: 12.r),
             Expanded(
               child: Text(
-                option.label,
+                option.label.tr(),
                 style: TextStyle(
                   fontSize: 13.r,
                   fontWeight: active ? FontWeight.w700 : FontWeight.w500,

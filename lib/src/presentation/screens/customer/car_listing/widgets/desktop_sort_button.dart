@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
@@ -34,7 +35,7 @@ class DesktopSortButton extends StatelessWidget {
             Icon(Iconsax.sort, size: 16.r, color: cs.onSurface.withValues(alpha: 0.6)),
             SizedBox(width: 6.r),
             Text(
-              'Sort',
+              'common_sort'.tr(),
               style: TextStyle(
                 fontSize: 12.r,
                 fontWeight: FontWeight.w600,

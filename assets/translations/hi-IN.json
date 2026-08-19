@@ -459,5 +459,9 @@
   "earnings_no_recent": "अभी तक कोई कमाई नहीं",
   "earnings_no_recent_desc": "पूरी हुई यात्राएँ यहाँ दिखाई देंगी।",
   "trips_to_label": "गंतव्य",
-  "error_occurred": "कुछ गलत हो गया"
+  "error_occurred": "कुछ गलत हो गया",
+  "sort_experience": "सबसे अनुभवी",
+  "trips_count_label": "{n} यात्राएँ",
+  "years_short_label": "{n} वर्ष",
+  "common_customer": "ग्राहक"
 }

@@ -1,4 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
@@ -100,7 +101,7 @@ class FavDriverCard extends StatelessWidget {
             Icon(Iconsax.star_1_copy, color: const Color(0xFFFFC107), size: 12.r),
             SizedBox(width: 3.r),
             Text(
-              '${driver.rating}  ·  ${driver.trips} trips',
+              '${driver.rating}  ·  ${'trips_count_label'.tr(namedArgs: {'n': '${driver.trips}'})}',
               style: TextStyle(
                 fontSize: 11.r,
                 color: cs.onSurface.withValues(alpha: 0.55),
