@@ -54,7 +54,10 @@ class PlaceNamer {
 
   Future<String?> _reverseGeocode(double lat, double lon) async {
     try {
-      final marks = await placemarkFromCoordinates(lat, lon);
+      // Platform geocoders (CLGeocoder / Android Geocoder) can stall for a
+      // long time under throttling — never let one lookup hang the caller.
+      final marks = await placemarkFromCoordinates(lat, lon)
+          .timeout(const Duration(seconds: 6));
       if (marks.isEmpty) return null;
       final m = marks.first;
       final parts = <String?>[m.subLocality, m.locality, m.administrativeArea]

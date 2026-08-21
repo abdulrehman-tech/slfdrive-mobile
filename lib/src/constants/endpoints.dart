@@ -1,13 +1,16 @@
+import '../core/config/app_environment.dart';
+
 class ApiEndpoints {
   /// Backend base URL — includes the `/api` segment. The path constants below
   /// also start with `/api`, so the full request URL intentionally contains
   /// `/api/api/...`, which matches the backend routing (verified: single
   /// `/api/...` returns 404, `/api/api/...` returns the endpoint).
-  static const String baseUrl = 'https://dashboard.slf-drives.com/api';
+  /// Resolved from [AppEnvironment] (`--dart-define=APP_ENV=uat|prod`).
+  static String get baseUrl => AppEnvironment.current.apiBaseUrl;
 
   /// Host that serves uploaded media (no `/api` segment). Stored photo/document
   /// URLs are relative to this.
-  static const String mediaBaseUrl = 'https://dashboard.slf-drives.com';
+  static String get mediaBaseUrl => AppEnvironment.current.mediaBaseUrl;
 
   /// Resolves a stored media path into an absolute URL. Backend photo URLs are
   /// relative to `/Uploads/`; an already-absolute URL is returned untouched.
@@ -59,6 +62,8 @@ class ApiEndpoints {
   static const String activeGeneralTypes = '/api/GeneralType/active';
   static const String activeGeneralStatuses = '/api/GeneralStatus/active';
   static String generalTypesByType(String type) => '/api/GeneralType/type/$type';
+  static String generalTypesByCompany(int companyId, String type) =>
+      '/api/GeneralType/company/$companyId?type=$type';
   static String generalStatusesByType(String type) => '/api/GeneralStatus/type/$type';
 
   // Corporate companies (booking-time company picker)

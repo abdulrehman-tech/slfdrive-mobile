@@ -16,6 +16,7 @@ abstract class LookupRepository {
   Future<List<OfferedService>> getActiveOfferedServices();
   Future<List<GeneralLookup>> getActiveGeneralTypes();
   Future<List<GeneralLookup>> getActiveGeneralStatuses();
+  Future<List<GeneralLookup>> getCompanyGeneralTypes(int companyId, {String type});
   Future<List<AllCompany>> getActiveCompanies();
   Future<int?> getBranchCompanyId(int branchId);
 }
@@ -52,6 +53,10 @@ class LookupRepositoryImpl implements LookupRepository {
   @override
   Future<List<GeneralLookup>> getActiveGeneralStatuses() =>
       remote.getActiveGeneralStatuses();
+
+  @override
+  Future<List<GeneralLookup>> getCompanyGeneralTypes(int companyId, {String type = 'payment_type'}) =>
+      remote.getCompanyGeneralTypes(companyId, type: type);
 
   @override
   Future<List<AllCompany>> getActiveCompanies() => remote.getActiveCompanies();

@@ -220,6 +220,7 @@ class _EditProfileView extends StatelessWidget {
                 final form = _buildForm(context, provider, desktop: isDesktop);
                 if (isDesktop) {
                   return SingleChildScrollView(
+                    keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
                     padding: EdgeInsets.symmetric(horizontal: 40.r, vertical: 24.r),
                     child: Center(
                       child: ConstrainedBox(constraints: BoxConstraints(maxWidth: 720.r), child: form),
@@ -227,6 +228,7 @@ class _EditProfileView extends StatelessWidget {
                   );
                 }
                 return SingleChildScrollView(
+                  keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
                   padding: EdgeInsets.fromLTRB(20.r, 12.r, 20.r, 32.r),
                   physics: const BouncingScrollPhysics(),
                   child: form,

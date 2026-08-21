@@ -24,6 +24,30 @@
       "program": "lib/main.dart",
       "flutterMode": "release",
       "args": ["--dart-define-from-file=.env"]
+    },
+    {
+      "name": "SLF Drive UAT (Debug)",
+      "request": "launch",
+      "type": "dart",
+      "program": "lib/main.dart",
+      "flutterMode": "debug",
+      "args": ["--dart-define-from-file=.env", "--dart-define=APP_ENV=uat"]
+    },
+    {
+      "name": "SLF Drive UAT (Profile)",
+      "request": "launch",
+      "type": "dart",
+      "program": "lib/main.dart",
+      "flutterMode": "profile",
+      "args": ["--dart-define-from-file=.env", "--dart-define=APP_ENV=uat"]
+    },
+    {
+      "name": "SLF Drive UAT (Release)",
+      "request": "launch",
+      "type": "dart",
+      "program": "lib/main.dart",
+      "flutterMode": "release",
+      "args": ["--dart-define-from-file=.env", "--dart-define=APP_ENV=uat"]
     }
   ]
 }

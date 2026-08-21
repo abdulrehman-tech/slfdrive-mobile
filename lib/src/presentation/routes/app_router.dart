@@ -33,6 +33,7 @@ import '../screens/customer/booking/models/booking_data.dart';
 import '../screens/customer/booking_detail/booking_detail_screen.dart';
 import '../screens/customer/booking_detail/models/booking_detail.dart' show BookingDetailSeed;
 import '../screens/customer/bookings/bookings_screen.dart';
+import '../screens/customer/payment/payment_screen.dart';
 import '../screens/customer/favorites/favorites_screen.dart';
 import '../screens/customer/profile/profile_screen.dart';
 import '../screens/customer/corporate/corporate_membership_screen.dart';
@@ -377,6 +378,22 @@ class AppRouter {
           final seed = state.extra is BookingDetailSeed ? state.extra as BookingDetailSeed : null;
           return AppModalTransition(
             child: BookingDetailScreen(bookingId: id, seed: seed),
+            name: state.name,
+          );
+        },
+      ),
+      GoRoute(
+        path: '/bookings/:id/pay',
+        name: 'booking-pay',
+        pageBuilder: (context, state) {
+          final id = int.tryParse(state.pathParameters['id'] ?? '') ?? 0;
+          final extra = state.extra as Map<String, dynamic>?;
+          return AppModalTransition(
+            child: PaymentScreen(
+              bookingId: id,
+              companyId: extra?['companyId'] as int?,
+              amount: extra?['amount'] as double?,
+            ),
             name: state.name,
           );
         },

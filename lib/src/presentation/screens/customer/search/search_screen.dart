@@ -108,6 +108,7 @@ class _SearchView extends StatelessWidget {
                   onClearFilters: provider.resetFilters,
                 )
               : CustomScrollView(
+                  keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
                   physics: const BouncingScrollPhysics(),
                   slivers: [
                     SliverPadding(

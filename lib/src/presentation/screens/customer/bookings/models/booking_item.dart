@@ -24,6 +24,10 @@ class BookingItem {
   final double totalPrice;
   final int? vehicleId;
   final int? driverId;
+
+  /// Rental company id from the booking DTO; drives the company-scoped
+  /// payment-type lookup on the pay screen. Null when the list DTO omits it.
+  final int? rentalCompanyId;
   final String? vehicleName;
   final String? vehicleImageUrl;
   final String? driverName;
@@ -44,6 +48,7 @@ class BookingItem {
     required this.totalPrice,
     this.vehicleId,
     this.driverId,
+    this.rentalCompanyId,
     this.vehicleName,
     this.vehicleImageUrl,
     this.driverName,
@@ -93,6 +98,7 @@ class BookingItem {
       totalPrice: totalPrice,
       vehicleId: vehicleId,
       driverId: driverId,
+      rentalCompanyId: rentalCompanyId,
       vehicleName: vehicleName ?? this.vehicleName,
       vehicleImageUrl: vehicleImageUrl ?? this.vehicleImageUrl,
       driverName: driverName ?? this.driverName,
@@ -124,6 +130,7 @@ class BookingItem {
       totalPrice: b.totalAmount ?? 0,
       vehicleId: b.vehicleId,
       driverId: b.driverId,
+      rentalCompanyId: b.rentalCompanyId,
       driverName: b.driverFullName,
       rejectionReason: b.rejectionReason,
     );

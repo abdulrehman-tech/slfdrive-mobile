@@ -122,8 +122,13 @@ class FakeDriverSession implements DriverSession {
 }
 
 class FakePlaceNamer implements PlaceNamer {
+  Completer<void>? gate; // when set, describe() never resolves until released
+
   @override
-  Future<String> describe(double? lat, double? lon) async => 'Somewhere';
+  Future<String> describe(double? lat, double? lon) async {
+    if (gate != null) await gate!.future;
+    return 'Somewhere';
+  }
 
   @override
   dynamic noSuchMethod(Invocation invocation) => throw UnimplementedError();
@@ -139,13 +144,17 @@ class FakeAvatars implements CustomerAvatars {
 
 Booking pending(int id) => Booking(id: id, statusId: 5, status: 'Pending');
 
-DriverShellProvider makeShell(FakeBookingRepository repo, {FakeDriverRepository? drivers}) =>
+DriverShellProvider makeShell(
+  FakeBookingRepository repo, {
+  FakeDriverRepository? drivers,
+  FakePlaceNamer? placeNamer,
+}) =>
     DriverShellProvider(
       repository: repo,
       drivers: drivers ?? FakeDriverRepository(),
       storage: FakeStorage(),
       session: FakeDriverSession(),
-      placeNamer: FakePlaceNamer(),
+      placeNamer: placeNamer ?? FakePlaceNamer(),
       avatars: FakeAvatars(),
     );
 
@@ -284,5 +293,23 @@ void main() {
     drivers.getByIdGate = null;
     await load;
     expect(shell.isOnline, isTrue);
+  });
+
+  test('screen goes live on API response even if the geocoder never answers', () async {
+    final repo = FakeBookingRepository()..bookings = [pending(1)];
+    final namer = FakePlaceNamer()..gate = Completer<void>(); // stalled geocoder
+    final shell = makeShell(repo, placeNamer: namer);
+    await shell.ensureLoaded().timeout(const Duration(seconds: 2));
+    // Loading finished and the request card exists (unenriched) — the
+    // skeleton must NOT wait for place names.
+    expect(shell.isInitialLoading, isFalse);
+    expect(shell.hasLoaded, isTrue);
+    expect(shell.requests.length, 1);
+    expect(shell.requests.first.pickup, '');
+    // When enrichment finally lands, names fill in without a reload.
+    namer.gate!.complete();
+    await Future<void>.delayed(const Duration(milliseconds: 20));
+    expect(shell.requests.first.pickup, 'Somewhere');
+    expect(repo.paginatedCalls, 1);
   });
 }

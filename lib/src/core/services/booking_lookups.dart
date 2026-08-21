@@ -47,14 +47,11 @@ class BookingLookups {
     }
   }
 
-  int? paymentTypeId(PaymentMethod method) {
-    switch (method) {
-      case PaymentMethod.card:
-        return _type('payment_type', const ['card', 'ompay']);
-      case PaymentMethod.cash:
-        return _type('payment_type', const ['cash']);
-    }
-  }
+  /// Active `payment_type` rows from the cached general types. Used as the
+  /// fallback method list when the company-scoped endpoint is unavailable.
+  List<GeneralLookup> paymentTypes() => (_types ?? const [])
+      .where((r) => (r.type ?? '').toLowerCase() == 'payment_type' && r.isActive)
+      .toList();
 
   int? bookingTypeId({required bool corporate}) {
     return corporate

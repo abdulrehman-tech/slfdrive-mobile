@@ -18,7 +18,6 @@ import 'widgets/car_card.dart';
 import 'widgets/driver_card.dart';
 import 'widgets/leave_review_sheet.dart';
 import 'widgets/location_map_card.dart';
-import 'widgets/pay_booking_sheet.dart';
 import 'widgets/price_card.dart';
 import 'widgets/ref_card.dart';
 import 'widgets/schedule_card.dart';
@@ -51,7 +50,11 @@ class _BookingDetailView extends StatelessWidget {
       width: double.infinity,
       child: FilledButton.icon(
         onPressed: () async {
-          final ok = await PayBookingSheet.show(context, bookingId: b.id, isDark: isDark);
+          final ok = await context.pushNamed<bool>(
+            'booking-pay',
+            pathParameters: {'id': b.id.toString()},
+            extra: {'companyId': b.rentalCompanyId, 'amount': b.total},
+          );
           if (ok == true && context.mounted) {
             context.read<BookingDetailProvider>().load();
           }

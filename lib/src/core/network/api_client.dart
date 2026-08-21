@@ -6,6 +6,7 @@ import '../../constants/endpoints.dart';
 import '../services/session_manager.dart';
 import 'api_interceptor.dart';
 import 'auth_interceptor.dart';
+import 'self_signed_tls.dart';
 
 class ApiClient {
   late final Dio _dio;
@@ -22,6 +23,10 @@ class ApiClient {
         validateStatus: (status) => status! < 500,
       ),
     );
+
+    // UAT is served from a raw IP with a self-signed cert: trust that single
+    // host only (no-op for prod, which has no self-signed host).
+    configureSelfSignedTls(_dio);
 
     // Add interceptors
     _dio.interceptors.add(ApiInterceptor());

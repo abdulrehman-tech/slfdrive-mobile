@@ -36,6 +36,14 @@ abstract class LookupRemoteDataSource {
   /// All active general statuses from `/api/GeneralStatus/active`.
   Future<List<GeneralLookup>> getActiveGeneralStatuses();
 
+  /// Company-scoped general types from `/api/GeneralType/company/{companyId}`.
+  /// The backend falls back to the default rows when the company has no
+  /// mapping of its own.
+  Future<List<GeneralLookup>> getCompanyGeneralTypes(
+    int companyId, {
+    String type = 'payment_type',
+  });
+
   /// Active corporate companies from `/api/AllCompanies/active`.
   Future<List<AllCompany>> getActiveCompanies();
 
@@ -96,6 +104,13 @@ class LookupRemoteDataSourceImpl implements LookupRemoteDataSource {
   @override
   Future<List<GeneralLookup>> getActiveGeneralStatuses() =>
       _getList(ApiEndpoints.activeGeneralStatuses, GeneralLookup.fromJson);
+
+  @override
+  Future<List<GeneralLookup>> getCompanyGeneralTypes(
+    int companyId, {
+    String type = 'payment_type',
+  }) =>
+      _getList(ApiEndpoints.generalTypesByCompany(companyId, type), GeneralLookup.fromJson);
 
   @override
   Future<int?> getBranchCompanyId(int branchId) async {

@@ -10,7 +10,6 @@ import 'package:provider/provider.dart';
 import '../../../../../constants/color_constants.dart';
 import '../../../../widgets/omr_icon.dart';
 import '../../booking_detail/models/booking_detail.dart' show BookingDetailSeed;
-import '../../booking_detail/widgets/pay_booking_sheet.dart';
 import '../models/booking_item.dart';
 import '../provider/bookings_provider.dart';
 import 'booking_status_badge.dart';
@@ -42,7 +41,11 @@ class BookingCard extends StatelessWidget {
 
   Future<void> _pay(BuildContext context) async {
     final provider = context.read<BookingsProvider>();
-    final ok = await PayBookingSheet.show(context, bookingId: booking.id, isDark: isDark);
+    final ok = await context.pushNamed<bool>(
+      'booking-pay',
+      pathParameters: {'id': booking.id.toString()},
+      extra: {'companyId': booking.rentalCompanyId, 'amount': booking.totalPrice},
+    );
     if (ok == true) provider.load();
   }
 

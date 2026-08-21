@@ -143,6 +143,7 @@ class _ApplyViewState extends State<_ApplyView> {
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       ),
       body: ListView(
+        keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
         padding: EdgeInsets.fromLTRB(16.r, 16.r, 16.r, 32.r),
         children: [
           Text(

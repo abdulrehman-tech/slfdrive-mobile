@@ -90,6 +90,10 @@ class BookingDetail {
   /// Owning company of the vehicle (from Vehicle/{id}), shown on the car card.
   final String? companyName;
 
+  /// Rental company id from the booking DTO (falls back to Vehicle.companyId
+  /// during enrichment). Drives the company-scoped payment-type lookup.
+  final int? rentalCompanyId;
+
   /// The settled payment method (cash / card / OmPay) from the Payment record,
   /// shown once the booking is paid. Null while unpaid / unknown.
   final String? paymentMethodName;
@@ -144,6 +148,7 @@ class BookingDetail {
     this.vehicleId,
     this.driverId,
     this.companyName,
+    this.rentalCompanyId,
     this.paymentMethodName,
     this.driverName,
     this.driverAvatar,
@@ -182,6 +187,7 @@ class BookingDetail {
     String? plateNumber,
     String? plateCode,
     String? companyName,
+    int? rentalCompanyId,
     String? paymentMethodName,
     String? driverName,
     String? driverAvatar,
@@ -233,6 +239,7 @@ class BookingDetail {
       vehicleId: vehicleId,
       driverId: driverId,
       companyName: companyName ?? this.companyName,
+      rentalCompanyId: rentalCompanyId ?? this.rentalCompanyId,
       paymentMethodName: paymentMethodName ?? this.paymentMethodName,
       driverName: driverName ?? this.driverName,
       driverAvatar: driverAvatar ?? this.driverAvatar,
@@ -359,6 +366,7 @@ class BookingDetail {
       rejectionReason: b.rejectionReason,
       vehicleId: b.vehicleId,
       driverId: b.driverId,
+      rentalCompanyId: b.rentalCompanyId,
       driverName: b.driverFullName,
       driverAvatar: null,
       driverPhone: b.driverPhoneNumber,

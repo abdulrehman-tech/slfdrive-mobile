@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
@@ -275,9 +277,12 @@ class DriverShellProvider extends ChangeNotifier {
         page++;
       }
 
-      final enrichment = await enrichBookings(mine, _placeNamer, _avatars);
-      if (seq != _loadSeq) return;
-      _applyBookings(seq, mine, enrichment: enrichment);
+      // Render immediately with unenriched cards — the screen must go live
+      // the moment the bookings API answers. Place names / avatars are filled
+      // in afterwards; a slow or stalled platform geocoder can never hold the
+      // skeleton (this exact hang was observed in the field).
+      _applyBookings(seq, mine);
+      unawaited(_enrich(seq, mine));
     } on AppException catch (e) {
       if (seq != _loadSeq) return;
       _error = e.message;
@@ -293,6 +298,20 @@ class DriverShellProvider extends ChangeNotifier {
         _loadedAt = DateTime.now();
         notifyListeners();
       }
+    }
+  }
+
+  /// Background enrichment pass: geocodes + avatars, then re-applies the same
+  /// booking list with names filled in. Discarded if a newer load started.
+  Future<void> _enrich(int seq, List<Booking> bookings) async {
+    if (bookings.isEmpty) return;
+    try {
+      final enrichment = await enrichBookings(bookings, _placeNamer, _avatars);
+      if (seq != _loadSeq) return;
+      _applyBookings(seq, bookings, enrichment: enrichment);
+      notifyListeners();
+    } catch (e) {
+      debugPrint('DriverShellProvider enrichment failed: $e');
     }
   }
 

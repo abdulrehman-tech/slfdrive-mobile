@@ -66,6 +66,7 @@ class _BrandsViewState extends State<_BrandsView> {
     final brands = provider.filteredBrands;
 
     return CustomScrollView(
+      keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
       physics: const BouncingScrollPhysics(),
       slivers: [
         BrandsAppBar(isDark: isDark, cs: cs),
@@ -121,6 +122,7 @@ class _BrandsViewState extends State<_BrandsView> {
     final brands = provider.filteredBrands;
 
     return SingleChildScrollView(
+      keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
       physics: const BouncingScrollPhysics(),
       padding: EdgeInsets.symmetric(horizontal: 40.r, vertical: 28.r),
       child: Center(

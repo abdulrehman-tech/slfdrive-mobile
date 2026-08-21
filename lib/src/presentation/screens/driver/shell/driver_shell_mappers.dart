@@ -14,28 +14,43 @@ import '../trips/models/driver_trip.dart';
 /// Per-booking display enrichment: resolved place names + customer avatar.
 typedef BookingEnrichment = ({String pickup, String dropoff, String? avatar});
 
-/// Resolves place names and avatars for every booking **in parallel** (one
-/// `Future.wait` per booking, all bookings concurrently). Returns a map keyed
-/// by booking id, shared by the request cards and the trip cards so each
-/// booking is geocoded exactly once per load.
+/// Resolves place names and avatars for every booking with a small worker
+/// pool ([concurrency] bookings at a time, each booking's three lookups in
+/// parallel) and a hard per-booking time box, so a throttled geocoder or slow
+/// avatar endpoint can neither stampede the platform nor stall the pass.
+/// Returns a map keyed by booking id, shared by the request cards and the
+/// trip cards so each booking is geocoded exactly once per load.
 Future<Map<int, BookingEnrichment>> enrichBookings(
   List<Booking> bookings,
   PlaceNamer placeNamer,
-  CustomerAvatars avatars,
-) async {
-  final entries = await Future.wait(bookings.map((b) async {
-    final results = await Future.wait<String?>([
-      placeNamer.describe(b.pickupLat, b.pickupLon),
-      placeNamer.describe(b.dropoffLat, b.dropoffLon),
-      avatars.photoUrl(b.userId),
-    ]);
-    return MapEntry(b.id, (
-      pickup: results[0] ?? '',
-      dropoff: results[1] ?? '',
-      avatar: results[2],
-    ));
-  }));
-  return Map.fromEntries(entries);
+  CustomerAvatars avatars, {
+  int concurrency = 4,
+  Duration perBookingTimeout = const Duration(seconds: 10),
+}) async {
+  final result = <int, BookingEnrichment>{};
+  if (bookings.isEmpty) return result;
+  final queue = List<Booking>.of(bookings);
+
+  Future<void> worker() async {
+    while (queue.isNotEmpty) {
+      final b = queue.removeAt(0);
+      List<String?> r;
+      try {
+        r = await Future.wait<String?>([
+          placeNamer.describe(b.pickupLat, b.pickupLon),
+          placeNamer.describe(b.dropoffLat, b.dropoffLon),
+          avatars.photoUrl(b.userId),
+        ]).timeout(perBookingTimeout);
+      } catch (_) {
+        r = const [null, null, null]; // degrade this card, never the pass
+      }
+      result[b.id] = (pickup: r[0] ?? '', dropoff: r[1] ?? '', avatar: r[2]);
+    }
+  }
+
+  final workers = concurrency.clamp(1, bookings.length);
+  await Future.wait(List.generate(workers, (_) => worker()));
+  return result;
 }
 
 DateTime? completionDay(Booking b) =>

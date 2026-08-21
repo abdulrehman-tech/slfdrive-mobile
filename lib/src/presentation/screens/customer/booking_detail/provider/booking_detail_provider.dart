@@ -91,6 +91,9 @@ class BookingDetailProvider extends ChangeNotifier {
             brand: v.brandName ?? '',
             plateNumber: v.plateNumber ?? '',
             companyName: v.companyName,
+            // Booking DTOs sometimes omit rentalCompanyId; the vehicle's owning
+            // company is the same entity, so use it as the fallback.
+            rentalCompanyId: out.rentalCompanyId ?? v.companyId,
             color: v.color,
             year: v.year,
             seats: v.seats,

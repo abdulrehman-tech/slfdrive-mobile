@@ -9,7 +9,9 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:provider/provider.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'src/core/data/repositories/auth_repository.dart';
+import 'src/core/config/app_environment.dart';
 import 'src/core/di/injection_container.dart';
+import 'src/core/network/self_signed_tls.dart';
 import 'src/core/secrets/maps_loader.dart';
 import 'src/core/services/session_manager.dart';
 import 'src/presentation/providers/auth_provider.dart';
@@ -35,6 +37,13 @@ Future<void> _applyHighRefreshRate() async {
   WidgetsFlutterBinding.ensureInitialized();
   unawaited(_applyHighRefreshRate());
   await EasyLocalization.ensureInitialized();
+
+  // UAT builds talk to a self-signed host: trust it for image loading too
+  // (Dio is handled in ApiClient). No-op for prod and on web.
+  applySelfSignedHttpOverrides();
+  if (!AppEnvironment.current.isProd) {
+    debugPrint('⚠️ APP_ENV=${AppEnvironment.current.name} → ${AppEnvironment.current.apiBaseUrl}');
+  }
 
   // Set up DI container (currently only registers FlutterSecureStorage).
   await setupDependencyInjection();
@@ -167,6 +176,15 @@ class _MyAppState extends State<MyApp> {
           supportedLocales: context.supportedLocales,
           localizationsDelegates: context.localizationDelegates,
           routerConfig: AppRouter.router,
+          // Tap anywhere outside a text field to dismiss the keyboard (iOS has
+          // no back button to close it). Sits above the Navigator, so every
+          // route and modal sheet is covered; translucent hit-testing lets
+          // interactive widgets win the gesture arena as usual.
+          builder: (context, child) => GestureDetector(
+            behavior: HitTestBehavior.translucent,
+            onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
+            child: child,
+          ),
         );
       },
     );
