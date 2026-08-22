@@ -71,21 +71,18 @@ class PreferencesSection extends StatelessWidget {
           title: 'profile_currency'.tr(),
           value: 'OMR',
           isDark: isDark,
-          onTap: () => ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('profile_currency_locked'.tr()),
-              behavior: SnackBarBehavior.floating,
-            ),
-          ),
+          onTap: () => ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text('profile_currency_locked'.tr()), behavior: SnackBarBehavior.floating)),
         ),
-        ProfileToggleTile(
-          icon: Iconsax.notification_copy,
-          iconColor: const Color(0xFFFF6D00),
-          title: 'settings_push_notifications'.tr(),
-          value: pushNotifications,
-          onChanged: onPushChanged,
-          isDark: isDark,
-        ),
+        // ProfileToggleTile(
+        //   icon: Iconsax.notification_copy,
+        //   iconColor: const Color(0xFFFF6D00),
+        //   title: 'settings_push_notifications'.tr(),
+        //   value: pushNotifications,
+        //   onChanged: onPushChanged,
+        //   isDark: isDark,
+        // ),
       ],
     );
   }

@@ -33,10 +33,7 @@ class ProfileScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (_) => ProfileProvider(),
-      child: const _ProfileView(),
-    );
+    return ChangeNotifierProvider(create: (_) => ProfileProvider(), child: const _ProfileView());
   }
 }
 
@@ -83,8 +80,8 @@ class _ProfileView extends StatelessWidget {
                   SizedBox(height: 16.r),
                   _PreferencesSection(isDark: isDark),
                   SizedBox(height: 16.r),
-                  MyDataSection(isDark: isDark),
-                  SizedBox(height: 16.r),
+                  // MyDataSection(isDark: isDark),
+                  // SizedBox(height: 16.r),
                   SupportSection(isDark: isDark),
                   DangerZoneSection(isDark: isDark),
                   SizedBox(height: 16.r),
@@ -97,9 +94,7 @@ class _ProfileView extends StatelessWidget {
                         final info = snap.data;
                         if (info == null) return const SizedBox.shrink();
                         return Text(
-                          'profile_version'.tr(
-                            namedArgs: {'version': '${info.version} (${info.buildNumber})'},
-                          ),
+                          'profile_version'.tr(namedArgs: {'version': '${info.version} (${info.buildNumber})'}),
                           style: TextStyle(
                             fontSize: 11.r,
                             color: cs.onSurface.withValues(alpha: 0.35),
@@ -114,12 +109,7 @@ class _ProfileView extends StatelessWidget {
             ),
           ],
         ),
-        Positioned(
-          left: 0,
-          right: 0,
-          top: 0,
-          child: GlassHeaderOverlay(isDark: isDark),
-        ),
+        Positioned(left: 0, right: 0, top: 0, child: GlassHeaderOverlay(isDark: isDark)),
       ],
     );
   }
