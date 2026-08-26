@@ -33,6 +33,10 @@ class DriverProfile {
   /// Live presence (`is_online`) — drives the header status dot/chip.
   final bool isOnline;
 
+  /// Admin verification flag from the backend (`isVerified`). Drives the
+  /// verified tick + trust chips in the identity card; never assumed true.
+  final bool isVerified;
+
   /// Authoritative review count from the stats aggregate. Used for the header
   /// count so it stays correct even when the review-LIST endpoint fails (the
   /// per-star histogram derives from the loaded list, which may be empty).
@@ -60,6 +64,7 @@ class DriverProfile {
     required this.reviewCounts,
     required this.reviews,
     this.isOnline = false,
+    this.isVerified = false,
     this.reviewCount = 0,
   });
 
@@ -113,6 +118,7 @@ class DriverProfile {
       reviews: reviews,
       reviewCount: stats?.totalReviews ?? 0,
       isOnline: d.isOnline ?? false,
+      isVerified: d.isVerified,
     );
   }
 }

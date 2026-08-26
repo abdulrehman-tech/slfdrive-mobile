@@ -67,23 +67,46 @@ class _DriverDetailView extends StatelessWidget {
           'booking', extra: {'service': BookingServiceType.driverOnly, 'driver': driver});
     }
 
-    if (!profile.isOnline) {
-      // The driver is offline — warn, but let the customer continue if they
-      // want. NOTE: _isDark() watches and must not be called from this tap
-      // handler; read the theme without subscribing instead.
+    // NOTE: _isDark() watches and must not be called from this tap handler;
+    // read the theme without subscribing instead.
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    void checkOffline() {
+      if (!context.mounted) return;
+      if (!profile.isOnline) {
+        // The driver is offline — warn, but let the customer continue if they
+        // want.
+        showConfirmDialog(
+          context,
+          isDark: isDark,
+          icon: Icons.wifi_off_rounded,
+          accent: const Color(0xFFEF6C00),
+          title: 'driver_offline_warning_title',
+          message: 'driver_offline_warning_msg',
+          confirmLabelKey: 'driver_offline_continue',
+          onConfirm: proceed,
+        );
+        return;
+      }
+      proceed();
+    }
+
+    if (!profile.isVerified) {
+      // Backend hasn't admin-verified this driver yet — surface that clearly
+      // before booking (the driver stays visible; the customer decides).
       showConfirmDialog(
         context,
-        isDark: Theme.of(context).brightness == Brightness.dark,
-        icon: Icons.wifi_off_rounded,
+        isDark: isDark,
+        icon: Icons.verified_user_outlined,
         accent: const Color(0xFFEF6C00),
-        title: 'driver_offline_warning_title',
-        message: 'driver_offline_warning_msg',
-        confirmLabelKey: 'driver_offline_continue',
-        onConfirm: proceed,
+        title: 'driver_unverified_warning_title',
+        message: 'driver_unverified_warning_msg',
+        confirmLabelKey: 'driver_unverified_continue',
+        onConfirm: checkOffline,
       );
       return;
     }
-    proceed();
+    checkOffline();
   }
 
   @override

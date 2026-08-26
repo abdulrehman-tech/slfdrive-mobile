@@ -79,8 +79,10 @@ class IdentityCard extends StatelessWidget {
                           overflow: TextOverflow.ellipsis,
                         ),
                       ),
-                      SizedBox(width: 4.r),
-                      Icon(Iconsax.verify_copy, size: 16.r, color: cs.primary),
+                      if (profile.isVerified) ...[
+                        SizedBox(width: 4.r),
+                        Icon(Iconsax.verify_copy, size: 16.r, color: cs.primary),
+                      ],
                     ],
                   ),
                   SizedBox(height: 6.r),
@@ -94,18 +96,29 @@ class IdentityCard extends StatelessWidget {
                         color: profile.isOnline ? const Color(0xFF4CAF50) : const Color(0xFF9E9E9E),
                         isDark: isDark,
                       ),
-                      TinyChip(
-                        icon: Iconsax.tick_circle_copy,
-                        label: 'driver_detail_verified_id'.tr(),
-                        color: const Color(0xFF4CAF50),
-                        isDark: isDark,
-                      ),
-                      TinyChip(
-                        icon: Iconsax.driver_copy,
-                        label: 'driver_detail_verified_license'.tr(),
-                        color: const Color(0xFF3D5AFE),
-                        isDark: isDark,
-                      ),
+                      // Trust chips reflect the backend's admin-verification flag —
+                      // never hardcoded. Unverified drivers get an explicit
+                      // pending chip so customers aren't misled.
+                      if (profile.isVerified) ...[
+                        TinyChip(
+                          icon: Iconsax.tick_circle_copy,
+                          label: 'driver_detail_verified_id'.tr(),
+                          color: const Color(0xFF4CAF50),
+                          isDark: isDark,
+                        ),
+                        TinyChip(
+                          icon: Iconsax.driver_copy,
+                          label: 'driver_detail_verified_license'.tr(),
+                          color: const Color(0xFF3D5AFE),
+                          isDark: isDark,
+                        ),
+                      ] else
+                        TinyChip(
+                          icon: Iconsax.clock_copy,
+                          label: 'driver_detail_pending_verification'.tr(),
+                          color: const Color(0xFFEF6C00),
+                          isDark: isDark,
+                        ),
                     ],
                   ),
                 ],
