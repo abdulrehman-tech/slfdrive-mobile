@@ -151,12 +151,17 @@ class BookingsProvider extends ChangeNotifier {
   int get tabIndex => _tabIndex;
   List<BookingItem> get bookings => List.unmodifiable(_bookings);
 
-  /// Corporate-approved bookings live under the "approved" tab.
+  /// Corporate-approved bookings live under the "approved" tab; cancelled ones
+  /// share the "rejected" tab (both terminal, no separate tab).
   bool _matchesTab(BookingItem b, int index) {
     final target = statusMap[index];
     if (target == BookingStatus.approved) {
       return b.status == BookingStatus.approved ||
           b.status == BookingStatus.corporateApproved;
+    }
+    if (target == BookingStatus.rejected) {
+      return b.status == BookingStatus.rejected ||
+          b.status == BookingStatus.cancelled;
     }
     return b.status == target;
   }

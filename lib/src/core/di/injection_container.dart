@@ -1,6 +1,7 @@
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get_it/get_it.dart';
 
+import '../data/datasources/app_version_remote_data_source.dart';
 import '../data/datasources/auth_remote_data_source.dart';
 import '../data/datasources/booking_remote_data_source.dart';
 import '../data/datasources/corporate_membership_remote_data_source.dart';
@@ -11,6 +12,7 @@ import '../data/datasources/driver_listing_remote_data_source.dart';
 import '../data/datasources/lookup_remote_data_source.dart';
 import '../data/datasources/review_remote_data_source.dart';
 import '../data/datasources/vehicle_remote_data_source.dart';
+import '../data/repositories/app_version_repository.dart';
 import '../data/repositories/auth_repository.dart';
 import '../data/repositories/booking_repository.dart';
 import '../data/repositories/corporate_membership_repository.dart';
@@ -26,6 +28,7 @@ import '../services/booking_lookups.dart';
 import '../services/customer_avatars.dart';
 import '../services/driver_session.dart';
 import '../services/place_namer.dart';
+import '../services/review_aggregates.dart';
 import '../services/session_manager.dart';
 import '../../presentation/providers/auth_provider.dart';
 import '../../presentation/screens/driver/shell/driver_shell_provider.dart';
@@ -81,6 +84,9 @@ Future<void> setupDependencyInjection() async {
   getIt.registerLazySingleton<ReviewRemoteDataSource>(
     () => ReviewRemoteDataSourceImpl(getIt<ApiClient>()),
   );
+  getIt.registerLazySingleton<AppVersionRemoteDataSource>(
+    () => AppVersionRemoteDataSourceImpl(getIt<ApiClient>()),
+  );
 
   // Repositories
   getIt.registerLazySingleton<AuthRepository>(
@@ -118,6 +124,9 @@ Future<void> setupDependencyInjection() async {
   getIt.registerLazySingleton<ReviewRepository>(
     () => ReviewRepositoryImpl(getIt<ReviewRemoteDataSource>()),
   );
+  getIt.registerLazySingleton<AppVersionRepository>(
+    () => AppVersionRepositoryImpl(getIt<AppVersionRemoteDataSource>()),
+  );
 
   // Services
   getIt.registerLazySingleton<BookingLookups>(
@@ -131,6 +140,9 @@ Future<void> setupDependencyInjection() async {
   );
   getIt.registerLazySingleton<CustomerAvatars>(
     () => CustomerAvatars(getIt<CustomerRepository>()),
+  );
+  getIt.registerLazySingleton<ReviewAggregates>(
+    () => ReviewAggregates(getIt<ReviewRepository>()),
   );
 
   // Providers

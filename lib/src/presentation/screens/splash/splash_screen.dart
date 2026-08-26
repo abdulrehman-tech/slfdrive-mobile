@@ -4,10 +4,17 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import '../../../constants/icon_constants.dart';
 import '../../../constants/breakpoints.dart';
 import '../../../constants/storage_keys.dart';
+import '../../../constants/url_constants.dart';
+import '../../../core/data/repositories/app_version_repository.dart';
 import '../../../core/di/injection_container.dart';
+import '../../../core/models/app/app_version_info.dart';
+import '../../../core/utils/app_version_compare.dart';
+import '../../utils/platform_utils.dart';
+import '../../widgets/force_update_dialog.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -23,6 +30,10 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
   String get _fullText => 'splash_tagline'.tr();
   int _currentIndex = 0;
 
+  /// Runs alongside the intro animation; resolves to the published version only
+  /// when the installed build must be updated before continuing.
+  late final Future<AppVersionInfo?> _requiredUpdate;
+
   @override
   void initState() {
     super.initState();
@@ -31,7 +42,31 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
 
     _logoAnimation = CurvedAnimation(parent: _controller, curve: Curves.easeInOut);
 
+    _requiredUpdate = _checkRequiredUpdate();
     _startAnimations();
+  }
+
+  /// Force-update gate. Only mobile has a store to send the user to; web and
+  /// desktop skip. Any failure (offline, timeout, malformed row) resolves to
+  /// null — a version check must never lock users out of the app.
+  Future<AppVersionInfo?> _checkRequiredUpdate() async {
+    if (!PlatformUtils.isMobile) return null;
+    try {
+      final pkg = await PackageInfo.fromPlatform();
+      final info = await getIt<AppVersionRepository>()
+          .check(UrlConstants.appVersionName)
+          .timeout(const Duration(seconds: 5));
+      if (info == null || !info.isActive || !info.forceUpdate) return null;
+      final outdated = isAppOutdated(
+        currentVersion: pkg.version,
+        currentBuild: int.tryParse(pkg.buildNumber) ?? 0,
+        latestVersion: info.version,
+        latestBuild: info.buildNumber,
+      );
+      return outdated ? info : null;
+    } catch (_) {
+      return null;
+    }
   }
 
   void _startAnimations() async {
@@ -64,8 +99,20 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
 
   /// Decide where to go after the splash animation based on persisted state:
   /// returning logged-in user → home (role-aware); already onboarded →
-  /// auth; first launch → language selection.
+  /// auth; first launch → language selection. A required update blocks here
+  /// instead — the dialog has no dismiss path.
   Future<void> _navigateNext() async {
+    final update = await _requiredUpdate;
+    if (!mounted) return;
+    if (update != null) {
+      ForceUpdateDialog.show(
+        context,
+        info: update,
+        isDark: Theme.of(context).brightness == Brightness.dark,
+      );
+      return;
+    }
+
     final storage = getIt<FlutterSecureStorage>();
     final accessToken = await storage.read(key: StorageKeys.accessToken);
     final role = await storage.read(key: StorageKeys.userRole);

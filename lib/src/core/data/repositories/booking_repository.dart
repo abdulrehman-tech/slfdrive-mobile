@@ -21,6 +21,7 @@ abstract class BookingRepository {
   Future<bool> approve({required int id, required int confirmedBy});
   Future<bool> reject({required int id, required int confirmedBy, String? reason});
   Future<bool> complete(int id);
+  Future<bool> cancel({required int id, String? reason});
   Future<PaymentInfo?> paymentForBooking(int bookingId);
 }
 
@@ -73,6 +74,10 @@ class BookingRepositoryImpl implements BookingRepository {
 
   @override
   Future<bool> complete(int id) => remote.complete(id);
+
+  @override
+  Future<bool> cancel({required int id, String? reason}) =>
+      remote.cancel(id: id, reason: reason);
 
   @override
   Future<PaymentInfo?> paymentForBooking(int bookingId) =>

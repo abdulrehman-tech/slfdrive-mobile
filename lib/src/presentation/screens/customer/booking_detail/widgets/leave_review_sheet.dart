@@ -6,6 +6,7 @@ import 'package:iconsax_flutter/iconsax_flutter.dart';
 import '../../../../../core/data/repositories/review_repository.dart';
 import '../../../../../core/di/injection_container.dart';
 import '../../../../../core/errors/app_exception.dart';
+import '../../../../../core/services/review_aggregates.dart';
 import '../../../../widgets/confirm_dialog.dart';
 
 /// Bottom sheet that lets a customer rate + comment a completed booking and
@@ -44,6 +45,8 @@ class _LeaveReviewSheetState extends State<LeaveReviewSheet> {
     setState(() => _submitting = true);
     try {
       await getIt<ReviewRepository>().submit(bookingId: widget.bookingId, rating: _rating, comment: _comment.text);
+      // Card/detail ratings are served from a session cache — refetch next time.
+      getIt<ReviewAggregates>().invalidate();
       if (!mounted) return;
       Navigator.of(context).pop(true);
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('review_submitted'.tr())));

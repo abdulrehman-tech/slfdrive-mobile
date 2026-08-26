@@ -25,7 +25,8 @@ class CarInfoHeader extends StatelessWidget {
     final title = vehicle.displayTitle(ar: ar);
     final brandLabel = (ar ? vehicle.brandNameAr : vehicle.brandName) ?? vehicle.brandName ?? '';
     final locationLabel = (ar ? vehicle.locationNameAr : vehicle.locationName) ?? vehicle.locationName ?? '';
-    final rating = vehicle.rating;
+    final rating = provider.rating;
+    final reviewCount = provider.reviewCount;
     final price = vehicle.pricePerDay;
 
     return CarGlassCard(
@@ -80,6 +81,13 @@ class CarInfoHeader extends StatelessWidget {
                     rating.toStringAsFixed(1),
                     style: TextStyle(fontSize: 13.r, fontWeight: FontWeight.w700, color: cs.onSurface),
                   ),
+                  if (reviewCount > 0) ...[
+                    SizedBox(width: 3.r),
+                    Text(
+                      '($reviewCount)',
+                      style: TextStyle(fontSize: 11.r, color: cs.onSurface.withValues(alpha: 0.5)),
+                    ),
+                  ],
                 ] else
                   Text(
                     'listing_new'.tr(),

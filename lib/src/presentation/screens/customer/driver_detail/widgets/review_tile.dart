@@ -10,13 +10,7 @@ class ReviewTile extends StatelessWidget {
   final ColorScheme cs;
   final bool isDark;
 
-  const ReviewTile({
-    super.key,
-    required this.review,
-    required this.index,
-    required this.cs,
-    required this.isDark,
-  });
+  const ReviewTile({super.key, required this.review, required this.index, required this.cs, required this.isDark});
 
   @override
   Widget build(BuildContext context) {
@@ -63,7 +57,7 @@ class ReviewTile extends StatelessWidget {
                   children: List.generate(
                     5,
                     (si) => Icon(
-                      si < review.rating.round() ? Iconsax.star_1_copy : Iconsax.star_1,
+                      si < review.rating.round() ? Iconsax.star : Iconsax.star_copy,
                       size: 10.r,
                       color: const Color(0xFFFFC107),
                     ),

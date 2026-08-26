@@ -105,6 +105,10 @@ class ApiEndpoints {
   // Booking lifecycle (driver/owner side)
   static const String bookingApprove = '/api/Booking/approve';
   static const String bookingReject = '/api/Booking/reject';
+
+  /// Customer/admin cancels a booking (`POST`, body `{id, cancellationReason?}`).
+  /// Backend enforces who may cancel and only while unapproved (5 / 12).
+  static const String bookingCancel = '/api/Booking/cancel';
   static String bookingComplete(int id) => '/api/Booking/$id/complete';
   static String bookingOmPayInit(int id) => '/api/Booking/$id/pay/ompay/init';
   static String bookingOmPayVerify(int id) => '/api/Booking/$id/pay/ompay/verify';
@@ -121,11 +125,16 @@ class ApiEndpoints {
   static const String vehiclePaginated = '/api/Vehicle/paginated';
   static const String vehicleNearestPaginated = '/api/Vehicle/nearest/paginated';
   static String vehicleById(int id) => '/api/Vehicle/$id';
+  // Aggregated vehicle stats (rating/reviews/bookings). Requires JWT.
+  static String vehicleStats(int id) => '/api/Vehicle/$id/stats';
   static String vehiclesByBrand(int brandId) => '/api/Vehicle/brand/$brandId';
 
   // Drivers (listings)
   static const String driverPaginated = '/api/Driver/paginated';
   static const String driverNearestPaginated = '/api/Driver/nearest/paginated';
+
+  // App version (force-update gate on splash)
+  static String appVersionCheck(String appName) => '/api/app-version/check/$appName';
 
   // Profile completion (post-OTP, multipart/form-data)
   static const String completeIndividualProfile = '/api/User/complete-individual-profile';

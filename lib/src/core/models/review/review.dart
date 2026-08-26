@@ -10,6 +10,11 @@ class Review {
   final String? customerName;
   final String? driverName;
 
+  /// Ids lifted from the nested `booking` object — the only way to tie a
+  /// review to a vehicle / driver (the review row itself carries names only).
+  final int? vehicleId;
+  final int? driverId;
+
   const Review({
     required this.id,
     required this.bookingId,
@@ -19,9 +24,13 @@ class Review {
     this.createdAt,
     this.customerName,
     this.driverName,
+    this.vehicleId,
+    this.driverId,
   });
 
   factory Review.fromJson(Map<String, dynamic> json) {
+    final booking = json['booking'];
+    final b = booking is Map ? booking : const {};
     return Review(
       id: (json['id'] as num?)?.toInt() ?? 0,
       bookingId: (json['bookingId'] as num?)?.toInt() ?? 0,
@@ -31,6 +40,8 @@ class Review {
       createdAt: json['createdAt'] as String?,
       customerName: json['customerName'] as String?,
       driverName: json['driverName'] as String?,
+      vehicleId: (b['vehicleId'] as num?)?.toInt(),
+      driverId: (b['driverId'] as num?)?.toInt(),
     );
   }
 }

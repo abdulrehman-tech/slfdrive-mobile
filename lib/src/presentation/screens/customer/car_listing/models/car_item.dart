@@ -32,14 +32,14 @@ class CarItem {
 
   /// Maps a backend [Vehicle] into the listing view model. [ar] selects the
   /// Arabic resolved names when true.
-  factory CarItem.fromVehicle(Vehicle v, {bool ar = false}) {
+  factory CarItem.fromVehicle(Vehicle v, {bool ar = false, double? rating}) {
     return CarItem(
       id: v.id.toString(),
       name: v.displayTitle(ar: ar),
       brand: (ar ? (v.brandNameAr ?? v.brandName) : v.brandName) ?? '',
       imageUrl: v.primaryPhoto ?? '',
       pricePerDay: v.pricePerDay ?? 0,
-      rating: v.rating,
+      rating: rating ?? v.rating,
       seats: v.seats ?? 0,
       transmission: (ar ? (v.transmissionTypeNameAr ?? v.transmissionTypeName) : v.transmissionTypeName) ?? '—',
       fuelType: (ar ? (v.fuelTypeNameAr ?? v.fuelTypeName) : v.fuelTypeName) ?? '—',

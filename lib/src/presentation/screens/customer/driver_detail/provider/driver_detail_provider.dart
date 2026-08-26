@@ -1,32 +1,32 @@
 import 'package:flutter/material.dart';
 
 import '../../../../../core/data/repositories/driver_repository.dart';
-import '../../../../../core/data/repositories/review_repository.dart';
 import '../../../../../core/di/injection_container.dart';
 import '../../../../../core/errors/app_exception.dart';
 import '../../../../../core/models/review/review.dart';
+import '../../../../../core/services/review_aggregates.dart';
 import '../../favorites/models/fav_driver.dart';
 import '../models/driver_profile.dart';
 import '../models/driver_review.dart';
 
 /// Loads a single driver from `GET /api/Driver/{id}` and exposes it as the
 /// screen's `DriverProfile` view model, enriched with the driver's rating
-/// aggregate (`/api/Driver/{id}/stats`) and their reviews (filtered from
-/// `/api/Review/active`, which is the only review-list endpoint).
+/// aggregate (`/api/Driver/{id}/stats`) and their reviews (from the shared
+/// [ReviewAggregates] cache of `/api/Review/active`, matched by driver id).
 class DriverDetailProvider extends ChangeNotifier {
   DriverDetailProvider({
     required this.driverId,
     DriverRepository? repository,
-    ReviewRepository? reviews,
+    ReviewAggregates? reviews,
   })  : _repository = repository ?? getIt<DriverRepository>(),
-        _reviews = reviews ?? getIt<ReviewRepository>() {
+        _reviews = reviews ?? getIt<ReviewAggregates>() {
     scroll.addListener(_onScroll);
     load();
   }
 
   final int driverId;
   final DriverRepository _repository;
-  final ReviewRepository _reviews;
+  final ReviewAggregates _reviews;
 
   DriverProfile? _profile;
   DriverProfile? get profile => _profile;
@@ -64,12 +64,12 @@ class DriverDetailProvider extends ChangeNotifier {
         // Rating aggregate + reviews are fetched best-effort; a failure here
         // must not blank the whole profile, so each is guarded independently.
         final stats = await _repository.getStats(driverId).catchError((_) => null);
-        final driverReviews = await _loadDriverReviews(details.fullName);
+        final rows = await _loadDriverReviews(details.driverId, details.fullName);
         _profile = DriverProfile.fromDetails(
           details,
           stats: stats,
-          reviews: driverReviews,
-          reviewCounts: _distribution(driverReviews),
+          reviews: rows.map(DriverReview.fromReview).toList(),
+          reviewCounts: ReviewAggregates.distribution(rows),
         );
       }
     } on AppException catch (e) {
@@ -82,51 +82,18 @@ class DriverDetailProvider extends ChangeNotifier {
     }
   }
 
-  /// Fetches all active reviews and keeps only those whose `driverName`
-  /// matches this driver (the backend exposes no per-driver reviews endpoint,
-  /// and review rows carry `driverName` but not a driver id). Best-effort:
-  /// returns empty on any failure.
-  Future<List<DriverReview>> _loadDriverReviews(String? driverName) async {
+  /// Reviews for this driver, matched by the booking's driver entity id
+  /// (`review.booking.driverId`). Falls back to the legacy name match for rows
+  /// whose nested booking is missing. Best-effort: empty on failure.
+  Future<List<Review>> _loadDriverReviews(int? entityDriverId, String? driverName) async {
+    await _reviews.ensureLoaded();
+    final byId = _reviews.forDriver(entityDriverId);
+    if (byId.isNotEmpty) return byId;
     final name = driverName?.trim().toLowerCase();
     if (name == null || name.isEmpty) return const [];
-    try {
-      final all = await _reviews.active();
-      return all
-          .where((r) => (r.driverName?.trim().toLowerCase() ?? '') == name)
-          .map(_toDriverReview)
-          .toList();
-    } catch (_) {
-      return const [];
-    }
-  }
-
-  DriverReview _toDriverReview(Review r) => DriverReview(
-        author: (r.customerName?.trim().isNotEmpty ?? false) ? r.customerName!.trim() : 'Customer',
-        rating: r.rating.toDouble(),
-        text: r.comment?.trim() ?? '',
-        timeAgo: _timeAgo(r.createdAt),
-      );
-
-  /// Star-count histogram ordered [5★, 4★, 3★, 2★, 1★] to match `reviews_card`.
-  List<int> _distribution(List<DriverReview> reviews) {
-    final counts = [0, 0, 0, 0, 0];
-    for (final r in reviews) {
-      final star = r.rating.round().clamp(1, 5);
-      counts[5 - star]++;
-    }
-    return counts;
-  }
-
-  String _timeAgo(String? iso) {
-    final t = DateTime.tryParse(iso ?? '')?.toLocal();
-    if (t == null) return '';
-    final diff = DateTime.now().difference(t);
-    if (diff.inDays >= 365) return '${(diff.inDays / 365).floor()}y';
-    if (diff.inDays >= 30) return '${(diff.inDays / 30).floor()}mo';
-    if (diff.inDays >= 1) return '${diff.inDays}d';
-    if (diff.inHours >= 1) return '${diff.inHours}h';
-    if (diff.inMinutes >= 1) return '${diff.inMinutes}m';
-    return 'now';
+    return _reviews.all
+        .where((r) => r.driverId == null && (r.driverName?.trim().toLowerCase() ?? '') == name)
+        .toList();
   }
 
   final ScrollController scroll = ScrollController();

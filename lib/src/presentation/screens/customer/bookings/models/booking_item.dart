@@ -5,9 +5,9 @@ import 'package:iconsax_flutter/iconsax_flutter.dart';
 import '../../../../../core/models/booking/booking.dart';
 
 /// Backend booking lifecycle (booking_status): pending(5) → approved(6) →
-/// completed(8), or rejected(7). Corporate bookings get an extra
-/// corporateApproved(12) state between approved and completion.
-enum BookingStatus { pending, approved, corporateApproved, completed, rejected }
+/// completed(8), or rejected(7) / cancelled(15). Corporate bookings get an
+/// extra corporateApproved(12) state between approved and completion.
+enum BookingStatus { pending, approved, corporateApproved, completed, rejected, cancelled }
 
 /// What was booked, from the service type (vehicle / driver / vehicle-with-driver).
 enum BookingServiceKind { vehicle, driver, vehicleWithDriver }
@@ -139,7 +139,8 @@ class BookingItem {
 
 /// Maps the backend booking_status onto the UI states. Prefers the numeric
 /// `statusId` (5=pending, 6=approved, 7=rejected, 8=completed,
-/// 12=corporate_approved); falls back to string matching only when absent.
+/// 12=corporate_approved, 15=cancelled); falls back to string matching only
+/// when absent.
 BookingStatus bookingStatusFromApi(Booking b) {
   switch (b.statusId) {
     case 5:
@@ -152,9 +153,12 @@ BookingStatus bookingStatusFromApi(Booking b) {
       return BookingStatus.rejected;
     case 8:
       return BookingStatus.completed;
+    case 15:
+      return BookingStatus.cancelled;
   }
   final s = '${b.status ?? ''} ${b.statusType ?? ''}'.toLowerCase();
-  if (s.contains('reject') || s.contains('cancel')) return BookingStatus.rejected;
+  if (s.contains('cancel')) return BookingStatus.cancelled;
+  if (s.contains('reject')) return BookingStatus.rejected;
   if (b.completedAt != null || s.contains('complete')) return BookingStatus.completed;
   if (s.contains('corporate') && s.contains('approved')) return BookingStatus.corporateApproved;
   if (s.contains('approved')) return BookingStatus.approved;
@@ -190,6 +194,8 @@ extension BookingStatusX on BookingStatus {
         return const Color(0xFF4CAF50);
       case BookingStatus.rejected:
         return const Color(0xFFE53935);
+      case BookingStatus.cancelled:
+        return const Color(0xFF757575);
     }
   }
 
@@ -205,6 +211,8 @@ extension BookingStatusX on BookingStatus {
         return Iconsax.medal_star;
       case BookingStatus.rejected:
         return Iconsax.close_circle;
+      case BookingStatus.cancelled:
+        return Iconsax.close_square;
     }
   }
 
@@ -220,6 +228,8 @@ extension BookingStatusX on BookingStatus {
         return 'bookings_status_completed'.tr();
       case BookingStatus.rejected:
         return 'bookings_status_rejected'.tr();
+      case BookingStatus.cancelled:
+        return 'bookings_status_cancelled'.tr();
     }
   }
 }

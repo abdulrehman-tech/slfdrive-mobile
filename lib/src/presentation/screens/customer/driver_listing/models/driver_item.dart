@@ -28,12 +28,12 @@ class DriverItem {
     this.isOnline = false,
   });
 
-  factory DriverItem.fromDriver(DriverListingItem d, {bool ar = false}) {
+  factory DriverItem.fromDriver(DriverListingItem d, {bool ar = false, double? rating}) {
     return DriverItem(
       id: d.id.toString(),
       name: d.displayName(ar: ar),
       imageUrl: d.resolvedPhotoUrl,
-      rating: d.rating,
+      rating: rating ?? d.rating,
       pricePerDay: d.amountPerDay,
       languages: d.languagesKnown != null && d.languagesKnown!.isNotEmpty
           ? d.languagesKnown!.split(',').map((s) => s.trim()).toList()

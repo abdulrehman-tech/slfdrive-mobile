@@ -1,3 +1,4 @@
+import '../../models/common/entity_stats.dart';
 import '../../models/common/paged_response.dart';
 import '../../models/common/pagination_params.dart';
 import '../../models/vehicle/vehicle.dart';
@@ -13,6 +14,7 @@ abstract class VehicleRepository {
     PaginationParams params,
   });
   Future<List<Vehicle>> getByBrand(int brandId);
+  Future<EntityStats?> getStats(int id);
 }
 
 class VehicleRepositoryImpl implements VehicleRepository {
@@ -37,4 +39,7 @@ class VehicleRepositoryImpl implements VehicleRepository {
 
   @override
   Future<List<Vehicle>> getByBrand(int brandId) => remote.getByBrand(brandId);
+
+  @override
+  Future<EntityStats?> getStats(int id) => remote.getStats(id);
 }

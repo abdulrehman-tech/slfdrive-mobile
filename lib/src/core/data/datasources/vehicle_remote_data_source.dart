@@ -1,5 +1,6 @@
 import '../../../constants/endpoints.dart';
 import '../../errors/error_handler.dart';
+import '../../models/common/entity_stats.dart';
 import '../../models/common/paged_response.dart';
 import '../../models/common/pagination_params.dart';
 import '../../models/vehicle/vehicle.dart';
@@ -23,6 +24,10 @@ abstract class VehicleRemoteDataSource {
 
   /// All vehicles for a brand (`GET /api/Vehicle/brand/{brandId}`).
   Future<List<Vehicle>> getByBrand(int brandId);
+
+  /// Aggregated stats — average rating + review count
+  /// (`GET /api/Vehicle/{id}/stats`). Null when unavailable.
+  Future<EntityStats?> getStats(int id);
 }
 
 class VehicleRemoteDataSourceImpl implements VehicleRemoteDataSource {
@@ -35,6 +40,20 @@ class VehicleRemoteDataSourceImpl implements VehicleRemoteDataSource {
     try {
       final res = await apiClient.post(ApiEndpoints.vehiclePaginated, data: params.toJson());
       return _parsePaged(res.data);
+    } catch (e) {
+      throw ErrorHandler.handleError(e);
+    }
+  }
+
+  @override
+  Future<EntityStats?> getStats(int id) async {
+    try {
+      final res = await apiClient.get(ApiEndpoints.vehicleStats(id));
+      final body = res.data as Map<String, dynamic>;
+      if (body['isSuccess'] == true && body['data'] is Map<String, dynamic>) {
+        return EntityStats.fromJson(body['data'] as Map<String, dynamic>);
+      }
+      return null;
     } catch (e) {
       throw ErrorHandler.handleError(e);
     }

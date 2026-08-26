@@ -3,7 +3,9 @@ import 'package:flutter/foundation.dart';
 import '../../../../../core/data/repositories/driver_listing_repository.dart';
 import '../../../../../core/errors/app_exception.dart';
 import '../../../../../core/models/common/pagination_params.dart';
+import '../../../../../core/di/injection_container.dart';
 import '../../../../../core/models/driver/driver_listing_item.dart';
+import '../../../../../core/services/review_aggregates.dart';
 import '../models/driver_item.dart';
 
 /// Vehicle-filter values for the chip bar.
@@ -15,6 +17,7 @@ enum DriverVehicleFilter { all, hasVehicle }
 class DriverListingProvider extends ChangeNotifier {
   final DriverListingRepository _repo;
   final bool _ar;
+  final ReviewAggregates _ratings = getIt<ReviewAggregates>();
 
   DriverListingProvider({
     required DriverListingRepository repository,
@@ -42,7 +45,24 @@ class DriverListingProvider extends ChangeNotifier {
   String get sortBy => _sortBy;
 
   // ---- Load ----
+  /// Ratings come from a shared session cache; when this screen is the first
+  /// to need it, repaint once the fetch lands so cards swap "New" for stars.
+  void _warmRatings() {
+    if (_ratings.isLoaded) return;
+    _ratings.ensureLoaded().then((_) {
+      if (!_disposed) notifyListeners();
+    });
+  }
+
+  bool _disposed = false;
+  @override
+  void dispose() {
+    _disposed = true;
+    super.dispose();
+  }
+
   Future<void> load() async {
+    _warmRatings();
     _isLoading = true;
     _error = null;
     notifyListeners();
@@ -105,7 +125,7 @@ class DriverListingProvider extends ChangeNotifier {
         .where((d) => d.allCompanyId == null)
         .where((d) =>
             _vehicleFilter == DriverVehicleFilter.all || d.hasVehicle)
-        .map((d) => DriverItem.fromDriver(d, ar: _ar))
+        .map((d) => DriverItem.fromDriver(d, ar: _ar, rating: _ratings.driverAverage(d.driverId)))
         .toList();
 
     switch (_sortBy) {

@@ -34,7 +34,9 @@ class CarItem {
   });
 
   /// Maps a backend [Vehicle] to a home CarItem. [ar] selects Arabic names.
-  factory CarItem.fromVehicle(Vehicle v, {bool ar = false}) {
+  /// [rating] overrides the (always-null) listing field with the client-side
+  /// aggregate from `ReviewAggregates`.
+  factory CarItem.fromVehicle(Vehicle v, {bool ar = false, double? rating}) {
     return CarItem(
       id: v.id.toString(),
       name: v.displayTitle(ar: ar),
@@ -47,7 +49,7 @@ class CarItem {
       seats: v.seats ?? 0,
       tag: '',
       isFavourite: false,
-      rating: v.rating,
+      rating: rating ?? v.rating,
     );
   }
 }

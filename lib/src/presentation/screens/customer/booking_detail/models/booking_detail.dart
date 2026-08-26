@@ -80,6 +80,9 @@ class BookingDetail {
   /// Free-text reason supplied when the booking was rejected.
   final String? rejectionReason;
 
+  /// Free-text reason supplied when the booking was cancelled.
+  final String? cancellationReason;
+
   /// Service label (e.g. "Vehicle rental"); shown alongside the enriched name.
   final String serviceLabel;
 
@@ -145,6 +148,7 @@ class BookingDetail {
     this.isCorporate = false,
     this.corporateCompanyName,
     this.rejectionReason,
+    this.cancellationReason,
     this.vehicleId,
     this.driverId,
     this.companyName,
@@ -179,6 +183,14 @@ class BookingDetail {
   /// Customer can pay once an admin has approved the booking and it isn't paid.
   /// Corporate bookings are billed to the company, so the customer never pays.
   bool get canPay => isApproved && !isPaid && !isCorporate;
+
+  bool get isCancelled => status == BookingStatus.cancelled;
+
+  /// Customer may cancel only while the booking is still unapproved by the
+  /// rental company — pending(5) or corporate_approved(12). Once approved(6)
+  /// the backend refuses and the button must not be offered.
+  bool get canCancel =>
+      status == BookingStatus.pending || status == BookingStatus.corporateApproved;
 
   BookingDetail copyWith({
     String? carName,
@@ -236,6 +248,7 @@ class BookingDetail {
       isCorporate: isCorporate,
       corporateCompanyName: corporateCompanyName,
       rejectionReason: rejectionReason,
+      cancellationReason: cancellationReason,
       vehicleId: vehicleId,
       driverId: driverId,
       companyName: companyName ?? this.companyName,
@@ -364,6 +377,7 @@ class BookingDetail {
       isCorporate: b.isCorporate,
       corporateCompanyName: b.corporateCompanyName,
       rejectionReason: b.rejectionReason,
+      cancellationReason: b.cancellationReason,
       vehicleId: b.vehicleId,
       driverId: b.driverId,
       rentalCompanyId: b.rentalCompanyId,

@@ -13,11 +13,13 @@ import 'widgets/action_bar.dart';
 import 'widgets/action_row.dart';
 import 'widgets/booking_app_bar.dart';
 import 'widgets/booking_detail_skeleton.dart';
+import 'widgets/cancel_booking_sheet.dart';
 import 'widgets/cancel_button.dart';
 import 'widgets/car_card.dart';
 import 'widgets/driver_card.dart';
 import 'widgets/leave_review_sheet.dart';
 import 'widgets/location_map_card.dart';
+import 'widgets/my_review_card.dart';
 import 'widgets/price_card.dart';
 import 'widgets/ref_card.dart';
 import 'widgets/schedule_card.dart';
@@ -100,34 +102,34 @@ class _BookingDetailView extends StatelessWidget {
     );
   }
 
-  Widget _reviewButton(BuildContext context, BookingDetail b, bool isDark) {
+  /// One review per booking: once the customer has reviewed, the action is
+  /// replaced by their review card. After a successful submit the provider
+  /// reloads so the card appears immediately.
+  Widget _reviewSection(BuildContext context, BookingDetail b, bool isDark, ColorScheme cs) {
+    final review = context.watch<BookingDetailProvider>().myReview;
+    if (review != null) return MyReviewCard(review: review, isDark: isDark, cs: cs);
     return SizedBox(
       width: double.infinity,
       child: FilledButton.icon(
-        onPressed: () => LeaveReviewSheet.show(context, bookingId: b.id, isDark: isDark),
+        onPressed: () async {
+          final ok = await LeaveReviewSheet.show(context, bookingId: b.id, isDark: isDark);
+          if (ok == true && context.mounted) context.read<BookingDetailProvider>().load();
+        },
         icon: const Icon(CupertinoIcons.star_fill, size: 18),
         label: Text('review_leave'.tr()),
       ),
     );
   }
 
-  void _confirmCancel(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: Text('booking_detail_cancel_title'.tr()),
-        content: Text('booking_detail_cancel_body'.tr()),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx), child: Text('cancel'.tr())),
-          TextButton(
-            onPressed: () {
-              Navigator.pop(ctx);
-              Navigator.of(context).pop();
-            },
-            style: TextButton.styleFrom(foregroundColor: const Color(0xFFE53935)),
-            child: Text('booking_detail_cancel_confirm'.tr()),
-          ),
-        ],
+  /// Offered only while the booking is still unapproved (see
+  /// [BookingDetail.canCancel]); the sheet submits and the provider reloads.
+  Widget _cancelButton(BuildContext context, bool isDark) {
+    return BookingCancelButton(
+      isDark: isDark,
+      onTap: () => CancelBookingSheet.show(
+        context,
+        provider: context.read<BookingDetailProvider>(),
+        isDark: isDark,
       ),
     );
   }
@@ -194,8 +196,8 @@ class _BookingDetailView extends StatelessWidget {
                     _billedBadge(context, b, isDark),
                     SizedBox(height: 14.r),
                   ],
-                  if (b.isCompleted) ...[_reviewButton(context, b, isDark), SizedBox(height: 14.r)],
-                  // BookingCancelButton(isDark: isDark, onTap: () => _confirmCancel(context)),
+                  if (b.isCompleted) ...[_reviewSection(context, b, isDark, cs), SizedBox(height: 14.r)],
+                  if (b.canCancel) ...[_cancelButton(context, isDark), SizedBox(height: 14.r)],
                 ],
               ),
             ),
@@ -284,8 +286,8 @@ class _BookingDetailView extends StatelessWidget {
                           _billedBadge(context, b, isDark),
                           SizedBox(height: 12.r),
                         ],
-                        if (b.isCompleted) ...[_reviewButton(context, b, isDark), SizedBox(height: 12.r)],
-                        BookingCancelButton(isDark: isDark, onTap: () => _confirmCancel(context)),
+                        if (b.isCompleted) ...[_reviewSection(context, b, isDark, cs), SizedBox(height: 12.r)],
+                        if (b.canCancel) _cancelButton(context, isDark),
                       ],
                     ),
                   ),

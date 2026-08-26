@@ -42,6 +42,9 @@ class Booking {
   final String? completedAt;
   final String? rejectedAt;
   final String? rejectionReason;
+  final String? cancelledAt;
+  final String? cancellationReason;
+  final int? cancelledBy;
   final String? customerFullName;
   final String? customerPhoneNumber;
   final String? customerEmail;
@@ -82,6 +85,9 @@ class Booking {
     this.completedAt,
     this.rejectedAt,
     this.rejectionReason,
+    this.cancelledAt,
+    this.cancellationReason,
+    this.cancelledBy,
     this.customerFullName,
     this.customerPhoneNumber,
     this.customerEmail,
@@ -166,6 +172,9 @@ class Booking {
       completedAt: json['completedAt'] as String?,
       rejectedAt: json['rejectedAt'] as String?,
       rejectionReason: json['rejectionReason'] as String?,
+      cancelledAt: json['cancelledAt'] as String?,
+      cancellationReason: json['cancellationReason'] as String?,
+      cancelledBy: i('cancelledBy'),
       customerFullName: json['customerFullName'] as String?,
       customerPhoneNumber: json['customerPhoneNumber'] as String?,
       customerEmail: json['customerEmail'] as String?,

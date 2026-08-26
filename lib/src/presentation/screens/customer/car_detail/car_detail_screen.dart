@@ -24,6 +24,7 @@ import 'widgets/image_gallery.dart';
 import 'widgets/location_section.dart';
 import 'widgets/owner_section.dart';
 import 'widgets/plate_section.dart';
+import 'widgets/reviews_section.dart';
 import 'widgets/specs_section.dart';
 
 // ============================================================
@@ -158,6 +159,12 @@ class _CarDetailView extends StatelessWidget {
                 child: LocationSection(isDark: isDark, cs: cs),
               ),
             ),
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: EdgeInsets.fromLTRB(16.r, 14.r, 16.r, 0),
+                child: ReviewsSection(isDark: isDark, cs: cs),
+              ),
+            ),
             SliverToBoxAdapter(child: SizedBox(height: 150.r)),
           ],
         ),
@@ -220,6 +227,8 @@ class _CarDetailView extends StatelessWidget {
                         OwnerSection(isDark: isDark, cs: cs),
                         SizedBox(height: 16.r),
                         LocationSection(isDark: isDark, cs: cs),
+                        SizedBox(height: 16.r),
+                        ReviewsSection(isDark: isDark, cs: cs),
                       ],
                     ),
                   ),

@@ -4,13 +4,16 @@ import '../../../../../core/data/repositories/lookup_repository.dart';
 import '../../../../../core/data/repositories/vehicle_repository.dart';
 import '../../../../../core/errors/app_exception.dart';
 import '../../../../../core/models/common/pagination_params.dart';
+import '../../../../../core/di/injection_container.dart';
 import '../../../../../core/models/vehicle/vehicle.dart';
+import '../../../../../core/services/review_aggregates.dart';
 import '../models/car_item.dart';
 
 /// Loads vehicle listings from the API and owns the brand filter + sort
 /// selection for the car listing screen.
 class CarListingProvider extends ChangeNotifier {
   final VehicleRepository _vehicleRepo;
+  final ReviewAggregates _ratings = getIt<ReviewAggregates>();
   final LookupRepository _lookupRepo;
   final bool _ar;
 
@@ -53,7 +56,24 @@ class CarListingProvider extends ChangeNotifier {
   bool get hasMore => _pageNumber < _totalPages;
 
   // ---- Loading ----
+  /// Ratings come from a shared session cache; when this screen is the first
+  /// to need it, repaint once the fetch lands so cards swap "New" for stars.
+  void _warmRatings() {
+    if (_ratings.isLoaded) return;
+    _ratings.ensureLoaded().then((_) {
+      if (!_disposed) notifyListeners();
+    });
+  }
+
+  bool _disposed = false;
+  @override
+  void dispose() {
+    _disposed = true;
+    super.dispose();
+  }
+
   Future<void> load() async {
+    _warmRatings();
     _isLoading = true;
     _error = null;
     notifyListeners();
@@ -137,7 +157,7 @@ class CarListingProvider extends ChangeNotifier {
   List<CarItem> get filteredCars {
     var items = _vehicles
         .where((v) => _selectedBrand == 'All' || (_ar ? v.brandNameAr : v.brandName) == _selectedBrand || v.brandName == _selectedBrand)
-        .map((v) => CarItem.fromVehicle(v, ar: _ar))
+        .map((v) => CarItem.fromVehicle(v, ar: _ar, rating: _ratings.vehicleAverage(v.id)))
         .toList();
     switch (_sortBy) {
       case 'price_low':

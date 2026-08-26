@@ -6,6 +6,7 @@ import '../../../../../core/data/repositories/lookup_repository.dart';
 import '../../../../../core/data/repositories/vehicle_repository.dart';
 import '../../../../../core/di/injection_container.dart';
 import '../../../../../core/models/common/pagination_params.dart';
+import '../../../../../core/services/review_aggregates.dart';
 import '../models/ad_item.dart';
 import '../models/car_brand.dart';
 import '../models/car_item.dart';
@@ -33,6 +34,9 @@ class HomeProvider extends ChangeNotifier {
   final VehicleRepository _vehicleRepo;
   final DriverListingRepository _driverRepo;
   final bool _ar;
+
+  /// Shared per-vehicle / per-driver rating cache (one `Review/active` fetch).
+  final ReviewAggregates _ratings = getIt<ReviewAggregates>();
 
   // ── Cars ───────────────────────────────────────────────────────
   bool _carsLoading = true;
@@ -109,8 +113,9 @@ class HomeProvider extends ChangeNotifier {
       final page = await _vehicleRepo.getNearest(
         params: const PaginationParams(pageSize: 10),
       );
+      await _ratings.ensureLoaded();
       _featuredCars = page.items
-          .map((v) => CarItem.fromVehicle(v, ar: _ar))
+          .map((v) => CarItem.fromVehicle(v, ar: _ar, rating: _ratings.vehicleAverage(v.id)))
           .toList();
     } catch (_) {
       // Never surface the raw exception (HTTP/cast/session text). A guest (no
@@ -132,9 +137,10 @@ class HomeProvider extends ChangeNotifier {
       );
       // Only freelance drivers are bookable directly by customers; drivers
       // affiliated to a rental company (allCompanyId != null) are hidden.
+      await _ratings.ensureLoaded();
       _nearbyDrivers = page.items
           .where((d) => d.allCompanyId == null)
-          .map((d) => DriverItem.fromDriver(d, ar: _ar))
+          .map((d) => DriverItem.fromDriver(d, ar: _ar, rating: _ratings.driverAverage(d.driverId)))
           .toList();
     } catch (_) {
       // Friendly, retryable message — never the raw HTTP/cast/session text.

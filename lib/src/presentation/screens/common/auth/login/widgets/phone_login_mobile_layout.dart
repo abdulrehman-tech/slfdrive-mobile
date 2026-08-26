@@ -27,9 +27,7 @@ class PhoneLoginMobileLayout extends StatelessWidget {
         children: [
           Padding(
             padding: EdgeInsets.symmetric(horizontal: 24.r, vertical: 16.r),
-            child: Row(
-              children: [PhoneLoginBackButton(isDark: isDark)],
-            ),
+            child: Row(children: [PhoneLoginBackButton(isDark: isDark)]),
           ),
           Expanded(
             child: SingleChildScrollView(
@@ -64,21 +62,13 @@ class PhoneLoginMobileLayout extends StatelessWidget {
                     ),
                   ),
                   SizedBox(height: 40.r),
-                  PhoneLoginSectionLabel(
-                    text: 'phone_number'.tr(),
-                    isDark: isDark,
-                    fontSize: 14.r,
-                  ),
+                  PhoneLoginSectionLabel(text: 'phone_number'.tr(), isDark: isDark, fontSize: 14.r),
                   SizedBox(height: 12.r),
                   PhoneLoginPhoneInput(isDark: isDark),
-                  SizedBox(height: 32.r),
-                  PhoneLoginContinueButton(
-                    isDark: isDark,
-                    height: 56.r,
-                    onContinue: onContinue,
-                  ),
-                  SizedBox(height: 16.r),
+                  SizedBox(height: 24.r),
                   PhoneLoginConsent(isDark: isDark),
+                  SizedBox(height: 24.r),
+                  PhoneLoginContinueButton(isDark: isDark, height: 56.r, onContinue: onContinue),
                   SizedBox(height: 24.r),
                 ],
               ),

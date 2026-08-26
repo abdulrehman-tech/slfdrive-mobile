@@ -27,17 +27,23 @@ class BookingCard extends StatelessWidget {
     required this.cs,
   });
 
-  void _openDetail(BuildContext context) => context.pushNamed(
-        'booking-detail',
-        pathParameters: {'id': booking.id.toString()},
-        // Seed the detail screen with what we already fetched, so it paints fast.
-        extra: BookingDetailSeed(
-          vehicleName: booking.vehicleName,
-          vehicleImageUrl: booking.vehicleImageUrl,
-          driverName: booking.driverName,
-          driverPhotoUrl: booking.driverPhotoUrl,
-        ),
-      );
+  Future<void> _openDetail(BuildContext context) async {
+    final provider = context.read<BookingsProvider>();
+    await context.pushNamed(
+      'booking-detail',
+      pathParameters: {'id': booking.id.toString()},
+      // Seed the detail screen with what we already fetched, so it paints fast.
+      extra: BookingDetailSeed(
+        vehicleName: booking.vehicleName,
+        vehicleImageUrl: booking.vehicleImageUrl,
+        driverName: booking.driverName,
+        driverPhotoUrl: booking.driverPhotoUrl,
+      ),
+    );
+    // The detail screen can mutate the booking (cancel); refresh so the tab
+    // counts and badges reflect it on return.
+    provider.load();
+  }
 
   Future<void> _pay(BuildContext context) async {
     final provider = context.read<BookingsProvider>();

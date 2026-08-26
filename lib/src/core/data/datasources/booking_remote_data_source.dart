@@ -58,6 +58,11 @@ abstract class BookingRemoteDataSource {
   /// Marks an in-progress booking as completed (`POST /api/Booking/{id}/complete`).
   Future<bool> complete(int id);
 
+  /// Cancels a booking (`POST /api/Booking/cancel`) → `cancelled(15)`, with an
+  /// optional [reason] shown to the other party. The backend derives who may
+  /// cancel from the token and refuses once a booking is approved.
+  Future<bool> cancel({required int id, String? reason});
+
   /// The settled payment for a booking (`GET /api/Payment/booking/{id}`) — the
   /// paid record when present, else the most recent. Null when none exists.
   /// Exposes the payment method (cash / card / OmPay).
@@ -246,6 +251,24 @@ class BookingRemoteDataSourceImpl implements BookingRemoteDataSource {
       final body = res.data as Map<String, dynamic>;
       if (body['isSuccess'] == true) return true;
       throw AppException(message: _message(body) ?? 'Could not complete trip');
+    } catch (e) {
+      throw ErrorHandler.handleError(e);
+    }
+  }
+
+  @override
+  Future<bool> cancel({required int id, String? reason}) async {
+    try {
+      final res = await apiClient.post(
+        ApiEndpoints.bookingCancel,
+        data: {
+          'id': id,
+          if (reason != null && reason.trim().isNotEmpty) 'cancellationReason': reason.trim(),
+        },
+      );
+      final body = res.data as Map<String, dynamic>;
+      if (body['isSuccess'] == true) return true;
+      throw AppException(message: _message(body) ?? 'Could not cancel booking');
     } catch (e) {
       throw ErrorHandler.handleError(e);
     }

@@ -10,7 +10,8 @@ import 'section_header.dart';
 
 /// Booking lifecycle timeline driven by the real backend status
 /// (`pending → approved → [corporate_approved] → completed`, or a terminal
-/// `rejected`). Corporate bookings include the extra corporate-approval step.
+/// `rejected` / `cancelled`). Corporate bookings include the extra
+/// corporate-approval step.
 class BookingTimelineCard extends StatelessWidget {
   final BookingDetail booking;
   final bool isDark;
@@ -70,17 +71,28 @@ class BookingTimelineCard extends StatelessWidget {
               isDark: isDark,
             ),
             SizedBox(height: 16.r),
-            booking.status == BookingStatus.rejected ? _rejected() : _stepper(),
+            switch (booking.status) {
+              BookingStatus.rejected => _terminal(
+                  color: const Color(0xFFE53935),
+                  labelKey: 'bookings_status_rejected',
+                  reason: booking.rejectionReason,
+                ),
+              BookingStatus.cancelled => _terminal(
+                  color: const Color(0xFF757575),
+                  labelKey: 'bookings_status_cancelled',
+                  reason: booking.cancellationReason,
+                ),
+              _ => _stepper(),
+            },
           ],
         ),
       ),
     );
   }
 
-  /// Terminal rejected state: a single red node (plus the rejection reason when
-  /// the backend supplies one).
-  Widget _rejected() {
-    const color = Color(0xFFE53935);
+  /// Terminal rejected/cancelled state: a single coloured node (plus the
+  /// free-text reason when the backend supplies one).
+  Widget _terminal({required Color color, required String labelKey, String? reason}) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -97,14 +109,14 @@ class BookingTimelineCard extends StatelessWidget {
             children: [
               SizedBox(height: 4.r),
               Text(
-                'bookings_status_rejected'.tr(),
+                labelKey.tr(),
                 style: TextStyle(fontSize: 13.r, fontWeight: FontWeight.w800, color: color),
               ),
-              if (booking.rejectionReason != null && booking.rejectionReason!.trim().isNotEmpty)
+              if (reason != null && reason.trim().isNotEmpty)
                 Padding(
                   padding: EdgeInsets.only(top: 4.r),
                   child: Text(
-                    booking.rejectionReason!,
+                    reason,
                     style: TextStyle(fontSize: 11.r, color: cs.onSurface.withValues(alpha: 0.6)),
                   ),
                 ),

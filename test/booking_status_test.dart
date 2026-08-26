@@ -12,6 +12,8 @@ void main() {
     test('12 (corporate approved) = active',
         () => expect(classifyBooking(b(statusId: 12)), BookingBucket.active));
     test('7 = cancelled', () => expect(classifyBooking(b(statusId: 7)), BookingBucket.cancelled));
+    test('15 (customer/admin cancelled) = cancelled',
+        () => expect(classifyBooking(b(statusId: 15)), BookingBucket.cancelled));
     test('8 = completed', () => expect(classifyBooking(b(statusId: 8)), BookingBucket.completed));
 
     test('statusId beats contradictory strings', () {

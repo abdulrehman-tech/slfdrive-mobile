@@ -36,13 +36,14 @@ class DriverItem {
     this.isOnline = false,
   });
 
-  /// Maps a backend [DriverListingItem] to a home DriverItem.
-  factory DriverItem.fromDriver(DriverListingItem d, {bool ar = false}) {
+  /// Maps a backend [DriverListingItem] to a home DriverItem. [rating]
+  /// overrides the (always-null) listing field with the client-side aggregate.
+  factory DriverItem.fromDriver(DriverListingItem d, {bool ar = false, double? rating}) {
     return DriverItem(
       id: d.id.toString(),
       name: d.displayName(ar: ar),
       avatarUrl: d.resolvedPhotoUrl ?? '',
-      rating: d.rating,
+      rating: rating ?? d.rating,
       // Backend listing has no trip-count field; use years of experience as a
       // proxy so the card shows a non-zero number for experienced drivers.
       trips: d.yearsOfExperience ?? 0,

@@ -5,8 +5,8 @@ enum BookingBucket { pending, active, completed, cancelled }
 
 /// Single source of truth for classifying a booking's status on the driver
 /// side. Prefers the numeric `statusId` (5=pending, 6=approved,
-/// 12=corporate_approved, 7=rejected, 8=completed — same mapping the customer
-/// side uses in `bookingStatusFromApi`); falls back to string matching only
+/// 12=corporate_approved, 7=rejected, 8=completed, 15=cancelled — same mapping
+/// the customer side uses in `bookingStatusFromApi`); falls back to string matching only
 /// when the id is absent/unknown. Unknown statuses classify as [BookingBucket.active]
 /// rather than pending, so they can never surface as accept/decline requests.
 BookingBucket classifyBooking(Booking b) {
@@ -19,6 +19,7 @@ BookingBucket classifyBooking(Booking b) {
       // row — a finished trip must never linger in the active tab.
       return b.completedAt != null ? BookingBucket.completed : BookingBucket.active;
     case 7:
+    case 15:
       return BookingBucket.cancelled;
     case 8:
       return BookingBucket.completed;
