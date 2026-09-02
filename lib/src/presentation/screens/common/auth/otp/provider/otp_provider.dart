@@ -20,6 +20,11 @@ class OtpProvider extends ChangeNotifier {
   /// Set by the screen to re-request an OTP via the auth API on resend.
   Future<void> Function()? onResend;
 
+  /// Fired once the sixth digit lands — however it arrived: typed, pasted, or
+  /// filled by the OS from the SMS. The screen wires this to the same verify
+  /// path as the button, so the button becomes a fallback rather than a step.
+  void Function()? onCompleted;
+
   final List<TextEditingController> _controllers = List.generate(_length, (_) => TextEditingController());
   final List<FocusNode> _focusNodes = List.generate(_length, (_) => FocusNode());
 
@@ -71,24 +76,80 @@ class OtpProvider extends ChangeNotifier {
 
   void _validate() {
     final enabled = _controllers.every((controller) => controller.text.isNotEmpty);
-    if (enabled != _isButtonEnabled) {
-      _isButtonEnabled = enabled;
-      notifyListeners();
+    if (enabled == _isButtonEnabled) return;
+    _isButtonEnabled = enabled;
+    notifyListeners();
+    if (enabled) {
+      // Deferred: this runs inside a TextEditingController listener, and the
+      // callback navigates and shows snackbars.
+      scheduleMicrotask(() => onCompleted?.call());
     }
   }
 
+  void _setCell(int index, String char) {
+    _controllers[index].text = char;
+    _controllers[index].selection = TextSelection.collapsed(offset: char.length);
+  }
+
+  /// Lays the whole code out from the first cell and drops the keyboard.
+  void _fillAll(String digits) {
+    for (int i = 0; i < _length; i++) {
+      _setCell(i, digits[i]);
+    }
+    unfocusAll();
+    _validate();
+  }
+
+  void unfocusAll() {
+    for (final node in _focusNodes) {
+      node.unfocus();
+    }
+  }
+
+  /// Clears every cell and returns focus to the first — used after a rejected
+  /// code so the next attempt can auto-submit again instead of sitting in a
+  /// full-but-wrong state.
+  void clear() {
+    for (final controller in _controllers) {
+      controller.clear();
+    }
+    _validate();
+    _focusNodes[0].requestFocus();
+  }
+
   void handleInput(int index, String value) {
-    if (value.length > 1) {
-      final digits = value.replaceAll(RegExp(r'\D'), '');
-      for (int i = 0; i < digits.length && (index + i) < _length; i++) {
-        _controllers[index + i].text = digits[i];
-        _controllers[index + i].selection = const TextSelection.collapsed(offset: 1);
-      }
-      final nextFocus = (index + digits.length).clamp(0, _length - 1);
-      _focusNodes[nextFocus].requestFocus();
-      _validate();
+    final digits = value.replaceAll(RegExp(r'\D'), '');
+
+    // The whole code arriving at once: SMS autofill or a paste. Lay it out from
+    // cell 0 regardless of which cell happened to be focused.
+    if (digits.length >= _length) {
+      _fillAll(digits.substring(0, _length));
       return;
     }
+
+    // Two characters means the user typed over an already-filled cell. Keep what
+    // they just typed, not the stale digit.
+    if (digits.length == 2) {
+      _setCell(index, digits[1]);
+      if (index < _length - 1) _focusNodes[index + 1].requestFocus();
+      return;
+    }
+
+    // A partial paste (3-5 digits): spread it from the current cell.
+    if (digits.length > 2) {
+      for (int i = 0; i < digits.length && (index + i) < _length; i++) {
+        _setCell(index + i, digits[i]);
+      }
+      _focusNodes[(index + digits.length).clamp(0, _length - 1)].requestFocus();
+      return;
+    }
+
+    // A single non-digit slipped past the formatter — drop it.
+    if (digits.isEmpty && value.isNotEmpty) {
+      _setCell(index, '');
+      return;
+    }
+
     if (value.isNotEmpty && index < _length - 1) {
       _focusNodes[index + 1].requestFocus();
     } else if (value.isEmpty && index > 0) {

@@ -10,7 +10,7 @@ import 'package:provider/provider.dart';
 
 import '../../../../providers/location_provider.dart';
 import '../../booking/models/booking_data.dart';
-import 'notification_btn.dart';
+import '../../../../widgets/notification_btn.dart';
 import 'theme_toggle_btn.dart';
 
 class MobileAppBar extends StatelessWidget {

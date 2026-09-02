@@ -26,6 +26,7 @@ import '../screens/customer/driver_listing/driver_listing_screen.dart';
 import '../screens/customer/driver_detail/driver_detail_screen.dart';
 import '../screens/customer/search/search_screen.dart';
 import '../screens/customer/brands/brands_screen.dart';
+import '../screens/customer/notifications/notification_detail_screen.dart';
 import '../screens/customer/notifications/notifications_screen.dart';
 import '../screens/customer/booking/booking_flow_screen.dart';
 import '../screens/customer/booking/location_picker_screen.dart';
@@ -120,13 +121,18 @@ const _preAuthRoutes = {
 };
 
 /// Routes shared by both roles once authenticated (profile management, help,
-/// legal, vehicles). These are NOT under `/driver/` yet drivers must reach them,
-/// so they're exempt from role fencing. Matched as exact path or `<prefix>/...`.
+/// legal, vehicles, notifications). These are NOT under `/driver/` yet drivers
+/// must reach them, so they're exempt from role fencing. Matched as exact path
+/// or `<prefix>/...`.
 const _sharedAuthedRoutes = {
   '/profile',
   '/help',
   '/legal',
   '/my-vehicles',
+  // The notification centre is role-neutral: both roles read the same
+  // device-local inbox. Without this exemption the driver fence below would
+  // redirect every driver notification tap to '/driver/home'.
+  '/notifications',
 };
 
 /// Legal pages are public (reachable pre-auth from the login consent line).
@@ -342,6 +348,18 @@ class AppRouter {
         path: '/notifications',
         name: 'notifications',
         pageBuilder: (context, state) => AppModalTransition(child: const NotificationsScreen(), name: state.name),
+      ),
+      GoRoute(
+        // Covered by the '/notifications' prefix in _sharedAuthedRoutes, so it
+        // is reachable by drivers too.
+        path: '/notifications/:id',
+        name: 'notification-detail',
+        pageBuilder: (context, state) => AppPageTransition(
+          child: NotificationDetailScreen(
+            notificationId: state.pathParameters['id'] ?? '',
+          ),
+          name: state.name,
+        ),
       ),
       GoRoute(
         path: '/booking',

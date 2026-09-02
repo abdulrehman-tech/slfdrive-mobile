@@ -29,6 +29,17 @@ class StorageKeys {
   
   static const String fcmToken = 'fcm_token';
   static const String notificationsEnabled = 'notifications_enabled';
+  // User id the stored [fcmToken] was last successfully registered for. Both are
+  // written only on a 2xx from PUT /api/Auth/fcm-token, so a failed upload
+  // naturally retries on the next resume instead of being assumed done.
+  static const String fcmTokenRegisteredUserId = 'fcm_token_registered_user_id';
+  // Stable per-install device identifier (ANDROID_ID / identifierForVendor),
+  // resolved once via device_info_plus then cached — see core/utils/device_id.dart.
+  static const String deviceId = 'device_id';
+  // Pre-permission ("soft ask") sheet throttle: how many times it has been shown
+  // and when it was last shown, so a declined prompt is never nagged.
+  static const String pushPrimeCount = 'push_prime_count';
+  static const String pushPrimeLastAt = 'push_prime_last_at';
   // Driver notification-channel preferences (local-only; no backend endpoint).
   static const String driverNotifPush = 'driver_notif_push';
   static const String driverNotifEmail = 'driver_notif_email';
@@ -37,6 +48,15 @@ class StorageKeys {
   static const String lastSyncTime = 'last_sync_time';
   static const String cachedCars = 'cached_cars';
   static const String cachedDrivers = 'cached_drivers';
+
+  // Locally-persisted notification inbox (SharedPreferences, not secure storage —
+  // non-sensitive and it grows). The backend has no notifications feed, so the
+  // inbox is built from received pushes. [notifInboxPending] is an append-only
+  // queue written ONLY by the FCM background isolate and drained ONLY by the UI
+  // isolate; keeping it separate from [notifInbox] avoids a lost-update race
+  // between the two isolates.
+  static const String notifInbox = 'notif_inbox';
+  static const String notifInboxPending = 'notif_inbox_pending';
 
   // Locally-persisted favourites (no backend endpoint).
   static const String favoriteCars = 'favorite_cars';

@@ -78,7 +78,7 @@ class _ProfileView extends StatelessWidget {
                 children: [
                   AccountSection(isDark: isDark),
                   SizedBox(height: 16.r),
-                  _PreferencesSection(isDark: isDark),
+                  PreferencesSection(isDark: isDark),
                   SizedBox(height: 16.r),
                   // MyDataSection(isDark: isDark),
                   // SizedBox(height: 16.r),
@@ -155,7 +155,7 @@ class _ProfileView extends StatelessWidget {
                     flex: 2,
                     child: Column(
                       children: [
-                        _PreferencesSection(isDark: isDark),
+                        PreferencesSection(isDark: isDark),
                         DangerZoneSection(isDark: isDark),
                         SizedBox(height: 16.r),
                         SignOutButton(isDark: isDark),
@@ -172,19 +172,3 @@ class _ProfileView extends StatelessWidget {
   }
 }
 
-/// Binds the customer [ProfileProvider]'s push-notification state to the shared
-/// [PreferencesSection].
-class _PreferencesSection extends StatelessWidget {
-  final bool isDark;
-  const _PreferencesSection({required this.isDark});
-
-  @override
-  Widget build(BuildContext context) {
-    final provider = context.watch<ProfileProvider>();
-    return PreferencesSection(
-      isDark: isDark,
-      pushNotifications: provider.pushNotifications,
-      onPushChanged: provider.setPushNotifications,
-    );
-  }
-}

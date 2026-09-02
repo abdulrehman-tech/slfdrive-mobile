@@ -12,7 +12,9 @@ import '../../../constants/url_constants.dart';
 import '../../../core/data/repositories/app_version_repository.dart';
 import '../../../core/di/injection_container.dart';
 import '../../../core/models/app/app_version_info.dart';
+import '../../../core/services/push_messaging_service.dart';
 import '../../../core/utils/app_version_compare.dart';
+import '../../routes/push_routes.dart';
 import '../../utils/platform_utils.dart';
 import '../../widgets/force_update_dialog.dart';
 
@@ -125,6 +127,31 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
       context.go('/auth');
     } else {
       context.go('/language-selection');
+    }
+
+    _openPendingPushTap(signedIn: accessToken != null && accessToken.isNotEmpty);
+  }
+
+  /// Drains a notification tap that cold-started the app.
+  ///
+  /// This has to run *after* the landing `go()` above, not before: navigating
+  /// first would simply be stomped by it. `handlePushTap` also refuses to act
+  /// while the router is still on '/', which is what keeps the post-frame drain
+  /// in `_MyAppState` from racing this one — splash is the only drain point
+  /// during a cold start.
+  ///
+  /// A guest's tap is dropped: every deep-link target sits behind auth, and the
+  /// item stays unread in the inbox either way.
+  void _openPendingPushTap({required bool signedIn}) {
+    final push = getIt<PushMessagingService>();
+    while (push.hasPendingTap) {
+      final payload = push.takePendingTap();
+      if (payload == null) return;
+      if (!signedIn) continue;
+      if (!handlePushTap(payload)) {
+        push.requeueTap(payload);
+        return;
+      }
     }
   }
 

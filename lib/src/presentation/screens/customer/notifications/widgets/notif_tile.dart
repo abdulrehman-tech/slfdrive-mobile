@@ -1,9 +1,11 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 import 'package:provider/provider.dart';
 
+import '../../../../widgets/confirm_dialog.dart';
 import '../models/notif_item.dart';
 import '../provider/notifications_provider.dart';
 
@@ -36,9 +38,29 @@ class NotifTile extends StatelessWidget {
         ),
         child: Icon(Iconsax.trash_copy, color: const Color(0xFFE53935), size: 20.r),
       ),
-      onDismissed: (_) => provider.dismiss(item.id),
+      // Returns false so the Dismissible never removes the row itself: the
+      // provider does, once the user confirms, and the list rebuilds without it.
+      // Deleting a notification is irreversible, so it asks first.
+      confirmDismiss: (_) async {
+        showConfirmDialog(
+          context,
+          isDark: isDark,
+          icon: Iconsax.trash,
+          accent: const Color(0xFFE53935),
+          title: 'notif_delete_confirm_title',
+          message: 'notif_delete_confirm_msg',
+          confirmLabelKey: 'notif_delete_confirm_yes',
+          onConfirm: () => provider.dismiss(item.id),
+        );
+        return false;
+      },
       child: GestureDetector(
-        onTap: () => provider.toggleRead(item.id),
+        // Always the detail screen — never the item's own deep link. Items that
+        // aren't actionable resolve to '/notifications', so following the link
+        // here pushed this same list onto the stack again and again. The detail
+        // screen offers the deep link as an explicit action instead.
+        onTap: () => context.push('/notifications/${item.id}'),
+        onLongPress: () => provider.toggleRead(item.id),
         child: Container(
           padding: EdgeInsets.all(14.r),
           clipBehavior: Clip.antiAlias,

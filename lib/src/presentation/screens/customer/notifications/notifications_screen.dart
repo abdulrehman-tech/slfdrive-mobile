@@ -16,7 +16,10 @@ class NotificationsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(create: (_) => NotificationsProvider(), child: const _NotificationsView());
+    // NotificationsProvider is an app-lifetime singleton supplied by the root
+    // MultiProvider — the inbox and its unread badge are shared with the home
+    // app bar and with pushes arriving while another screen is on top.
+    return const _NotificationsView();
   }
 }
 

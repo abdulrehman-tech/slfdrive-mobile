@@ -1,5 +1,7 @@
 import 'dart:async';
 
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart' show defaultTargetPlatform, kIsWeb, TargetPlatform;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -11,14 +13,20 @@ import 'package:easy_localization/easy_localization.dart';
 import 'src/core/data/repositories/auth_repository.dart';
 import 'src/core/config/app_environment.dart';
 import 'src/core/di/injection_container.dart';
+import 'firebase_options.dart';
 import 'src/core/network/self_signed_tls.dart';
 import 'src/core/secrets/maps_loader.dart';
+import 'src/core/services/push_background_handler.dart';
+import 'src/core/services/push_messaging_service.dart';
 import 'src/core/services/session_manager.dart';
 import 'src/presentation/providers/auth_provider.dart';
 import 'src/presentation/providers/location_provider.dart';
 import 'src/presentation/providers/role_provider.dart';
 import 'src/presentation/providers/theme_provider.dart';
 import 'src/presentation/screens/customer/favorites/provider/favorites_provider.dart';
+import 'src/presentation/screens/customer/notifications/provider/notifications_provider.dart';
+import 'src/presentation/routes/push_routes.dart';
+import 'src/presentation/utils/platform_utils.dart';
 import 'src/presentation/theme/app_theme.dart';
 import 'src/presentation/routes/app_router.dart';
 /// Opt into the device's highest refresh rate (90/120 Hz) on Android so
@@ -33,8 +41,30 @@ Future<void> _applyHighRefreshRate() async {
   }
 }
 
+/// Brings up Firebase and registers the FCM background isolate handler.
+///
+/// Returns false when initialisation fails so [PushMessagingService] can no-op:
+/// a fresh clone without `google-services.json` / `GoogleService-Info.plist`
+/// must still run the rest of the app. Web is skipped entirely (no service
+/// worker or VAPID key is configured).
+Future<bool> _initFirebase() async {
+  if (!PlatformUtils.isMobile) return false;
+  try {
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+    // Must be registered before runApp, with the bare top-level tear-off.
+    FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
+    return true;
+  } catch (e) {
+    debugPrint('⚠️ Firebase init failed — push notifications disabled: $e');
+    return false;
+  }
+}
+
  void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  final firebaseReady = await _initFirebase();
   unawaited(_applyHighRefreshRate());
   await EasyLocalization.ensureInitialized();
 
@@ -47,6 +77,15 @@ Future<void> _applyHighRefreshRate() async {
 
   // Set up DI container (currently only registers FlutterSecureStorage).
   await setupDependencyInjection();
+
+  // Push: hydrate the inbox and wire FCM. Both are fire-and-forget so neither
+  // delays the first frame — same treatment as the Maps SDK below.
+  final notifications = getIt<NotificationsProvider>();
+  final push = getIt<PushMessagingService>()
+    ..firebaseReady = firebaseReady
+    ..onMessageReceived = notifications.ingest;
+  unawaited(notifications.load());
+  unawaited(push.init());
 
   // Inject Google Maps JS SDK on web (no-op elsewhere). Non-blocking for the
   // UI — map widgets will await the same future lazily if needed.
@@ -85,6 +124,7 @@ Future<void> _applyHighRefreshRate() async {
             create: (_) => LocationProvider(getIt<AuthRepository>(), getIt<FlutterSecureStorage>()),
           ),
           ChangeNotifierProvider(create: (_) => FavoritesProvider()),
+          ChangeNotifierProvider.value(value: notifications),
         ],
         child: const MyApp(),
       ),
@@ -99,9 +139,10 @@ class MyApp extends StatefulWidget {
   State<MyApp> createState() => _MyAppState();
 }
 
-class _MyAppState extends State<MyApp> {
+class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   final GlobalKey<ScaffoldMessengerState> _messengerKey = GlobalKey<ScaffoldMessengerState>();
   late final SessionManager _sessionManager;
+  late final PushMessagingService _push;
   bool _handlingExpiry = false;
 
   @override
@@ -109,12 +150,45 @@ class _MyAppState extends State<MyApp> {
     super.initState();
     _sessionManager = getIt<SessionManager>();
     _sessionManager.expiredSignal.addListener(_onSessionExpired);
+
+    _push = getIt<PushMessagingService>();
+    _push.tapSignal.addListener(_drainPushTaps);
+    WidgetsBinding.instance.addObserver(this);
+    // A cold-start tap is queued by PushMessagingService.init() before this
+    // listener exists, so the signal alone would miss it. Splash still owns the
+    // first navigation — handlePushTap no-ops while the router is on '/'.
+    WidgetsBinding.instance.addPostFrameCallback((_) => _drainPushTaps());
   }
 
   @override
   void dispose() {
     _sessionManager.expiredSignal.removeListener(_onSessionExpired);
+    _push.tapSignal.removeListener(_drainPushTaps);
+    WidgetsBinding.instance.removeObserver(this);
     super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state != AppLifecycleState.resumed) return;
+    // Re-check permission (the user may have changed it in system Settings) and
+    // fold in anything the FCM background isolate queued while we were away.
+    unawaited(_push.onAppResumed());
+    unawaited(getIt<NotificationsProvider>().drainBackgroundQueue());
+    _drainPushTaps();
+  }
+
+  /// Routes queued notification taps. Payloads that can't be handled yet (no
+  /// context, or the router is still on splash) stay queued for the next drain.
+  void _drainPushTaps() {
+    while (_push.hasPendingTap) {
+      final payload = _push.takePendingTap();
+      if (payload == null) return;
+      if (!handlePushTap(payload)) {
+        _push.requeueTap(payload);
+        return;
+      }
+    }
   }
 
   /// Fired when the auth interceptor gives up refreshing an expired token.

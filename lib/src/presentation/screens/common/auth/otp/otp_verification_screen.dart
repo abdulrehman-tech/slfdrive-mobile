@@ -46,8 +46,30 @@ class OtpVerificationScreen extends StatelessWidget {
   }
 }
 
-class _OtpVerificationView extends StatelessWidget {
+class _OtpVerificationView extends StatefulWidget {
   const _OtpVerificationView();
+
+  @override
+  State<_OtpVerificationView> createState() => _OtpVerificationViewState();
+}
+
+class _OtpVerificationViewState extends State<_OtpVerificationView> {
+  @override
+  void initState() {
+    super.initState();
+    // Submit as soon as the sixth digit lands — typed, pasted, or filled by the
+    // OS from the SMS. The verify button stays as a fallback (and for anyone
+    // who dismisses the autofill suggestion), but nobody has to reach for it.
+    context.read<OtpProvider>().onCompleted = _autoVerify;
+  }
+
+  void _autoVerify() {
+    if (!mounted) return;
+    // Drop the keyboard so the verify spinner isn't hidden behind it when the
+    // last digit was typed by hand (autofill already unfocuses).
+    context.read<OtpProvider>().unfocusAll();
+    _onVerify(context);
+  }
 
   Future<void> _onVerify(BuildContext context) async {
     final provider = context.read<OtpProvider>();
@@ -63,6 +85,9 @@ class _OtpVerificationView extends StatelessWidget {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(auth.error ?? 'OTP verification failed')),
       );
+      // Reset so the next attempt auto-submits too. Without this the row stays
+      // full-but-wrong and the completion callback can never fire again.
+      provider.clear();
       return;
     }
 

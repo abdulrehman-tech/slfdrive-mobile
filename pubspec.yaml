@@ -72,6 +72,9 @@ dependencies:
   share_plus: ^10.1.4
   package_info_plus: ^8.3.1
   permission_handler: ^12.0.1
+  # Stable per-install device identifier (ANDROID_ID / identifierForVendor)
+  # sent with the FCM token so the backend can key device rows.
+  device_info_plus: ^11.5.0
   path_provider: ^2.1.5
   intl_phone_field: ^3.2.0
   pinput: ^6.0.1

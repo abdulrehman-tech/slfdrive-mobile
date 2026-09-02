@@ -11,6 +11,7 @@ import '../../../../core/di/injection_container.dart';
 import '../../../providers/auth_provider.dart';
 import '../../../providers/theme_provider.dart';
 import '../../../widgets/auth_gate.dart';
+import '../../../widgets/push_permission_primer.dart';
 import '../../../widgets/skeletons/home_skeleton.dart';
 import 'provider/home_provider.dart';
 import 'widgets/ads_carousel.dart';
@@ -46,7 +47,12 @@ class CustomerHomeScreen extends StatelessWidget {
         driverRepository: getIt<DriverListingRepository>(),
         ar: ar,
       ),
-      child: _CustomerHomeShell(tabBody: tabBody),
+      // First landing after sign-in. The primer self-throttles and no-ops for a
+      // guest, so serving the /favorites, /bookings and /profile tabs from this
+      // same shell doesn't re-ask.
+      child: PushPermissionPrimer(
+        child: _CustomerHomeShell(tabBody: tabBody),
+      ),
     );
   }
 }

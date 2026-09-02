@@ -5,15 +5,6 @@ class ProfileProvider extends ChangeNotifier {
     scroll.addListener(_onScroll);
   }
 
-  bool _pushNotifications = true;
-  bool get pushNotifications => _pushNotifications;
-
-  void setPushNotifications(bool value) {
-    if (_pushNotifications == value) return;
-    _pushNotifications = value;
-    notifyListeners();
-  }
-
   final ScrollController scroll = ScrollController();
   double _scrollOffset = 0;
   double get scrollOffset => _scrollOffset;

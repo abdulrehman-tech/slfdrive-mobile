@@ -17,6 +17,10 @@
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+    <!-- Android 13+ runtime permission for showing notifications. Requested at a
+         contextual moment behind the pre-permission sheet (never at first launch)
+         so the one-shot OS prompt is not burned on a cold user. -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
     <application
         android:label="SLF Drive"
         android:name="${applicationName}"
@@ -58,6 +62,21 @@
         <meta-data
             android:name="flutterEmbedding"
             android:value="2" />
+        <!-- FCM defaults, applied to notifications the OS renders itself (app
+             backgrounded or terminated). Without default_notification_channel_id
+             those land in a plugin-created fallback channel and ignore the
+             importance configured in PushMessagingService.init(). The icon MUST be
+             a white-on-transparent silhouette — a full-colour drawable renders as
+             a white square in the status bar on Android 5+. -->
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_icon"
+            android:resource="@drawable/ic_stat_notification" />
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_color"
+            android:resource="@color/notification_accent" />
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_channel_id"
+            android:value="slfdrive_default" />
         <!-- Google Maps SDK for Android.
              The value comes from `android/secrets.properties` (gitignored) via
              a manifestPlaceholder wired up in `android/app/build.gradle.kts`. -->

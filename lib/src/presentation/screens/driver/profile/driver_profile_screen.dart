@@ -14,15 +14,12 @@ import '../../common/profile/sections/support_section.dart';
 import '../../common/profile/widgets/profile_header_card.dart';
 import '../../common/profile/widgets/profile_section.dart';
 import '../../common/profile/widgets/profile_tile.dart';
-import 'provider/driver_profile_provider.dart';
 
 class DriverProfileScreen extends StatelessWidget {
   const DriverProfileScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return ChangeNotifierProvider(create: (_) => DriverProfileProvider(), child: const _DriverProfileView());
-  }
+  Widget build(BuildContext context) => const _DriverProfileView();
 }
 
 class _DriverProfileView extends StatefulWidget {
@@ -59,7 +56,6 @@ class _DriverProfileViewState extends State<_DriverProfileView> {
   @override
   Widget build(BuildContext context) {
     final isDark = _isDark(context);
-    final provider = context.watch<DriverProfileProvider>();
     final auth = context.watch<AuthProvider>();
 
     return Scaffold(
@@ -108,11 +104,7 @@ class _DriverProfileViewState extends State<_DriverProfileView> {
               ],
             ),
             SizedBox(height: 16.r),
-            PreferencesSection(
-              isDark: isDark,
-              pushNotifications: provider.pushNotifications,
-              onPushChanged: provider.setPushNotifications,
-            ),
+            PreferencesSection(isDark: isDark, isDriver: true),
             SizedBox(height: 16.r),
             SupportSection(isDark: isDark),
             DangerZoneSection(isDark: isDark),

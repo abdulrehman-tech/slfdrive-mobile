@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "761851660930",
+    "project_id": "slf-drive",
+    "storage_bucket": "slf-drive.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:761851660930:android:ab45c2193f37e3d932829b",
+        "android_client_info": {
+          "package_name": "com.gmq.slfdrive"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB-cYccTLVQeAKVzAI7wt_wk-0yF0HbJa0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -16,13 +16,17 @@ class OtpInputRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final length = context.read<OtpProvider>().length;
     // Always LTR so boxes 0→5 are left→right in all locales.
-    return Directionality(
-      textDirection: ui.TextDirection.ltr,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: List.generate(
-          length,
-          (index) => OtpInputCell(index: index, isDark: isDark, desktop: desktop),
+    // AutofillGroup is what lets the platform treat the six cells as one
+    // one-time-code field.
+    return AutofillGroup(
+      child: Directionality(
+        textDirection: ui.TextDirection.ltr,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: List.generate(
+            length,
+            (index) => OtpInputCell(index: index, isDark: isDark, desktop: desktop),
+          ),
         ),
       ),
     );

@@ -10,6 +10,7 @@ import '../data/datasources/delivery_fee_remote_data_source.dart';
 import '../data/datasources/driver_remote_data_source.dart';
 import '../data/datasources/driver_listing_remote_data_source.dart';
 import '../data/datasources/lookup_remote_data_source.dart';
+import '../data/datasources/push_remote_data_source.dart';
 import '../data/datasources/review_remote_data_source.dart';
 import '../data/datasources/vehicle_remote_data_source.dart';
 import '../data/repositories/app_version_repository.dart';
@@ -21,16 +22,20 @@ import '../data/repositories/delivery_fee_repository.dart';
 import '../data/repositories/driver_repository.dart';
 import '../data/repositories/driver_listing_repository.dart';
 import '../data/repositories/lookup_repository.dart';
+import '../data/repositories/push_repository.dart';
 import '../data/repositories/review_repository.dart';
 import '../data/repositories/vehicle_repository.dart';
 import '../network/api_client.dart';
 import '../services/booking_lookups.dart';
 import '../services/customer_avatars.dart';
 import '../services/driver_session.dart';
+import '../services/notification_inbox_store.dart';
 import '../services/place_namer.dart';
+import '../services/push_messaging_service.dart';
 import '../services/review_aggregates.dart';
 import '../services/session_manager.dart';
 import '../../presentation/providers/auth_provider.dart';
+import '../../presentation/screens/customer/notifications/provider/notifications_provider.dart';
 import '../../presentation/screens/driver/shell/driver_shell_provider.dart';
 
 final getIt = GetIt.instance;
@@ -87,6 +92,9 @@ Future<void> setupDependencyInjection() async {
   getIt.registerLazySingleton<AppVersionRemoteDataSource>(
     () => AppVersionRemoteDataSourceImpl(getIt<ApiClient>()),
   );
+  getIt.registerLazySingleton<PushRemoteDataSource>(
+    () => PushRemoteDataSourceImpl(getIt<ApiClient>()),
+  );
 
   // Repositories
   getIt.registerLazySingleton<AuthRepository>(
@@ -127,6 +135,9 @@ Future<void> setupDependencyInjection() async {
   getIt.registerLazySingleton<AppVersionRepository>(
     () => AppVersionRepositoryImpl(getIt<AppVersionRemoteDataSource>()),
   );
+  getIt.registerLazySingleton<PushRepository>(
+    () => PushRepositoryImpl(getIt<PushRemoteDataSource>()),
+  );
 
   // Services
   getIt.registerLazySingleton<BookingLookups>(
@@ -144,11 +155,29 @@ Future<void> setupDependencyInjection() async {
   getIt.registerLazySingleton<ReviewAggregates>(
     () => ReviewAggregates(getIt<ReviewRepository>()),
   );
+  getIt.registerLazySingleton<NotificationInboxStore>(
+    () => NotificationInboxStore(),
+  );
+  // Singleton, never a factory: it owns the FCM listeners and the pending-tap
+  // queue, both of which must outlive any screen.
+  getIt.registerLazySingleton<PushMessagingService>(
+    () => PushMessagingService(
+      getIt<PushRepository>(),
+      getIt<FlutterSecureStorage>(),
+      getIt<NotificationInboxStore>(),
+    ),
+  );
 
   // Providers
   // App-lifetime driver-role state shared across the driver tabs; reset on
   // logout/account-switch alongside DriverSession.clear().
   getIt.registerLazySingleton<DriverShellProvider>(() => DriverShellProvider());
+  // App-lifetime notification inbox: the home-screen bell badge and the
+  // notifications screen must observe the same instance, and pushes arrive while
+  // neither is mounted.
+  getIt.registerLazySingleton<NotificationsProvider>(
+    () => NotificationsProvider(),
+  );
   getIt.registerFactory<AuthProvider>(
     () => AuthProvider(
       getIt<AuthRepository>(),

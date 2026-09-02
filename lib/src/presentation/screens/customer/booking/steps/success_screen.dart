@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 
 import '../../../../../constants/breakpoints.dart';
 import '../../../../providers/theme_provider.dart';
+import '../../../../widgets/push_permission_sheet.dart';
 import '../models/booking_data.dart';
 import 'success_widgets/success_actions.dart';
 import 'success_widgets/success_animated_icon.dart';
@@ -27,9 +28,20 @@ class _BookingSuccessScreenState extends State<BookingSuccessScreen> with Single
   @override
   void initState() {
     super.initState();
-    _ctrl = AnimationController(vsync: this, duration: const Duration(milliseconds: 1200))..forward();
+    _ctrl = AnimationController(vsync: this, duration: const Duration(milliseconds: 1200));
     _tick = CurvedAnimation(parent: _ctrl, curve: const Interval(0.0, 0.55, curve: Curves.easeOutBack));
     _pulse = CurvedAnimation(parent: _ctrl, curve: const Interval(0.3, 1.0, curve: Curves.easeOut));
+
+    // Offer notifications once the success animation has landed. This is the
+    // highest-intent moment in the customer flow — the user has just created
+    // something they want status on — which is exactly when a permission ask is
+    // defensible. Deliberately after the animation so the sheet doesn't fight
+    // it. maybePrimePushPermission self-throttles and no-ops when it isn't
+    // appropriate, so nothing else needs guarding here.
+    _ctrl.forward().whenComplete(() {
+      if (!mounted) return;
+      maybePrimePushPermission(context, isDriver: false);
+    });
   }
 
   @override

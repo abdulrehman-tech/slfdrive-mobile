@@ -1,4 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="ic_launcher_background">#FFFFFF</color>
+    <!-- Tint applied by the system to the notification small icon and to the
+         app name line in the shade. Brand primary (see primaryColor in
+         lib/src/constants/color_constants.dart). -->
+    <color name="notification_accent">#0C2485</color>
 </resources>

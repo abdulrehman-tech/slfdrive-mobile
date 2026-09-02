@@ -4,27 +4,28 @@ import 'package:iconsax_flutter/iconsax_flutter.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../providers/theme_provider.dart';
+import '../../../../widgets/push_toggle_tile.dart';
 import '../data/profile_languages.dart';
 import '../widgets/language_sheet.dart';
 import '../widgets/profile_section.dart';
 import '../widgets/profile_tile.dart';
-import '../widgets/profile_toggle_tile.dart';
 import '../widgets/theme_sheet.dart';
 
 /// Preferences group shared by both roles: language, theme, currency, push
 /// notifications. Behaviour is identical across customer and driver — language
-/// goes through easy_localization, theme through [ThemeProvider]. The push
-/// toggle is owned by the caller (each role's profile provider) and passed in.
+/// goes through easy_localization, theme through [ThemeProvider].
+///
+/// The push toggle is self-contained ([PushToggleTile]): it reads the real OS
+/// permission plus the stored preference rather than a per-role local bool, so
+/// it can't claim "on" while the system is dropping every message.
 class PreferencesSection extends StatelessWidget {
   final bool isDark;
-  final bool pushNotifications;
-  final ValueChanged<bool> onPushChanged;
+  final bool isDriver;
 
   const PreferencesSection({
     super.key,
     required this.isDark,
-    required this.pushNotifications,
-    required this.onPushChanged,
+    this.isDriver = false,
   });
 
   String _currentLangName(BuildContext context) {
@@ -75,14 +76,7 @@ class PreferencesSection extends StatelessWidget {
             context,
           ).showSnackBar(SnackBar(content: Text('profile_currency_locked'.tr()), behavior: SnackBarBehavior.floating)),
         ),
-        // ProfileToggleTile(
-        //   icon: Iconsax.notification_copy,
-        //   iconColor: const Color(0xFFFF6D00),
-        //   title: 'settings_push_notifications'.tr(),
-        //   value: pushNotifications,
-        //   onChanged: onPushChanged,
-        //   isDark: isDark,
-        // ),
+        PushToggleTile(isDark: isDark, isDriver: isDriver),
       ],
     );
   }

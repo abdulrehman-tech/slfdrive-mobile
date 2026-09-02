@@ -2,7 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
+import 'package:provider/provider.dart';
 
+import '../screens/customer/notifications/provider/notifications_provider.dart';
+
+/// Bell button with an unread dot, used by the customer home app bars and by the
+/// driver home header. `/notifications` is exempt from the router's role fence
+/// (see `_sharedAuthedRoutes`), so both roles reach the same inbox.
 class NotificationBtn extends StatelessWidget {
   final ColorScheme cs;
   final bool isDark;
@@ -10,6 +16,7 @@ class NotificationBtn extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final hasUnread = context.watch<NotificationsProvider>().unreadCount > 0;
     return GestureDetector(
       onTap: () => context.pushNamed('notifications'),
       child: Stack(
@@ -27,19 +34,20 @@ class NotificationBtn extends StatelessWidget {
             ),
             child: Icon(Iconsax.notification_copy, color: cs.onSurface.withValues(alpha: 0.7), size: 18.r),
           ),
-          Positioned(
-            top: -1.r,
-            right: -1.r,
-            child: Container(
-              width: 9.r,
-              height: 9.r,
-              decoration: BoxDecoration(
-                color: const Color(0xFFE53935),
-                shape: BoxShape.circle,
-                border: Border.all(color: isDark ? const Color(0xFF0F0F18) : Colors.white, width: 1.5),
+          if (hasUnread)
+            Positioned(
+              top: -1.r,
+              right: -1.r,
+              child: Container(
+                width: 9.r,
+                height: 9.r,
+                decoration: BoxDecoration(
+                  color: const Color(0xFFE53935),
+                  shape: BoxShape.circle,
+                  border: Border.all(color: isDark ? const Color(0xFF0F0F18) : Colors.white, width: 1.5),
+                ),
               ),
             ),
-          ),
         ],
       ),
     );

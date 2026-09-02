@@ -49,3 +49,7 @@ app.*.map.json
 .env
 android/secrets.properties
 ios/Flutter/Secrets.xcconfig
+# APNs auth key (.p8) — uploaded to the Firebase console, never to the repo.
+# Firebase's own client config (google-services.json, GoogleService-Info.plist,
+# lib/firebase_options.dart) is NOT secret and is committed deliberately.
+*.p8

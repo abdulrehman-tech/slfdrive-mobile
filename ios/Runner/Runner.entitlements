@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<!-- Driven per build configuration by APS_ENVIRONMENT (see project.pbxproj):
+	     development for Debug/Profile, production for Release. Hardcoding
+	     "development" here is a common bug — it relies on Xcode rewriting the
+	     value during export and silently breaks TestFlight when it doesn't. -->
+	<key>aps-environment</key>
+	<string>$(APS_ENVIRONMENT)</string>
+</dict>
+</plist>

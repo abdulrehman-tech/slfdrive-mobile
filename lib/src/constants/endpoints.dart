@@ -28,6 +28,12 @@ class ApiEndpoints {
   static const String verifyOtp = '/api/Auth/verify-otp';
   static const String refresh = '/api/Auth/refresh';
   static const String signout = '/api/Auth/signout';
+  /// Registers or updates this device's Firebase token for the signed-in user.
+  /// PUT, JWT-required (the only Auth endpoint that declares a 401), body
+  /// `{ deviceId, platform, fcmToken }`. There is no matching delete endpoint —
+  /// logout stops delivery by calling FirebaseMessaging.deleteToken() locally,
+  /// which makes the server's stored copy start returning UNREGISTERED.
+  static const String fcmToken = '/api/Auth/fcm-token';
 
   // User
   static const String setLocation = '/api/User/set-location';

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:image_picker/image_picker.dart' show XFile;
@@ -9,6 +11,8 @@ import '../../core/data/repositories/customer_repository.dart';
 import '../../core/data/repositories/driver_repository.dart';
 import '../../core/di/injection_container.dart';
 import '../../core/services/driver_session.dart';
+import '../../core/services/push_messaging_service.dart';
+import '../screens/customer/notifications/provider/notifications_provider.dart';
 import '../../core/errors/app_exception.dart';
 import '../../core/models/auth/auth_session.dart';
 import '../../core/models/user/user_model.dart';
@@ -85,6 +89,14 @@ class AuthProvider extends ChangeNotifier {
     _isAuthenticated = (await _storage.read(key: StorageKeys.isLoggedIn)) == 'true';
     _isVerified = (await _storage.read(key: StorageKeys.isVerified)) == 'true';
     notifyListeners();
+
+    // Re-register the FCM token on every cold start with a live session: it may
+    // have rotated while the app was closed, and there is no other signal for
+    // that. Fire-and-forget — it self-guards on the access token and no-ops when
+    // nothing changed.
+    if (_isAuthenticated) {
+      unawaited(getIt<PushMessagingService>().onUserSignedIn());
+    }
   }
 
   /// Drops any persisted session so the app treats the user as an
@@ -106,6 +118,7 @@ class AuthProvider extends ChangeNotifier {
     for (final key in keys) {
       await _storage.delete(key: key);
     }
+    _clearPushState();
     _user = null;
     _displayName = null;
     _displayEmail = null;
@@ -188,6 +201,9 @@ class AuthProvider extends ChangeNotifier {
     _photoPath = user.photoUrl ?? _photoPath;
     _isVerified = user.isVerified ?? _isVerified;
     _isAuthenticated = true;
+    // Single hook covering verifyOtp and both profile-completion paths. The
+    // upload needs the bearer, which _persistSession has already written.
+    unawaited(getIt<PushMessagingService>().onUserSignedIn());
   }
 
   /// Sends an OTP to [phoneNumber]. Returns the session on success (also stored
@@ -377,6 +393,7 @@ class AuthProvider extends ChangeNotifier {
   }
 
   void _resetSessionState() {
+    _clearPushState();
     _user = null;
     _pendingUserId = null;
     _requiresOtp = false;
@@ -389,6 +406,18 @@ class AuthProvider extends ChangeNotifier {
     getIt<DriverSession>().clear();
     getIt<DriverShellProvider>().reset();
     notifyListeners();
+  }
+
+  /// Invalidates the device's FCM token and wipes the notification inbox.
+  ///
+  /// The backend has no token-delete endpoint, so deleting locally is the only
+  /// way to stop delivery to a signed-out device — it makes the server's stored
+  /// copy start returning UNREGISTERED. The inbox is cleared because
+  /// notifications are per-user: a second account on this device must not
+  /// inherit the first's.
+  void _clearPushState() {
+    unawaited(getIt<PushMessagingService>().onUserSignedOut());
+    unawaited(getIt<NotificationsProvider>().clearForSignOut());
   }
 
   void _setLoading(bool value) {

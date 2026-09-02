@@ -1,5 +1,8 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
+
+import '../../../../../core/models/notification/push_payload.dart';
 
 enum NotifCategory { booking, promotion, system }
 
@@ -13,6 +16,15 @@ class NotifItem {
   final DateTime at;
   bool isRead;
 
+  /// In-app route this item opens when tapped, already resolved against the
+  /// signed-in role. Null when the push isn't actionable (promotions, system
+  /// messages, or a payload this build doesn't understand).
+  final String? route;
+
+  /// Raw push `data`, kept so a future build can route on keys this one ignores
+  /// without losing them from already-stored items.
+  final Map<String, String> data;
+
   NotifItem({
     required this.id,
     required this.category,
@@ -20,7 +32,59 @@ class NotifItem {
     required this.subtitle,
     required this.at,
     this.isRead = false,
+    this.route,
+    this.data = const {},
   });
+
+  /// Builds an inbox row from a received push. [route] comes from the caller
+  /// because resolving it needs the role, which lives in the presentation layer.
+  factory NotifItem.fromPush(PushPayload p, {String? route}) => NotifItem(
+        id: p.id,
+        category: categoryFromKey(p.category),
+        title: p.title ?? '',
+        subtitle: p.body ?? '',
+        at: p.sentAt,
+        route: route,
+        data: p.data,
+      );
+
+  factory NotifItem.fromJson(Map<String, dynamic> json) => NotifItem(
+        id: '${json['id']}',
+        category: categoryFromKey(json['category'] as String?),
+        title: (json['title'] as String?) ?? '',
+        subtitle: (json['subtitle'] as String?) ?? '',
+        at: DateTime.tryParse('${json['at']}')?.toLocal() ?? DateTime.now(),
+        isRead: json['isRead'] == true,
+        route: json['route'] as String?,
+        data: {
+          for (final e in (json['data'] as Map? ?? const {}).entries)
+            '${e.key}': '${e.value}',
+        },
+      );
+
+  Map<String, dynamic> toJson() => {
+        'id': id,
+        'category': category.name,
+        'title': title,
+        'subtitle': subtitle,
+        'at': at.toIso8601String(),
+        'isRead': isRead,
+        'route': route,
+        'data': data,
+      };
+
+  /// Tolerant decode — an unrecognised category (a newer server type reaching an
+  /// older build) lands in `system` rather than throwing away the notification.
+  static NotifCategory categoryFromKey(String? key) {
+    switch (key) {
+      case 'booking':
+        return NotifCategory.booking;
+      case 'promotion':
+        return NotifCategory.promotion;
+      default:
+        return NotifCategory.system;
+    }
+  }
 
   NotifAge get age {
     final now = DateTime.now();
@@ -62,11 +126,19 @@ String ageLabelKey(NotifAge age) {
   }
 }
 
+/// Relative timestamp for a notification row. Localised — the list is no longer
+/// always empty, so these strings are user-visible in every locale.
 String formatRelative(DateTime at) {
   final diff = DateTime.now().difference(at);
-  if (diff.inMinutes < 1) return 'just now';
-  if (diff.inMinutes < 60) return '${diff.inMinutes}m ago';
-  if (diff.inHours < 24) return '${diff.inHours}h ago';
-  if (diff.inDays < 7) return '${diff.inDays}d ago';
-  return '${at.day}/${at.month}/${at.year}';
+  if (diff.inMinutes < 1) return 'notif_time_now'.tr();
+  if (diff.inMinutes < 60) {
+    return 'notif_time_minutes'.tr(namedArgs: {'n': '${diff.inMinutes}'});
+  }
+  if (diff.inHours < 24) {
+    return 'notif_time_hours'.tr(namedArgs: {'n': '${diff.inHours}'});
+  }
+  if (diff.inDays < 7) {
+    return 'notif_time_days'.tr(namedArgs: {'n': '${diff.inDays}'});
+  }
+  return DateFormat.yMd(Intl.getCurrentLocale()).format(at);
 }

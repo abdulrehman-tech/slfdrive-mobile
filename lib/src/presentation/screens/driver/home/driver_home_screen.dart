@@ -8,6 +8,7 @@ import '../../../../constants/breakpoints.dart';
 import '../../../../core/di/injection_container.dart';
 import '../../../providers/auth_provider.dart';
 import '../../../widgets/app_error_state.dart';
+import '../../../widgets/push_permission_primer.dart';
 import '../shell/driver_shell_provider.dart';
 import 'widgets/driver_bottom_nav.dart';
 import 'widgets/driver_drawer.dart';
@@ -35,7 +36,13 @@ class DriverHomeScreen extends StatelessWidget {
     final shell = getIt<DriverShellProvider>()..ensureLoaded();
     return ChangeNotifierProvider<DriverShellProvider>.value(
       value: shell,
-      child: _DriverHomeView(tabBody: tabBody),
+      // First landing after sign-in is the moment the rationale actually holds:
+      // a driver who can't receive trip requests can't work. The primer
+      // self-throttles, so re-entering the shell doesn't re-ask.
+      child: PushPermissionPrimer(
+        isDriver: true,
+        child: _DriverHomeView(tabBody: tabBody),
+      ),
     );
   }
 }

@@ -39,10 +39,18 @@ class OtpInputCell extends StatelessWidget {
         keyboardType: TextInputType.number,
         textAlign: TextAlign.center,
         textAlignVertical: TextAlignVertical.center,
-        maxLength: 1,
+        // Deliberately NOT maxLength: 1. iOS delivers the whole code from the
+        // SMS into whichever field is focused, and a 1-char limit truncates it
+        // to the first digit — autofill silently stops working. The cell is kept
+        // to a single visible digit by OtpProvider.handleInput, which
+        // redistributes anything longer across the row.
+        autofillHints: const [AutofillHints.oneTimeCode],
         cursorColor: secondaryColor,
         showCursor: true,
-        inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+        inputFormatters: [
+          FilteringTextInputFormatter.digitsOnly,
+          LengthLimitingTextInputFormatter(provider.length),
+        ],
         style: TextStyle(
           fontSize: fontSize,
           fontWeight: FontWeight.bold,

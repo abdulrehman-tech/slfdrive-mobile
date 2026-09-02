@@ -5,6 +5,7 @@ import 'package:iconsax_flutter/iconsax_flutter.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../providers/auth_provider.dart';
+import '../../../../widgets/notification_btn.dart';
 import '../../shell/driver_shell_provider.dart';
 import 'online_status_dialog.dart';
 
@@ -80,6 +81,10 @@ class DriverHeader extends StatelessWidget {
               ],
             ),
           ),
+          // Same inbox as the customer side: '/notifications' is exempt from the
+          // router's driver fence (see _sharedAuthedRoutes).
+          NotificationBtn(cs: Theme.of(context).colorScheme, isDark: isDark),
+          SizedBox(width: 12.r),
           GestureDetector(
             onTap: isToggling
                 ? null

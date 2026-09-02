@@ -107,7 +107,20 @@
 		<!-- App uses only standard HTTPS/TLS encryption (no custom/proprietary
 		     crypto), so it is exempt from U.S. export documentation. This skips
 		     the export-compliance question on every App Store Connect upload. -->
-		<key>ITSAppUsesNonExemptEncryption</key>
+		<!-- Required so a data-only / content-available push can wake the app and run
+	     the FCM background isolate. Added alongside the Push Notifications and
+	     Background Modes capabilities on the Runner target. -->
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>remote-notification</string>
+	</array>
+	<!-- Firebase method swizzling stays ON. Disabling it would require manually
+	     forwarding every remote-notification AppDelegate callback; the explicit
+	     apnsToken assignment in AppDelegate.swift works either way. Declared
+	     rather than left implicit so the choice is visible. -->
+	<key>FirebaseAppDelegateProxyEnabled</key>
+	<true/>
+	<key>ITSAppUsesNonExemptEncryption</key>
 		<false/>
 	</dict>
 </plist>
