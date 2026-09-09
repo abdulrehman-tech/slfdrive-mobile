@@ -43,13 +43,61 @@ class _DatesStepState extends State<DatesStep> {
     if (widget.data.startAt == null) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (!mounted || widget.data.startAt != null) return;
-        final now = DateTime.now();
-        _startDate = DateTime(now.year, now.month, now.day);
+        // Default to the next bookable slot rather than a fixed hour: a hardcoded
+        // 10:00 is already in the past for anyone opening the flow after 10am,
+        // and the backend rejects a start time in the past.
+        final pickup = _defaultPickupAt();
+        _startDate = DateTime(pickup.year, pickup.month, pickup.day);
         _endDate = _startDate!.add(const Duration(days: 2));
-        _pickupTime = const TimeOfDay(hour: 10, minute: 0);
-        _returnTime = const TimeOfDay(hour: 11, minute: 0);
+        _pickupTime = TimeOfDay.fromDateTime(pickup);
+        _returnTime = TimeOfDay.fromDateTime(pickup.add(const Duration(hours: 1)));
         _applyDateTime();
       });
+    }
+  }
+
+  static bool _isSameDay(DateTime a, DateTime b) =>
+      a.year == b.year && a.month == b.month && a.day == b.day;
+
+  /// Earliest pickup that is still bookable on [date] — now for today, midnight
+  /// for any later day. Mirrors the backend rule that rejects past bookings.
+  DateTime _earliestPickupOn(DateTime date) {
+    final now = DateTime.now();
+    return _isSameDay(date, now)
+        ? now
+        : DateTime(date.year, date.month, date.day);
+  }
+
+  /// An hour of lead time, rounded up to the next half hour. Rolls into
+  /// tomorrow on its own near midnight, which is why the caller takes the date
+  /// from it rather than assuming today.
+  DateTime _defaultPickupAt() {
+    var t = DateTime.now().add(const Duration(hours: 1));
+    final overshoot = t.minute % 30;
+    if (overshoot != 0) t = t.add(Duration(minutes: 30 - overshoot));
+    return DateTime(t.year, t.month, t.day, t.hour, t.minute);
+  }
+
+  /// Pushes pickup (and return with it) forward when the current selection has
+  /// fallen into the past — e.g. the user picked today, then sat on the screen
+  /// past their chosen time, or switched the date back to today.
+  void _ensurePickupNotPast() {
+    final sd = _startDate;
+    if (sd == null) return;
+    final earliest = _earliestPickupOn(sd);
+    final picked = DateTime(sd.year, sd.month, sd.day, _pickupTime.hour, _pickupTime.minute);
+    if (!picked.isBefore(earliest)) return;
+
+    final bumped = _defaultPickupAt();
+    if (_isSameDay(bumped, sd)) {
+      _pickupTime = TimeOfDay.fromDateTime(bumped);
+    } else {
+      // Lead time crossed midnight — move the booking to that day.
+      _startDate = DateTime(bumped.year, bumped.month, bumped.day);
+      if (_endDate != null && _endDate!.isBefore(_startDate!)) {
+        _endDate = _startDate;
+      }
+      _pickupTime = TimeOfDay.fromDateTime(bumped);
     }
   }
 
@@ -62,15 +110,22 @@ class _DatesStepState extends State<DatesStep> {
       final end = DateTime(ed.year, ed.month, ed.day, _returnTime.hour, _returnTime.minute);
       final diff = end.difference(start).inMinutes;
 
+      // Checked before the duration rules: the backend auto-rejects a booking
+      // that starts in the past, so it must never reach submission.
+      if (start.isBefore(_earliestPickupOn(sd))) {
+        _timeError = 'booking_time_past'.tr();
+        return;
+      }
+
       if (widget.data.isExplicitlyHourly) {
         if (diff < 60) {
-          _timeError = 'Drop-off must be at least 1 hour after pickup.';
+          _timeError = 'booking_time_min_hour'.tr();
         } else {
           _timeError = null;
         }
       } else {
         if (diff <= 0) {
-          _timeError = 'Drop-off must be after pickup time.';
+          _timeError = 'booking_time_after_pickup'.tr();
         } else {
           _timeError = null;
         }
@@ -94,9 +149,49 @@ class _DatesStepState extends State<DatesStep> {
   }
 
   void _pickTime({required bool isReturn}) {
-    final initialTime = isReturn ? _returnTime : _pickupTime;
     final now = DateTime.now();
-    final initialDateTime = DateTime(now.year, now.month, now.day, initialTime.hour, initialTime.minute);
+    final initialTime = isReturn ? _returnTime : _pickupTime;
+
+    // Anchor on the day actually being edited, not on today: minimumDate is
+    // compared against the full DateTime, so an anchor of "today" would apply
+    // today's cutoff to a booking three days out.
+    final anchor = (isReturn
+            ? (widget.data.isExplicitlyHourly ? _startDate : _endDate)
+            : _startDate) ??
+        DateTime(now.year, now.month, now.day);
+
+    // Only the same-day case needs a floor; a future date is unrestricted.
+    DateTime? minimumDate =
+        _isSameDay(anchor, now) ? _earliestPickupOn(anchor) : null;
+
+    // The return wheel additionally can't precede pickup.
+    if (isReturn && _startDate != null && _isSameDay(anchor, _startDate!)) {
+      final pickupAt = DateTime(_startDate!.year, _startDate!.month,
+          _startDate!.day, _pickupTime.hour, _pickupTime.minute);
+      if (minimumDate == null || pickupAt.isAfter(minimumDate)) {
+        minimumDate = pickupAt;
+      }
+    }
+
+    var initialDateTime = DateTime(
+        anchor.year, anchor.month, anchor.day, initialTime.hour, initialTime.minute);
+    // CupertinoDatePicker asserts initialDateTime >= minimumDate.
+    if (minimumDate != null && initialDateTime.isBefore(minimumDate)) {
+      initialDateTime = minimumDate;
+      // Commit the clamp, otherwise a user who opens the wheel (already showing
+      // the clamped value) and taps Done without scrolling keeps the stale past
+      // time — onDateTimeChanged never fires for a value they didn't move.
+      final clamped = TimeOfDay.fromDateTime(initialDateTime);
+      setState(() {
+        if (isReturn) {
+          _returnTime = clamped;
+        } else {
+          _pickupTime = clamped;
+        }
+        _validateAndAdjustTime(changedPickup: !isReturn);
+      });
+      _applyDateTime();
+    }
 
     showCupertinoModalPopup(
       context: context,
@@ -143,6 +238,7 @@ class _DatesStepState extends State<DatesStep> {
                 child: CupertinoDatePicker(
                   mode: CupertinoDatePickerMode.time,
                   initialDateTime: initialDateTime,
+                  minimumDate: minimumDate,
                   onDateTimeChanged: (DateTime newDateTime) {
                     setState(() {
                       if (isReturn) {
@@ -215,6 +311,7 @@ class _DatesStepState extends State<DatesStep> {
                       if (args.value is DateTime) {
                         _startDate = args.value as DateTime;
                         _endDate = _startDate;
+                        _ensurePickupNotPast();
                         _validateAndAdjustTime(changedPickup: true);
                         _applyDateTime();
                       }
@@ -224,6 +321,7 @@ class _DatesStepState extends State<DatesStep> {
                         if (r.startDate != null && r.endDate != null) {
                           _startDate = r.startDate;
                           _endDate = r.endDate;
+                          _ensurePickupNotPast();
                           _validateAndAdjustTime(changedPickup: true);
                           _applyDateTime();
                         }

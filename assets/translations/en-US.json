@@ -1030,5 +1030,8 @@
   "notif_action_view_details": "View details",
   "notif_delete_confirm_title": "Delete this notification?",
   "notif_delete_confirm_msg": "It will be removed from your list permanently.",
-  "notif_delete_confirm_yes": "Delete"
+  "notif_delete_confirm_yes": "Delete",
+  "booking_time_past": "Pick-up time can't be in the past.",
+  "booking_time_min_hour": "Drop-off must be at least 1 hour after pick-up.",
+  "booking_time_after_pickup": "Drop-off must be after the pick-up time."
 }

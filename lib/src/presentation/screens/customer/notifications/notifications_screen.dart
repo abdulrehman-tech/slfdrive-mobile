@@ -11,16 +11,30 @@ import 'widgets/notif_empty.dart';
 import 'widgets/notif_grouped_list.dart';
 import 'widgets/notif_tab_strip.dart';
 
-class NotificationsScreen extends StatelessWidget {
+class NotificationsScreen extends StatefulWidget {
   const NotificationsScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    // NotificationsProvider is an app-lifetime singleton supplied by the root
-    // MultiProvider — the inbox and its unread badge are shared with the home
-    // app bar and with pushes arriving while another screen is on top.
-    return const _NotificationsView();
+  State<NotificationsScreen> createState() => _NotificationsScreenState();
+}
+
+class _NotificationsScreenState extends State<NotificationsScreen> {
+  @override
+  void initState() {
+    super.initState();
+    // Seeing the list counts as seeing the notifications: drop them from the
+    // system tray so the launcher badge doesn't keep claiming they're pending.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      context.read<NotificationsProvider>().onInboxOpened();
+    });
   }
+
+  // NotificationsProvider is an app-lifetime singleton supplied by the root
+  // MultiProvider — the inbox and its unread badge are shared with the home
+  // app bar and with pushes arriving while another screen is on top.
+  @override
+  Widget build(BuildContext context) => const _NotificationsView();
 }
 
 class _NotificationsView extends StatelessWidget {

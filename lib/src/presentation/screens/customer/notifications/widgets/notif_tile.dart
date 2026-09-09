@@ -59,7 +59,10 @@ class NotifTile extends StatelessWidget {
         // aren't actionable resolve to '/notifications', so following the link
         // here pushed this same list onto the stack again and again. The detail
         // screen offers the deep link as an explicit action instead.
-        onTap: () => context.push('/notifications/${item.id}'),
+        // The id is escaped because it is usually the raw FCM message id, which
+        // contains ':' and '%' — unescaped, the path segment is invalid and the
+        // push silently fails to match the route.
+        onTap: () => context.push('/notifications/${Uri.encodeComponent(item.id)}'),
         onLongPress: () => provider.toggleRead(item.id),
         child: Container(
           padding: EdgeInsets.all(14.r),

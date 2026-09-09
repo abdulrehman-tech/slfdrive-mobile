@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import '../../../../../core/di/injection_container.dart';
 import '../../../../../core/models/notification/push_payload.dart';
 import '../../../../../core/services/notification_inbox_store.dart';
+import '../../../../../core/services/push_messaging_service.dart';
 import '../../../../../core/utils/safe_notifier.dart';
 import '../../../../routes/push_routes.dart';
 import '../models/notif_item.dart';
@@ -21,10 +22,12 @@ import '../models/notif_item.dart';
 /// not sync, so a user with two devices sees two independent unread counts, and
 /// clearing here clears nothing server-side. Revisit if a feed endpoint ships.
 class NotificationsProvider extends ChangeNotifier with SafeNotifier {
-  NotificationsProvider({NotificationInboxStore? store})
-      : _store = store ?? getIt<NotificationInboxStore>();
+  NotificationsProvider({NotificationInboxStore? store, NotificationTray? tray})
+      : _store = store ?? getIt<NotificationInboxStore>(),
+        _tray = tray ?? getIt<PushMessagingService>();
 
   final NotificationInboxStore _store;
+  final NotificationTray _tray;
 
   final List<NotifItem> _items = [];
   int _tab = 0; // 0=All, 1=Bookings, 2=Promotions, 3=System
@@ -56,8 +59,24 @@ class NotificationsProvider extends ChangeNotifier with SafeNotifier {
   /// Null once the item has been deleted, cleared, or pushed past the cap while
   /// the detail screen was open.
   NotifItem? byId(String id) {
-    final i = _items.indexWhere((n) => n.id == id);
+    final i = _indexOf(id);
     return i == -1 ? null : _items[i];
+  }
+
+  /// Ids are FCM message ids when the backend omits `notificationId`, and those
+  /// contain ':' and '%' — characters that have to be escaped to survive a URL
+  /// path segment. Match the raw value first, then the decoded one, so a lookup
+  /// works whether or not the router handed the segment back decoded.
+  int _indexOf(String id) {
+    var i = _items.indexWhere((n) => n.id == id);
+    if (i != -1) return i;
+    try {
+      final decoded = Uri.decodeComponent(id);
+      if (decoded != id) i = _items.indexWhere((n) => n.id == decoded);
+    } catch (_) {
+      // Not valid percent-encoding — nothing more to try.
+    }
+    return i;
   }
 
   int countForTab(int i) {
@@ -119,6 +138,19 @@ class NotificationsProvider extends ChangeNotifier with SafeNotifier {
   /// re-surfaces a message the foreground handler may already have stored).
   bool _insert(PushPayload payload) {
     if (_items.any((n) => n.id == payload.id)) return false;
+    // Fallback dedupe for sends that omit `notificationId`: FCM then assigns a
+    // fresh messageId per delivery, so a redelivery of the same content would
+    // otherwise land as a second row. Scoped tightly to identical text within a
+    // couple of minutes, so a genuinely repeated alert later still shows.
+    final title = payload.title ?? '';
+    final body = payload.body ?? '';
+    if (title.isNotEmpty || body.isNotEmpty) {
+      final duplicate = _items.any((n) =>
+          n.title == title &&
+          n.subtitle == body &&
+          payload.sentAt.difference(n.at).abs() < const Duration(minutes: 2));
+      if (duplicate) return false;
+    }
     _items.insert(
       0,
       NotifItem.fromPush(payload, route: resolvePushRouteForCurrentRole(payload)),
@@ -152,17 +184,29 @@ class NotificationsProvider extends ChangeNotifier with SafeNotifier {
       n.isRead = true;
     }
     unawaited(_persist());
+    // Everything has been seen in-app, so nothing should be left sitting in the
+    // system tray. On Android the launcher badge dot is derived from active
+    // notifications, so clearing them clears the dot too.
+    unawaited(_tray.clearDeliveredNotifications());
     notifyListeners();
+  }
+
+  /// Called when the inbox screen opens: seeing the list is seeing the
+  /// notifications, so the tray and badge shouldn't keep claiming otherwise.
+  void onInboxOpened() {
+    unawaited(_tray.clearDeliveredNotifications());
   }
 
   void clearAll() {
     _items.clear();
     unawaited(_persist());
+    unawaited(_tray.clearDeliveredNotifications());
     notifyListeners();
   }
 
   void dismiss(String id) {
     _items.removeWhere((n) => n.id == id);
+    unawaited(_tray.cancelDelivered(id));
     unawaited(_persist());
     notifyListeners();
   }
@@ -178,13 +222,16 @@ class NotificationsProvider extends ChangeNotifier with SafeNotifier {
 
   /// Marks an item read on open and hands back its route, if any.
   String? openAndMarkRead(String id) {
-    final i = _items.indexWhere((n) => n.id == id);
+    final i = _indexOf(id);
     if (i == -1) return null;
-    if (!_items[i].isRead) {
-      _items[i].isRead = true;
+    final item = _items[i];
+    if (!item.isRead) {
+      item.isRead = true;
       unawaited(_persist());
       notifyListeners();
     }
-    return _items[i].route;
+    // Drop just this one from the tray — the others may still be unread.
+    unawaited(_tray.cancelDelivered(item.id));
+    return item.route;
   }
 }

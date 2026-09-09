@@ -27,6 +27,19 @@ enum PushAuthStatus {
   unsupported,
 }
 
+/// The slice of push behaviour the notification inbox needs.
+///
+/// Exists so [NotificationsProvider] depends on two methods rather than the
+/// whole messaging service — which also keeps the inbox unit-testable without
+/// standing up Firebase.
+abstract class NotificationTray {
+  /// Clears every notification this app has posted from the system tray.
+  Future<void> clearDeliveredNotifications();
+
+  /// Clears one, matched by the id it was displayed with.
+  Future<void> cancelDelivered(String payloadId);
+}
+
 /// Owns everything FCM: channels, permission, token lifecycle, and the routing
 /// of received messages and taps.
 ///
@@ -36,7 +49,7 @@ enum PushAuthStatus {
 /// Two things it deliberately never does in [init]: request permission (that is
 /// the pre-permission sheet's job, at a moment of user intent) and upload a
 /// token (that needs a JWT, so it is driven by the auth lifecycle).
-class PushMessagingService {
+class PushMessagingService implements NotificationTray {
   PushMessagingService(this._repo, this._storage, this._inbox);
 
   final PushRepository _repo;
@@ -438,6 +451,34 @@ class PushMessagingService {
       );
     } catch (e) {
       debugPrint('[Push] Could not decode local notification payload: $e');
+    }
+  }
+
+  /// Removes every notification this app has posted from the system tray.
+  ///
+  /// Cancels FCM-rendered notifications too, not just the ones displayed via
+  /// flutter_local_notifications: on Android this maps to
+  /// `NotificationManager.cancelAll()`, which is app-wide. That also clears the
+  /// launcher badge dot, which Android derives from the active notifications
+  /// rather than from any count we control.
+  @override
+  Future<void> clearDeliveredNotifications() async {
+    if (!_supported) return;
+    try {
+      await _local.cancelAll();
+    } catch (e) {
+      debugPrint('[Push] cancelAll failed: $e');
+    }
+  }
+
+  /// Removes one notification, matched by the same id used when displaying it.
+  @override
+  Future<void> cancelDelivered(String payloadId) async {
+    if (!_supported) return;
+    try {
+      await _local.cancel(payloadId.hashCode);
+    } catch (e) {
+      debugPrint('[Push] cancel failed: $e');
     }
   }
 

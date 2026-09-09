@@ -1030,5 +1030,8 @@
   "notif_action_view_details": "عرض التفاصيل",
   "notif_delete_confirm_title": "حذف هذا الإشعار؟",
   "notif_delete_confirm_msg": "سيُحذف من قائمتك نهائياً.",
-  "notif_delete_confirm_yes": "حذف"
+  "notif_delete_confirm_yes": "حذف",
+  "booking_time_past": "لا يمكن أن يكون وقت الاستلام في الماضي.",
+  "booking_time_min_hour": "يجب أن يكون التسليم بعد ساعة على الأقل من الاستلام.",
+  "booking_time_after_pickup": "يجب أن يكون التسليم بعد وقت الاستلام."
 }
