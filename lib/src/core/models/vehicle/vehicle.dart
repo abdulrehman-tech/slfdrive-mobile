@@ -119,6 +119,22 @@ class Vehicle {
 
   String? get primaryPhoto => photoUrls.isNotEmpty ? photoUrls.first : null;
 
+  /// Bookable right now: enabled by the admin ([isActive]) and in the
+  /// "available" status. Customer lists only request active vehicles, so there
+  /// the status is what can still mark one unavailable (rented, maintenance…).
+  bool get isAvailable {
+    if (!isActive) return false;
+    final status = statusName?.trim().toLowerCase();
+    if (status != null && status.isNotEmpty) return status == 'available';
+    return statusId == null || statusId == 1;
+  }
+
+  /// Priced for daily rental. Some companies list cars without a price yet.
+  bool get hasPrice => (pricePerDay ?? 0) > 0;
+
+  /// Can be booked: available and priced (an unpriced car would book at 0).
+  bool get isBookable => isAvailable && hasPrice;
+
   factory Vehicle.fromJson(Map<String, dynamic> json) {
     final rawPhotos = json['photoUrls'];
     final photos = rawPhotos is List

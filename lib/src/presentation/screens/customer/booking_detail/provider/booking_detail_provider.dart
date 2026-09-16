@@ -8,7 +8,9 @@ import '../../../../../core/data/repositories/vehicle_repository.dart';
 import '../../../../../core/di/injection_container.dart';
 import '../../../../../core/errors/app_exception.dart';
 import '../../../../../core/models/common/pagination_params.dart';
+import '../../../../../core/models/driver/driver_listing_item.dart';
 import '../../../../../core/models/review/review.dart';
+import '../../../../../core/utils/paged_list.dart';
 import '../models/booking_detail.dart';
 
 /// Loads a single booking from `GET /api/Booking/{id}` and enriches it with the
@@ -151,13 +153,14 @@ class BookingDetailProvider extends ChangeNotifier {
       } catch (_) {/* keep base */}
     }
     // Driver: the booking stores the entity `driverId`, but Driver/{id} is keyed
-    // by the listing id — so find the matching driver in the paginated list.
+    // by the listing id — so page through the driver list until it turns up.
     if (detail.driverId != null) {
       try {
-        final page = await _drivers.getPaginated(
-          const PaginationParams(pageNumber: 1, pageSize: 100),
+        final drivers = await fetchAllPages<DriverListingItem>(
+          (page, size) => _drivers.getPaginated(PaginationParams(pageNumber: page, pageSize: size)),
+          until: (rows) => rows.any((d) => d.driverId == detail.driverId),
         );
-        final match = page.items.where((d) => d.driverId == detail.driverId).toList();
+        final match = drivers.where((d) => d.driverId == detail.driverId).toList();
         if (match.isNotEmpty) {
           final d = match.first;
           out = out.copyWith(

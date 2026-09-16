@@ -10,6 +10,7 @@ import '../../../../constants/breakpoints.dart';
 import '../../../../core/data/repositories/driver_listing_repository.dart';
 import '../../../../core/di/injection_container.dart';
 import '../../../providers/theme_provider.dart';
+import '../../../widgets/load_more.dart';
 import 'models/driver_item.dart';
 import 'provider/driver_listing_provider.dart';
 import 'widgets/desktop_header.dart';
@@ -17,7 +18,6 @@ import 'widgets/driver_list_card.dart';
 import 'widgets/empty_state.dart';
 import 'widgets/listing_app_bar.dart';
 import 'widgets/results_count_label.dart';
-import 'widgets/sort_bottom_sheet.dart';
 import 'widgets/speciality_chip_bar.dart';
 import 'widgets/speciality_chip_wrap.dart';
 
@@ -52,23 +52,6 @@ class _DriverListingView extends StatelessWidget {
 
   void _navigateToDetail(BuildContext context, DriverItem driver) {
     context.pushNamed('driver-detail', pathParameters: {'id': driver.id});
-  }
-
-  void _showSortSheet(BuildContext context, bool isDark, ColorScheme cs) {
-    final provider = context.read<DriverListingProvider>();
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: Colors.transparent,
-      builder: (_) => SortBottomSheet(
-        isDark: isDark,
-        cs: cs,
-        current: provider.sortBy,
-        onSelect: (v) {
-          provider.setSortBy(v);
-          Navigator.pop(context);
-        },
-      ),
-    );
   }
 
   /// Maps filter chips to [DriverVehicleFilter].
@@ -109,65 +92,78 @@ class _DriverListingView extends StatelessWidget {
     final filterLabels = _filterLabels(context);
     final selectedLabel = _selectedLabel(context, provider.vehicleFilter);
 
-    return CustomScrollView(
-      physics: const BouncingScrollPhysics(),
-      slivers: [
-        ListingAppBar(
-          isDark: isDark,
-          cs: cs,
-          onSortTap: () => _showSortSheet(context, isDark, cs),
-        ),
-        SliverToBoxAdapter(
-          child: SpecialityChipBar(
-            specialities: filterLabels,
-            selected: selectedLabel,
-            isDark: isDark,
-            cs: cs,
-            onSelect: (label) => _onChipSelect(provider, label, context),
-          ),
-        ),
-        SliverToBoxAdapter(child: SizedBox(height: 12.r)),
-        SliverToBoxAdapter(
-          child: Padding(
-            padding: EdgeInsets.symmetric(horizontal: 20.r),
-            child: ResultsCountLabel(count: drivers.length, cs: cs),
-          ),
-        ),
-        SliverToBoxAdapter(child: SizedBox(height: 12.r)),
-        if (provider.isLoading)
-          SliverFillRemaining(
-            child: const ListSkeleton(itemCount: 5, itemHeight: 96),
-          )
-        else if (provider.error != null)
-          SliverFillRemaining(
-            child: _ErrorRetry(message: provider.error!, cs: cs, onRetry: provider.refresh),
-          )
-        else if (drivers.isEmpty)
-          SliverFillRemaining(child: EmptyState(isDark: isDark, cs: cs))
-        else
-          SliverPadding(
-            padding: EdgeInsets.symmetric(horizontal: 16.r),
-            sliver: SliverList(
-              delegate: SliverChildBuilderDelegate(
-                (_, i) => RepaintBoundary(
-                  child: Padding(
-                    padding: EdgeInsets.only(bottom: 12.r),
-                    child: DriverListCard(
-                      driver: drivers[i],
-                      isDark: isDark,
-                      cs: cs,
-                      onTap: () => _navigateToDetail(context, drivers[i]),
-                    ),
-                  ),
-                ),
-                childCount: drivers.length,
-              ),
+    return LoadMoreListener(
+      enabled: provider.canLoadMore,
+      onLoadMore: provider.loadMore,
+      child: CustomScrollView(
+        physics: const BouncingScrollPhysics(),
+        slivers: [
+          ListingAppBar(isDark: isDark, cs: cs),
+          SliverToBoxAdapter(
+            child: SpecialityChipBar(
+              specialities: filterLabels,
+              selected: selectedLabel,
+              isDark: isDark,
+              cs: cs,
+              onSelect: (label) => _onChipSelect(provider, label, context),
             ),
           ),
-        SliverToBoxAdapter(child: SizedBox(height: 40.r)),
-      ],
+          SliverToBoxAdapter(child: SizedBox(height: 12.r)),
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: EdgeInsets.symmetric(horizontal: 20.r),
+              child: ResultsCountLabel(count: drivers.length, cs: cs),
+            ),
+          ),
+          SliverToBoxAdapter(child: SizedBox(height: 12.r)),
+          if (provider.isLoading || _stillPaging(provider, drivers))
+            SliverFillRemaining(
+              child: const ListSkeleton(itemCount: 5, itemHeight: 96),
+            )
+          else if (provider.error != null)
+            SliverFillRemaining(
+              child: _ErrorRetry(message: provider.error!, cs: cs, onRetry: provider.refresh),
+            )
+          else if (drivers.isEmpty)
+            SliverFillRemaining(child: EmptyState(isDark: isDark, cs: cs))
+          else
+            SliverPadding(
+              padding: EdgeInsets.symmetric(horizontal: 16.r),
+              sliver: SliverList(
+                delegate: SliverChildBuilderDelegate(
+                  (_, i) => RepaintBoundary(
+                    child: Padding(
+                      padding: EdgeInsets.only(bottom: 12.r),
+                      child: DriverListCard(
+                        driver: drivers[i],
+                        isDark: isDark,
+                        cs: cs,
+                        onTap: () => _navigateToDetail(context, drivers[i]),
+                      ),
+                    ),
+                  ),
+                  childCount: drivers.length,
+                ),
+              ),
+            ),
+          if (!provider.isLoading && provider.error == null)
+            SliverToBoxAdapter(child: _footer(provider)),
+          SliverToBoxAdapter(child: SizedBox(height: 40.r)),
+        ],
+      ),
     );
   }
+
+  /// Nothing visible yet but more pages to scan (e.g. a page of only
+  /// company drivers) — keep the skeleton up instead of the empty state.
+  bool _stillPaging(DriverListingProvider provider, List<DriverItem> drivers) =>
+      drivers.isEmpty && provider.hasMore && !provider.loadMoreFailed;
+
+  Widget _footer(DriverListingProvider provider) => LoadMoreFooter(
+        isLoading: provider.isLoadingMore,
+        failed: provider.loadMoreFailed,
+        onRetry: provider.retryLoadMore,
+      );
 
   Widget _buildDesktop(BuildContext context, bool isDark, ColorScheme cs) {
     final provider = context.watch<DriverListingProvider>();
@@ -175,63 +171,64 @@ class _DriverListingView extends StatelessWidget {
     final filterLabels = _filterLabels(context);
     final selectedLabel = _selectedLabel(context, provider.vehicleFilter);
 
-    return SingleChildScrollView(
-      physics: const BouncingScrollPhysics(),
-      padding: EdgeInsets.symmetric(horizontal: 40.r, vertical: 28.r),
-      child: Center(
-        child: Container(
-          constraints: BoxConstraints(maxWidth: 1100.r),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              DesktopHeader(
-                isDark: isDark,
-                cs: cs,
-                onSortTap: () => _showSortSheet(context, isDark, cs),
-              ),
-              SizedBox(height: 20.r),
-              SpecialityChipWrap(
-                specialities: filterLabels,
-                selected: selectedLabel,
-                isDark: isDark,
-                cs: cs,
-                onSelect: (label) => _onChipSelect(provider, label, context),
-              ),
-              SizedBox(height: 16.r),
-              ResultsCountLabel(count: drivers.length, cs: cs),
-              SizedBox(height: 16.r),
-              if (provider.isLoading)
-                SizedBox(
-                  height: 300.r,
-                  child: const ListSkeleton(itemCount: 5, itemHeight: 96),
-                )
-              else if (provider.error != null)
-                SizedBox(
-                  height: 300.r,
-                  child: _ErrorRetry(message: provider.error!, cs: cs, onRetry: provider.refresh),
-                )
-              else if (drivers.isEmpty)
-                SizedBox(height: 300.r, child: EmptyState(isDark: isDark, cs: cs))
-              else
-                Wrap(
-                  spacing: 16.r,
-                  runSpacing: 16.r,
-                  children: drivers
-                      .map(
-                        (d) => SizedBox(
-                          width: 340.r,
-                          child: DriverListCard(
-                            driver: d,
-                            isDark: isDark,
-                            cs: cs,
-                            onTap: () => _navigateToDetail(context, d),
-                          ),
-                        ),
-                      )
-                      .toList(),
+    return LoadMoreListener(
+      enabled: provider.canLoadMore,
+      onLoadMore: provider.loadMore,
+      child: SingleChildScrollView(
+        physics: const BouncingScrollPhysics(),
+        padding: EdgeInsets.symmetric(horizontal: 40.r, vertical: 28.r),
+        child: Center(
+          child: Container(
+            constraints: BoxConstraints(maxWidth: 1100.r),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                DesktopHeader(isDark: isDark, cs: cs),
+                SizedBox(height: 20.r),
+                SpecialityChipWrap(
+                  specialities: filterLabels,
+                  selected: selectedLabel,
+                  isDark: isDark,
+                  cs: cs,
+                  onSelect: (label) => _onChipSelect(provider, label, context),
                 ),
-              SizedBox(height: 40.r),
-            ],
+                SizedBox(height: 16.r),
+                ResultsCountLabel(count: drivers.length, cs: cs),
+                SizedBox(height: 16.r),
+                if (provider.isLoading || _stillPaging(provider, drivers))
+                  SizedBox(
+                    height: 300.r,
+                    child: const ListSkeleton(itemCount: 5, itemHeight: 96),
+                  )
+                else if (provider.error != null)
+                  SizedBox(
+                    height: 300.r,
+                    child: _ErrorRetry(message: provider.error!, cs: cs, onRetry: provider.refresh),
+                  )
+                else if (drivers.isEmpty)
+                  SizedBox(height: 300.r, child: EmptyState(isDark: isDark, cs: cs))
+                else
+                  Wrap(
+                    spacing: 16.r,
+                    runSpacing: 16.r,
+                    children: drivers
+                        .map(
+                          (d) => SizedBox(
+                            width: 340.r,
+                            child: DriverListCard(
+                              driver: d,
+                              isDark: isDark,
+                              cs: cs,
+                              onTap: () => _navigateToDetail(context, d),
+                            ),
+                          ),
+                        )
+                        .toList(),
+                  ),
+                if (!provider.isLoading && provider.error == null) _footer(provider),
+                SizedBox(height: 40.r),
+              ],
+            ),
           ),
         ),
       ),

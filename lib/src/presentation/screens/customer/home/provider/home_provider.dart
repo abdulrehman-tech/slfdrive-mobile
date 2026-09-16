@@ -6,6 +6,7 @@ import '../../../../../core/data/repositories/lookup_repository.dart';
 import '../../../../../core/data/repositories/vehicle_repository.dart';
 import '../../../../../core/di/injection_container.dart';
 import '../../../../../core/models/common/pagination_params.dart';
+import '../../../../../core/services/featured_vehicles.dart';
 import '../../../../../core/services/review_aggregates.dart';
 import '../models/ad_item.dart';
 import '../models/car_brand.dart';
@@ -25,13 +26,14 @@ class HomeProvider extends ChangeNotifier {
     required VehicleRepository vehicleRepository,
     required DriverListingRepository driverRepository,
     bool ar = false,
-  })  : _vehicleRepo = vehicleRepository,
+  })  : _featured = FeaturedVehiclePicker(vehicleRepository),
         _driverRepo = driverRepository,
         _ar = ar {
     load();
   }
 
-  final VehicleRepository _vehicleRepo;
+  /// Varied, shuffled sample for the featured row — see [FeaturedVehiclePicker].
+  final FeaturedVehiclePicker _featured;
   final DriverListingRepository _driverRepo;
   final bool _ar;
 
@@ -108,13 +110,9 @@ class HomeProvider extends ChangeNotifier {
     _carsError = null;
     notifyListeners();
     try {
-      // lat/lon are null — LocationProvider only holds a display label, not
-      // raw coordinates. The backend treats null as "return all nearest".
-      final page = await _vehicleRepo.getNearest(
-        params: const PaginationParams(pageSize: 10),
-      );
+      final vehicles = await _featured.pick(count: 10);
       await _ratings.ensureLoaded();
-      _featuredCars = page.items
+      _featuredCars = vehicles
           .map((v) => CarItem.fromVehicle(v, ar: _ar, rating: _ratings.vehicleAverage(v.id)))
           .toList();
     } catch (_) {

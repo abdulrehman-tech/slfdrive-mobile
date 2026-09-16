@@ -7,14 +7,17 @@ import '../../../../../constants/color_constants.dart';
 /// Full-width gradient book button used in the desktop sidebar column.
 class DesktopBookButton extends StatelessWidget {
   final VoidCallback onTap;
+  final bool enabled;
 
-  const DesktopBookButton({super.key, required this.onTap});
+  const DesktopBookButton({super.key, required this.onTap, this.enabled = true});
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: onTap,
-      child: Container(
+      child: Opacity(
+        opacity: enabled ? 1 : 0.45,
+        child: Container(
         width: double.infinity,
         padding: EdgeInsets.symmetric(vertical: 16.r),
         decoration: BoxDecoration(
@@ -30,6 +33,7 @@ class DesktopBookButton extends StatelessWidget {
             style: TextStyle(fontSize: 15.r, fontWeight: FontWeight.w700, color: Colors.white),
           ),
         ),
+      ),
       ),
     );
   }

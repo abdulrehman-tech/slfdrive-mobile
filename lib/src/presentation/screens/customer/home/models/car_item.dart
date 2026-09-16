@@ -20,6 +20,13 @@ class CarItem {
   /// Aggregate vehicle rating. Null when the backend has no rating yet.
   final double? rating;
 
+  /// False when the company hasn't set a daily price — shown as "Price on
+  /// request" rather than 0.
+  final bool hasPrice;
+
+  /// Bookable now ([Vehicle.isAvailable]).
+  final bool isAvailable;
+
   CarItem({
     required this.id,
     required this.name,
@@ -31,6 +38,8 @@ class CarItem {
     this.tag = '',
     this.isFavourite = false,
     this.rating,
+    this.hasPrice = true,
+    this.isAvailable = true,
   });
 
   /// Maps a backend [Vehicle] to a home CarItem. [ar] selects Arabic names.
@@ -50,6 +59,8 @@ class CarItem {
       tag: '',
       isFavourite: false,
       rating: rating ?? v.rating,
+      hasPrice: v.hasPrice,
+      isAvailable: v.isAvailable,
     );
   }
 }

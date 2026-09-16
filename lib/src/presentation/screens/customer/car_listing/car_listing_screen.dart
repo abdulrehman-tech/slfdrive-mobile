@@ -1,256 +1,134 @@
 import 'package:easy_localization/easy_localization.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import '../../../widgets/skeletons/list_skeleton.dart';
 import 'package:go_router/go_router.dart';
-import 'package:provider/provider.dart';
 
-import '../../../../constants/breakpoints.dart';
-import '../../../../core/data/repositories/lookup_repository.dart';
-import '../../../../core/data/repositories/vehicle_repository.dart';
-import '../../../../core/di/injection_container.dart';
-import '../../../providers/theme_provider.dart';
-import 'models/car_item.dart';
-import 'provider/car_listing_provider.dart';
-import 'widgets/brand_filter_list.dart';
-import 'widgets/brand_filter_wrap.dart';
-import 'widgets/car_list_card.dart';
-import 'widgets/car_listing_app_bar.dart';
-import 'widgets/circle_icon_button.dart';
-import 'widgets/desktop_sort_button.dart';
-import 'widgets/empty_state.dart';
-import 'widgets/results_count.dart';
-import 'widgets/sort_bottom_sheet.dart';
+import '../../../../core/models/vehicle/vehicle_query.dart';
+import '../../../providers/vehicle_catalog.dart';
+import '../../../widgets/vehicles/catalog_search_header.dart';
+import '../../../widgets/vehicles/vehicle_filter_bar.dart';
+import '../../../widgets/vehicles/vehicle_results_view.dart';
 
-// ============================================================
-// CAR LISTING SCREEN
-// ============================================================
-
-class CarListingScreen extends StatelessWidget {
+/// "Browse cars" (home → All Collections, brand tiles, services): every
+/// active car, searchable by name and filterable by type, brand, transmission
+/// and fuel — all applied by the API — loaded 20 at a time.
+class CarListingScreen extends StatefulWidget {
+  /// Brand name from a brand tile; resolved to the API's brand id.
   final String? initialBrand;
+
   const CarListingScreen({super.key, this.initialBrand});
 
   @override
-  Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      key: ValueKey(context.locale.languageCode),
-      create: (_) => CarListingProvider(
-        vehicleRepository: getIt<VehicleRepository>(),
-        lookupRepository: getIt<LookupRepository>(),
-        ar: context.locale.languageCode == 'ar',
-        initialBrand: initialBrand,
-      ),
-      child: const _CarListingView(),
-    );
-  }
+  State<CarListingScreen> createState() => _CarListingScreenState();
 }
 
-class _CarListingView extends StatelessWidget {
-  const _CarListingView();
+class _CarListingScreenState extends State<CarListingScreen> {
+  final _search = TextEditingController();
+  VehicleCatalog? _catalog;
+  String? _locale;
 
-  bool _isDark(BuildContext context) {
-    final tp = context.watch<ThemeProvider>();
-    return tp.isDarkMode || (tp.isSystemMode && MediaQuery.of(context).platformBrightness == Brightness.dark);
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Names are localized, so a language switch rebuilds the catalogue.
+    final locale = context.locale.languageCode;
+    if (locale == _locale) return;
+    _locale = locale;
+    final previous = _catalog;
+    _catalog = VehicleCatalog(ar: locale == 'ar')
+      ..start(
+        initial: previous?.query ?? VehicleQuery.empty,
+        brandName: previous == null ? widget.initialBrand : null,
+      );
+    if (previous != null) WidgetsBinding.instance.addPostFrameCallback((_) => previous.dispose());
   }
 
-  void _navigateToDetail(BuildContext context, CarItem car) {
-    context.pushNamed('car-detail', pathParameters: {'id': car.id});
-  }
-
-  void _showSortSheet(BuildContext context, bool isDark, ColorScheme cs) {
-    final provider = context.read<CarListingProvider>();
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: Colors.transparent,
-      builder: (_) => SortBottomSheet(
-        isDark: isDark,
-        cs: cs,
-        current: provider.sortBy,
-        onSelect: (v) {
-          provider.setSort(v);
-          Navigator.pop(context);
-        },
-      ),
-    );
+  @override
+  void dispose() {
+    _catalog?.dispose();
+    _search.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    final isDesktop = Breakpoints.isDesktop(MediaQuery.of(context).size.width);
-    final isDark = _isDark(context);
-    final cs = Theme.of(context).colorScheme;
+    final catalog = _catalog!;
+    final bg = Theme.of(context).scaffoldBackgroundColor;
     return Scaffold(
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      body: isDesktop ? _buildDesktop(context, isDark, cs) : _buildMobile(context, isDark, cs),
-    );
-  }
-
-  // ==========================================================================
-  // MOBILE LAYOUT
-  // ==========================================================================
-
-  Widget _buildMobile(BuildContext context, bool isDark, ColorScheme cs) {
-    final provider = context.watch<CarListingProvider>();
-    final cars = provider.filteredCars;
-    return CustomScrollView(
-      physics: const BouncingScrollPhysics(),
-      slivers: [
-        CarListingAppBar(
-          isDark: isDark,
-          cs: cs,
-          onSortTap: () => _showSortSheet(context, isDark, cs),
-        ),
-        SliverToBoxAdapter(child: BrandFilterList(isDark: isDark, cs: cs)),
-        SliverToBoxAdapter(child: SizedBox(height: 12.r)),
-        SliverToBoxAdapter(
-          child: Padding(
-            padding: EdgeInsets.symmetric(horizontal: 20.r),
-            child: ResultsCount(count: cars.length, cs: cs),
-          ),
-        ),
-        SliverToBoxAdapter(child: SizedBox(height: 12.r)),
-        if (provider.isLoading)
-          const SliverFillRemaining(child: ListSkeleton(itemCount: 4, itemHeight: 120))
-        else if (provider.error != null)
-          SliverFillRemaining(
-            child: _ErrorRetry(message: provider.error!, cs: cs, onRetry: provider.refresh),
-          )
-        else if (cars.isEmpty)
-          SliverFillRemaining(child: EmptyState(isDark: isDark, cs: cs))
-        else
-          SliverPadding(
-            padding: EdgeInsets.symmetric(horizontal: 16.r),
-            sliver: SliverFixedExtentList(
-              itemExtent: 154.r,
-              delegate: SliverChildBuilderDelegate(
-                (_, i) => RepaintBoundary(
-                  child: Padding(
-                    padding: EdgeInsets.only(bottom: 14.r),
-                    child: CarListCard(
-                      car: cars[i],
-                      isDark: isDark,
-                      cs: cs,
-                      onTap: () => _navigateToDetail(context, cars[i]),
+      backgroundColor: bg,
+      body: SafeArea(
+        bottom: false,
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            final side = VehicleResultsView.sidePadding(constraints.maxWidth);
+            return VehicleResultsView(
+              catalog: catalog,
+              onOpen: (v) => context.pushNamed('car-detail', pathParameters: {'id': v.id.toString()}),
+              headerSlivers: [
+                SliverAppBar(
+                  pinned: true,
+                  automaticallyImplyLeading: false,
+                  backgroundColor: bg,
+                  surfaceTintColor: Colors.transparent,
+                  toolbarHeight: 64.r,
+                  titleSpacing: side,
+                  title: CatalogSearchHeader(
+                    controller: _search,
+                    hint: 'catalog_search_hint'.tr(),
+                    onChanged: catalog.setText,
+                    onClear: () {
+                      _search.clear();
+                      catalog.setText('');
+                    },
+                  ),
+                  bottom: PreferredSize(
+                    preferredSize: Size.fromHeight(50.r),
+                    child: Padding(
+                      padding: EdgeInsets.only(bottom: 12.r),
+                      child: VehicleFilterBar(
+                        catalog: catalog,
+                        padding: EdgeInsets.symmetric(horizontal: side),
+                      ),
                     ),
                   ),
                 ),
-                childCount: cars.length,
-              ),
-            ),
-          ),
-        SliverToBoxAdapter(child: SizedBox(height: 40.r)),
-      ],
-    );
-  }
-
-  // ==========================================================================
-  // DESKTOP LAYOUT
-  // ==========================================================================
-
-  Widget _buildDesktop(BuildContext context, bool isDark, ColorScheme cs) {
-    final provider = context.watch<CarListingProvider>();
-    final cars = provider.filteredCars;
-    return SingleChildScrollView(
-      physics: const BouncingScrollPhysics(),
-      padding: EdgeInsets.symmetric(horizontal: 40.r, vertical: 28.r),
-      child: Center(
-        child: Container(
-          constraints: BoxConstraints(maxWidth: 1100.r),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  CircleIconButton(
-                    icon: CupertinoIcons.back,
-                    onTap: () => Navigator.of(context).pop(),
-                    isDark: isDark,
-                    cs: cs,
-                  ),
-                  SizedBox(width: 12.r),
-                  Text(
-                    'car_listing_title'.tr(),
-                    style: TextStyle(fontSize: 24.r, fontWeight: FontWeight.bold, color: cs.onSurface),
-                  ),
-                  const Spacer(),
-                  DesktopSortButton(
-                    isDark: isDark,
-                    cs: cs,
-                    onTap: () => _showSortSheet(context, isDark, cs),
-                  ),
-                ],
-              ),
-              SizedBox(height: 20.r),
-              BrandFilterWrap(isDark: isDark, cs: cs),
-              SizedBox(height: 16.r),
-              ResultsCount(count: cars.length, cs: cs),
-              SizedBox(height: 16.r),
-              if (provider.isLoading)
-                SizedBox(height: 300.r, child: const ListSkeleton(itemCount: 3, itemHeight: 120))
-              else if (provider.error != null)
-                SizedBox(
-                  height: 300.r,
-                  child: _ErrorRetry(message: provider.error!, cs: cs, onRetry: provider.refresh),
-                )
-              else if (cars.isEmpty)
-                SizedBox(height: 300.r, child: EmptyState(isDark: isDark, cs: cs))
-              else
-                Wrap(
-                  spacing: 16.r,
-                  runSpacing: 16.r,
-                  children: cars
-                      .map(
-                        (c) => SizedBox(
-                          width: 340.r,
-                          child: CarListCard(
-                            car: c,
-                            isDark: isDark,
-                            cs: cs,
-                            onTap: () => _navigateToDetail(context, c),
-                          ),
-                        ),
-                      )
-                      .toList(),
-                ),
-              SizedBox(height: 40.r),
-            ],
-          ),
+                SliverToBoxAdapter(child: _TitleRow(catalog: catalog, side: side)),
+              ],
+            );
+          },
         ),
       ),
     );
   }
 }
 
-/// Centered error message with a retry button, shared by the listing layouts.
-class _ErrorRetry extends StatelessWidget {
-  final String message;
-  final ColorScheme cs;
-  final VoidCallback onRetry;
+class _TitleRow extends StatelessWidget {
+  final VehicleCatalog catalog;
+  final double side;
 
-  const _ErrorRetry({required this.message, required this.cs, required this.onRetry});
+  const _TitleRow({required this.catalog, required this.side});
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Padding(
-        padding: EdgeInsets.all(24.r),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
+    final cs = Theme.of(context).colorScheme;
+    return ListenableBuilder(
+      listenable: catalog,
+      builder: (context, _) => Padding(
+        padding: EdgeInsets.fromLTRB(side, 4.r, side, 12.r),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.end,
           children: [
-            Icon(CupertinoIcons.exclamationmark_circle, size: 40.r, color: cs.primary.withValues(alpha: 0.6)),
-            SizedBox(height: 12.r),
-            Text(
-              message,
-              textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 14.r, color: cs.onSurface.withValues(alpha: 0.7)),
+            Expanded(
+              child: Text(
+                'car_listing_title'.tr(),
+                style: TextStyle(fontSize: 22.r, fontWeight: FontWeight.w800, color: cs.onSurface),
+              ),
             ),
-            SizedBox(height: 16.r),
-            FilledButton(
-              onPressed: onRetry,
-              style: FilledButton.styleFrom(backgroundColor: cs.primary),
-              child: Text('common_retry'.tr()),
-            ),
+            if (!catalog.isLoading && catalog.error == null && catalog.totalCount != null)
+              Text(
+                'catalog_count'.tr(args: ['${catalog.totalCount}']),
+                style: TextStyle(fontSize: 12.r, fontWeight: FontWeight.w600, color: cs.onSurface.withValues(alpha: 0.55)),
+              ),
           ],
         ),
       ),

@@ -10,7 +10,10 @@ import '../../../../../core/data/repositories/vehicle_repository.dart';
 import '../../../../../core/di/injection_container.dart';
 import '../../../../../core/errors/app_exception.dart';
 import '../../../../../core/models/common/pagination_params.dart';
+import '../../../../../core/models/driver/driver_listing_item.dart';
 import '../../../../../core/models/vehicle/vehicle.dart';
+import '../../../../../core/models/vehicle/vehicle_query.dart';
+import '../../../../../core/utils/paged_list.dart';
 import '../../../../widgets/omr_icon.dart';
 import '../models/booking_data.dart';
 import '../widgets/booking_glass_card.dart';
@@ -46,16 +49,26 @@ class _VehicleSelectStepState extends State<VehicleSelectStep> {
       _error = null;
     });
     try {
-      final page = await _repo.getPaginated(const PaginationParams(pageNumber: 1, pageSize: 50));
-      var vehicles = page.items;
+      // A picker needs the whole catalogue, not just the first page.
+      final withDriver = widget.data.serviceType == BookingServiceType.carWithDriver;
+      // Only cars that can actually be booked: enabled, available, priced.
+      final vehiclesFuture = fetchAllPages<Vehicle>(
+        (page, size) => _repo.getPaginated(
+          PaginationParams(pageNumber: page, pageSize: size, searchFilter: VehicleQuery.empty.toSearchFilter(activeOnly: true)),
+        ),
+      ).then((all) => all.where((v) => v.isBookable).toList());
+      final driversFuture = withDriver
+          ? fetchAllPages<DriverListingItem>(
+              (page, size) => _driverRepo.getPaginated(PaginationParams(pageNumber: page, pageSize: size)),
+            )
+          : null;
+      var vehicles = await vehiclesFuture;
       var scoped = false;
       // Car + driver: only offer cars whose owning company also has drivers,
       // since the next step assigns a driver from that same company.
-      if (widget.data.serviceType == BookingServiceType.carWithDriver) {
-        final drivers = await _driverRepo.getPaginated(
-          const PaginationParams(pageNumber: 1, pageSize: 50),
-        );
-        final companiesWithDrivers = drivers.items
+      if (driversFuture != null) {
+        final drivers = await driversFuture;
+        final companiesWithDrivers = drivers
             .map((d) => d.allCompanyId)
             .whereType<int>()
             .toSet();

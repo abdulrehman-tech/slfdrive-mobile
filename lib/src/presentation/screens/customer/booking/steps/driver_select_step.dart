@@ -10,6 +10,7 @@ import '../../../../../core/di/injection_container.dart';
 import '../../../../../core/errors/app_exception.dart';
 import '../../../../../core/models/common/pagination_params.dart';
 import '../../../../../core/models/driver/driver_listing_item.dart';
+import '../../../../../core/utils/paged_list.dart';
 import '../../../../widgets/confirm_dialog.dart';
 import '../../../../widgets/omr_icon.dart';
 import '../models/booking_data.dart';
@@ -55,9 +56,11 @@ class _DriverSelectStepState extends State<DriverSelectStep> {
         companyId = car?.companyId;
       }
 
-      final page = await _repo.getPaginated(const PaginationParams(pageNumber: 1, pageSize: 50));
+      // A picker needs every driver, not just the first page.
+      var drivers = await fetchAllPages<DriverListingItem>(
+        (page, size) => _repo.getPaginated(PaginationParams(pageNumber: page, pageSize: size)),
+      );
       if (!mounted) return;
-      var drivers = page.items;
       final scoped = companyId != null;
       if (scoped) {
         // Car + driver → drivers of the car's owning company.

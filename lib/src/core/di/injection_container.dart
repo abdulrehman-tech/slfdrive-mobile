@@ -31,6 +31,7 @@ import '../services/customer_avatars.dart';
 import '../services/driver_session.dart';
 import '../services/notification_inbox_store.dart';
 import '../services/place_namer.dart';
+import '../services/vehicle_filter_options.dart';
 import '../services/push_messaging_service.dart';
 import '../services/review_aggregates.dart';
 import '../services/session_manager.dart';
@@ -148,6 +149,9 @@ Future<void> setupDependencyInjection() async {
   );
   getIt.registerLazySingleton<PlaceNamer>(
     () => PlaceNamer(getIt<LookupRepository>()),
+  );
+  getIt.registerLazySingleton<VehicleFilterOptions>(
+    () => VehicleFilterOptions(getIt<LookupRepository>()),
   );
   getIt.registerLazySingleton<CustomerAvatars>(
     () => CustomerAvatars(getIt<CustomerRepository>()),

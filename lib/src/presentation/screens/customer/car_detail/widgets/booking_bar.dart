@@ -25,10 +25,8 @@ class BookingBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final vehicle = context.watch<CarDetailProvider>().vehicle;
-    final price = vehicle?.pricePerDay;
-    final priceLabel = price != null
-        ? price.toStringAsFixed(price.truncateToDouble() == price ? 0 : 2)
-        : '-';
+    final price = (vehicle?.hasPrice ?? false) ? vehicle!.pricePerDay! : null;
+    final bookable = vehicle?.isBookable ?? false;
 
     return ClipRRect(
       child: BackdropFilter(
@@ -58,28 +56,36 @@ class BookingBar extends StatelessWidget {
                     ),
                   ),
                   SizedBox(height: 2.r),
-                  Row(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      OmrIcon(size: 15.r, color: cs.primary),
-                      SizedBox(width: 3.r),
-                      Text(
-                        priceLabel,
-                        style: TextStyle(fontSize: 20.r, fontWeight: FontWeight.bold, color: cs.primary),
-                      ),
-                      Text(
-                        'car_detail_per_day'.tr(),
-                        style: TextStyle(fontSize: 11.r, color: cs.onSurface.withValues(alpha: 0.4)),
-                      ),
-                    ],
-                  ),
+                  if (price == null)
+                    Text(
+                      'price_on_request'.tr(),
+                      style: TextStyle(fontSize: 15.r, fontWeight: FontWeight.bold, color: cs.onSurface.withValues(alpha: 0.7)),
+                    )
+                  else
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        OmrIcon(size: 15.r, color: cs.primary),
+                        SizedBox(width: 3.r),
+                        Text(
+                          price.toStringAsFixed(price.truncateToDouble() == price ? 0 : 2),
+                          style: TextStyle(fontSize: 20.r, fontWeight: FontWeight.bold, color: cs.primary),
+                        ),
+                        Text(
+                          'car_detail_per_day'.tr(),
+                          style: TextStyle(fontSize: 11.r, color: cs.onSurface.withValues(alpha: 0.4)),
+                        ),
+                      ],
+                    ),
                 ],
               ),
               const Spacer(),
               GestureDetector(
                 onTap: onBook,
-                child: Container(
+                child: Opacity(
+                  opacity: bookable ? 1 : 0.45,
+                  child: Container(
                   padding: EdgeInsets.symmetric(horizontal: 28.r, vertical: 14.r),
                   decoration: BoxDecoration(
                     gradient: primaryGradient,
@@ -96,6 +102,7 @@ class BookingBar extends StatelessWidget {
                     'car_detail_book'.tr(),
                     style: TextStyle(fontSize: 14.r, fontWeight: FontWeight.w700, color: Colors.white),
                   ),
+                ),
                 ),
               ),
             ],

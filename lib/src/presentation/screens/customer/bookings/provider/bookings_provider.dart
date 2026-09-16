@@ -10,6 +10,7 @@ import '../../../../../core/di/injection_container.dart';
 import '../../../../../core/errors/app_exception.dart';
 import '../../../../../core/models/common/pagination_params.dart';
 import '../../../../../core/models/driver/driver_listing_item.dart';
+import '../../../../../core/utils/paged_list.dart';
 import '../models/booking_item.dart';
 
 class BookingsProvider extends ChangeNotifier {
@@ -69,15 +70,18 @@ class BookingsProvider extends ChangeNotifier {
     final vehicleIds = _bookings.map((b) => b.vehicleId).whereType<int>().toSet();
     final needDrivers = _bookings.any((b) => b.driverId != null);
 
-    // Drivers: single paginated fetch, indexed by driverId.
+    // Drivers: page through the driver list (stopping once every booked
+    // driver is found), indexed by driverId.
     Map<int, DriverListingItem> driversById = const {};
     if (needDrivers) {
+      final wanted = _bookings.map((b) => b.driverId).whereType<int>().toSet();
       try {
-        final page = await _drivers.getPaginated(
-          const PaginationParams(pageNumber: 1, pageSize: 100),
+        final drivers = await fetchAllPages<DriverListingItem>(
+          (page, size) => _drivers.getPaginated(PaginationParams(pageNumber: page, pageSize: size)),
+          until: (rows) => rows.map((d) => d.driverId).toSet().containsAll(wanted),
         );
         driversById = {
-          for (final d in page.items)
+          for (final d in drivers)
             if (d.driverId != null) d.driverId!: d,
         };
       } catch (_) {/* keep base */}

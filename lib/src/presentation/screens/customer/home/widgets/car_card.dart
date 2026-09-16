@@ -5,6 +5,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 
 import '../../../../widgets/omr_icon.dart';
+import '../../../../widgets/vehicles/availability_pill.dart';
 import '../models/car_item.dart';
 import 'glass_card.dart';
 import 'spec_pill.dart';
@@ -61,9 +62,22 @@ class CarCard extends StatelessWidget {
                     ),
                   ),
                 ),
+                if (!car.isAvailable)
+                  Positioned.fill(
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.only(topLeft: Radius.circular(20.r), topRight: Radius.circular(20.r)),
+                      child: ColoredBox(color: Colors.black.withValues(alpha: 0.45)),
+                    ),
+                  ),
+                // Status is always shown; a tag (unused today) would sit below it.
+                Positioned(
+                  top: 10.r,
+                  left: 10.r,
+                  child: AvailabilityPill(available: car.isAvailable, onPhoto: true),
+                ),
                 if (car.tag.isNotEmpty)
                   Positioned(
-                    top: 10.r,
+                    top: 38.r,
                     left: 10.r,
                     child: Container(
                       padding: EdgeInsets.symmetric(horizontal: 8.r, vertical: 4.r),
@@ -103,17 +117,22 @@ class CarCard extends StatelessWidget {
                       color: Colors.black.withValues(alpha: 0.50),
                       borderRadius: BorderRadius.circular(10.r),
                     ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        OmrIcon(size: 12.r, color: Colors.white),
-                        SizedBox(width: 3.r),
-                        Text(
-                          '${car.pricePerDay.toInt()}/${'day'.tr()}',
-                          style: TextStyle(fontSize: 14.r, fontWeight: FontWeight.bold, color: Colors.white),
-                        ),
-                      ],
-                    ),
+                    child: car.hasPrice
+                        ? Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              OmrIcon(size: 12.r, color: Colors.white),
+                              SizedBox(width: 3.r),
+                              Text(
+                                '${car.pricePerDay == car.pricePerDay.roundToDouble() ? car.pricePerDay.toInt() : car.pricePerDay.toStringAsFixed(1)}/${'day'.tr()}',
+                                style: TextStyle(fontSize: 14.r, fontWeight: FontWeight.bold, color: Colors.white),
+                              ),
+                            ],
+                          )
+                        : Text(
+                            'price_on_request'.tr(),
+                            style: TextStyle(fontSize: 11.r, fontWeight: FontWeight.w700, color: Colors.white),
+                          ),
                   ),
                 ),
               ],

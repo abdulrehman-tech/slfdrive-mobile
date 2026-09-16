@@ -27,7 +27,9 @@ class CarInfoHeader extends StatelessWidget {
     final locationLabel = (ar ? vehicle.locationNameAr : vehicle.locationName) ?? vehicle.locationName ?? '';
     final rating = provider.rating;
     final reviewCount = provider.reviewCount;
-    final price = vehicle.pricePerDay;
+    final price = vehicle.hasPrice ? vehicle.pricePerDay : null;
+    final available = vehicle.isAvailable;
+    final statusColor = available ? const Color(0xFF4CAF50) : const Color(0xFFE53935);
 
     return CarGlassCard(
       isDark: isDark,
@@ -47,12 +49,12 @@ class CarInfoHeader extends StatelessWidget {
                 Container(
                   padding: EdgeInsets.symmetric(horizontal: 8.r, vertical: 4.r),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF4CAF50).withValues(alpha: 0.12),
+                    color: statusColor.withValues(alpha: 0.12),
                     borderRadius: BorderRadius.circular(8.r),
                   ),
                   child: Text(
-                    'car_status_available'.tr(),
-                    style: TextStyle(fontSize: 10.r, fontWeight: FontWeight.w700, color: const Color(0xFF4CAF50)),
+                    (available ? 'car_status_available' : 'car_status_unavailable').tr(),
+                    style: TextStyle(fontSize: 10.r, fontWeight: FontWeight.w700, color: statusColor),
                   ),
                 ),
               ],
@@ -114,6 +116,11 @@ class CarInfoHeader extends StatelessWidget {
                         style: TextStyle(fontSize: 12.r, color: cs.onSurface.withValues(alpha: 0.45)),
                       ),
                     ],
+                  )
+                else
+                  Text(
+                    'price_on_request'.tr(),
+                    style: TextStyle(fontSize: 16.r, fontWeight: FontWeight.w700, color: cs.onSurface.withValues(alpha: 0.7)),
                   ),
                 const Spacer(),
                 if (locationLabel.isNotEmpty) ...[

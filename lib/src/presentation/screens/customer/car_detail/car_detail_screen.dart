@@ -55,6 +55,14 @@ class _CarDetailView extends StatelessWidget {
   }
 
   Future<void> _launchBookingFlow(BuildContext context, Vehicle vehicle) async {
+    if (!vehicle.isBookable) {
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(SnackBar(
+          content: Text((vehicle.isAvailable ? 'car_no_price_not_bookable' : 'car_not_bookable').tr()),
+        ));
+      return;
+    }
     if (!await requireLogin(context)) return;
     if (!context.mounted) return;
     final car = BookingCar(
@@ -245,7 +253,10 @@ class _CarDetailView extends StatelessWidget {
                         SizedBox(height: 16.r),
                         FeaturesSection(isDark: isDark, cs: cs),
                         SizedBox(height: 16.r),
-                        DesktopBookButton(onTap: () => _launchBookingFlow(context, vehicle)),
+                        DesktopBookButton(
+                          enabled: vehicle.isBookable,
+                          onTap: () => _launchBookingFlow(context, vehicle),
+                        ),
                       ],
                     ),
                   ),
