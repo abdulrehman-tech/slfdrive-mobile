@@ -265,6 +265,8 @@ class _DatesStepState extends State<DatesStep> {
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
+    // The picker paints text itself and doesn't inherit the theme font.
+    final font = Theme.of(context).textTheme.bodyMedium?.fontFamily;
     final isDark = widget.isDark;
     final d = widget.data;
 
@@ -329,20 +331,34 @@ class _DatesStepState extends State<DatesStep> {
                       }
                     }
                   },
+                  // Narrow weekday names in every locale. The default 'EE' is
+                  // only shortened to one letter for English, so Arabic headers
+                  // ("الخميس") wrapped onto two lines.
+                  monthViewSettings: DateRangePickerMonthViewSettings(
+                    dayFormat: 'EEEEE',
+                    viewHeaderStyle: DateRangePickerViewHeaderStyle(
+                      textStyle: TextStyle(
+                        fontFamily: font,
+                        fontSize: 12.r,
+                        fontWeight: FontWeight.w600,
+                        color: cs.onSurface.withValues(alpha: 0.55),
+                      ),
+                    ),
+                  ),
                   headerStyle: DateRangePickerHeaderStyle(
                     textAlign: TextAlign.center,
-                    textStyle: TextStyle(fontSize: 14.r, fontWeight: FontWeight.w700, color: cs.onSurface),
+                    textStyle: TextStyle(fontFamily: font, fontSize: 14.r, fontWeight: FontWeight.w700, color: cs.onSurface),
                   ),
                   monthCellStyle: DateRangePickerMonthCellStyle(
-                    textStyle: TextStyle(fontSize: 12.r, color: cs.onSurface),
-                    todayTextStyle: TextStyle(fontSize: 12.r, color: cs.primary, fontWeight: FontWeight.w700),
+                    textStyle: TextStyle(fontFamily: font, fontSize: 12.r, color: cs.onSurface),
+                    todayTextStyle: TextStyle(fontFamily: font, fontSize: 12.r, color: cs.primary, fontWeight: FontWeight.w700),
                   ),
                   selectionColor: cs.primary,
                   startRangeSelectionColor: cs.primary,
                   endRangeSelectionColor: cs.primary,
                   rangeSelectionColor: cs.primary.withValues(alpha: 0.15),
-                  selectionTextStyle: TextStyle(fontSize: 12.r, color: Colors.white, fontWeight: FontWeight.w700),
-                  rangeTextStyle: TextStyle(fontSize: 12.r, color: cs.onSurface, fontWeight: FontWeight.w600),
+                  selectionTextStyle: TextStyle(fontFamily: font, fontSize: 12.r, color: Colors.white, fontWeight: FontWeight.w700),
+                  rangeTextStyle: TextStyle(fontFamily: font, fontSize: 12.r, color: cs.onSurface, fontWeight: FontWeight.w600),
                 ),
               ),
             ],

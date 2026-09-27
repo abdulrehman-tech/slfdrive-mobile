@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 
+import '../../../../widgets/company_link.dart';
 import '../../../../widgets/omr_icon.dart';
 import '../../../../widgets/vehicles/availability_pill.dart';
 import '../models/car_item.dart';
@@ -28,6 +29,12 @@ class CarCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Fixed-size carousel slot (photo + text); cap text scaling like the list
+    // VehicleCard so large accessibility sizes don't overflow it.
+    return MediaQuery.withClampedTextScaling(maxScaleFactor: 1.3, child: _card(context));
+  }
+
+  Widget _card(BuildContext context) {
     return GestureDetector(
       onTap: onTap,
       child: GlassCard(
@@ -147,11 +154,20 @@ class CarCard extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                   ),
                   SizedBox(height: 4.r),
-                  // Rating row — null rating shows 'listing_new' placeholder.
-                  if (car.rating != null)
-                    Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
+                  // Company link on the start side, rating (or 'New') on the
+                  // end — one row, so the fixed-height card doesn't grow.
+                  Row(
+                    children: [
+                      Expanded(
+                        child: car.companyName.isEmpty
+                            ? const SizedBox.shrink()
+                            : Align(
+                                alignment: AlignmentDirectional.centerStart,
+                                child: CompanyLink(name: car.companyName, companyId: car.companyId, fontSize: 10),
+                              ),
+                      ),
+                      SizedBox(width: 6.r),
+                      if (car.rating != null) ...[
                         Icon(Iconsax.star_1_copy, color: const Color(0xFFFFC107), size: 12.r),
                         SizedBox(width: 3.r),
                         Text(
@@ -162,17 +178,17 @@ class CarCard extends StatelessWidget {
                             color: cs.onSurface.withValues(alpha: 0.65),
                           ),
                         ),
-                      ],
-                    )
-                  else
-                    Text(
-                      'listing_new'.tr(),
-                      style: TextStyle(
-                        fontSize: 10.r,
-                        fontWeight: FontWeight.w600,
-                        color: cs.primary.withValues(alpha: 0.8),
-                      ),
-                    ),
+                      ] else
+                        Text(
+                          'listing_new'.tr(),
+                          style: TextStyle(
+                            fontSize: 10.r,
+                            fontWeight: FontWeight.w600,
+                            color: cs.primary.withValues(alpha: 0.8),
+                          ),
+                        ),
+                    ],
+                  ),
                   SizedBox(height: 6.r),
                   Row(
                     children: [

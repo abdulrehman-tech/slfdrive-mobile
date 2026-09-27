@@ -29,6 +29,8 @@ import 'package:slfdrive/src/presentation/screens/customer/booking/models/bookin
 import 'package:slfdrive/src/presentation/screens/customer/booking/steps/summary_widgets/summary_promo_card.dart';
 import 'package:slfdrive/src/presentation/screens/customer/company_profile/company_profile_screen.dart';
 import 'package:slfdrive/src/presentation/screens/customer/favorites/provider/favorites_provider.dart';
+import 'package:slfdrive/src/presentation/screens/customer/home/models/car_item.dart';
+import 'package:slfdrive/src/presentation/screens/customer/home/widgets/car_card.dart';
 import 'package:slfdrive/src/presentation/theme/app_theme.dart';
 import 'package:slfdrive/src/presentation/widgets/vehicles/vehicle_card.dart';
 
@@ -316,6 +318,51 @@ void main() {
         ),
       );
       expect(find.byType(VehicleCard), findsNWidgets(3));
+    });
+
+    testWidgets('home car card company row lays out without overflow (${_label(c)})', (tester) async {
+      await _pump(
+        tester,
+        locale: c.locale,
+        size: c.size,
+        textScale: c.scale,
+        dark: c.dark,
+        // Same box as FeaturedCarsSection: 220 x 270 design px.
+        child: Scaffold(
+          body: Center(
+            child: Builder(
+              builder: (context) => SizedBox(
+                width: 220.r,
+                height: 270.r,
+                child: CarCard(
+                  car: CarItem.fromVehicle(
+                    Vehicle.fromJson({
+                      'id': 1,
+                      'name': 'Mercedes-Benz GLE 450 AMG Line Coupé',
+                      'brandName': 'Mercedes-Benz',
+                      'pricePerDay': 45.5,
+                      'companyId': 6,
+                      'companyName': _longName,
+                      'companyNameAr': 'شركة المها لتأجير السيارات (مجموعة الهاجري)',
+                      'seats': 5,
+                      'transmissionTypeName': 'Automatic',
+                      'isActive': true,
+                      'statusId': 1,
+                      'statusName': 'available',
+                    }),
+                    ar: c.locale.languageCode == 'ar',
+                    rating: 4.8,
+                  ),
+                  isDark: c.dark,
+                  cs: Theme.of(context).colorScheme,
+                  onFavourite: () {},
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+      expect(find.byType(CarCard), findsOneWidget);
     });
 
     testWidgets('promo card lays out without overflow (${_label(c)})', (tester) async {
