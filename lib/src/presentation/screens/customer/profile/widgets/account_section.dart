@@ -7,6 +7,7 @@ import 'package:provider/provider.dart';
 import '../../../../providers/auth_provider.dart';
 import '../../../common/profile/widgets/profile_section.dart';
 import '../../../common/profile/widgets/profile_tile.dart';
+import '../../../../utils/bidi.dart';
 
 class AccountSection extends StatelessWidget {
   final bool isDark;
@@ -23,7 +24,7 @@ class AccountSection extends StatelessWidget {
           icon: Iconsax.call_copy,
           iconColor: const Color(0xFF4CAF50),
           title: 'profile_phone'.tr(),
-          value: auth.displayPhone ?? '',
+          value: ltr(auth.displayPhone ?? ''),
           isDark: isDark,
           onTap: () => context.push('/profile/edit'),
         ),

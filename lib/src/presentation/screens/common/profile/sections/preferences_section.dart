@@ -31,7 +31,8 @@ class PreferencesSection extends StatelessWidget {
   String _currentLangName(BuildContext context) {
     final loc = context.locale;
     final match = kProfileLanguages.where((l) => l.locale.languageCode == loc.languageCode);
-    return match.isNotEmpty ? match.first.name : 'English';
+    // The language's own name ("العربية", "Deutsch"), as the language sheet shows.
+    return match.isNotEmpty ? match.first.nativeName : 'English';
   }
 
   String _currentThemeLabel(BuildContext context) {

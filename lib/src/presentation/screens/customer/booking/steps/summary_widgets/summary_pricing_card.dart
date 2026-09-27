@@ -7,6 +7,7 @@ import '../../../../../widgets/omr_icon.dart';
 import '../../models/booking_data.dart';
 import '../../widgets/booking_glass_card.dart';
 import 'summary_price_row.dart';
+import '../../../../../utils/duration_label.dart';
 
 /// Price breakdown on the summary step. Prefers the authoritative backend fare
 /// (`/Booking/pre-booking`, held on [BookingData.quote]); shows a spinner while
@@ -65,16 +66,16 @@ class SummaryPricingCard extends StatelessWidget {
   /// Breakdown from the backend quote — the authoritative fare.
   List<Widget> _quoteBody(ColorScheme cs) {
     final q = data.quote!;
-    final unit = (q.isSameDay ? 'booking_dates_hours' : 'booking_dates_days').tr();
+    final unitsLabel = durationLabel(q.units, hourly: q.isSameDay);
     return [
       if ((q.vehicleAmount ?? 0) > 0)
         SummaryPriceRow(
-          label: '${'booking_summary_vehicle'.tr()} · ${q.vehicleUnitPrice.toStringAsFixed(0)} × ${q.units} $unit',
+          label: '${'booking_summary_vehicle'.tr()} · ${q.vehicleUnitPrice.toStringAsFixed(0)} × $unitsLabel',
           amount: q.vehicleAmount!,
         ),
       if ((q.driverAmount ?? 0) > 0)
         SummaryPriceRow(
-          label: '${'booking_summary_driver'.tr()} · ${q.driverUnitPrice.toStringAsFixed(0)} × ${q.units} $unit',
+          label: '${'booking_summary_driver'.tr()} · ${q.driverUnitPrice.toStringAsFixed(0)} × $unitsLabel',
           amount: q.driverAmount!,
         ),
       if (q.totalDeliveryFee > 0)
@@ -92,17 +93,17 @@ class SummaryPricingCard extends StatelessWidget {
     return [
       if (d.hasCarCharge)
         SummaryPriceRow(
-          label: '${'booking_summary_vehicle'.tr()} · ${d.carRate.toStringAsFixed(0)} × ${p.units} ${p.unitLabelKey.tr()}',
+          label: '${'booking_summary_vehicle'.tr()} · ${d.carRate.toStringAsFixed(0)} × ${p.unitsLabel}',
           amount: d.carAmount,
         ),
       if (d.hasDriverCharge)
         SummaryPriceRow(
-          label: '${'booking_summary_driver'.tr()} · ${d.driverRate.toStringAsFixed(0)} × ${p.units} ${p.unitLabelKey.tr()}',
+          label: '${'booking_summary_driver'.tr()} · ${d.driverRate.toStringAsFixed(0)} × ${p.unitsLabel}',
           amount: d.driverAmount,
         ),
       if (!d.hasCarCharge && !d.hasDriverCharge)
         SummaryPriceRow(
-          label: '${p.baseRate.toStringAsFixed(0)} × ${p.units} ${p.unitLabelKey.tr()}',
+          label: '${p.baseRate.toStringAsFixed(0)} × ${p.unitsLabel}',
           amount: p.baseRate * p.units,
         ),
       if (p.deliveryFee > 0)

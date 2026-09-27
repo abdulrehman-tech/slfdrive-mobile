@@ -42,16 +42,18 @@ class ActiveTripCard extends StatelessWidget {
           SizedBox(height: 16.r),
           _buildCustomerRow(),
           SizedBox(height: 16.r),
+          if (trip.pickup != null) ...[
+            _buildLocationRow(
+              icon: Iconsax.location,
+              iconColor: const Color(0xFF4D63DD),
+              text: trip.pickup!,
+            ),
+            SizedBox(height: 8.r),
+          ],
           _buildLocationRow(
-            icon: Iconsax.location,
-            iconColor: const Color(0xFF4D63DD),
-            text: trip.pickup ?? '',
-          ),
-          SizedBox(height: 8.r),
-          _buildLocationRow(
-            icon: Iconsax.location_tick,
+            icon: trip.destination != null ? Iconsax.location_tick : Iconsax.car,
             iconColor: const Color(0xFF4CAF50),
-            text: trip.destination,
+            text: trip.destination ?? trip.serviceLabel,
           ),
           SizedBox(height: 16.r),
           _buildCompleteButton(context),

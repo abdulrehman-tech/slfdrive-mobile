@@ -2,6 +2,7 @@ import 'package:easy_localization/easy_localization.dart';
 
 import '../../../../../core/models/booking/booking.dart';
 import '../../bookings/models/booking_item.dart';
+import '../../../../utils/duration_label.dart';
 
 enum BookingTimelineStage { confirmed, pickedUp, inTrip, returned }
 
@@ -290,8 +291,8 @@ class BookingDetail {
   /// Billing units: hours for a same-day booking, otherwise days.
   int get units => isHourly ? hours : days;
 
-  /// Translation key for the unit label ("hours" / "days").
-  String get unitLabelKey => isHourly ? 'booking_dates_hours' : 'booking_dates_days';
+  /// Localised billing duration, e.g. "1 day" / "3 days" / "2 hours".
+  String get unitsLabel => durationLabel(units, hourly: isHourly);
 
   /// Per-unit vehicle / driver rate derived from the backend amount.
   double get vehicleUnitRate => units > 0 ? vehicleAmount / units : vehicleAmount;

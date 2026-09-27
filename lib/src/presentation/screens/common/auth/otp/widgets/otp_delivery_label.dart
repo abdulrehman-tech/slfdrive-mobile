@@ -1,6 +1,7 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import '../../../../../utils/bidi.dart';
 
 class OtpDeliveryLabel extends StatelessWidget {
   final String deliveryMethod;
@@ -46,7 +47,7 @@ class OtpDeliveryLabel extends StatelessWidget {
                     children: [
                       TextSpan(text: methodText),
                       TextSpan(
-                        text: ' $phoneNumber',
+                        text: ' ${ltr(phoneNumber)}',
                         style: TextStyle(fontWeight: FontWeight.w600, color: strongColor),
                       ),
                     ],

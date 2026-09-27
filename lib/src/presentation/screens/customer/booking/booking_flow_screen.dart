@@ -1,6 +1,7 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../constants/breakpoints.dart';
@@ -9,7 +10,6 @@ import 'models/booking_data.dart';
 import 'provider/booking_flow_provider.dart';
 import 'provider/corporate_companies_provider.dart';
 import '../corporate/provider/corporate_membership_provider.dart';
-import 'steps/success_screen.dart';
 import 'widgets/booking_flow_bottom_bar.dart';
 import 'widgets/booking_flow_desktop_sidebar.dart';
 import 'widgets/booking_flow_step_content.dart';
@@ -85,13 +85,7 @@ class _BookingFlowView extends StatelessWidget {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
       return;
     }
-    Navigator.of(context).pushReplacement(
-      PageRouteBuilder(
-        transitionDuration: const Duration(milliseconds: 350),
-        pageBuilder: (_, _, _) => BookingSuccessScreen(data: provider.data),
-        transitionsBuilder: (_, anim, _, child) => FadeTransition(opacity: anim, child: child),
-      ),
-    );
+    context.pushReplacementNamed('booking-success', extra: provider.data);
   }
 
   void _handleBack(BuildContext context) {

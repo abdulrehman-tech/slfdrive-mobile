@@ -279,7 +279,6 @@
   "about_title": "Über SLF Drive",
   "settings_cache_cleared": "Cache geleert",
   "driver_accept_snack": "Fahrt angenommen — bis zur Abholung",
-  "driver_request_days": "{n} Tage",
   "driver_request_total": "Gesamtpreis",
   "driver_request_per_day": "pro Tag",
   "driver_request_pickup": "Abholung",
@@ -395,7 +394,6 @@
   "legal_consent_privacy": "Datenschutzrichtlinie",
   "legal_load_error": "Die Seite konnte nicht geladen werden. Prüfe deine Verbindung und versuche es erneut.",
   "legal_retry": "Erneut versuchen",
-  "booking_dates_hours": "Stunden",
   "booking_summary_vehicle": "Fahrzeug",
   "booking_summary_driver": "Fahrer",
   "booking_summary_duration": "Dauer",
@@ -490,5 +488,19 @@
   "sort_experience": "Erfahrenste zuerst",
   "trips_count_label": "{n} Fahrten",
   "years_short_label": "{n} J.",
-  "common_customer": "Kunde"
+  "common_customer": "Kunde",
+  "units_days": {
+    "one": "{} Tag",
+    "other": "{} Tage"
+  },
+  "units_hours": {
+    "one": "{} Stunde",
+    "other": "{} Stunden"
+  },
+  "price_unit_hour": "/Std.",
+  "price_unit_day": "/Tag",
+  "price_unit_week": "/Woche",
+  "driver_request_awaiting_company": "Wartet auf Freigabe der Firma",
+  "booking_success_subtitle_corporate": "Ihre Buchung wartet auf die Freigabe Ihrer Firma — sie wird Ihrer Firma in Rechnung gestellt.",
+  "location_default_delivery_label": "Lieferadresse"
 }

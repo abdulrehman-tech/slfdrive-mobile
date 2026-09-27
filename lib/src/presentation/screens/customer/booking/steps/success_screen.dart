@@ -76,7 +76,7 @@ class _BookingSuccessScreenState extends State<BookingSuccessScreen> with Single
                   SizedBox(height: isDesktop ? 12.r : 32.r),
                   SuccessAnimatedIcon(tick: _tick, pulse: _pulse),
                   SizedBox(height: 22.r),
-                  const SuccessTitle(),
+                  SuccessTitle(isCorporate: widget.data.isCorporate),
                   SizedBox(height: 22.r),
                   SuccessReferenceCard(reference: ref, isDark: isDark),
                   SizedBox(height: 16.r),

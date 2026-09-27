@@ -48,19 +48,28 @@ class NotifItem {
         data: p.data,
       );
 
-  factory NotifItem.fromJson(Map<String, dynamic> json) => NotifItem(
-        id: '${json['id']}',
-        category: categoryFromKey(json['category'] as String?),
-        title: (json['title'] as String?) ?? '',
-        subtitle: (json['subtitle'] as String?) ?? '',
-        at: DateTime.tryParse('${json['at']}')?.toLocal() ?? DateTime.now(),
-        isRead: json['isRead'] == true,
-        route: json['route'] as String?,
-        data: {
-          for (final e in (json['data'] as Map? ?? const {}).entries)
-            '${e.key}': '${e.value}',
-        },
-      );
+  factory NotifItem.fromJson(Map<String, dynamic> json) {
+    final data = {
+      for (final e in (json['data'] as Map? ?? const {}).entries) '${e.key}': '${e.value}',
+    };
+    // Re-resolve on load so rows stored before the category fix (booking
+    // pushes saved as `system`) move to the Bookings tab.
+    final category = PushPayload.resolveCategory(
+      category: json['category'] as String?,
+      type: PushPayload.typeFrom(data),
+      bookingId: PushPayload.bookingIdFrom(data),
+    );
+    return NotifItem(
+      id: '${json['id']}',
+      category: categoryFromKey(category),
+      title: (json['title'] as String?) ?? '',
+      subtitle: (json['subtitle'] as String?) ?? '',
+      at: DateTime.tryParse('${json['at']}')?.toLocal() ?? DateTime.now(),
+      isRead: json['isRead'] == true,
+      route: json['route'] as String?,
+      data: data,
+    );
+  }
 
   Map<String, dynamic> toJson() => {
         'id': id,
@@ -76,7 +85,7 @@ class NotifItem {
   /// Tolerant decode — an unrecognised category (a newer server type reaching an
   /// older build) lands in `system` rather than throwing away the notification.
   static NotifCategory categoryFromKey(String? key) {
-    switch (key) {
+    switch (key?.trim().toLowerCase()) {
       case 'booking':
         return NotifCategory.booking;
       case 'promotion':

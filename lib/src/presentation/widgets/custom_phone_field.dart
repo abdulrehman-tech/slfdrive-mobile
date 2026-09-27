@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:easy_localization/easy_localization.dart' hide TextDirection;
 import 'package:intl_phone_field/countries.dart';
+import '../utils/bidi.dart';
 
 class CustomPhoneField extends StatefulWidget {
   final Function(String completeNumber, String dialCode) onChanged;
@@ -193,7 +194,7 @@ class _CustomPhoneFieldState extends State<CustomPhoneField> {
                                   ),
                                 ),
                                 Text(
-                                  '+${country.dialCode}',
+                                  ltr('+${country.dialCode}'),
                                   style: TextStyle(
                                     fontSize: 16.r,
                                     fontWeight: FontWeight.w600,
@@ -245,7 +246,7 @@ class _CustomPhoneFieldState extends State<CustomPhoneField> {
                       Text(_selectedCountry.flag, style: TextStyle(fontSize: 24.r)),
                       SizedBox(width: 8.r),
                       Text(
-                        '+${_selectedCountry.dialCode}',
+                        ltr('+${_selectedCountry.dialCode}'),
                         style: TextStyle(
                           fontSize: 16.r,
                           fontWeight: FontWeight.w600,

@@ -6,36 +6,16 @@ import 'package:iconsax_flutter/iconsax_flutter.dart';
 import '../../models/booking_data.dart';
 import '../../widgets/booking_glass_card.dart';
 import 'summary_info_row.dart';
+import '../../../../../utils/date_labels.dart';
 
 class SummaryScheduleCard extends StatelessWidget {
   final BookingData data;
   final bool isDark;
   const SummaryScheduleCard({super.key, required this.data, required this.isDark});
 
-  static const _months = [
-    'Jan',
-    'Feb',
-    'Mar',
-    'Apr',
-    'May',
-    'Jun',
-    'Jul',
-    'Aug',
-    'Sep',
-    'Oct',
-    'Nov',
-    'Dec',
-  ];
-
   String _formatDate(DateTime? d, bool includeTime) {
     if (d == null) return '-';
-    final dateStr = '${d.day} ${_months[d.month - 1]} ${d.year}';
-    if (!includeTime) return dateStr;
-
-    final hour = d.hour == 0 ? 12 : (d.hour > 12 ? d.hour - 12 : d.hour);
-    final amPm = d.hour >= 12 ? 'PM' : 'AM';
-    final minute = d.minute.toString().padLeft(2, '0');
-    return '$dateStr, $hour:$minute $amPm';
+    return includeTime ? formatDayMonthYearTime(d) : formatDayMonthYear(d);
   }
 
   @override
@@ -58,7 +38,7 @@ class SummaryScheduleCard extends StatelessWidget {
           SummaryInfoRow(label: 'booking_summary_return_date'.tr(), value: _formatDate(d.endAt, d.isHourly)),
           SummaryInfoRow(
             label: 'booking_summary_duration'.tr(),
-            value: '${d.units} ${d.unitLabelKey.tr()}',
+            value: d.unitsLabel,
           ),
         ],
       ),

@@ -31,6 +31,7 @@ import '../screens/customer/notifications/notifications_screen.dart';
 import '../screens/customer/booking/booking_flow_screen.dart';
 import '../screens/customer/booking/location_picker_screen.dart';
 import '../screens/customer/booking/models/booking_data.dart';
+import '../screens/customer/booking/steps/success_screen.dart';
 import '../screens/customer/booking_detail/booking_detail_screen.dart';
 import '../screens/customer/booking_detail/models/booking_detail.dart' show BookingDetailSeed;
 import '../screens/customer/bookings/bookings_screen.dart';
@@ -386,6 +387,20 @@ class AppRouter {
             child: LocationPickerScreen(initial: initial, forDelivery: forDelivery),
             name: state.name,
           );
+        },
+      ),
+      // Booking confirmation. A real route (not an imperative Navigator push)
+      // so its "View booking details" go() replaces it: a pageless route here
+      // stayed on top and hid the detail screen it had just opened.
+      GoRoute(
+        path: '/booking/success',
+        name: 'booking-success',
+        pageBuilder: (context, state) {
+          final data = state.extra as BookingData?;
+          if (data == null) {
+            return AppFadeThroughTransition(child: const ComingSoonScreen(titleKey: 'error_route_not_found'), name: state.name);
+          }
+          return AppFadeThroughTransition(child: BookingSuccessScreen(data: data), name: state.name);
         },
       ),
       GoRoute(

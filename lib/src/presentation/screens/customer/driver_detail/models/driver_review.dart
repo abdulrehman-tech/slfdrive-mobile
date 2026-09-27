@@ -1,4 +1,7 @@
+import 'package:easy_localization/easy_localization.dart';
+
 import '../../../../../core/models/review/review.dart';
+import '../../../../utils/date_labels.dart';
 
 /// Display model for one review tile (shared by the driver and car detail
 /// screens).
@@ -26,11 +29,12 @@ class DriverReview {
     final t = DateTime.tryParse(iso ?? '')?.toLocal();
     if (t == null) return '';
     final diff = DateTime.now().difference(t);
-    if (diff.inDays >= 365) return '${(diff.inDays / 365).floor()}y';
-    if (diff.inDays >= 30) return '${(diff.inDays / 30).floor()}mo';
-    if (diff.inDays >= 1) return '${diff.inDays}d';
-    if (diff.inHours >= 1) return '${diff.inHours}h';
-    if (diff.inMinutes >= 1) return '${diff.inMinutes}m';
-    return 'now';
+    // Older than a month: show the date itself rather than an untranslated
+    // "3mo" / "1y" suffix.
+    if (diff.inDays >= 30) return formatDayMonthYear(t);
+    if (diff.inDays >= 1) return 'notif_time_days'.tr(namedArgs: {'n': '${diff.inDays}'});
+    if (diff.inHours >= 1) return 'notif_time_hours'.tr(namedArgs: {'n': '${diff.inHours}'});
+    if (diff.inMinutes >= 1) return 'notif_time_minutes'.tr(namedArgs: {'n': '${diff.inMinutes}'});
+    return 'notif_time_now'.tr();
   }
 }

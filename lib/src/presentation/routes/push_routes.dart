@@ -40,13 +40,15 @@ String? resolvePushRoute(PushPayload p, UserRole? role) {
     return explicit;
   }
 
+  // Category rather than the exact type: the backend's event codes
+  // (BOOKING_CREATED, BOOKING_APPROVED…) all resolve to the booking category.
+  if (p.category == 'booking') {
+    if (isDriver) return '/driver/trips';
+    final id = p.bookingId;
+    return id == null ? '/bookings' : '/bookings/$id';
+  }
+
   switch (p.type) {
-    case 'booking':
-    case 'booking_status':
-    case 'payment':
-      if (isDriver) return '/driver/trips';
-      final id = p.bookingId;
-      return id == null ? '/bookings' : '/bookings/$id';
     case 'earnings':
       return isDriver ? '/driver/earnings' : '/notifications';
     case 'promotion':

@@ -91,7 +91,7 @@ class BookingCarCard extends StatelessWidget {
                             // for a car+driver booking it wrongly bundled the
                             // driver's charge into the vehicle price. Use the
                             // backend `vehicleAmount` split over the billed units.
-                            '${(booking.vehicleAmount > 0 ? booking.vehicleUnitRate : booking.pricePerDay).toInt()}/${booking.isHourly ? 'h' : 'd'}',
+                            '${(booking.vehicleAmount > 0 ? booking.vehicleUnitRate : booking.pricePerDay).toInt()}${(booking.isHourly ? 'price_unit_hour' : 'price_unit_day').tr()}',
                             style: TextStyle(fontSize: 13.r, fontWeight: FontWeight.w800, color: cs.primary),
                           ),
                         ],

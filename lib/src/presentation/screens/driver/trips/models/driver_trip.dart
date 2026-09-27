@@ -2,6 +2,7 @@ import 'package:easy_localization/easy_localization.dart';
 
 import '../../../../../core/models/booking/booking.dart';
 import '../../../../../core/utils/booking_status.dart';
+import '../../home/models/trip_request.dart' show serviceKeyFor;
 
 enum DriverTripStatus { active, completed, cancelled }
 
@@ -11,7 +12,14 @@ class DriverTrip {
   final String bookingNo;
   final String customer;
   final String? avatarUrl;
-  final String destination;
+
+  /// Resolved drop-off place name, or null when none is known. Raw coordinates
+  /// are never shown — they read as noise to a driver.
+  final String? destination;
+
+  /// Localised service ("Driver only", "Car + driver"…) shown when there is no
+  /// destination to display.
+  final String serviceLabel;
   final double fare;
   final String time;
   final DriverTripStatus status;
@@ -32,7 +40,8 @@ class DriverTrip {
     required this.bookingNo,
     required this.customer,
     this.avatarUrl,
-    required this.destination,
+    this.destination,
+    required this.serviceLabel,
     required this.fare,
     required this.time,
     required this.status,
@@ -53,19 +62,16 @@ class DriverTrip {
   }) {
     final status = _statusFromBooking(b);
     if (status == null) return null;
-    final pickup = (pickupName != null && pickupName.isNotEmpty)
-        ? pickupName
-        : _locationLabel(b.pickupLat, b.pickupLon);
-    final dropoff = (dropoffName != null && dropoffName.isNotEmpty)
-        ? dropoffName
-        : _locationLabel(b.dropoffLat, b.dropoffLon);
+    final pickup = (pickupName != null && pickupName.isNotEmpty) ? pickupName : null;
+    final dropoff = (dropoffName != null && dropoffName.isNotEmpty) ? dropoffName : null;
     return DriverTrip(
       id: b.id.toString(),
       bookingId: b.id,
       bookingNo: b.bookingNo ?? 'SLF${b.id}',
       customer: (b.customerFullName?.trim().isNotEmpty ?? false) ? b.customerFullName!.trim() : 'common_customer'.tr(),
       avatarUrl: avatarUrl,
-      destination: dropoff ?? b.serviceType ?? '',
+      destination: dropoff,
+      serviceLabel: serviceKeyFor(b.serviceType).tr(),
       pickup: pickup,
       fare: b.totalAmount ?? 0,
       time: _dateLabel(b.fromDateTime ?? b.confirmedAt ?? b.completedAt),
@@ -89,14 +95,6 @@ DriverTripStatus? _statusFromBooking(Booking b) {
     case BookingBucket.pending:
       return null; // pending → handled as a request on home
   }
-}
-
-/// Formats a stored lat/lon pair as a compact coordinate label, or null when
-/// either coordinate is missing. The backend booking DTO carries no address
-/// text, only coordinates.
-String? _locationLabel(double? lat, double? lon) {
-  if (lat == null || lon == null) return null;
-  return '${lat.toStringAsFixed(4)}, ${lon.toStringAsFixed(4)}';
 }
 
 /// Compact `YYYY-MM-DD HH:MM` from an ISO timestamp, or '' when unparseable.

@@ -33,7 +33,11 @@ class BookingDetailScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (_) => BookingDetailProvider(bookingId: int.tryParse(bookingId) ?? 0, seed: seed),
+      create: (_) => BookingDetailProvider(
+        bookingId: int.tryParse(bookingId) ?? 0,
+        seed: seed,
+        ar: context.locale.languageCode == 'ar',
+      ),
       child: const _BookingDetailView(),
     );
   }

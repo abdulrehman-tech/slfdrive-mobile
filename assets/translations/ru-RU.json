@@ -279,7 +279,6 @@
   "about_title": "О SLF Drive",
   "settings_cache_cleared": "Кэш очищен",
   "driver_accept_snack": "Поездка принята",
-  "driver_request_days": "{n} дн.",
   "driver_request_total": "Итоговая стоимость",
   "driver_request_per_day": "в день",
   "driver_request_pickup": "Подача",
@@ -395,7 +394,6 @@
   "legal_consent_privacy": "Политикой конфиденциальности",
   "legal_load_error": "Не удалось загрузить страницу. Проверьте подключение и повторите попытку.",
   "legal_retry": "Повторить",
-  "booking_dates_hours": "часов",
   "booking_summary_vehicle": "Автомобиль",
   "booking_summary_driver": "Водитель",
   "booking_summary_duration": "Длительность",
@@ -490,5 +488,23 @@
   "sort_experience": "Самые опытные",
   "trips_count_label": "{n} поездок",
   "years_short_label": "{n} лет",
-  "common_customer": "Клиент"
+  "common_customer": "Клиент",
+  "units_days": {
+    "one": "{} день",
+    "few": "{} дня",
+    "many": "{} дней",
+    "other": "{} дня"
+  },
+  "units_hours": {
+    "one": "{} час",
+    "few": "{} часа",
+    "many": "{} часов",
+    "other": "{} часа"
+  },
+  "price_unit_hour": "/ч",
+  "price_unit_day": "/день",
+  "price_unit_week": "/нед.",
+  "driver_request_awaiting_company": "Ожидает одобрения компании",
+  "booking_success_subtitle_corporate": "Бронирование ожидает одобрения вашей компании — оплату произведёт компания.",
+  "location_default_delivery_label": "Адрес доставки"
 }

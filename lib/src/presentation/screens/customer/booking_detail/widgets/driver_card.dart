@@ -99,7 +99,7 @@ class BookingDriverCard extends StatelessWidget {
                         OmrIcon(size: 11.r, color: cs.primary),
                         SizedBox(width: 3.r),
                         Text(
-                          '${booking.driverUnitRate.toInt()}/${booking.isHourly ? 'h' : 'd'}',
+                          '${booking.driverUnitRate.toInt()}${(booking.isHourly ? 'price_unit_hour' : 'price_unit_day').tr()}',
                           style: TextStyle(fontSize: 13.r, fontWeight: FontWeight.w800, color: cs.primary),
                         ),
                       ],

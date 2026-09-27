@@ -3,7 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class SuccessTitle extends StatelessWidget {
-  const SuccessTitle({super.key});
+  /// Corporate bookings are billed to the employer, so the "you'll pay once
+  /// it's approved" line would be wrong for them.
+  final bool isCorporate;
+
+  const SuccessTitle({super.key, this.isCorporate = false});
 
   @override
   Widget build(BuildContext context) {
@@ -19,7 +23,7 @@ class SuccessTitle extends StatelessWidget {
         Padding(
           padding: EdgeInsets.symmetric(horizontal: 24.r),
           child: Text(
-            'booking_success_subtitle'.tr(),
+            (isCorporate ? 'booking_success_subtitle_corporate' : 'booking_success_subtitle').tr(),
             textAlign: TextAlign.center,
             style: TextStyle(fontSize: 13.r, color: cs.onSurface.withValues(alpha: 0.6), height: 1.5),
           ),

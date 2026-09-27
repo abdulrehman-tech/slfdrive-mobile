@@ -1,6 +1,7 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../widgets/skeletons/list_skeleton.dart';
 import 'package:go_router/go_router.dart';
@@ -130,9 +131,14 @@ class _DriverDetailView extends StatelessWidget {
           : _buildMobile(context, isDark, cs);
     }
 
-    return Scaffold(
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      body: body,
+    // The cover photo sits under the status bar and there is no AppBar to
+    // set its style, so force light icons here.
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: SystemUiOverlayStyle.light,
+      child: Scaffold(
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+        body: body,
+      ),
     );
   }
 

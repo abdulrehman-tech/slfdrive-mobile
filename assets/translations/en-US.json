@@ -359,7 +359,6 @@
   "booking_dates_subtitle": "Select your pickup and return dates plus a preferred pickup time.",
   "booking_dates_range": "Rental dates",
   "booking_dates_duration": "Duration",
-  "booking_dates_days": "days",
   "booking_time_pickup": "Pickup time",
   "booking_time_return": "Return time",
   "booking_time_morning": "Morning",
@@ -606,7 +605,6 @@
   "driver_new_requests": "New Trip Requests",
   "driver_decline": "Decline",
   "driver_accept": "Accept",
-  "driver_request_days": "{n} days",
   "driver_request_total": "Total fare",
   "driver_request_per_day": "per day",
   "driver_request_pickup": "Pickup",
@@ -918,7 +916,6 @@
   "legal_consent_privacy": "Privacy Policy",
   "legal_load_error": "Couldn't load the page. Check your connection and try again.",
   "legal_retry": "Retry",
-  "booking_dates_hours": "hours",
   "booking_summary_vehicle": "Vehicle",
   "booking_summary_driver": "Driver",
   "booking_summary_duration": "Duration",
@@ -1054,5 +1051,21 @@
   "notif_delete_confirm_yes": "Delete",
   "booking_time_past": "Pick-up time can't be in the past.",
   "booking_time_min_hour": "Drop-off must be at least 1 hour after pick-up.",
-  "booking_time_after_pickup": "Drop-off must be after the pick-up time."
+  "booking_time_after_pickup": "Drop-off must be after the pick-up time.",
+  "units_days": {
+    "zero": "{} days",
+    "one": "{} day",
+    "other": "{} days"
+  },
+  "units_hours": {
+    "zero": "{} hours",
+    "one": "{} hour",
+    "other": "{} hours"
+  },
+  "price_unit_hour": "/hr",
+  "price_unit_day": "/day",
+  "price_unit_week": "/wk",
+  "driver_request_awaiting_company": "Awaiting company approval",
+  "booking_success_subtitle_corporate": "Your booking is waiting for your company's approval — it will be billed to your company.",
+  "location_default_delivery_label": "Delivery address"
 }

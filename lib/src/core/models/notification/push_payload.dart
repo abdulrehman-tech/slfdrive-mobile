@@ -40,7 +40,22 @@ class PushPayload {
     required this.data,
   });
 
-  String? get bookingId => _nonEmpty(data['bookingId']);
+  String? get bookingId => bookingIdFrom(data);
+
+  /// The booking a push refers to. The UAT backend doesn't send `bookingId`;
+  /// it sends `related_entity: BOOKING` + `related_id: <id>` (with an
+  /// `event_code` such as `BOOKING_CREATED` instead of `type`), so accept both.
+  static String? bookingIdFrom(Map<String, String> data) {
+    final direct = _nonEmpty(data['bookingId']);
+    if (direct != null) return direct;
+    final entity = _nonEmpty(data['related_entity'])?.toLowerCase();
+    return entity == 'booking' ? _nonEmpty(data['related_id']) : null;
+  }
+
+  /// `type`, else the backend's `event_code` (e.g. `BOOKING_CREATED`).
+  static String typeFrom(Map<String, String> data) =>
+      _nonEmpty(data['type']) ?? _nonEmpty(data['event_code'])?.toLowerCase() ?? 'system';
+
   String? get targetRole => _nonEmpty(data['targetRole']);
 
   /// Explicit server-supplied route. Only honoured when it looks like an in-app
@@ -54,13 +69,17 @@ class PushPayload {
     final data = <String, String>{
       for (final e in message.data.entries) e.key: '${e.value}',
     };
-    final type = _nonEmpty(data['type']) ?? 'system';
+    final type = typeFrom(data);
     return PushPayload(
       id: _nonEmpty(data['notificationId']) ??
           _nonEmpty(message.messageId) ??
           DateTime.now().microsecondsSinceEpoch.toString(),
       type: type,
-      category: _nonEmpty(data['category']) ?? categoryForType(type),
+      category: resolveCategory(
+        category: data['category'],
+        type: type,
+        bookingId: bookingIdFrom(data),
+      ),
       title: _nonEmpty(message.notification?.title) ?? _nonEmpty(data['title']),
       body: _nonEmpty(message.notification?.body) ?? _nonEmpty(data['body']),
       sentAt: _parseDate(data['sentAt']) ?? DateTime.now(),
@@ -69,18 +88,22 @@ class PushPayload {
   }
 
   factory PushPayload.fromJson(Map<String, dynamic> json) {
-    final type = _nonEmpty(json['type'] as String?) ?? 'system';
+    final data = <String, String>{
+      for (final e in (json['data'] as Map? ?? const {}).entries) '${e.key}': '${e.value}',
+    };
+    final type = _nonEmpty(json['type'] as String?) ?? typeFrom(data);
     return PushPayload(
       id: '${json['id']}',
       type: type,
-      category: _nonEmpty(json['category'] as String?) ?? categoryForType(type),
+      category: resolveCategory(
+        category: json['category'] as String?,
+        type: type,
+        bookingId: bookingIdFrom(data),
+      ),
       title: _nonEmpty(json['title'] as String?),
       body: _nonEmpty(json['body'] as String?),
       sentAt: _parseDate(json['sentAt'] as String?) ?? DateTime.now(),
-      data: {
-        for (final e in (json['data'] as Map? ?? const {}).entries)
-          '${e.key}': '${e.value}',
-      },
+      data: data,
     );
   }
 
@@ -97,16 +120,22 @@ class PushPayload {
   /// Default `category` when the server omits it. Keep in sync with the channel
   /// ids created in `PushMessagingService.init()`.
   static String categoryForType(String type) {
-    switch (type) {
-      case 'booking':
-      case 'booking_status':
-      case 'payment':
-        return 'booking';
-      case 'promotion':
-        return 'promotion';
-      default:
-        return 'system';
-    }
+    final t = type.trim().toLowerCase();
+    if (t.contains('booking') || t.contains('payment') || t.contains('trip')) return 'booking';
+    if (t.contains('promo') || t.contains('offer')) return 'promotion';
+    return 'system';
+  }
+
+  /// Picks the inbox category for a push. The backend has been seen sending
+  /// booking pushes with no usable `category`/`type` (they landed in System and
+  /// the Bookings tab stayed empty), so a push that carries a `bookingId` is
+  /// treated as a booking unless the server explicitly says otherwise.
+  static String resolveCategory({String? category, required String type, String? bookingId}) {
+    final explicit = _nonEmpty(category)?.toLowerCase();
+    if (explicit == 'booking' || explicit == 'promotion') return explicit!;
+    final inferred = categoryForType(type);
+    if (inferred != 'system') return inferred;
+    return _nonEmpty(bookingId) != null ? 'booking' : 'system';
   }
 
   static String? _nonEmpty(String? v) =>

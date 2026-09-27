@@ -7,6 +7,7 @@ import 'package:syncfusion_flutter_datepicker/datepicker.dart';
 
 import '../models/booking_data.dart';
 import '../widgets/booking_glass_card.dart';
+import '../../../../utils/date_labels.dart';
 
 class DatesStep extends StatefulWidget {
   final BookingData data;
@@ -444,7 +445,7 @@ class _DatesStepState extends State<DatesStep> {
                     ),
                     SizedBox(height: 2.r),
                     Text(
-                      '${d.units} ${d.unitLabelKey.tr()}',
+                      d.unitsLabel,
                       style: TextStyle(fontSize: 17.r, fontWeight: FontWeight.w800, color: cs.onSurface),
                     ),
                   ],
@@ -452,7 +453,7 @@ class _DatesStepState extends State<DatesStep> {
               ),
               if (d.startAt != null && d.endAt != null)
                 Text(
-                  '${_formatShort(d.startAt!)} → ${_formatShort(d.endAt!)}',
+                  formatDayRange(d.startAt!, d.endAt!),
                   style: TextStyle(fontSize: 11.r, color: cs.onSurface.withValues(alpha: 0.55)),
                 ),
             ],
@@ -543,11 +544,6 @@ class _DatesStepState extends State<DatesStep> {
         ),
       ),
     );
-  }
-
-  String _formatShort(DateTime d) {
-    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-    return '${d.day} ${months[d.month - 1]}';
   }
 }
 

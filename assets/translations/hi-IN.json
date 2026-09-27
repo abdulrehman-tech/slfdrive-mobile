@@ -279,7 +279,6 @@
   "about_title": "SLF Drive के बारे में",
   "settings_cache_cleared": "कैश साफ़ किया गया",
   "driver_accept_snack": "यात्रा स्वीकृत",
-  "driver_request_days": "{n} दिन",
   "driver_request_total": "कुल किराया",
   "driver_request_per_day": "प्रति दिन",
   "driver_request_pickup": "पिकअप",
@@ -395,7 +394,6 @@
   "legal_consent_privacy": "गोपनीयता नीति",
   "legal_load_error": "पेज लोड नहीं हो सका। अपना कनेक्शन जांचें और पुनः प्रयास करें।",
   "legal_retry": "पुनः प्रयास करें",
-  "booking_dates_hours": "घंटे",
   "booking_summary_vehicle": "वाहन",
   "booking_summary_driver": "ड्राइवर",
   "booking_summary_duration": "अवधि",
@@ -490,5 +488,19 @@
   "sort_experience": "सबसे अनुभवी",
   "trips_count_label": "{n} यात्राएँ",
   "years_short_label": "{n} वर्ष",
-  "common_customer": "ग्राहक"
+  "common_customer": "ग्राहक",
+  "units_days": {
+    "one": "{} दिन",
+    "other": "{} दिन"
+  },
+  "units_hours": {
+    "one": "{} घंटा",
+    "other": "{} घंटे"
+  },
+  "price_unit_hour": "/घंटा",
+  "price_unit_day": "/दिन",
+  "price_unit_week": "/सप्ताह",
+  "driver_request_awaiting_company": "कंपनी की मंज़ूरी की प्रतीक्षा",
+  "booking_success_subtitle_corporate": "आपकी बुकिंग आपकी कंपनी की मंज़ूरी की प्रतीक्षा में है — इसका बिल आपकी कंपनी को जाएगा।",
+  "location_default_delivery_label": "डिलीवरी पता"
 }

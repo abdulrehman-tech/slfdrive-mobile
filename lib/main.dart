@@ -19,6 +19,7 @@ import 'src/core/secrets/maps_loader.dart';
 import 'src/core/services/push_background_handler.dart';
 import 'src/core/services/push_messaging_service.dart';
 import 'src/core/services/session_manager.dart';
+import 'src/core/utils/reinstall_guard.dart';
 import 'src/presentation/providers/auth_provider.dart';
 import 'src/presentation/providers/location_provider.dart';
 import 'src/presentation/providers/role_provider.dart';
@@ -67,6 +68,11 @@ Future<bool> _initFirebase() async {
   final firebaseReady = await _initFirebase();
   unawaited(_applyHighRefreshRate());
   await EasyLocalization.ensureInitialized();
+  // Dates use Arabic month names but Latin digits, matching prices and
+  // references elsewhere in the app (intl defaults Arabic to ٠-٩ digits).
+  for (final l in const ['ar', 'ar_AE']) {
+    DateFormat.useNativeDigitsByDefaultFor(l, false);
+  }
 
   // UAT builds talk to a self-signed host: trust it for image loading too
   // (Dio is handled in ApiClient). No-op for prod and on web.
@@ -77,6 +83,9 @@ Future<bool> _initFirebase() async {
 
   // Set up DI container (currently only registers FlutterSecureStorage).
   await setupDependencyInjection();
+
+  // Must run before anything reads the stored session (role, tokens, inbox).
+  await clearSessionOnReinstall(getIt<FlutterSecureStorage>());
 
   // Push: hydrate the inbox and wire FCM. Both are fire-and-forget so neither
   // delays the first frame — same treatment as the Maps SDK below.
@@ -234,6 +243,9 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   @override
   Widget build(BuildContext context) {
     final themeProvider = context.watch<ThemeProvider>();
+    // EasyLocalization doesn't touch Intl; keep it in sync so locale-free
+    // formatters (date_labels.dart, notification timestamps) follow the app.
+    Intl.defaultLocale = context.locale.toString();
     return ScreenUtilInit(
       designSize: const Size(390, 844),
       minTextAdapt: true,
@@ -254,10 +266,20 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
           // no back button to close it). Sits above the Navigator, so every
           // route and modal sheet is covered; translucent hit-testing lets
           // interactive widgets win the gesture arena as usual.
-          builder: (context, child) => GestureDetector(
-            behavior: HitTestBehavior.translucent,
-            onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
-            child: child,
+          //
+          // The AnnotatedRegion is the app-wide status bar default: without it
+          // the style last set by a screen with a dark header stuck around, so
+          // light screens got white (invisible) status icons. AppBars that set
+          // their own systemOverlayStyle still win inside their region.
+          builder: (context, child) => AnnotatedRegion<SystemUiOverlayStyle>(
+            value: Theme.of(context).brightness == Brightness.dark
+                ? SystemUiOverlayStyle.light.copyWith(statusBarColor: Colors.transparent)
+                : SystemUiOverlayStyle.dark.copyWith(statusBarColor: Colors.transparent),
+            child: GestureDetector(
+              behavior: HitTestBehavior.translucent,
+              onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
+              child: child,
+            ),
           ),
         );
       },

@@ -110,14 +110,18 @@ class _Bar extends StatelessWidget {
           ),
         ),
         SizedBox(height: 8.r),
-        Text(
-          bar.label,
-          maxLines: 1,
-          overflow: TextOverflow.clip,
-          style: TextStyle(
-            fontSize: 10.r,
-            fontWeight: bar.highlighted ? FontWeight.w600 : FontWeight.normal,
-            color: bar.highlighted ? highlightLabelColor : labelColor,
+        // Scale down rather than clip: Arabic has no short month names, so a
+        // 12-bar year chart would otherwise cut "سبتمبر" to a fragment.
+        FittedBox(
+          fit: BoxFit.scaleDown,
+          child: Text(
+            bar.label,
+            maxLines: 1,
+            style: TextStyle(
+              fontSize: 10.r,
+              fontWeight: bar.highlighted ? FontWeight.w600 : FontWeight.normal,
+              color: bar.highlighted ? highlightLabelColor : labelColor,
+            ),
           ),
         ),
       ],

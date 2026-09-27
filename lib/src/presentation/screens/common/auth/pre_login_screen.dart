@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import '../../../../constants/breakpoints.dart';
 import 'pre_login_widgets/pre_login_desktop_layout.dart';
 import 'pre_login_widgets/pre_login_mobile_layout.dart';
@@ -12,15 +13,19 @@ class PreLoginScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.black,
-      body: LayoutBuilder(
-        builder: (context, constraints) {
-          if (Breakpoints.isDesktop(constraints.maxWidth)) {
-            return const PreLoginDesktopLayout();
-          }
-          return const PreLoginMobileLayout();
-        },
+    // Full-bleed dark photo under the status bar: light icons.
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: SystemUiOverlayStyle.light,
+      child: Scaffold(
+        backgroundColor: Colors.black,
+        body: LayoutBuilder(
+          builder: (context, constraints) {
+            if (Breakpoints.isDesktop(constraints.maxWidth)) {
+              return const PreLoginDesktopLayout();
+            }
+            return const PreLoginMobileLayout();
+          },
+        ),
       ),
     );
   }

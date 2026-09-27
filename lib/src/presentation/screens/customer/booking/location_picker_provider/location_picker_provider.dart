@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:geocoding/geocoding.dart';
@@ -22,7 +23,7 @@ class LocationPickerProvider extends ChangeNotifier {
       _address = initial.address;
       _label = initial.label ?? '';
     } else if (forDelivery) {
-      _label = 'Delivery address';
+      _label = 'location_default_delivery_label'.tr();
     }
     addressController.text = _address;
     labelController.text = _label;
