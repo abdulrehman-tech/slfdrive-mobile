@@ -61,11 +61,13 @@ class ContactLauncher {
   /// Open a web URL (FAQ, socials, store pages) in the external browser.
   static Future<bool> openWebsite(String url) => _launch(Uri.parse(url));
 
+  // No canLaunchUrl() pre-check: it answers false for any scheme missing from
+  // LSApplicationQueriesSchemes / Android <queries>, which silently disabled
+  // every call/email button. launchUrl reports failure itself (false on iOS,
+  // an exception on Android when nothing can handle the link).
   static Future<bool> _launch(Uri uri) async {
     try {
-      final canOpen = await canLaunchUrl(uri);
-      if (!canOpen) return false;
-      return launchUrl(uri, mode: LaunchMode.externalApplication);
+      return await launchUrl(uri, mode: LaunchMode.externalApplication);
     } catch (e) {
       if (kDebugMode) {
         debugPrint('ContactLauncher failed to open $uri: $e');

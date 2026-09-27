@@ -1107,5 +1107,6 @@
   "company_action_email": "Email",
   "company_action_website": "Website",
   "promo_subtitle": "Have a code? Apply it to save on your rental.",
-  "promo_applied": "Code applied"
+  "promo_applied": "Code applied",
+  "company_contact_copied": "Couldn't open it here — {value} copied."
 }

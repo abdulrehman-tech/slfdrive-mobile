@@ -122,5 +122,15 @@
 	<true/>
 	<key>ITSAppUsesNonExemptEncryption</key>
 		<false/>
+	<!-- Schemes ContactLauncher opens (call / email / SMS / WhatsApp). Without
+	     these, canOpenURL reports "not allowed to query for scheme" and the
+	     contact buttons silently do nothing. -->
+	<key>LSApplicationQueriesSchemes</key>
+	<array>
+		<string>tel</string>
+		<string>mailto</string>
+		<string>sms</string>
+		<string>whatsapp</string>
+	</array>
 	</dict>
 </plist>

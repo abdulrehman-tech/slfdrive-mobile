@@ -1,5 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 
@@ -133,16 +134,16 @@ class CompanyActions extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final c = company;
-    final actions = <(IconData, String, VoidCallback)>[
+    // (icon, label key, value, launcher). If nothing on the device can handle
+    // the link (iPad, simulator, no Mail account), copy the value instead of
+    // failing silently.
+    final website = c.website == null ? null : (c.website!.startsWith('http') ? c.website! : 'https://${c.website!}');
+    final actions = <(IconData, String, String, Future<bool> Function())>[
       if (c.contactPhone != null)
-        (Iconsax.call, 'company_action_call', () => ContactLauncher.openPhoneCall(c.contactPhone!)),
+        (Iconsax.call, 'company_action_call', c.contactPhone!, () => ContactLauncher.openPhoneCall(c.contactPhone!)),
       if (c.contactEmail != null)
-        (Iconsax.sms, 'company_action_email', () => ContactLauncher.openEmail(c.contactEmail!)),
-      if (c.website != null)
-        (Iconsax.global, 'company_action_website', () {
-          final url = c.website!.startsWith('http') ? c.website! : 'https://${c.website!}';
-          ContactLauncher.openWebsite(url);
-        }),
+        (Iconsax.sms, 'company_action_email', c.contactEmail!, () => ContactLauncher.openEmail(c.contactEmail!)),
+      if (website != null) (Iconsax.global, 'company_action_website', website, () => ContactLauncher.openWebsite(website)),
     ];
     if (actions.isEmpty) return const SizedBox.shrink();
     final cs = Theme.of(context).colorScheme;
@@ -158,7 +159,7 @@ class CompanyActions extends StatelessWidget {
                 borderRadius: BorderRadius.circular(16.r),
                 child: InkWell(
                   borderRadius: BorderRadius.circular(16.r),
-                  onTap: actions[i].$3,
+                  onTap: () => _open(context, actions[i].$3, actions[i].$4),
                   child: Padding(
                     padding: EdgeInsets.symmetric(vertical: 12.r, horizontal: 6.r),
                     child: Column(
@@ -189,5 +190,15 @@ class CompanyActions extends StatelessWidget {
         ],
       ],
     );
+  }
+
+  Future<void> _open(BuildContext context, String value, Future<bool> Function() launch) async {
+    final messenger = ScaffoldMessenger.of(context);
+    if (await launch()) return;
+    await Clipboard.setData(ClipboardData(text: value));
+    messenger.showSnackBar(SnackBar(
+      behavior: SnackBarBehavior.floating,
+      content: Text('company_contact_copied'.tr(namedArgs: {'value': ltr(value)})),
+    ));
   }
 }

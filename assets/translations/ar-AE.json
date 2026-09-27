@@ -1119,5 +1119,6 @@
   "company_action_email": "البريد",
   "company_action_website": "الموقع",
   "promo_subtitle": "لديك رمز؟ طبّقه لتوفّر على الإيجار.",
-  "promo_applied": "تم تطبيق الرمز"
+  "promo_applied": "تم تطبيق الرمز",
+  "company_contact_copied": "تعذّر الفتح هنا — تم نسخ {value}."
 }
