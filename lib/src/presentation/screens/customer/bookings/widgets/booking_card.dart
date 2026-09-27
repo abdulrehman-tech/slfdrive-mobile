@@ -205,9 +205,7 @@ class BookingCard extends StatelessWidget {
         // Rejected bookings have no payment to make — omit the pill entirely.
         if (booking.showPaymentStatus) _paymentBadge(),
         const Spacer(),
-        OmrIcon(size: 13.r, color: cs.primary),
-        SizedBox(width: 3.r),
-        Text(
+        OmrAmount(
           booking.totalPrice.toStringAsFixed(2),
           style: TextStyle(fontSize: 16.r, fontWeight: FontWeight.w900, color: cs.primary),
         ),

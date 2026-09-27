@@ -84,9 +84,7 @@ class BookingCarCard extends StatelessWidget {
                       SizedBox(height: 6.r),
                       Row(
                         children: [
-                          OmrIcon(size: 11.r, color: cs.primary),
-                          SizedBox(width: 3.r),
-                          Text(
+                          OmrAmount(
                             // VEHICLE-only rate. `pricePerDay` is total/days, so
                             // for a car+driver booking it wrongly bundled the
                             // driver's charge into the vehicle price. Use the

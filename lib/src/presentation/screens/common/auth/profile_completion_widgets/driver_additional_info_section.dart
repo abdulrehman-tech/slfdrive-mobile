@@ -62,6 +62,7 @@ class DriverAdditionalInfoSection extends StatelessWidget {
           hint: 'enter_amount'.tr(),
           label: 'amount_per_day'.tr(),
           icon: Icons.payments_outlined,
+          isCurrency: true,
         ),
         SizedBox(height: 16.r),
         _number(
@@ -69,6 +70,7 @@ class DriverAdditionalInfoSection extends StatelessWidget {
           hint: 'enter_amount'.tr(),
           label: 'amount_per_hour'.tr(),
           icon: Icons.schedule_outlined,
+          isCurrency: true,
         ),
         SizedBox(height: 16.r),
         _hasVehicleToggle(provider),
@@ -81,6 +83,7 @@ class DriverAdditionalInfoSection extends StatelessWidget {
     required String hint,
     required String label,
     required IconData icon,
+    bool isCurrency = false,
   }) {
     if (desktop) {
       return InputFieldDesktop(
@@ -89,6 +92,7 @@ class DriverAdditionalInfoSection extends StatelessWidget {
         label: label,
         icon: icon,
         isDark: isDark,
+        isCurrency: isCurrency,
         keyboardType: const TextInputType.numberWithOptions(decimal: true),
       );
     }
@@ -98,6 +102,7 @@ class DriverAdditionalInfoSection extends StatelessWidget {
       label: label,
       icon: icon,
       isDark: isDark,
+      isCurrency: isCurrency,
       keyboardType: const TextInputType.numberWithOptions(decimal: true),
     );
   }

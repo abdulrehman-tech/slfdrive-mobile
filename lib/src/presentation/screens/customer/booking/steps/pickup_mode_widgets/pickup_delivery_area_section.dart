@@ -150,9 +150,7 @@ class PickupDeliveryAreaSection extends StatelessWidget {
             style: TextStyle(fontSize: 13.r, fontWeight: FontWeight.w800, color: const Color(0xFF4CAF50)),
           )
         else ...[
-          OmrIcon(size: 12.r, color: cs.onSurface),
-          SizedBox(width: 3.r),
-          Text(
+          OmrAmount(
             fee.toStringAsFixed(2),
             style: TextStyle(fontSize: 13.r, fontWeight: FontWeight.w800, color: cs.onSurface),
           ),

@@ -4,6 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 
 import '../models/driver_trip.dart';
+import '../../../../widgets/omr_icon.dart';
 
 class CompletedTripCard extends StatelessWidget {
   final DriverTrip trip;
@@ -78,8 +79,8 @@ class CompletedTripCard extends StatelessWidget {
               ],
             ),
           ),
-          Text(
-            'OMR ${trip.fare.toStringAsFixed(2)}',
+          OmrAmount.value(
+            trip.fare,
             style: TextStyle(
               fontSize: 16.r,
               fontWeight: FontWeight.w700,

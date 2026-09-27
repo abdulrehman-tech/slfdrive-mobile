@@ -19,9 +19,7 @@ class BookingPriceBadge extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          OmrIcon(size: 11.r, color: Colors.white),
-          SizedBox(width: 3.r),
-          Text(
+          OmrAmount(
             '${price.toInt()}',
             style: TextStyle(
               fontSize: 14.r,

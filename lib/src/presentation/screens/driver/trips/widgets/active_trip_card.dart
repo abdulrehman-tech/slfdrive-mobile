@@ -8,6 +8,7 @@ import 'package:provider/provider.dart';
 import '../../../../widgets/confirm_dialog.dart';
 import '../models/driver_trip.dart';
 import '../provider/driver_trips_provider.dart';
+import '../../../../widgets/omr_icon.dart';
 
 class ActiveTripCard extends StatelessWidget {
   final DriverTrip trip;
@@ -151,8 +152,8 @@ class ActiveTripCard extends StatelessWidget {
             ],
           ),
         ),
-        Text(
-          'OMR ${trip.fare.toStringAsFixed(2)}',
+        OmrAmount.value(
+          trip.fare,
           style: TextStyle(
             fontSize: 16.r,
             fontWeight: FontWeight.w700,

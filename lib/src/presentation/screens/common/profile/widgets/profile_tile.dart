@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import '../../../../widgets/omr_icon.dart';
 
 /// Tappable profile row with leading icon, title, optional trailing value and a
 /// chevron. Shared by both roles.
@@ -9,6 +10,9 @@ class ProfileTile extends StatelessWidget {
   final String title;
   final String? value;
   final Color? valueColor;
+
+  /// Show the currency symbol before [value].
+  final bool valueIsCurrency;
   final bool isDark;
   final VoidCallback onTap;
 
@@ -21,7 +25,14 @@ class ProfileTile extends StatelessWidget {
     required this.onTap,
     this.value,
     this.valueColor,
+    this.valueIsCurrency = false,
   });
+
+  TextStyle _valueStyle(ColorScheme cs) => TextStyle(
+        fontSize: 12.r,
+        color: valueColor ?? cs.onSurface.withValues(alpha: 0.55),
+        fontWeight: FontWeight.w700,
+      );
 
   @override
   Widget build(BuildContext context) {
@@ -54,14 +65,9 @@ class ProfileTile extends StatelessWidget {
               if (value != null)
                 Padding(
                   padding: EdgeInsetsDirectional.only(end: 6.r),
-                  child: Text(
-                    value!,
-                    style: TextStyle(
-                      fontSize: 12.r,
-                      color: valueColor ?? cs.onSurface.withValues(alpha: 0.55),
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
+                  child: valueIsCurrency
+                      ? OmrAmount(value!, style: _valueStyle(cs))
+                      : Text(value!, style: _valueStyle(cs)),
                 ),
               Icon(Icons.chevron_right, size: 18.r, color: cs.onSurface.withValues(alpha: 0.3)),
             ],

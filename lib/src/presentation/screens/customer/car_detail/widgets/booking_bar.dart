@@ -63,12 +63,11 @@ class BookingBar extends StatelessWidget {
                     )
                   else
                     Row(
+                      crossAxisAlignment: CrossAxisAlignment.baseline,
+                      textBaseline: TextBaseline.alphabetic,
                       mainAxisSize: MainAxisSize.min,
-                      crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        OmrIcon(size: 15.r, color: cs.primary),
-                        SizedBox(width: 3.r),
-                        Text(
+                        OmrAmount(
                           price.toStringAsFixed(price.truncateToDouble() == price ? 0 : 2),
                           style: TextStyle(fontSize: 20.r, fontWeight: FontWeight.bold, color: cs.primary),
                         ),

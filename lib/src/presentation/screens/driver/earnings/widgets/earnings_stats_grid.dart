@@ -49,9 +49,10 @@ class EarningsStatsGrid extends StatelessWidget {
           EarningsStatCard(
             icon: Iconsax.chart,
             label: 'earnings_avg_trip'.tr(),
-            value: 'OMR ${snapshot.avgPerTrip.toStringAsFixed(2)}',
+            value: snapshot.avgPerTrip.toStringAsFixed(2),
             color: const Color(0xFF4CAF50),
             isDark: isDark,
+            isCurrency: true,
           ),
         ],
       ),

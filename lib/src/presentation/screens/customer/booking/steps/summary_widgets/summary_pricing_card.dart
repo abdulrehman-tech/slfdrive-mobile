@@ -131,15 +131,15 @@ class SummaryPricingCard extends StatelessWidget {
       );
 
   Widget _totalRow(ColorScheme cs, double total) => Row(
+        crossAxisAlignment: CrossAxisAlignment.baseline,
+        textBaseline: TextBaseline.alphabetic,
         children: [
           Text(
             'booking_summary_total'.tr(),
             style: TextStyle(fontSize: 14.r, fontWeight: FontWeight.w700, color: cs.onSurface),
           ),
           const Spacer(),
-          OmrIcon(size: 14.r, color: cs.primary),
-          SizedBox(width: 3.r),
-          Text(
+          OmrAmount(
             total.toStringAsFixed(2),
             style: TextStyle(fontSize: 22.r, fontWeight: FontWeight.w900, color: cs.primary),
           ),

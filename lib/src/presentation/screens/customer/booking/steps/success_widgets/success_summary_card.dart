@@ -50,15 +50,15 @@ class SuccessSummaryCard extends StatelessWidget {
                 color: isDark ? Colors.white.withValues(alpha: 0.06) : Colors.black.withValues(alpha: 0.05),
               ),
               Row(
+                crossAxisAlignment: CrossAxisAlignment.baseline,
+                textBaseline: TextBaseline.alphabetic,
                 children: [
                   Text(
                     'booking_summary_total'.tr(),
                     style: TextStyle(fontSize: 13.r, fontWeight: FontWeight.w700, color: cs.onSurface),
                   ),
                   const Spacer(),
-                  OmrIcon(size: 14.r, color: cs.primary),
-                  SizedBox(width: 3.r),
-                  Text(
+                  OmrAmount(
                     data.totalPrice.toStringAsFixed(2),
                     style: TextStyle(fontSize: 20.r, fontWeight: FontWeight.w900, color: cs.primary),
                   ),

@@ -20,6 +20,8 @@ class SummaryPriceRow extends StatelessWidget {
     return Padding(
       padding: EdgeInsets.symmetric(vertical: 4.r),
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.baseline,
+        textBaseline: TextBaseline.alphabetic,
         children: [
           Expanded(
             child: Text(
@@ -27,15 +29,15 @@ class SummaryPriceRow extends StatelessWidget {
               style: TextStyle(fontSize: 12.r, color: cs.onSurface.withValues(alpha: 0.6)),
             ),
           ),
-          OmrIcon(size: 11.r, color: highlight ?? cs.onSurface.withValues(alpha: 0.7)),
-          SizedBox(width: 2.r),
-          Text(
+          OmrAmount(
             amount.toStringAsFixed(2),
             style: TextStyle(
               fontSize: 12.r,
               fontWeight: FontWeight.w700,
               color: highlight ?? cs.onSurface,
             ),
+            iconColor: highlight ?? cs.onSurface.withValues(alpha: 0.7),
+            gap: 2.r,
           ),
         ],
       ),

@@ -60,9 +60,7 @@ class SummarySubjectCard extends StatelessWidget {
                 ),
                 Row(
                   children: [
-                    OmrIcon(size: 12.r, color: cs.primary),
-                    SizedBox(width: 3.r),
-                    Text(
+                    OmrAmount(
                       '${d.car!.pricePerDay.toStringAsFixed(0)}${'car_detail_per_day'.tr()}',
                       style: TextStyle(fontSize: 13.r, fontWeight: FontWeight.w800, color: cs.primary),
                     ),
@@ -122,9 +120,7 @@ class SummarySubjectCard extends StatelessWidget {
                 ),
                 Row(
                   children: [
-                    OmrIcon(size: 11.r, color: cs.primary),
-                    SizedBox(width: 3.r),
-                    Text(
+                    OmrAmount(
                       '${d.driver!.pricePerDay.toStringAsFixed(0)}${'driver_detail_per_day'.tr()}',
                       style: TextStyle(fontSize: 12.r, fontWeight: FontWeight.w800, color: cs.primary),
                     ),
