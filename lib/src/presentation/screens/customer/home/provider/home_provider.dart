@@ -98,7 +98,7 @@ class HomeProvider extends ChangeNotifier {
   Future<void> _loadBrands() async {
     try {
       final brands = await getIt<LookupRepository>().getActiveBrands();
-      _brands = brands.map((b) => CarBrand(b.displayName(ar: _ar), '')).toList();
+      _brands = brands.map((b) => CarBrand(b.displayName(ar: _ar), b.resolvedLogoUrl)).toList();
       notifyListeners();
     } catch (_) {
       // Brands are non-critical chrome; leave empty on failure.

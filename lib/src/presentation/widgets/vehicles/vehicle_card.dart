@@ -12,6 +12,7 @@ import '../auth_gate.dart';
 import '../omr_icon.dart';
 import 'availability_pill.dart';
 import 'lookup_label.dart';
+import '../company_link.dart';
 
 /// Row card for vehicle lists (browse cars, search): photo with favourite,
 /// then name with its availability status, brand · year · type, the renting
@@ -23,9 +24,20 @@ class VehicleCard extends StatelessWidget {
   final bool ar;
   final VoidCallback onTap;
 
+  /// Show the owning company as a link to its profile. Off on the company's
+  /// own profile page, where every card belongs to it.
+  final bool showCompany;
+
   static const double height = 152;
 
-  const VehicleCard({super.key, required this.vehicle, required this.onTap, this.rating, this.ar = false});
+  const VehicleCard({
+    super.key,
+    required this.vehicle,
+    required this.onTap,
+    this.rating,
+    this.ar = false,
+    this.showCompany = true,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -54,7 +66,7 @@ class VehicleCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             _Photo(vehicle: vehicle, rating: rating, isDark: isDark, cs: cs),
-            Expanded(child: _Info(vehicle: vehicle, rating: rating, ar: ar, isDark: isDark, cs: cs)),
+            Expanded(child: _Info(vehicle: vehicle, rating: rating, ar: ar, isDark: isDark, cs: cs, showCompany: showCompany)),
           ],
         ),
       ),
@@ -139,8 +151,16 @@ class _Info extends StatelessWidget {
   final bool ar;
   final bool isDark;
   final ColorScheme cs;
+  final bool showCompany;
 
-  const _Info({required this.vehicle, required this.rating, required this.ar, required this.isDark, required this.cs});
+  const _Info({
+    required this.vehicle,
+    required this.rating,
+    required this.ar,
+    required this.isDark,
+    required this.cs,
+    required this.showCompany,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -185,22 +205,9 @@ class _Info extends StatelessWidget {
               overflow: TextOverflow.ellipsis,
               style: TextStyle(fontSize: 11.r, color: muted, fontWeight: FontWeight.w500),
             ),
-          if (company.isNotEmpty) ...[
-            SizedBox(height: 3.r),
-            Row(
-              children: [
-                Icon(Iconsax.building_copy, size: 11.r, color: cs.primary.withValues(alpha: 0.8)),
-                SizedBox(width: 4.r),
-                Expanded(
-                  child: Text(
-                    company,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(fontSize: 10.r, color: cs.primary, fontWeight: FontWeight.w600),
-                  ),
-                ),
-              ],
-            ),
+          if (showCompany && company.isNotEmpty) ...[
+            SizedBox(height: 1.r),
+            CompanyLink(name: company, companyId: v.companyId, fontSize: 10),
           ],
           SizedBox(height: 7.r),
           // One line; extra pills are clipped rather than wrapping into the price.

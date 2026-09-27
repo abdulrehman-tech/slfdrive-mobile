@@ -505,5 +505,30 @@
   "units_trips": {
     "one": "{} ट्रिप",
     "other": "{} ट्रिप"
-  }
+  },
+  "promo_title": "प्रोमो कोड",
+  "promo_hint": "प्रोमो कोड दर्ज करें",
+  "promo_apply": "लागू करें",
+  "promo_remove": "हटाएं",
+  "promo_you_save": "आपकी बचत",
+  "promo_available": "उपलब्ध ऑफ़र",
+  "promo_discount_line": "प्रोमो ({code})",
+  "promo_invalid": "यह प्रोमो कोड मान्य नहीं है।",
+  "promo_not_applicable": "यह प्रोमो कोड इस बुकिंग पर लागू नहीं होता।",
+  "company_load_failed": "इस कंपनी को लोड नहीं किया जा सका।",
+  "company_new": "नया",
+  "company_about": "परिचय",
+  "company_no_vehicles": "अभी कोई वाहन नहीं।",
+  "company_no_drivers": "अभी कोई ड्राइवर नहीं।",
+  "company_no_reviews": "अभी कोई समीक्षा नहीं।",
+  "company_tab_vehicles": "वाहन",
+  "company_tab_drivers": "ड्राइवर",
+  "company_tab_reviews": "समीक्षाएं",
+  "company_view_profile": "कंपनी प्रोफ़ाइल देखें",
+  "company_vehicles_count": {
+    "one": "{} वाहन",
+    "other": "{} वाहन"
+  },
+  "company_read_more": "और पढ़ें",
+  "company_read_less": "कम दिखाएं"
 }

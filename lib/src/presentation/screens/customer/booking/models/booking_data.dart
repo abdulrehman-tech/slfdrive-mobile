@@ -344,6 +344,49 @@ class BookingData extends ChangeNotifier {
 
   double get totalPrice => pricing.total;
 
+  /// What the customer will actually be charged: the server quote (which
+  /// includes any promo discount) when available, else the local estimate.
+  double get payableTotal => _quote?.totalAmount ?? totalPrice;
+
+  // ---- Promo code ----
+  // The code the customer applied. It rides on every pre-booking quote and on
+  // create; the server computes the discount. Cleared when the selection
+  // changes enough to need re-validation (see [clearPromo]).
+  String? _promoCode;
+  bool _promoApplying = false;
+  String? _promoError;
+
+  String? get promoCode => _promoCode;
+  bool get promoApplying => _promoApplying;
+  String? get promoError => _promoError;
+
+  void setPromoApplying() {
+    _promoApplying = true;
+    _promoError = null;
+    notifyListeners();
+  }
+
+  void setPromoApplied(String code) {
+    _promoCode = code;
+    _promoApplying = false;
+    _promoError = null;
+    notifyListeners();
+  }
+
+  void setPromoError(String message) {
+    _promoApplying = false;
+    _promoError = message;
+    notifyListeners();
+  }
+
+  void clearPromo() {
+    if (_promoCode == null && _promoError == null && !_promoApplying) return;
+    _promoCode = null;
+    _promoApplying = false;
+    _promoError = null;
+    notifyListeners();
+  }
+
   // ---- Setters ----
   void setServiceType(BookingServiceType type) {
     _serviceType = type;

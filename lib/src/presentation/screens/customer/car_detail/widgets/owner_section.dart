@@ -1,9 +1,11 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 
 import '../provider/car_detail_provider.dart';
 import 'car_glass_card.dart';
+import '../../../../widgets/company_link.dart';
 
 /// Card showing the car owner avatar and name.
 /// Contact actions (phone/WhatsApp) are omitted — the backend DTO
@@ -26,8 +28,9 @@ class OwnerSection extends StatelessWidget {
     if (name == null || name.isEmpty) return const SizedBox.shrink();
 
     final initial = name[0].toUpperCase();
+    final companyId = vehicle.companyId;
 
-    return CarGlassCard(
+    final card = CarGlassCard(
       isDark: isDark,
       child: Padding(
         padding: EdgeInsets.all(16.r),
@@ -49,14 +52,33 @@ class OwnerSection extends StatelessWidget {
             ),
             SizedBox(width: 12.r),
             Expanded(
-              child: Text(
-                name,
-                style: TextStyle(fontSize: 13.r, fontWeight: FontWeight.w700, color: cs.onSurface),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    name,
+                    style: TextStyle(fontSize: 13.r, fontWeight: FontWeight.w700, color: cs.onSurface),
+                  ),
+                  if (companyId != null) ...[
+                    SizedBox(height: 2.r),
+                    Text(
+                      'company_view_profile'.tr(),
+                      style: TextStyle(fontSize: 11.r, fontWeight: FontWeight.w600, color: cs.primary),
+                    ),
+                  ],
+                ],
               ),
             ),
+            if (companyId != null) Icon(Icons.chevron_right, size: 20.r, color: cs.onSurface.withValues(alpha: 0.35)),
           ],
         ),
       ),
+    );
+    if (companyId == null) return card;
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: () => openCompanyProfile(context, companyId),
+      child: card,
     );
   }
 }

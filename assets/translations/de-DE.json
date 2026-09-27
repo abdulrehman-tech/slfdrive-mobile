@@ -505,5 +505,30 @@
   "units_trips": {
     "one": "{} Fahrt",
     "other": "{} Fahrten"
-  }
+  },
+  "promo_title": "Gutscheincode",
+  "promo_hint": "Gutscheincode eingeben",
+  "promo_apply": "Anwenden",
+  "promo_remove": "Entfernen",
+  "promo_you_save": "Du sparst",
+  "promo_available": "Verfügbare Angebote",
+  "promo_discount_line": "Gutschein ({code})",
+  "promo_invalid": "Dieser Gutscheincode ist ungültig.",
+  "promo_not_applicable": "Dieser Gutscheincode gilt nicht für diese Buchung.",
+  "company_load_failed": "Unternehmen konnte nicht geladen werden.",
+  "company_new": "Neu",
+  "company_about": "Über uns",
+  "company_no_vehicles": "Noch keine Fahrzeuge.",
+  "company_no_drivers": "Noch keine Fahrer.",
+  "company_no_reviews": "Noch keine Bewertungen.",
+  "company_tab_vehicles": "Fahrzeuge",
+  "company_tab_drivers": "Fahrer",
+  "company_tab_reviews": "Bewertungen",
+  "company_view_profile": "Firmenprofil ansehen",
+  "company_vehicles_count": {
+    "one": "{} Fahrzeug",
+    "other": "{} Fahrzeuge"
+  },
+  "company_read_more": "Mehr lesen",
+  "company_read_less": "Weniger anzeigen"
 }

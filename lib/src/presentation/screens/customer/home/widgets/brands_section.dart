@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 import '../provider/home_provider.dart';
+import '../../../../widgets/network_logo.dart';
 import 'section_header.dart';
 
 class BrandsSection extends StatelessWidget {
@@ -83,15 +84,10 @@ class BrandsSection extends StatelessWidget {
                         child: ClipOval(
                           child: Padding(
                             padding: EdgeInsets.all(10.r),
-                            child: Image.asset(
-                              brand.logoUrl,
-                              fit: BoxFit.contain,
-                              errorBuilder: (_, _, _) => Center(
-                                child: Text(
-                                  brand.name[0],
-                                  style: TextStyle(fontSize: 18.r, fontWeight: FontWeight.bold, color: cs.primary),
-                                ),
-                              ),
+                            child: NetworkLogo(
+                              url: brand.logoUrl,
+                              name: brand.name,
+                              letterStyle: TextStyle(fontSize: 18.r, fontWeight: FontWeight.bold, color: cs.primary),
                             ),
                           ),
                         ),

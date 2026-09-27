@@ -505,5 +505,30 @@
   "units_trips": {
     "one": "{} viaje",
     "other": "{} viajes"
-  }
+  },
+  "promo_title": "Código promocional",
+  "promo_hint": "Introduce el código",
+  "promo_apply": "Aplicar",
+  "promo_remove": "Quitar",
+  "promo_you_save": "Ahorras",
+  "promo_available": "Ofertas disponibles",
+  "promo_discount_line": "Promoción ({code})",
+  "promo_invalid": "Este código no es válido.",
+  "promo_not_applicable": "Este código no se aplica a esta reserva.",
+  "company_load_failed": "No se pudo cargar la empresa.",
+  "company_new": "Nuevo",
+  "company_about": "Acerca de",
+  "company_no_vehicles": "Aún no hay vehículos.",
+  "company_no_drivers": "Aún no hay conductores.",
+  "company_no_reviews": "Aún no hay reseñas.",
+  "company_tab_vehicles": "Vehículos",
+  "company_tab_drivers": "Conductores",
+  "company_tab_reviews": "Reseñas",
+  "company_view_profile": "Ver perfil de la empresa",
+  "company_vehicles_count": {
+    "one": "{} vehículo",
+    "other": "{} vehículos"
+  },
+  "company_read_more": "Leer más",
+  "company_read_less": "Ver menos"
 }

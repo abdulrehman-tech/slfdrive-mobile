@@ -511,5 +511,32 @@
     "few": "{} поездки",
     "many": "{} поездок",
     "other": "{} поездки"
-  }
+  },
+  "promo_title": "Промокод",
+  "promo_hint": "Введите промокод",
+  "promo_apply": "Применить",
+  "promo_remove": "Удалить",
+  "promo_you_save": "Экономия",
+  "promo_available": "Доступные предложения",
+  "promo_discount_line": "Промокод ({code})",
+  "promo_invalid": "Этот промокод недействителен.",
+  "promo_not_applicable": "Этот промокод нельзя применить к этому бронированию.",
+  "company_load_failed": "Не удалось загрузить компанию.",
+  "company_new": "Новая",
+  "company_about": "О компании",
+  "company_no_vehicles": "Пока нет автомобилей.",
+  "company_no_drivers": "Пока нет водителей.",
+  "company_no_reviews": "Пока нет отзывов.",
+  "company_tab_vehicles": "Авто",
+  "company_tab_drivers": "Водители",
+  "company_tab_reviews": "Отзывы",
+  "company_view_profile": "Профиль компании",
+  "company_vehicles_count": {
+    "one": "{} автомобиль",
+    "few": "{} автомобиля",
+    "many": "{} автомобилей",
+    "other": "{} автомобиля"
+  },
+  "company_read_more": "Читать далее",
+  "company_read_less": "Свернуть"
 }

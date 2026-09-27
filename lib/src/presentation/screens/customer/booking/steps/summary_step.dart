@@ -6,6 +6,7 @@ import 'summary_widgets/summary_corporate_card.dart';
 import 'summary_widgets/summary_header.dart';
 import 'summary_widgets/summary_logistics_card.dart';
 import 'summary_widgets/summary_pricing_card.dart';
+import 'summary_widgets/summary_promo_card.dart';
 import 'summary_widgets/summary_schedule_card.dart';
 import 'summary_widgets/summary_subject_card.dart';
 
@@ -39,6 +40,13 @@ class SummaryStep extends StatelessWidget {
 
         // Location card
         SummaryLogisticsCard(data: d, isDark: isDark),
+
+        // Promo codes apply to what the customer pays; corporate bookings are
+        // billed to the employer, so there is nothing to discount here.
+        if (!d.isCorporate) ...[
+          SizedBox(height: 12.r),
+          SummaryPromoCard(data: d, isDark: isDark),
+        ],
 
         SizedBox(height: 14.r),
         SummaryPricingCard(data: d, isDark: isDark),

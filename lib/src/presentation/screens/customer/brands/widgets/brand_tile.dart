@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../widgets/network_logo.dart';
 import '../models/brand.dart';
 
 class BrandTile extends StatelessWidget {
@@ -55,15 +56,10 @@ class BrandTile extends StatelessWidget {
                     child: ClipOval(
                       child: Padding(
                         padding: EdgeInsets.all(10.r),
-                        child: Image.asset(
-                          brand.logoAsset,
-                          fit: BoxFit.contain,
-                          errorBuilder: (_, _, _) => Center(
-                            child: Text(
-                              brand.name[0],
-                              style: TextStyle(fontSize: 20.r, fontWeight: FontWeight.bold, color: cs.primary),
-                            ),
-                          ),
+                        child: NetworkLogo(
+                          url: brand.logoUrl,
+                          name: brand.name,
+                          letterStyle: TextStyle(fontSize: 20.r, fontWeight: FontWeight.bold, color: cs.primary),
                         ),
                       ),
                     ),

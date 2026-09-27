@@ -1080,5 +1080,34 @@
     "few": "{} رحلات",
     "many": "{} رحلة",
     "other": "{} رحلة"
-  }
+  },
+  "promo_title": "رمز الخصم",
+  "promo_hint": "أدخل رمز الخصم",
+  "promo_apply": "تطبيق",
+  "promo_remove": "إزالة",
+  "promo_you_save": "وفّرت",
+  "promo_available": "العروض المتاحة",
+  "promo_discount_line": "خصم ({code})",
+  "promo_invalid": "رمز الخصم غير صالح.",
+  "promo_not_applicable": "لا يمكن استخدام رمز الخصم لهذا الحجز.",
+  "company_load_failed": "تعذّر تحميل بيانات الشركة.",
+  "company_new": "جديد",
+  "company_about": "نبذة",
+  "company_no_vehicles": "لا توجد مركبات بعد.",
+  "company_no_drivers": "لا يوجد سائقون بعد.",
+  "company_no_reviews": "لا توجد تقييمات بعد.",
+  "company_tab_vehicles": "المركبات",
+  "company_tab_drivers": "السائقون",
+  "company_tab_reviews": "التقييمات",
+  "company_view_profile": "عرض ملف الشركة",
+  "company_vehicles_count": {
+    "zero": "{} مركبة",
+    "one": "مركبة واحدة",
+    "two": "مركبتان",
+    "few": "{} مركبات",
+    "many": "{} مركبة",
+    "other": "{} مركبة"
+  },
+  "company_read_more": "اقرأ المزيد",
+  "company_read_less": "عرض أقل"
 }

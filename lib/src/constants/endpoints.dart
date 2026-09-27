@@ -92,6 +92,13 @@ class ApiEndpoints {
   static String branchById(int id) => '/api/Branch/$id';
 
   // Bookings
+  // Promo codes
+  static const String promoCodeValidate = '/api/PromoCode/validate';
+  static const String promoCodeActive = '/api/PromoCode/active';
+
+  // Company profile (rental companies are AllCompanies rows)
+  static String companyProfile(int id) => '/api/AllCompanies/$id/profile';
+
   static const String bookingCreate = '/api/Booking/create';
   static const String bookingPreBooking = '/api/Booking/pre-booking';
   static const String bookingMyPaginated = '/api/Booking/my/paginated';

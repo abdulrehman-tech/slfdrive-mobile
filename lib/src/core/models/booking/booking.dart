@@ -9,6 +9,13 @@ class Booking {
   final int? rentalCompanyId;
   final int? corporateCompanyId;
   final double? totalAmount;
+
+  /// Promo snapshot stored on the booking: code text, discount taken off the
+  /// rental amount, and the gross amount before it (`totalAmount` is net).
+  final String? promoCode;
+  final String? promoCodeName;
+  final double? discountAmount;
+  final double? grossAmount;
   final double? vehicleAmount;
   final double? driverAmount;
 
@@ -62,6 +69,10 @@ class Booking {
     this.rentalCompanyId,
     this.corporateCompanyId,
     this.totalAmount,
+    this.promoCode,
+    this.promoCodeName,
+    this.discountAmount,
+    this.grossAmount,
     this.vehicleAmount,
     this.driverAmount,
     this.deliveryFee,
@@ -149,6 +160,10 @@ class Booking {
       rentalCompanyId: i('rentalCompanyId'),
       corporateCompanyId: i('corporateCompanyId'),
       totalAmount: d('totalAmount') ?? d('amount'),
+      promoCode: json['promoCode'] as String?,
+      promoCodeName: json['promoCodeName'] as String?,
+      discountAmount: d('discountAmount'),
+      grossAmount: d('grossAmount'),
       vehicleAmount: d('vehicleAmount'),
       driverAmount: d('driverAmount'),
       deliveryFee: d('deliveryFee'),

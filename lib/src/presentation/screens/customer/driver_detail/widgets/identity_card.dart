@@ -7,6 +7,7 @@ import 'package:iconsax_flutter/iconsax_flutter.dart';
 import '../models/driver_profile.dart';
 import 'glass_card.dart';
 import 'tiny_chip.dart';
+import '../../../../widgets/company_link.dart';
 
 class IdentityCard extends StatelessWidget {
   final DriverProfile profile;
@@ -121,6 +122,10 @@ class IdentityCard extends StatelessWidget {
                         ),
                     ],
                   ),
+                  if (profile.companyName != null) ...[
+                    SizedBox(height: 6.r),
+                    CompanyLink(name: profile.companyName!, companyId: profile.companyId, fontSize: 12),
+                  ],
                 ],
               ),
             ),

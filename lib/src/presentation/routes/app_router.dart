@@ -33,6 +33,7 @@ import '../screens/customer/booking/location_picker_screen.dart';
 import '../screens/customer/booking/models/booking_data.dart';
 import '../screens/customer/booking/steps/success_screen.dart';
 import '../screens/customer/booking_detail/booking_detail_screen.dart';
+import '../screens/customer/company_profile/company_profile_screen.dart';
 import '../screens/customer/booking_detail/models/booking_detail.dart' show BookingDetailSeed;
 import '../screens/customer/bookings/bookings_screen.dart';
 import '../screens/customer/payment/payment_screen.dart';
@@ -402,6 +403,14 @@ class AppRouter {
           }
           return AppFadeThroughTransition(child: BookingSuccessScreen(data: data), name: state.name);
         },
+      ),
+      GoRoute(
+        path: '/companies/:id',
+        name: 'company-profile',
+        pageBuilder: (context, state) => AppModalTransition(
+          child: CompanyProfileScreen(companyId: int.tryParse(state.pathParameters['id'] ?? '') ?? 0),
+          name: state.name,
+        ),
       ),
       GoRoute(
         path: '/bookings/:id',

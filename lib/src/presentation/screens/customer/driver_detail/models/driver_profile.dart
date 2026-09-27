@@ -37,6 +37,10 @@ class DriverProfile {
   /// verified tick + trust chips in the identity card; never assumed true.
   final bool isVerified;
 
+  /// Rental company the driver works for (null for freelancers).
+  final int? companyId;
+  final String? companyName;
+
   /// Authoritative review count from the stats aggregate. Used for the header
   /// count so it stays correct even when the review-LIST endpoint fails (the
   /// per-star histogram derives from the loaded list, which may be empty).
@@ -46,6 +50,8 @@ class DriverProfile {
     required this.id,
     this.bookingDriverId = '',
     required this.name,
+    this.companyId,
+    this.companyName,
     required this.coverUrl,
     required this.avatarUrl,
     required this.rating,
@@ -119,6 +125,8 @@ class DriverProfile {
       reviewCount: stats?.totalReviews ?? 0,
       isOnline: d.isOnline ?? false,
       isVerified: d.isVerified,
+      companyId: d.allCompanyId,
+      companyName: (d.allCompanyName?.trim().isNotEmpty ?? false) ? d.allCompanyName!.trim() : null,
     );
   }
 }

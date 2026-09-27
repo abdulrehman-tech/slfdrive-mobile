@@ -7,11 +7,15 @@ class SummaryPriceRow extends StatelessWidget {
   final String label;
   final double amount;
   final Color? highlight;
+
+  /// Show the amount as a deduction ("−3.00"), e.g. a promo discount.
+  final bool isDeduction;
   const SummaryPriceRow({
     super.key,
     required this.label,
     required this.amount,
     this.highlight,
+    this.isDeduction = false,
   });
 
   @override
@@ -29,6 +33,8 @@ class SummaryPriceRow extends StatelessWidget {
               style: TextStyle(fontSize: 12.r, color: cs.onSurface.withValues(alpha: 0.6)),
             ),
           ),
+          if (isDeduction)
+            Text('−', style: TextStyle(fontSize: 12.r, fontWeight: FontWeight.w700, color: highlight ?? cs.onSurface)),
           OmrAmount(
             amount.toStringAsFixed(2),
             style: TextStyle(

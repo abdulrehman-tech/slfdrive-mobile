@@ -11,6 +11,7 @@ import '../../../../../core/models/booking/booking_creation_request.dart';
 import '../../../../../core/services/booking_lookups.dart';
 import '../models/booking_data.dart';
 import '../models/booking_step_id.dart';
+import '../../../../../core/data/repositories/promo_code_repository.dart';
 
 /// Orchestrates the multi-step booking flow.
 ///
@@ -241,10 +242,58 @@ class BookingFlowProvider extends ChangeNotifier {
       final quote = await getIt<BookingRepository>().quote(request);
       data.setQuote(quote);
     } on AppException catch (e) {
+      // A code that no longer fits the selection (dates/vehicle changed) must
+      // not block the booking: drop it, say why, and re-quote at full price.
+      if (data.promoCode != null) {
+        data.clearPromo();
+        data.setPromoError(e.message);
+        return refreshQuote();
+      }
       data.setQuoteError(e.message);
     } catch (e) {
       data.setQuoteError(e.toString());
     }
+  }
+
+  /// Validates [code] against this booking's rental company and amount, then
+  /// re-quotes with it so the summary shows the server's discount and total.
+  /// Returns true when applied; on failure [BookingData.promoError] holds the
+  /// server's reason (or a translation key).
+  Future<bool> applyPromo(String code) async {
+    final trimmed = code.trim().toUpperCase();
+    if (trimmed.isEmpty) return false;
+    data.setPromoApplying();
+    try {
+      final quote = data.quote;
+      await getIt<PromoCodeRepository>().validate(
+        code: trimmed,
+        companyId: quote?.rentalCompanyId,
+        amount: quote?.rentalAmount,
+      );
+      data.setPromoApplied(trimmed);
+      await refreshQuote();
+      // The quote is authoritative: if the server didn't apply it there (e.g.
+      // it isn't valid for this company after all), don't pretend it worked.
+      if (data.quote != null && !data.quote!.hasPromo) {
+        data.clearPromo();
+        data.setPromoError('promo_not_applicable');
+        await refreshQuote();
+        return false;
+      }
+      return true;
+    } on AppException catch (e) {
+      data.setPromoError(e.message);
+      return false;
+    } catch (e) {
+      data.setPromoError('promo_invalid');
+      return false;
+    }
+  }
+
+  /// Removes the applied code and re-quotes at full price.
+  Future<void> removePromo() async {
+    data.clearPromo();
+    await refreshQuote();
   }
 
   /// Builds the `BookingCreationRequest` from the current [data]. Shared by the
@@ -308,6 +357,7 @@ class BookingFlowProvider extends ChangeNotifier {
       corporateCompanyId: data.isCorporate ? data.company?.id : null,
       bookingTypeId: bookingTypeId,
       serviceTypeId: serviceTypeId,
+      promoCode: data.isCorporate ? null : data.promoCode,
       bookingDetails: [detail],
     );
     return (request, null);

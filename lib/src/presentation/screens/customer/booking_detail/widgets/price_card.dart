@@ -37,6 +37,13 @@ class BookingPriceCard extends StatelessWidget {
             if (booking.extrasPerDay > 0)
               _priceRow(cs, 'booking_summary_extras'.tr(), booking.extrasPerDay * booking.days),
             if (booking.deliveryFee > 0) _priceRow(cs, 'booking_summary_delivery_fee'.tr(), booking.deliveryFee),
+            if (booking.discountAmount > 0)
+              _priceRow(
+                cs,
+                'promo_discount_line'.tr(namedArgs: {'code': booking.promoCode ?? ''}),
+                booking.discountAmount,
+                deduction: true,
+              ),
             Divider(
               height: 20.r,
               color: isDark ? Colors.white.withValues(alpha: 0.08) : Colors.black.withValues(alpha: 0.06),
@@ -155,7 +162,8 @@ class BookingPriceCard extends StatelessWidget {
     return rows;
   }
 
-  Widget _priceRow(ColorScheme cs, String label, double amount) {
+  Widget _priceRow(ColorScheme cs, String label, double amount, {bool deduction = false}) {
+    const green = Color(0xFF2E9E57);
     return Padding(
       padding: EdgeInsets.symmetric(vertical: 3.r),
       child: Row(
@@ -168,10 +176,12 @@ class BookingPriceCard extends StatelessWidget {
               style: TextStyle(fontSize: 12.r, color: cs.onSurface.withValues(alpha: 0.6)),
             ),
           ),
+          if (deduction)
+            Text('−', style: TextStyle(fontSize: 12.r, fontWeight: FontWeight.w700, color: green)),
           OmrAmount(
             amount.toStringAsFixed(2),
-            style: TextStyle(fontSize: 12.r, fontWeight: FontWeight.w700, color: cs.onSurface),
-            iconColor: cs.onSurface.withValues(alpha: 0.7),
+            style: TextStyle(fontSize: 12.r, fontWeight: FontWeight.w700, color: deduction ? green : cs.onSurface),
+            iconColor: deduction ? green : cs.onSurface.withValues(alpha: 0.7),
             gap: 2.r,
           ),
         ],

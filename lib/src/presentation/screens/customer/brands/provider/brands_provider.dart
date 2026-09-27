@@ -42,7 +42,7 @@ class BrandsProvider extends ChangeNotifier {
         ..clear()
         ..addAll(brands.map((b) => Brand(
               name: b.displayName(ar: _ar),
-              logoAsset: '',
+              logoUrl: b.resolvedLogoUrl,
               carsCount: 0,
               tagline: '',
             )));
