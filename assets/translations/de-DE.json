@@ -530,5 +530,15 @@
     "other": "{} Fahrzeuge"
   },
   "company_read_more": "Mehr lesen",
-  "company_read_less": "Weniger anzeigen"
+  "company_read_less": "Weniger anzeigen",
+  "company_listed_by": "Angeboten von",
+  "company_type_rental": "Autovermietung",
+  "company_stat_rating": "Bewertung",
+  "company_stat_trips": "Fahrten",
+  "company_stat_branches": "Filialen",
+  "company_action_call": "Anrufen",
+  "company_action_email": "E-Mail",
+  "company_action_website": "Website",
+  "promo_subtitle": "Haben Sie einen Code? Lösen Sie ihn ein und sparen Sie.",
+  "promo_applied": "Code eingelöst"
 }

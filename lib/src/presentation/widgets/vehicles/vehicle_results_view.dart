@@ -92,7 +92,7 @@ class VehicleResultsView extends StatelessWidget {
               ? SliverGrid(
                   gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
                     maxCrossAxisExtent: 520,
-                    mainAxisExtent: VehicleCard.height.r,
+                    mainAxisExtent: VehicleCard.extentOf(context),
                     crossAxisSpacing: 14.r,
                     mainAxisSpacing: 14.r,
                   ),

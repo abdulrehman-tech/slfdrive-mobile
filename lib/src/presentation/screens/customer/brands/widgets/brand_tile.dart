@@ -48,14 +48,16 @@ class BrandTile extends StatelessWidget {
                     height: 54.r,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      color: isDark ? Colors.white.withValues(alpha: 0.08) : Colors.white,
+                      // Logos are drawn for light backgrounds — give real ones a
+                      // white plate even in dark mode.
+                      color: brand.logoUrl != null ? Colors.white : (isDark ? Colors.white.withValues(alpha: 0.08) : Colors.white),
                       border: Border.all(
                         color: isDark ? Colors.white.withValues(alpha: 0.08) : Colors.black.withValues(alpha: 0.05),
                       ),
                     ),
                     child: ClipOval(
                       child: Padding(
-                        padding: EdgeInsets.all(10.r),
+                        padding: EdgeInsets.all(brand.logoUrl != null ? 8.r : 10.r),
                         child: NetworkLogo(
                           url: brand.logoUrl,
                           name: brand.name,

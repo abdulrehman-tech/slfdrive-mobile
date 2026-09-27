@@ -538,5 +538,15 @@
     "other": "{} автомобиля"
   },
   "company_read_more": "Читать далее",
-  "company_read_less": "Свернуть"
+  "company_read_less": "Свернуть",
+  "company_listed_by": "Размещено",
+  "company_type_rental": "Прокатная компания",
+  "company_stat_rating": "Рейтинг",
+  "company_stat_trips": "Поездки",
+  "company_stat_branches": "Филиалы",
+  "company_action_call": "Позвонить",
+  "company_action_email": "Почта",
+  "company_action_website": "Сайт",
+  "promo_subtitle": "Есть код? Примените его и сэкономьте на аренде.",
+  "promo_applied": "Код применён"
 }

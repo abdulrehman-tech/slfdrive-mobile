@@ -1097,5 +1097,15 @@
     "other": "{} vehicles"
   },
   "company_read_more": "Read more",
-  "company_read_less": "Show less"
+  "company_read_less": "Show less",
+  "company_listed_by": "Listed by",
+  "company_type_rental": "Rental company",
+  "company_stat_rating": "Rating",
+  "company_stat_trips": "Trips",
+  "company_stat_branches": "Branches",
+  "company_action_call": "Call",
+  "company_action_email": "Email",
+  "company_action_website": "Website",
+  "promo_subtitle": "Have a code? Apply it to save on your rental.",
+  "promo_applied": "Code applied"
 }

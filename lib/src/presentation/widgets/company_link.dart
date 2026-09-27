@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
-import 'package:iconsax_flutter/iconsax_flutter.dart';
+
+import 'network_logo.dart';
 
 /// Opens a rental company's profile page.
 void openCompanyProfile(BuildContext context, int companyId) =>
     context.pushNamed('company-profile', pathParameters: {'id': '$companyId'});
 
-/// "🏢 Company name ›" — the owning rental company as a tappable link to its
-/// profile. Renders as plain text when [companyId] is null (no profile to open).
+/// "[logo] Company name ›" — the owning rental company as a tappable link to
+/// its profile. Renders as plain text when [companyId] is null (no profile to open).
 class CompanyLink extends StatelessWidget {
   final String name;
   final int? companyId;
@@ -25,8 +26,8 @@ class CompanyLink extends StatelessWidget {
     final row = Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Icon(Iconsax.building_copy, size: (fontSize + 1).r, color: c),
-        SizedBox(width: 4.r),
+        CompanyAvatar(companyId: companyId, name: name, size: (fontSize + 6).r, radius: 4.r),
+        SizedBox(width: 5.r),
         Flexible(
           child: Text(
             name,

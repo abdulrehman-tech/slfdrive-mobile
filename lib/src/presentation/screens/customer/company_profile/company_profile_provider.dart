@@ -4,6 +4,7 @@ import '../../../../core/data/repositories/company_repository.dart';
 import '../../../../core/di/injection_container.dart';
 import '../../../../core/errors/app_exception.dart';
 import '../../../../core/models/company/company_profile.dart';
+import '../../../../core/services/company_directory.dart';
 import '../../../../core/services/review_aggregates.dart';
 
 enum CompanyTab { vehicles, drivers, reviews }
@@ -35,6 +36,7 @@ class CompanyProfileProvider extends ChangeNotifier {
     notifyListeners();
     try {
       _profile = await _repository.profile(companyId);
+      if (getIt.isRegistered<CompanyDirectory>()) getIt<CompanyDirectory>().remember(_profile!.company);
       // Per-card vehicle/driver ratings come from the shared review cache.
       await ratings.ensureLoaded();
     } on AppException catch (e) {

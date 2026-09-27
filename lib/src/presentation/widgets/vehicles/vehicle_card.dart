@@ -28,7 +28,19 @@ class VehicleCard extends StatelessWidget {
   /// own profile page, where every card belongs to it.
   final bool showCompany;
 
+  /// Design height at 1.0 text scale (the skeleton uses it as is).
   static const double height = 152;
+
+  /// Text scaling is capped here inside the card: it is a dense list row.
+  static const double _maxTextScale = 1.3;
+
+  /// Row height for the ambient text scale: the photo is fixed, the text
+  /// column (~100 design px of type) grows with the (capped) scale. Lists must
+  /// size their rows with this, not [height].
+  static double extentOf(BuildContext context) {
+    final scale = MediaQuery.textScalerOf(context).scale(1).clamp(1.0, _maxTextScale);
+    return (height + 100 * (scale - 1)).r;
+  }
 
   const VehicleCard({
     super.key,
@@ -43,31 +55,35 @@ class VehicleCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        height: height.r,
-        clipBehavior: Clip.antiAlias,
-        decoration: BoxDecoration(
-          color: isDark ? Colors.white.withValues(alpha: 0.07) : Colors.white,
-          borderRadius: BorderRadius.circular(18.r),
-          border: Border.all(
-            color: isDark ? Colors.white.withValues(alpha: 0.1) : Colors.black.withValues(alpha: 0.06),
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: isDark ? 0.22 : 0.05),
-              blurRadius: 14.r,
-              offset: Offset(0, 4.r),
+    final extent = extentOf(context);
+    return MediaQuery.withClampedTextScaling(
+      maxScaleFactor: _maxTextScale,
+      child: GestureDetector(
+        onTap: onTap,
+        child: Container(
+          height: extent,
+          clipBehavior: Clip.antiAlias,
+          decoration: BoxDecoration(
+            color: isDark ? Colors.white.withValues(alpha: 0.07) : Colors.white,
+            borderRadius: BorderRadius.circular(18.r),
+            border: Border.all(
+              color: isDark ? Colors.white.withValues(alpha: 0.1) : Colors.black.withValues(alpha: 0.06),
             ),
-          ],
-        ),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            _Photo(vehicle: vehicle, rating: rating, isDark: isDark, cs: cs),
-            Expanded(child: _Info(vehicle: vehicle, rating: rating, ar: ar, isDark: isDark, cs: cs, showCompany: showCompany)),
-          ],
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: isDark ? 0.22 : 0.05),
+                blurRadius: 14.r,
+                offset: Offset(0, 4.r),
+              ),
+            ],
+          ),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              _Photo(vehicle: vehicle, rating: rating, isDark: isDark, cs: cs),
+              Expanded(child: _Info(vehicle: vehicle, rating: rating, ar: ar, isDark: isDark, cs: cs, showCompany: showCompany)),
+            ],
+          ),
         ),
       ),
     );

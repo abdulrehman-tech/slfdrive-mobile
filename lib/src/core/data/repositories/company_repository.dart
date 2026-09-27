@@ -3,6 +3,7 @@ import '../datasources/company_remote_data_source.dart';
 
 abstract class CompanyRepository {
   Future<CompanyProfile> profile(int companyId);
+  Future<List<CompanyInfo>> active();
 }
 
 class CompanyRepositoryImpl implements CompanyRepository {
@@ -12,4 +13,7 @@ class CompanyRepositoryImpl implements CompanyRepository {
 
   @override
   Future<CompanyProfile> profile(int companyId) => remote.profile(companyId);
+
+  @override
+  Future<List<CompanyInfo>> active() => remote.active();
 }

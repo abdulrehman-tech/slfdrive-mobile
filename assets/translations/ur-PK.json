@@ -530,5 +530,15 @@
     "other": "{} گاڑیاں"
   },
   "company_read_more": "مزید پڑھیں",
-  "company_read_less": "کم دکھائیں"
+  "company_read_less": "کم دکھائیں",
+  "company_listed_by": "فہرست کنندہ",
+  "company_type_rental": "رینٹل کمپنی",
+  "company_stat_rating": "ریٹنگ",
+  "company_stat_trips": "سفر",
+  "company_stat_branches": "شاخیں",
+  "company_action_call": "کال",
+  "company_action_email": "ای میل",
+  "company_action_website": "ویب سائٹ",
+  "promo_subtitle": "کوڈ ہے؟ کرایے پر بچت کے لیے لاگو کریں۔",
+  "promo_applied": "کوڈ لاگو ہو گیا"
 }

@@ -4,11 +4,9 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 
 import '../../../../../core/models/company/company_profile.dart';
-import '../../../../utils/bidi.dart';
-import '../../../../utils/contact_launcher.dart';
 
-/// Description plus tappable contact rows (call, email, website, address).
-/// Hidden entirely when the company has none of these.
+/// Description (collapsed to four lines) and address. Hidden when the company
+/// has neither.
 class CompanyAboutCard extends StatefulWidget {
   final CompanyInfo company;
   final bool isDark;
@@ -27,17 +25,9 @@ class _CompanyAboutCardState extends State<CompanyAboutCard> {
     final cs = Theme.of(context).colorScheme;
     final c = widget.company;
     final isDark = widget.isDark;
+    // Contact actions live in CompanyActions; only the address is listed here.
     final rows = <Widget>[
-      if (c.contactPhone != null)
-        _row(cs, Iconsax.call_copy, ltr(c.contactPhone!), () => ContactLauncher.openPhoneCall(c.contactPhone!)),
-      if (c.contactEmail != null)
-        _row(cs, Iconsax.sms_copy, c.contactEmail!, () => ContactLauncher.openEmail(c.contactEmail!)),
-      if (c.website != null)
-        _row(cs, Iconsax.global_copy, c.website!, () {
-          final url = c.website!.startsWith('http') ? c.website! : 'https://${c.website!}';
-          ContactLauncher.openWebsite(url);
-        }),
-      if (c.address != null) _row(cs, Iconsax.location_copy, c.address!, null),
+      if (c.address != null) _row(cs, Iconsax.location_copy, c.address!),
     ];
     if (c.description == null && rows.isEmpty) return const SizedBox.shrink();
 
@@ -45,8 +35,8 @@ class _CompanyAboutCardState extends State<CompanyAboutCard> {
       padding: EdgeInsets.all(16.r),
       decoration: BoxDecoration(
         color: isDark ? const Color(0xFF1E1E2E) : Colors.white,
-        borderRadius: BorderRadius.circular(16.r),
-        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 10.r, offset: Offset(0, 4.r))],
+        borderRadius: BorderRadius.circular(18.r),
+        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: isDark ? 0.25 : 0.05), blurRadius: 16.r, offset: Offset(0, 6.r))],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -89,38 +79,35 @@ class _CompanyAboutCardState extends State<CompanyAboutCard> {
               );
             }),
           ],
-          if (rows.isNotEmpty) ...[SizedBox(height: 8.r), ...rows],
+          ...rows,
         ],
       ),
     );
   }
 
-  Widget _row(ColorScheme cs, IconData icon, String text, VoidCallback? onTap) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(10.r),
-      child: Padding(
-        padding: EdgeInsets.symmetric(vertical: 8.r),
-        child: Row(
-          children: [
-            Container(
-              width: 34.r,
-              height: 34.r,
-              decoration: BoxDecoration(color: cs.primary.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(10.r)),
-              child: Icon(icon, size: 16.r, color: cs.primary),
-            ),
-            SizedBox(width: 12.r),
-            Expanded(
+  Widget _row(ColorScheme cs, IconData icon, String text) {
+    return Padding(
+      padding: EdgeInsets.only(top: 10.r),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            width: 30.r,
+            height: 30.r,
+            decoration: BoxDecoration(color: cs.primary.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(9.r)),
+            child: Icon(icon, size: 15.r, color: cs.primary),
+          ),
+          SizedBox(width: 10.r),
+          Expanded(
+            child: Padding(
+              padding: EdgeInsets.only(top: 6.r),
               child: Text(
                 text,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(fontSize: 13.r, fontWeight: FontWeight.w600, color: onTap != null ? cs.primary : cs.onSurface),
+                style: TextStyle(fontSize: 13.r, fontWeight: FontWeight.w600, color: cs.onSurface.withValues(alpha: 0.85)),
               ),
             ),
-            if (onTap != null) Icon(Icons.chevron_right, size: 18.r, color: cs.onSurface.withValues(alpha: 0.3)),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

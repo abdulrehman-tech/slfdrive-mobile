@@ -16,6 +16,7 @@ import '../driver_listing/widgets/driver_list_card.dart';
 import 'company_profile_provider.dart';
 import 'widgets/company_about_card.dart';
 import 'widgets/company_header.dart';
+import 'widgets/company_overview.dart';
 
 /// Public profile of a rental company (`AllCompanies/{id}/profile`): header
 /// with logo and stats, contact details, and its vehicles, drivers and reviews.
@@ -65,7 +66,15 @@ class _CompanyProfileView extends StatelessWidget {
             CompanyHeader(profile: profile, ar: ar),
             SliverPadding(
               padding: EdgeInsets.fromLTRB(16.r, 16.r, 16.r, 4.r),
-              sliver: SliverToBoxAdapter(child: CompanyAboutCard(company: profile.company, isDark: isDark)),
+              sliver: SliverList.list(
+                children: [
+                  CompanyStatsCard(profile: profile, isDark: isDark),
+                  SizedBox(height: 12.r),
+                  CompanyActions(company: profile.company, isDark: isDark),
+                  SizedBox(height: 12.r),
+                  CompanyAboutCard(company: profile.company, isDark: isDark),
+                ],
+              ),
             ),
             SliverPersistentHeader(
               pinned: true,
@@ -115,7 +124,7 @@ class _CompanyProfileView extends StatelessWidget {
           list(profile.vehicles.length, (i) {
             final v = profile.vehicles[i];
             return SizedBox(
-              height: VehicleCard.height.r,
+              height: VehicleCard.extentOf(context),
               child: VehicleCard(
                 vehicle: v,
                 ar: ar,
@@ -145,7 +154,18 @@ class _CompanyProfileView extends StatelessWidget {
         return [
           list(
             profile.recentReviews.length,
-            (i) => ReviewTile(review: DriverReview.fromReview(profile.recentReviews[i]), index: i, cs: cs, isDark: isDark),
+            (i) => Container(
+              padding: EdgeInsets.all(14.r),
+              decoration: BoxDecoration(
+                color: isDark ? const Color(0xFF1E1E2E) : Colors.white,
+                borderRadius: BorderRadius.circular(16.r),
+                boxShadow: [
+                  BoxShadow(color: Colors.black.withValues(alpha: isDark ? 0.25 : 0.05), blurRadius: 12.r, offset: Offset(0, 4.r)),
+                ],
+              ),
+              // index 0: the tile's own inter-item gap isn't wanted inside a card.
+              child: ReviewTile(review: DriverReview.fromReview(profile.recentReviews[i]), index: 0, cs: cs, isDark: isDark),
+            ),
           ),
         ];
     }
@@ -176,40 +196,72 @@ class _TabsDelegate extends SliverPersistentHeaderDelegate {
       (CompanyTab.drivers, 'company_tab_drivers', profile.drivers.length),
       (CompanyTab.reviews, 'company_tab_reviews', profile.recentReviews.length),
     ];
+    final cs = Theme.of(context).colorScheme;
+    // The pinned header hands its child loose constraints; the bar must fill
+    // the full extent or the sliver's layout and paint extents disagree.
     return Container(
+      height: _h,
       color: bg,
       padding: EdgeInsets.fromLTRB(16.r, 8.r, 16.r, 8.r),
       child: Container(
         padding: EdgeInsets.all(4.r),
         decoration: BoxDecoration(
-          color: isDark ? const Color(0xFF2A2A2A) : const Color(0xFFE8E8E8),
-          borderRadius: BorderRadius.circular(12.r),
+          color: isDark ? const Color(0xFF1E1E2E) : const Color(0xFFEDEEF2),
+          borderRadius: BorderRadius.circular(14.r),
         ),
         child: Row(
           children: [
             for (final (t, key, count) in tabs)
               Expanded(
                 child: GestureDetector(
+                  behavior: HitTestBehavior.opaque,
                   onTap: () => onTab(t),
                   child: AnimatedContainer(
                     duration: const Duration(milliseconds: 200),
+                    curve: Curves.easeOut,
                     alignment: Alignment.center,
+                    padding: EdgeInsets.symmetric(horizontal: 6.r),
                     decoration: BoxDecoration(
-                      color: tab == t ? (isDark ? const Color(0xFF3A3F5C) : Colors.white) : Colors.transparent,
+                      color: tab == t ? (isDark ? const Color(0xFF34395A) : Colors.white) : Colors.transparent,
                       borderRadius: BorderRadius.circular(10.r),
-                      boxShadow: tab == t ? [BoxShadow(color: Colors.black.withValues(alpha: 0.1), blurRadius: 4.r)] : null,
+                      boxShadow: tab == t
+                          ? [BoxShadow(color: Colors.black.withValues(alpha: isDark ? 0.3 : 0.08), blurRadius: 6.r, offset: Offset(0, 2.r))]
+                          : null,
                     ),
-                    child: Text(
-                      '${key.tr()} ($count)',
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                        fontSize: 13.r,
-                        fontWeight: tab == t ? FontWeight.w700 : FontWeight.w500,
-                        color: isDark
-                            ? (tab == t ? Colors.white : Colors.white60)
-                            : (tab == t ? Colors.black87 : const Color(0xFF757575)),
-                      ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Flexible(
+                          child: Text(
+                            key.tr(),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              fontSize: 13.r,
+                              fontWeight: tab == t ? FontWeight.w700 : FontWeight.w500,
+                              color: tab == t ? cs.onSurface : cs.onSurface.withValues(alpha: 0.55),
+                            ),
+                          ),
+                        ),
+                        SizedBox(width: 5.r),
+                        Container(
+                          constraints: BoxConstraints(minWidth: 18.r),
+                          padding: EdgeInsets.symmetric(horizontal: 5.r, vertical: 1.r),
+                          decoration: BoxDecoration(
+                            color: tab == t ? cs.primary : cs.onSurface.withValues(alpha: 0.1),
+                            borderRadius: BorderRadius.circular(10.r),
+                          ),
+                          child: Text(
+                            '$count',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontSize: 10.r,
+                              fontWeight: FontWeight.w800,
+                              color: tab == t ? Colors.white : cs.onSurface.withValues(alpha: 0.6),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ),

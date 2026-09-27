@@ -530,5 +530,15 @@
     "other": "{} vehículos"
   },
   "company_read_more": "Leer más",
-  "company_read_less": "Ver menos"
+  "company_read_less": "Ver menos",
+  "company_listed_by": "Publicado por",
+  "company_type_rental": "Empresa de alquiler",
+  "company_stat_rating": "Valoración",
+  "company_stat_trips": "Viajes",
+  "company_stat_branches": "Sucursales",
+  "company_action_call": "Llamar",
+  "company_action_email": "Correo",
+  "company_action_website": "Sitio web",
+  "promo_subtitle": "¿Tienes un código? Aplícalo y ahorra en tu alquiler.",
+  "promo_applied": "Código aplicado"
 }

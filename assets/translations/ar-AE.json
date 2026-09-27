@@ -1109,5 +1109,15 @@
     "other": "{} مركبة"
   },
   "company_read_more": "اقرأ المزيد",
-  "company_read_less": "عرض أقل"
+  "company_read_less": "عرض أقل",
+  "company_listed_by": "مُدرجة من",
+  "company_type_rental": "شركة تأجير",
+  "company_stat_rating": "التقييم",
+  "company_stat_trips": "الرحلات",
+  "company_stat_branches": "الفروع",
+  "company_action_call": "اتصال",
+  "company_action_email": "البريد",
+  "company_action_website": "الموقع",
+  "promo_subtitle": "لديك رمز؟ طبّقه لتوفّر على الإيجار.",
+  "promo_applied": "تم تطبيق الرمز"
 }

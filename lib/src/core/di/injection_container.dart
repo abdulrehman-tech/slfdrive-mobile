@@ -27,6 +27,7 @@ import '../data/repositories/review_repository.dart';
 import '../data/repositories/vehicle_repository.dart';
 import '../network/api_client.dart';
 import '../services/booking_lookups.dart';
+import '../services/company_directory.dart';
 import '../services/customer_avatars.dart';
 import '../services/driver_session.dart';
 import '../services/notification_inbox_store.dart';
@@ -174,6 +175,9 @@ Future<void> setupDependencyInjection() async {
   );
   getIt.registerLazySingleton<ReviewAggregates>(
     () => ReviewAggregates(getIt<ReviewRepository>()),
+  );
+  getIt.registerLazySingleton<CompanyDirectory>(
+    () => CompanyDirectory(getIt<CompanyRepository>()),
   );
   getIt.registerLazySingleton<NotificationInboxStore>(
     () => NotificationInboxStore(),

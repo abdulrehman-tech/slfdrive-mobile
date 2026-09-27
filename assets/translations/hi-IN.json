@@ -530,5 +530,15 @@
     "other": "{} वाहन"
   },
   "company_read_more": "और पढ़ें",
-  "company_read_less": "कम दिखाएं"
+  "company_read_less": "कम दिखाएं",
+  "company_listed_by": "सूचीबद्धकर्ता",
+  "company_type_rental": "रेंटल कंपनी",
+  "company_stat_rating": "रेटिंग",
+  "company_stat_trips": "यात्राएँ",
+  "company_stat_branches": "शाखाएँ",
+  "company_action_call": "कॉल",
+  "company_action_email": "ईमेल",
+  "company_action_website": "वेबसाइट",
+  "promo_subtitle": "कोड है? किराये पर बचत के लिए लागू करें।",
+  "promo_applied": "कोड लागू हुआ"
 }
