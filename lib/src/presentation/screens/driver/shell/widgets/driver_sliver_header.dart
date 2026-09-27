@@ -8,9 +8,9 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 Color driverPageBackground(bool isDark) => isDark ? const Color(0xFF121212) : const Color(0xFFF8F9FA);
 
 /// Bottom padding a driver tab needs so its last item clears the floating nav
-/// bar. The shell sets `extendBody`, so the nav height arrives as the body's
-/// bottom inset.
-double driverBottomClearance(BuildContext context) => MediaQuery.paddingOf(context).bottom + 20.r;
+/// bar with breathing room. The shell sets `extendBody`, so the nav height
+/// arrives as the body's bottom inset — [context] must be below the Scaffold.
+double driverBottomClearance(BuildContext context) => MediaQuery.paddingOf(context).bottom + 32.r;
 
 /// Frosted surface the driver headers turn into once content scrolls under
 /// them. [glass] 0 = flat page colour (at rest), 1 = blurred and translucent

@@ -115,7 +115,11 @@ class _DriverHomeView extends StatelessWidget {
                 ],
               ),
             )
-          : _buildBody(context, isDark),
+          // Builder: the body must read MediaQuery from INSIDE the Scaffold,
+          // where extendBody adds the nav bar's height to the bottom inset.
+          // The outer context only sees the home indicator, so the last trip
+          // request card ended up under the nav bar.
+          : Builder(builder: (context) => _buildBody(context, isDark)),
       bottomNavigationBar: isDesktop
           ? null
           : DriverBottomNav(
