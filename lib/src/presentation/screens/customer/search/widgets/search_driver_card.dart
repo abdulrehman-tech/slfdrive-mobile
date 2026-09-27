@@ -117,11 +117,10 @@ class SearchDriverCard extends StatelessWidget {
                     Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        OmrIcon(size: 10.r, color: cs.primary),
-                        SizedBox(width: 2.r),
-                        Text(
+                        OmrAmount(
                           '${driver.pricePerDay.toInt()}/${'day'.tr()}',
                           style: TextStyle(fontSize: 12.r, fontWeight: FontWeight.bold, color: cs.primary),
+                          gap: 2.r,
                         ),
                       ],
                     ),

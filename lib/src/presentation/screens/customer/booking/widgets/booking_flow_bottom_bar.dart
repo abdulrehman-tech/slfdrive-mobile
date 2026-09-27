@@ -105,9 +105,7 @@ class BookingFlowBottomBar extends StatelessWidget {
         Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            OmrIcon(size: 14.r, color: cs.primary),
-            SizedBox(width: 3.r),
-            Text(
+            OmrAmount(
               totalPrice.toStringAsFixed(2),
               style: TextStyle(fontSize: 18.r, fontWeight: FontWeight.w900, color: cs.primary),
             ),

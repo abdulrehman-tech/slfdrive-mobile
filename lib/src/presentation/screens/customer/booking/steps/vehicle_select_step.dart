@@ -235,10 +235,10 @@ class _VehicleCard extends StatelessWidget {
                 ),
                 SizedBox(height: 4.r),
                 Row(
+                  crossAxisAlignment: CrossAxisAlignment.baseline,
+                  textBaseline: TextBaseline.alphabetic,
                   children: [
-                    OmrIcon(size: 12.r, color: cs.primary),
-                    SizedBox(width: 3.r),
-                    Text(
+                    OmrAmount(
                       (vehicle.pricePerDay ?? 0).toStringAsFixed(0),
                       style: TextStyle(fontSize: 14.r, fontWeight: FontWeight.w800, color: cs.primary),
                     ),

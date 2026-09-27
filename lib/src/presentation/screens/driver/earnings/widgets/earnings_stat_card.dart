@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import '../../../../widgets/omr_icon.dart';
 
 class EarningsStatCard extends StatelessWidget {
   final IconData icon;
@@ -8,6 +9,9 @@ class EarningsStatCard extends StatelessWidget {
   final Color color;
   final bool isDark;
 
+  /// Prefix [value] with the currency symbol.
+  final bool isCurrency;
+
   const EarningsStatCard({
     super.key,
     required this.icon,
@@ -15,7 +19,14 @@ class EarningsStatCard extends StatelessWidget {
     required this.value,
     required this.color,
     required this.isDark,
+    this.isCurrency = false,
   });
+
+  TextStyle get _valueStyle => TextStyle(
+        fontSize: 18.r,
+        fontWeight: FontWeight.w700,
+        color: isDark ? Colors.white : Colors.black87,
+      );
 
   @override
   Widget build(BuildContext context) {
@@ -56,14 +67,7 @@ class EarningsStatCard extends StatelessWidget {
                   ),
                 ),
                 SizedBox(height: 4.r),
-                Text(
-                  value,
-                  style: TextStyle(
-                    fontSize: 18.r,
-                    fontWeight: FontWeight.w700,
-                    color: isDark ? Colors.white : Colors.black87,
-                  ),
-                ),
+                if (isCurrency) OmrAmount(value, style: _valueStyle) else Text(value, style: _valueStyle),
               ],
             ),
           ),

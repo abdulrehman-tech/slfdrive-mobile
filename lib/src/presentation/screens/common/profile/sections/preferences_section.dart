@@ -72,6 +72,7 @@ class PreferencesSection extends StatelessWidget {
           iconColor: const Color(0xFF4CAF50),
           title: 'profile_currency'.tr(),
           value: 'OMR',
+          valueIsCurrency: true,
           isDark: isDark,
           onTap: () => ScaffoldMessenger.of(
             context,

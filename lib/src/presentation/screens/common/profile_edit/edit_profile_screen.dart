@@ -362,11 +362,11 @@ class _EditProfileView extends StatelessWidget {
         SizedBox(height: 16.r),
         _text(provider.amountPerDayController, 'enter_amount'.tr(), 'amount_per_day'.tr(),
             Icons.payments_outlined, desktop,
-            keyboardType: const TextInputType.numberWithOptions(decimal: true)),
+            keyboardType: const TextInputType.numberWithOptions(decimal: true), isCurrency: true),
         SizedBox(height: 16.r),
         _text(provider.amountPerHourController, 'enter_amount'.tr(), 'amount_per_hour'.tr(),
             Icons.schedule_outlined, desktop,
-            keyboardType: const TextInputType.numberWithOptions(decimal: true)),
+            keyboardType: const TextInputType.numberWithOptions(decimal: true), isCurrency: true),
       ];
 
   List<Widget> _documentFields(EditProfileProvider provider, bool desktop) {
@@ -437,6 +437,7 @@ class _EditProfileView extends StatelessWidget {
     IconData icon,
     bool desktop, {
     TextInputType keyboardType = TextInputType.text,
+    bool isCurrency = false,
   }) {
     if (desktop) {
       return InputFieldDesktop(
@@ -445,6 +446,7 @@ class _EditProfileView extends StatelessWidget {
         label: label,
         icon: icon,
         isDark: isDark,
+        isCurrency: isCurrency,
         keyboardType: keyboardType,
       );
     }
@@ -454,6 +456,7 @@ class _EditProfileView extends StatelessWidget {
       label: label,
       icon: icon,
       isDark: isDark,
+      isCurrency: isCurrency,
       keyboardType: keyboardType,
     );
   }

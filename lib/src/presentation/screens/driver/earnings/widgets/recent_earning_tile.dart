@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 
 import '../models/earnings_period.dart';
+import '../../../../widgets/omr_icon.dart';
 
 class RecentEarningTile extends StatelessWidget {
   final RecentEarning earning;
@@ -69,8 +70,8 @@ class RecentEarningTile extends StatelessWidget {
               ],
             ),
           ),
-          Text(
-            'OMR ${earning.amount.toStringAsFixed(2)}',
+          OmrAmount.value(
+            earning.amount,
             style: TextStyle(
               fontSize: 16.r,
               fontWeight: FontWeight.w700,

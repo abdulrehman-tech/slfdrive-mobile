@@ -193,6 +193,8 @@ class _PaymentView extends StatelessWidget {
         border: Border.all(color: cs.primary.withValues(alpha: 0.3)),
       ),
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.baseline,
+        textBaseline: TextBaseline.alphabetic,
         children: [
           Expanded(
             child: Text(
@@ -200,12 +202,10 @@ class _PaymentView extends StatelessWidget {
               style: TextStyle(fontSize: 14.r, fontWeight: FontWeight.w600, color: cs.onSurface),
             ),
           ),
-          Text(
+          OmrAmount(
             amount!.toStringAsFixed(2),
             style: TextStyle(fontSize: 18.r, fontWeight: FontWeight.bold, color: cs.primary),
           ),
-          SizedBox(width: 6.r),
-          OmrIcon(size: 16.r, color: cs.primary),
         ],
       ),
     );

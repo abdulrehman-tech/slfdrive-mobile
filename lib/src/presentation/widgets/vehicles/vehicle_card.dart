@@ -260,11 +260,11 @@ class _Price extends StatelessWidget {
     }
     final price = vehicle.pricePerDay!;
     return Row(
+      crossAxisAlignment: CrossAxisAlignment.baseline,
+      textBaseline: TextBaseline.alphabetic,
       mainAxisSize: MainAxisSize.min,
       children: [
-        OmrIcon(size: 13.r, color: cs.primary),
-        SizedBox(width: 3.r),
-        Text(
+        OmrAmount(
           price == price.roundToDouble() ? price.toInt().toString() : price.toStringAsFixed(1),
           style: TextStyle(fontSize: 16.r, fontWeight: FontWeight.w800, color: cs.primary),
         ),

@@ -182,9 +182,7 @@ class FavCarCard extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            OmrIcon(size: 13.r, color: cs.primary),
-            SizedBox(width: 3.r),
-            Text(
+            OmrAmount(
               '${car.pricePerDay.toInt()}/${'day'.tr()}',
               style: TextStyle(
                 fontSize: 16.r,

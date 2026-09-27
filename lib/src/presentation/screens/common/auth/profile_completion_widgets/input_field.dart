@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import '../../../../widgets/omr_icon.dart';
 
 /// Mobile-sized labeled text field used throughout the profile form.
 class InputField extends StatelessWidget {
@@ -10,12 +11,16 @@ class InputField extends StatelessWidget {
   final bool isDark;
   final TextInputType keyboardType;
 
+  /// Money field: show the currency symbol in place of [icon].
+  final bool isCurrency;
+
   const InputField({
     super.key,
     required this.controller,
     required this.hint,
     required this.label,
     required this.icon,
+    this.isCurrency = false,
     required this.isDark,
     this.keyboardType = TextInputType.text,
   });
@@ -51,7 +56,15 @@ class InputField extends StatelessWidget {
             decoration: InputDecoration(
               hintText: hint,
               hintStyle: TextStyle(fontSize: 14.r, color: isDark ? Colors.white38 : const Color(0xFF9E9E9E)),
-              prefixIcon: Icon(icon, color: isDark ? Colors.white38 : const Color(0xFF9E9E9E), size: 20.r),
+              prefixIcon: isCurrency
+                  ? Center(
+                      widthFactor: 1,
+                      child: Padding(
+                        padding: EdgeInsetsDirectional.only(start: 14.r, end: 6.r),
+                        child: OmrIcon(size: 20.r, color: isDark ? Colors.white38 : const Color(0xFF9E9E9E)),
+                      ),
+                    )
+                  : Icon(icon, color: isDark ? Colors.white38 : const Color(0xFF9E9E9E), size: 20.r),
               border: InputBorder.none,
               contentPadding: EdgeInsets.symmetric(horizontal: 12.r, vertical: 16.r),
             ),
@@ -71,12 +84,16 @@ class InputFieldDesktop extends StatelessWidget {
   final bool isDark;
   final TextInputType keyboardType;
 
+  /// Money field: show the currency symbol in place of [icon].
+  final bool isCurrency;
+
   const InputFieldDesktop({
     super.key,
     required this.controller,
     required this.hint,
     required this.label,
     required this.icon,
+    this.isCurrency = false,
     required this.isDark,
     this.keyboardType = TextInputType.text,
   });
@@ -112,7 +129,15 @@ class InputFieldDesktop extends StatelessWidget {
             decoration: InputDecoration(
               hintText: hint,
               hintStyle: TextStyle(fontSize: 15.r, color: isDark ? Colors.white38 : const Color(0xFF9E9E9E)),
-              prefixIcon: Icon(icon, color: isDark ? Colors.white38 : const Color(0xFF9E9E9E), size: 22.r),
+              prefixIcon: isCurrency
+                  ? Center(
+                      widthFactor: 1,
+                      child: Padding(
+                        padding: EdgeInsetsDirectional.only(start: 14.r, end: 6.r),
+                        child: OmrIcon(size: 22.r, color: isDark ? Colors.white38 : const Color(0xFF9E9E9E)),
+                      ),
+                    )
+                  : Icon(icon, color: isDark ? Colors.white38 : const Color(0xFF9E9E9E), size: 22.r),
               border: InputBorder.none,
               contentPadding: EdgeInsets.symmetric(horizontal: 16.r, vertical: 18.r),
             ),

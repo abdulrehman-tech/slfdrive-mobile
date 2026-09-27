@@ -42,15 +42,15 @@ class BookingPriceCard extends StatelessWidget {
               color: isDark ? Colors.white.withValues(alpha: 0.08) : Colors.black.withValues(alpha: 0.06),
             ),
             Row(
+              crossAxisAlignment: CrossAxisAlignment.baseline,
+              textBaseline: TextBaseline.alphabetic,
               children: [
                 Text(
                   'booking_summary_total'.tr(),
                   style: TextStyle(fontSize: 14.r, fontWeight: FontWeight.w700, color: cs.onSurface),
                 ),
                 const Spacer(),
-                OmrIcon(size: 14.r, color: cs.primary),
-                SizedBox(width: 3.r),
-                Text(
+                OmrAmount(
                   booking.total.toStringAsFixed(2),
                   style: TextStyle(fontSize: 20.r, fontWeight: FontWeight.w900, color: cs.primary),
                 ),
@@ -159,6 +159,8 @@ class BookingPriceCard extends StatelessWidget {
     return Padding(
       padding: EdgeInsets.symmetric(vertical: 3.r),
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.baseline,
+        textBaseline: TextBaseline.alphabetic,
         children: [
           Expanded(
             child: Text(
@@ -166,11 +168,11 @@ class BookingPriceCard extends StatelessWidget {
               style: TextStyle(fontSize: 12.r, color: cs.onSurface.withValues(alpha: 0.6)),
             ),
           ),
-          OmrIcon(size: 11.r, color: cs.onSurface.withValues(alpha: 0.7)),
-          SizedBox(width: 2.r),
-          Text(
+          OmrAmount(
             amount.toStringAsFixed(2),
             style: TextStyle(fontSize: 12.r, fontWeight: FontWeight.w700, color: cs.onSurface),
+            iconColor: cs.onSurface.withValues(alpha: 0.7),
+            gap: 2.r,
           ),
         ],
       ),

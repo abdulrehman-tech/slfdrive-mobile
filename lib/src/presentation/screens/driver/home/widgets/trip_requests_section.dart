@@ -12,6 +12,7 @@ import 'online_status_dialog.dart';
 import 'trip_action_dialog.dart';
 import '../../../../utils/duration_label.dart';
 import '../../../../utils/bidi.dart';
+import '../../../../widgets/omr_icon.dart';
 
 class TripRequestsSection extends StatelessWidget {
   final bool isDark;
@@ -273,9 +274,15 @@ class TripRequestCard extends StatelessWidget {
                 ),
                 if (perDay != null) ...[
                   SizedBox(height: 2.r),
-                  Text(
-                    '${_daysLabel()} × OMR ${perDay.toStringAsFixed(2)} ${'driver_request_per_day'.tr()}',
-                    style: TextStyle(fontSize: 11.r, color: muted),
+                  Text.rich(
+                    TextSpan(
+                      style: TextStyle(fontSize: 11.r, color: muted),
+                      children: [
+                        TextSpan(text: '${_daysLabel()} × '),
+                        omrSpan(TextStyle(fontSize: 11.r, color: muted), gap: 2),
+                        TextSpan(text: '${perDay.toStringAsFixed(2)} ${'driver_request_per_day'.tr()}'),
+                      ],
+                    ),
                   ),
                 ],
                 if (trip.isCorporate) ...[
@@ -288,8 +295,8 @@ class TripRequestCard extends StatelessWidget {
               ],
             ),
           ),
-          Text(
-            'OMR ${trip.fare.toStringAsFixed(2)}',
+          OmrAmount.value(
+            trip.fare,
             style: TextStyle(fontSize: 18.r, fontWeight: FontWeight.w800, color: const Color(0xFF4CAF50)),
           ),
         ],

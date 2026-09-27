@@ -121,9 +121,7 @@ class CarCard extends StatelessWidget {
                         ? Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              OmrIcon(size: 12.r, color: Colors.white),
-                              SizedBox(width: 3.r),
-                              Text(
+                              OmrAmount(
                                 '${car.pricePerDay == car.pricePerDay.roundToDouble() ? car.pricePerDay.toInt() : car.pricePerDay.toStringAsFixed(1)}/${'day'.tr()}',
                                 style: TextStyle(fontSize: 14.r, fontWeight: FontWeight.bold, color: Colors.white),
                               ),

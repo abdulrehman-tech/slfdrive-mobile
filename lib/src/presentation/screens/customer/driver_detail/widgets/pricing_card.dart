@@ -66,11 +66,10 @@ class PricingCard extends StatelessWidget {
                         Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            OmrIcon(size: 11.r, color: cs.primary),
-                            SizedBox(width: 2.r),
-                            Text(
+                            OmrAmount(
                               t.$2.toStringAsFixed(0),
                               style: TextStyle(fontSize: 16.r, fontWeight: FontWeight.w900, color: cs.primary),
+                              gap: 2.r,
                             ),
                           ],
                         ),

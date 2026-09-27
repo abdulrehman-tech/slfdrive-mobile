@@ -44,9 +44,7 @@ class DesktopHireButton extends StatelessWidget {
               Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  OmrIcon(size: 11.r, color: Colors.white70),
-                  SizedBox(width: 3.r),
-                  Text(
+                  OmrAmount(
                     '${profile.dailyRate.toInt()}/${'day'.tr()}',
                     style: TextStyle(fontSize: 13.r, fontWeight: FontWeight.w600, color: Colors.white70),
                   ),

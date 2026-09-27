@@ -102,12 +102,11 @@ class CarInfoHeader extends StatelessWidget {
               children: [
                 if (price != null)
                   Row(
+                    crossAxisAlignment: CrossAxisAlignment.baseline,
+                    textBaseline: TextBaseline.alphabetic,
                     mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      OmrIcon(size: 16.r, color: cs.primary),
-                      SizedBox(width: 3.r),
-                      Text(
+                      OmrAmount(
                         price.toStringAsFixed(price.truncateToDouble() == price ? 0 : 2),
                         style: TextStyle(fontSize: 22.r, fontWeight: FontWeight.bold, color: cs.primary),
                       ),

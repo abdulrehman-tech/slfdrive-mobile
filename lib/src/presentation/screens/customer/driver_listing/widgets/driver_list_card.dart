@@ -197,9 +197,7 @@ class DriverListCard extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  OmrIcon(size: 12.r, color: cs.primary),
-                  SizedBox(width: 3.r),
-                  Text(
+                  OmrAmount(
                     '${driver.pricePerDay!.toInt()}${'driver_detail_per_day'.tr()}',
                     style: TextStyle(fontSize: 15.r, fontWeight: FontWeight.bold, color: cs.primary),
                   ),

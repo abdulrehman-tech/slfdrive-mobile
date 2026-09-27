@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../models/earnings_period.dart';
+import '../../../../widgets/omr_icon.dart';
 
 class EarningsTotalCard extends StatelessWidget {
   final EarningsSnapshot snapshot;
@@ -87,8 +88,8 @@ class EarningsTotalCard extends StatelessWidget {
               ],
             ),
             SizedBox(height: 12.r),
-            Text(
-              'OMR ${snapshot.total.toStringAsFixed(2)}',
+            OmrAmount.value(
+              snapshot.total,
               style: TextStyle(
                 fontSize: 36.r,
                 fontWeight: FontWeight.bold,

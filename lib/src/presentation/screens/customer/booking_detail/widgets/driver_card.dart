@@ -96,9 +96,7 @@ class BookingDriverCard extends StatelessWidget {
                     SizedBox(height: 6.r),
                     Row(
                       children: [
-                        OmrIcon(size: 11.r, color: cs.primary),
-                        SizedBox(width: 3.r),
-                        Text(
+                        OmrAmount(
                           '${booking.driverUnitRate.toInt()}${(booking.isHourly ? 'price_unit_hour' : 'price_unit_day').tr()}',
                           style: TextStyle(fontSize: 13.r, fontWeight: FontWeight.w800, color: cs.primary),
                         ),

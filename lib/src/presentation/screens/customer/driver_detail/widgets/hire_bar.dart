@@ -55,11 +55,11 @@ class HireBar extends StatelessWidget {
                   ),
                   SizedBox(height: 2.r),
                   Row(
+                    crossAxisAlignment: CrossAxisAlignment.baseline,
+                    textBaseline: TextBaseline.alphabetic,
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      OmrIcon(size: 15.r, color: cs.primary),
-                      SizedBox(width: 3.r),
-                      Text(
+                      OmrAmount(
                         '${profile.dailyRate.toInt()}',
                         style: TextStyle(fontSize: 20.r, fontWeight: FontWeight.w900, color: cs.primary),
                       ),

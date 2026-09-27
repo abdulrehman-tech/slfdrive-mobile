@@ -290,9 +290,7 @@ class _DriverCard extends StatelessWidget {
               Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  OmrIcon(size: 12.r, color: cs.primary),
-                  SizedBox(width: 3.r),
-                  Text(
+                  OmrAmount(
                     (driver.amountPerDay ?? 0).toStringAsFixed(0),
                     style: TextStyle(fontSize: 15.r, fontWeight: FontWeight.w800, color: cs.primary),
                   ),

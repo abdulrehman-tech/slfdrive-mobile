@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 
 import '../../../../widgets/charts/revenue_bar_chart.dart';
 import '../../shell/driver_shell_provider.dart';
+import '../../../../widgets/omr_icon.dart';
 
 class EarningsCard extends StatelessWidget {
   final bool isDark;
@@ -46,8 +47,8 @@ class EarningsCard extends StatelessWidget {
               style: TextStyle(fontSize: 14.r, color: Colors.white.withValues(alpha: 0.8)),
             ),
             SizedBox(height: 12.r),
-            Text(
-              'OMR ${earnings.toStringAsFixed(2)}',
+            OmrAmount.value(
+              earnings,
               style: TextStyle(fontSize: 32.r, fontWeight: FontWeight.bold, color: Colors.white),
             ),
             SizedBox(height: 20.r),
