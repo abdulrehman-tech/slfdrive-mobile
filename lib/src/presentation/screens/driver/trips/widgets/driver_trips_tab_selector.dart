@@ -10,12 +10,16 @@ class DriverTripsTabSelector extends StatelessWidget {
 
   const DriverTripsTabSelector({super.key, required this.isDark});
 
+  /// Exact height, so the pinned header can reserve precisely this much.
+  static double get height => 64.r;
+
   @override
   Widget build(BuildContext context) {
     final provider = context.watch<DriverTripsProvider>();
     return Padding(
-      padding: EdgeInsets.fromLTRB(20.r, 8.r, 20.r, 16.r),
+      padding: EdgeInsets.fromLTRB(20.r, 4.r, 20.r, 12.r),
       child: Container(
+        height: 48.r,
         padding: EdgeInsets.all(4.r),
         decoration: BoxDecoration(
           color: isDark ? const Color(0xFF2A2A2A) : const Color(0xFFE8E8E8),
@@ -63,7 +67,8 @@ class _DriverTripsTab extends StatelessWidget {
         onTap: onTap,
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 200),
-          padding: EdgeInsets.symmetric(vertical: 10.r),
+          alignment: Alignment.center,
+          padding: EdgeInsets.symmetric(horizontal: 4.r),
           decoration: BoxDecoration(
             color: isSelected
                 ? (isDark ? const Color(0xFF1E1E1E) : Colors.white)
@@ -78,41 +83,39 @@ class _DriverTripsTab extends StatelessWidget {
                   ]
                 : null,
           ),
-          child: Column(
+          // Label and count side by side: one row keeps the pinned header
+          // short (the stacked badge made it 100pt tall).
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text(
-                label,
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 13.r,
-                  fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
-                  color: isDark
-                      ? (isSelected ? Colors.white : Colors.white60)
-                      : (isSelected
-                            ? Colors.black87
-                            : const Color(0xFF757575)),
+              Flexible(
+                child: Text(
+                  label,
+                  textAlign: TextAlign.center,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontSize: 13.r,
+                    fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+                    color: isDark
+                        ? (isSelected ? Colors.white : Colors.white60)
+                        : (isSelected ? Colors.black87 : const Color(0xFF757575)),
+                  ),
                 ),
               ),
               if (count > 0) ...[
-                SizedBox(height: 4.r),
+                SizedBox(width: 6.r),
                 Container(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: 8.r,
-                    vertical: 2.r,
-                  ),
+                  constraints: BoxConstraints(minWidth: 20.r),
+                  padding: EdgeInsets.symmetric(horizontal: 6.r, vertical: 2.r),
                   decoration: BoxDecoration(
-                    color: isSelected
-                        ? const Color(0xFF4D63DD)
-                        : (isDark ? Colors.white24 : Colors.black26),
+                    color: isSelected ? const Color(0xFF4D63DD) : (isDark ? Colors.white24 : Colors.black26),
                     borderRadius: BorderRadius.circular(10.r),
                   ),
                   child: Text(
                     count.toString(),
-                    style: TextStyle(
-                      fontSize: 11.r,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.white,
-                    ),
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontSize: 11.r, fontWeight: FontWeight.w700, color: Colors.white),
                   ),
                 ),
               ],

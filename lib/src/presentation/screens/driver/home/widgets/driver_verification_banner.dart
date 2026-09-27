@@ -63,7 +63,7 @@ class _DriverVerificationBannerState extends State<DriverVerificationBanner> {
     final String message = verified ? 'driver_status_verified_msg'.tr() : 'driver_status_pending_msg'.tr();
 
     return Container(
-      margin: EdgeInsets.symmetric(horizontal: 16.r, vertical: 12.r),
+      margin: EdgeInsets.symmetric(horizontal: 20.r, vertical: 12.r),
       padding: EdgeInsets.all(14.r),
       decoration: BoxDecoration(
         color: accent.withValues(alpha: isDark ? 0.16 : 0.10),

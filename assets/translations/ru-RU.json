@@ -421,7 +421,6 @@
   "mon_nov": "Ноя",
   "mon_dec": "Дек",
   "earnings_week_short": "Нед {}",
-  "earnings_trips_hours": "{trips} поездок • {hours} ч",
   "earnings_revenue": "Доход",
   "driver_online": "В сети",
   "driver_offline": "Не в сети",
@@ -506,5 +505,11 @@
   "price_unit_week": "/нед.",
   "driver_request_awaiting_company": "Ожидает одобрения компании",
   "booking_success_subtitle_corporate": "Бронирование ожидает одобрения вашей компании — оплату произведёт компания.",
-  "location_default_delivery_label": "Адрес доставки"
+  "location_default_delivery_label": "Адрес доставки",
+  "units_trips": {
+    "one": "{} поездка",
+    "few": "{} поездки",
+    "many": "{} поездок",
+    "other": "{} поездки"
+  }
 }

@@ -6,6 +6,7 @@ import '../../../../../core/models/booking/booking.dart';
 import '../../../../../core/utils/safe_notifier.dart';
 import '../../shell/driver_shell_provider.dart';
 import '../models/earnings_period.dart';
+import '../../../../utils/date_labels.dart';
 
 /// Thin view-model over [DriverShellProvider] for the earnings tab. The
 /// completed-booking dataset and the selected period live in the shared shell
@@ -181,15 +182,10 @@ class DriverEarningsProvider extends ChangeNotifier with SafeNotifier {
   }
 
   List<RecentEarning> get recentEarnings {
-    String date(DateTime d) {
-      String two(int v) => v.toString().padLeft(2, '0');
-      return '${d.year}-${two(d.month)}-${two(d.day)} ${two(d.hour)}:${two(d.minute)}';
-    }
-
     return _completed.take(10).map((r) {
       final b = r.booking;
       return RecentEarning(
-        date: date(r.when),
+        date: formatDayMonthYearTime(r.when),
         customer: (b.customerFullName?.trim().isNotEmpty ?? false) ? b.customerFullName!.trim() : 'common_customer'.tr(),
         amount: b.totalAmount ?? 0,
         status: 'completed',

@@ -421,7 +421,6 @@
   "mon_nov": "نوم",
   "mon_dec": "دسم",
   "earnings_week_short": "ہفتہ {}",
-  "earnings_trips_hours": "{trips} سفر • {hours} گھنٹے",
   "earnings_revenue": "آمدنی",
   "driver_online": "آن لائن",
   "driver_offline": "آف لائن",
@@ -502,5 +501,9 @@
   "price_unit_week": "/ہفتہ",
   "driver_request_awaiting_company": "کمپنی کی منظوری کا انتظار",
   "booking_success_subtitle_corporate": "آپ کی بکنگ آپ کی کمپنی کی منظوری کی منتظر ہے — اس کا بل آپ کی کمپنی کو جائے گا۔",
-  "location_default_delivery_label": "ڈیلیوری کا پتہ"
+  "location_default_delivery_label": "ڈیلیوری کا پتہ",
+  "units_trips": {
+    "one": "{} ٹرپ",
+    "other": "{} ٹرپس"
+  }
 }

@@ -421,7 +421,6 @@
   "mon_nov": "नव",
   "mon_dec": "दिस",
   "earnings_week_short": "सप्त {}",
-  "earnings_trips_hours": "{trips} ट्रिप • {hours} घंटे",
   "earnings_revenue": "राजस्व",
   "driver_online": "ऑनलाइन",
   "driver_offline": "ऑफ़लाइन",
@@ -502,5 +501,9 @@
   "price_unit_week": "/सप्ताह",
   "driver_request_awaiting_company": "कंपनी की मंज़ूरी की प्रतीक्षा",
   "booking_success_subtitle_corporate": "आपकी बुकिंग आपकी कंपनी की मंज़ूरी की प्रतीक्षा में है — इसका बिल आपकी कंपनी को जाएगा।",
-  "location_default_delivery_label": "डिलीवरी पता"
+  "location_default_delivery_label": "डिलीवरी पता",
+  "units_trips": {
+    "one": "{} ट्रिप",
+    "other": "{} ट्रिप"
+  }
 }

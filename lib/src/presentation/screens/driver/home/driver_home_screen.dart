@@ -1,6 +1,5 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
@@ -18,6 +17,7 @@ import 'widgets/driver_verification_banner.dart';
 import 'widgets/earnings_card.dart';
 import 'widgets/quick_stats_row.dart';
 import 'widgets/trip_requests_section.dart';
+import '../shell/widgets/driver_sliver_header.dart';
 
 class DriverHomeScreen extends StatelessWidget {
   /// When provided, renders this widget in place of the home body — used by
@@ -89,7 +89,10 @@ class _DriverHomeView extends StatelessWidget {
     final drawerSelectedIndex = _drawerSelectedIndex(context);
 
     return Scaffold(
-      backgroundColor: isDark ? const Color(0xFF121212) : const Color(0xFFF8F9FA),
+      backgroundColor: driverPageBackground(isDark),
+      // The nav is a floating frosted pill: let tab content scroll behind it
+      // (each tab pads its end by driverBottomClearance).
+      extendBody: !isDesktop,
       drawer: isDesktop
           ? null
           : DriverMobileDrawer(
@@ -97,9 +100,11 @@ class _DriverHomeView extends StatelessWidget {
               drawerSelectedIndex: drawerSelectedIndex,
               onTabSelect: (i) => _goToTab(context, i),
             ),
-      body: SafeArea(
-        child: isDesktop
-            ? Row(
+      // Mobile tabs draw under the status bar themselves (their pinned glass
+      // headers include the inset); desktop keeps the plain safe area.
+      body: isDesktop
+          ? SafeArea(
+              child: Row(
                 children: [
                   DriverDesktopDrawer(
                     isDark: isDark,
@@ -108,9 +113,9 @@ class _DriverHomeView extends StatelessWidget {
                   ),
                   Expanded(child: _buildBody(context, isDark)),
                 ],
-              )
-            : _buildBody(context, isDark),
-      ),
+              ),
+            )
+          : _buildBody(context, isDark),
       bottomNavigationBar: isDesktop
           ? null
           : DriverBottomNav(
@@ -125,7 +130,7 @@ class _DriverHomeView extends StatelessWidget {
     if (tabBody != null) return tabBody!;
     final shell = context.watch<DriverShellProvider>();
     if (shell.isInitialLoading) {
-      return const DriverHomeSkeleton();
+      return const SafeArea(bottom: false, child: DriverHomeSkeleton());
     }
     final showFullError = shell.error != null && !shell.hasData;
     return RefreshIndicator(
@@ -145,9 +150,18 @@ class _DriverHomeView extends StatelessWidget {
           ));
         }
       },
+      // Spinner appears below the pinned header, not behind it.
+      edgeOffset: MediaQuery.paddingOf(context).top + DriverHeader.height,
       child: CustomScrollView(
         physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
         slivers: [
+          // Pinned so the drawer, inbox and the online toggle stay one tap
+          // away while scrolling; turns to glass once content passes under it.
+          DriverPinnedGlassHeader(
+            height: DriverHeader.height,
+            isDark: isDark,
+            child: DriverHeader(isDark: isDark),
+          ),
           if (showFullError)
             SliverFillRemaining(
               hasScrollBody: false,
@@ -158,12 +172,11 @@ class _DriverHomeView extends StatelessWidget {
               ),
             )
           else ...[
-            SliverToBoxAdapter(child: DriverHeader(isDark: isDark)),
             SliverToBoxAdapter(child: DriverVerificationBanner(isDark: isDark)),
             SliverToBoxAdapter(child: EarningsCard(isDark: isDark)),
             SliverToBoxAdapter(child: QuickStatsRow(isDark: isDark)),
             SliverToBoxAdapter(child: TripRequestsSection(isDark: isDark)),
-            SliverToBoxAdapter(child: SizedBox(height: 100.r)),
+            SliverToBoxAdapter(child: SizedBox(height: driverBottomClearance(context))),
           ],
         ],
       ),

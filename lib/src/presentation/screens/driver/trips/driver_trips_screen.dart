@@ -11,6 +11,7 @@ import 'provider/driver_trips_provider.dart';
 import 'widgets/driver_trips_empty_state.dart';
 import 'widgets/driver_trips_list.dart';
 import 'widgets/driver_trips_tab_selector.dart';
+import '../shell/widgets/driver_sliver_header.dart';
 
 class DriverTripsScreen extends StatelessWidget {
   const DriverTripsScreen({super.key});
@@ -36,50 +37,31 @@ class _DriverTripsView extends StatelessWidget {
     final trips = provider.filteredTrips;
     final tabIndex = provider.tabIndex;
 
-    return Scaffold(
-      backgroundColor: isDark
-          ? const Color(0xFF121212)
-          : const Color(0xFFF8F9FA),
-      body: SafeArea(
-        child: RefreshIndicator(
-          onRefresh: () => context.read<DriverTripsProvider>().load(),
-          child: CustomScrollView(
-            physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
-            slivers: [
-              SliverAppBar(
-                floating: true,
-                pinned: true,
-                backgroundColor: isDark
-                    ? const Color(0xFF1E1E1E)
-                    : Colors.white,
-                elevation: 0,
-                leadingWidth: 56.r,
-                titleSpacing: 0,
-                title: Text(
-                  'driver_trips'.tr(),
-                  style: TextStyle(
-                    fontSize: 20.r,
-                    fontWeight: FontWeight.w700,
-                    color: isDark ? Colors.white : Colors.black87,
-                  ),
-                ),
-                bottom: PreferredSize(
-                  preferredSize: Size.fromHeight(100.r),
-                  child: DriverTripsTabSelector(isDark: isDark),
-                ),
-              ),
-              SliverToBoxAdapter(child: SizedBox(height: 20.r)),
-              // A refresh that fails while trips are on screen keeps the list
-              // and surfaces the problem in a slim banner instead of hiding it.
-              if (provider.error != null && provider.trips.isNotEmpty)
-                SliverToBoxAdapter(child: _ErrorBanner(isDark: isDark)),
-              SliverToBoxAdapter(
-                child: _buildContent(context, provider, trips, tabIndex, isDark),
-              ),
-              SliverToBoxAdapter(child: SizedBox(height: 100.r)),
-            ],
+    return RefreshIndicator(
+      onRefresh: () => context.read<DriverTripsProvider>().load(),
+      // Spinner appears below the pinned header, not behind it.
+      edgeOffset: DriverSliverHeader.expandedExtent(context, bottomHeight: DriverTripsTabSelector.height),
+      child: CustomScrollView(
+        physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
+        slivers: [
+          // Large title that collapses into a compact one; the selector stays
+          // pinned underneath and the bar turns to glass over the content.
+          DriverSliverHeader(
+            title: 'driver_trips'.tr(),
+            isDark: isDark,
+            bottom: DriverTripsTabSelector(isDark: isDark),
+            bottomHeight: DriverTripsTabSelector.height,
           ),
-        ),
+          SliverToBoxAdapter(child: SizedBox(height: 8.r)),
+          // A refresh that fails while trips are on screen keeps the list
+          // and surfaces the problem in a slim banner instead of hiding it.
+          if (provider.error != null && provider.trips.isNotEmpty)
+            SliverToBoxAdapter(child: _ErrorBanner(isDark: isDark)),
+          SliverToBoxAdapter(
+            child: _buildContent(context, provider, trips, tabIndex, isDark),
+          ),
+          SliverToBoxAdapter(child: SizedBox(height: driverBottomClearance(context))),
+        ],
       ),
     );
   }

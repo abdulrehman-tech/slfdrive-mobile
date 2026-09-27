@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 
-class ProfileProvider extends ChangeNotifier {
-  ProfileProvider() {
+/// Scroll position of a profile page, driving the glass header's fade-in.
+/// Shared by the customer and driver profile screens.
+class ProfileScrollProvider extends ChangeNotifier {
+  ProfileScrollProvider() {
     scroll.addListener(_onScroll);
   }
 

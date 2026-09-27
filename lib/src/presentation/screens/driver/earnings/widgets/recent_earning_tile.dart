@@ -19,7 +19,7 @@ class RecentEarningTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       margin: EdgeInsets.only(bottom: 12.r),
-      padding: EdgeInsets.all(16.r),
+      padding: EdgeInsets.all(14.r),
       decoration: BoxDecoration(
         color: isDark ? const Color(0xFF1E1E2E) : Colors.white,
         borderRadius: BorderRadius.circular(16.r),
@@ -34,8 +34,8 @@ class RecentEarningTile extends StatelessWidget {
       child: Row(
         children: [
           Container(
-            width: 48.r,
-            height: 48.r,
+            width: 44.r,
+            height: 44.r,
             decoration: BoxDecoration(
               color: const Color(0xFF4CAF50).withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(12.r),
@@ -46,13 +46,15 @@ class RecentEarningTile extends StatelessWidget {
               size: 22.r,
             ),
           ),
-          SizedBox(width: 16.r),
+          SizedBox(width: 14.r),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   earning.customer,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                     fontSize: 15.r,
                     fontWeight: FontWeight.w600,

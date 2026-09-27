@@ -15,12 +15,17 @@ import '../../common/profile/widgets/profile_header_card.dart';
 import '../../common/profile/widgets/profile_section.dart';
 import '../../common/profile/widgets/profile_tile.dart';
 import '../../../utils/bidi.dart';
+import '../../common/profile/provider/profile_scroll_provider.dart';
+import '../../common/profile/widgets/profile_glass_header.dart';
+import '../../common/profile/widgets/app_version_label.dart';
+import '../shell/widgets/driver_sliver_header.dart';
 
 class DriverProfileScreen extends StatelessWidget {
   const DriverProfileScreen({super.key});
 
   @override
-  Widget build(BuildContext context) => const _DriverProfileView();
+  Widget build(BuildContext context) =>
+      ChangeNotifierProvider(create: (_) => ProfileScrollProvider(), child: const _DriverProfileView());
 }
 
 class _DriverProfileView extends StatefulWidget {
@@ -59,62 +64,77 @@ class _DriverProfileViewState extends State<_DriverProfileView> {
     final isDark = _isDark(context);
     final auth = context.watch<AuthProvider>();
 
-    return Scaffold(
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      body: RefreshIndicator(
-        onRefresh: () => context.read<AuthProvider>().refreshDriverStatus(),
-        child: SingleChildScrollView(
-          physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
-          // The shell's SafeArea already consumes the status-bar inset.
-          padding: EdgeInsets.fromLTRB(16.r, 12.r, 16.r, 100.r),
-          child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            ProfileHeaderCard(
-              isDark: isDark,
-              statusChip: _StatusChip(isVerified: auth.isVerified),
-            ),
-            SizedBox(height: 18.r),
-            ProfileSection(
-              title: 'profile_section_account'.tr(),
-              isDark: isDark,
-              children: [
-                ProfileTile(
-                  icon: Iconsax.user_edit_copy,
-                  iconColor: const Color(0xFF3D5AFE),
-                  title: 'profile_edit_profile'.tr(),
-                  isDark: isDark,
-                  onTap: () => _openEdit(context),
+    final topPad = MediaQuery.paddingOf(context).top;
+    final chip = _StatusChip(isVerified: auth.isVerified);
+
+    // Same structure as the customer profile: the header card scrolls away
+    // under the status bar and a compact glass header (with the verification
+    // chip) fades in once it's gone.
+    return Stack(
+      children: [
+        RefreshIndicator(
+          onRefresh: () => context.read<AuthProvider>().refreshDriverStatus(),
+          edgeOffset: topPad,
+          child: CustomScrollView(
+            controller: context.read<ProfileScrollProvider>().scroll,
+            physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
+            slivers: [
+              SliverPadding(
+                padding: EdgeInsets.fromLTRB(16.r, topPad + 12.r, 16.r, 0),
+                sliver: SliverToBoxAdapter(
+                  child: ProfileHeaderCard(isDark: isDark, statusChip: chip),
                 ),
-                ProfileTile(
-                  icon: Iconsax.call_copy,
-                  iconColor: const Color(0xFF4CAF50),
-                  title: 'profile_phone'.tr(),
-                  value: ltr(auth.displayPhone ?? ''),
-                  isDark: isDark,
-                  onTap: () => _openEdit(context),
+              ),
+              SliverPadding(
+                padding: EdgeInsets.fromLTRB(16.r, 18.r, 16.r, driverBottomClearance(context)),
+                sliver: SliverList.list(
+                  children: [
+                    ProfileSection(
+                      title: 'profile_section_account'.tr(),
+                      isDark: isDark,
+                      children: [
+                        ProfileTile(
+                          icon: Iconsax.user_edit_copy,
+                          iconColor: const Color(0xFF3D5AFE),
+                          title: 'profile_edit_profile'.tr(),
+                          isDark: isDark,
+                          onTap: () => _openEdit(context),
+                        ),
+                        ProfileTile(
+                          icon: Iconsax.call_copy,
+                          iconColor: const Color(0xFF4CAF50),
+                          title: 'profile_phone'.tr(),
+                          value: ltr(auth.displayPhone ?? ''),
+                          isDark: isDark,
+                          onTap: () => _openEdit(context),
+                        ),
+                        ProfileTile(
+                          icon: Iconsax.sms_copy,
+                          iconColor: const Color(0xFFFF6D00),
+                          title: 'profile_email_address'.tr(),
+                          value: auth.displayEmail ?? '',
+                          isDark: isDark,
+                          onTap: () => _openEdit(context),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 16.r),
+                    PreferencesSection(isDark: isDark, isDriver: true),
+                    SizedBox(height: 16.r),
+                    SupportSection(isDark: isDark),
+                    DangerZoneSection(isDark: isDark),
+                    SizedBox(height: 16.r),
+                    SignOutButton(isDark: isDark),
+                    SizedBox(height: 20.r),
+                    const AppVersionLabel(),
+                  ],
                 ),
-                ProfileTile(
-                  icon: Iconsax.sms_copy,
-                  iconColor: const Color(0xFFFF6D00),
-                  title: 'profile_email_address'.tr(),
-                  value: auth.displayEmail ?? '',
-                  isDark: isDark,
-                  onTap: () => _openEdit(context),
-                ),
-              ],
-            ),
-            SizedBox(height: 16.r),
-            PreferencesSection(isDark: isDark, isDriver: true),
-            SizedBox(height: 16.r),
-            SupportSection(isDark: isDark),
-            DangerZoneSection(isDark: isDark),
-            SizedBox(height: 16.r),
-            SignOutButton(isDark: isDark),
-          ],
+              ),
+            ],
           ),
         ),
-      ),
+        Positioned(left: 0, right: 0, top: 0, child: ProfileGlassHeader(isDark: isDark, trailing: chip)),
+      ],
     );
   }
 }
