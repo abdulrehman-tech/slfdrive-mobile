@@ -12,6 +12,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:iconsax_flutter/iconsax_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:slfdrive/src/core/data/repositories/company_repository.dart';
@@ -28,6 +29,8 @@ import 'package:slfdrive/src/core/services/review_aggregates.dart';
 import 'package:slfdrive/src/presentation/screens/customer/booking/models/booking_data.dart';
 import 'package:slfdrive/src/presentation/screens/customer/booking/steps/summary_widgets/summary_promo_card.dart';
 import 'package:slfdrive/src/presentation/screens/customer/company_profile/company_profile_screen.dart';
+import 'package:slfdrive/src/presentation/screens/customer/driver_detail/models/driver_profile.dart';
+import 'package:slfdrive/src/presentation/screens/customer/driver_detail/widgets/hire_bar.dart';
 import 'package:slfdrive/src/presentation/screens/customer/favorites/provider/favorites_provider.dart';
 import 'package:slfdrive/src/presentation/screens/customer/home/models/car_item.dart';
 import 'package:slfdrive/src/presentation/screens/customer/home/widgets/car_card.dart';
@@ -364,6 +367,61 @@ void main() {
       );
       expect(find.byType(CarCard), findsOneWidget);
     });
+
+    for (final company in [false, true]) {
+      testWidgets('driver hire bar (${company ? 'company' : 'freelance'}) lays out without overflow (${_label(c)})',
+          (tester) async {
+        await _pump(
+          tester,
+          locale: c.locale,
+          size: c.size,
+          textScale: c.scale,
+          dark: c.dark,
+          child: Scaffold(
+            body: Builder(
+              builder: (context) => Align(
+                alignment: Alignment.bottomCenter,
+                child: HireBar(
+                  profile: DriverProfile(
+                    id: '5',
+                    name: 'Mohammed Abdullah Al Balushi',
+                    companyId: company ? 11 : null,
+                    companyName: company ? _longName : null,
+                    coverUrl: '',
+                    avatarUrl: '',
+                    rating: 4.8,
+                    trips: 120,
+                    years: 12,
+                    responseTime: '',
+                    hourlyRate: 5,
+                    dailyRate: 150,
+                    weeklyRate: 900,
+                    phone: '+96890000000',
+                    bio: '',
+                    languages: const [],
+                    services: const [],
+                    vehicles: const [],
+                    availability: const [],
+                    reviewCounts: const [],
+                    reviews: const [],
+                  ),
+                  isDark: c.dark,
+                  cs: Theme.of(context).colorScheme,
+                  onHire: () {},
+                ),
+              ),
+            ),
+          ),
+        );
+        final label = find.text((company ? 'driver_detail_book_company' : 'driver_detail_hire').tr());
+        expect(label, findsOneWidget);
+        // The primary action must read in full, not "Book a compan…".
+        expect(tester.renderObject<RenderParagraph>(label).didExceedMaxLines, isFalse);
+        // Company drivers are booked with a company car: no direct contact.
+        expect(find.byIcon(Iconsax.call_copy), company ? findsNothing : findsOneWidget);
+        expect(find.byIcon(Iconsax.message_copy), company ? findsNothing : findsOneWidget);
+      });
+    }
 
     testWidgets('promo card lays out without overflow (${_label(c)})', (tester) async {
       final data = BookingData();

@@ -541,5 +541,6 @@
   "company_action_website": "Sitio web",
   "promo_subtitle": "¿Tienes un código? Aplícalo y ahorra en tu alquiler.",
   "promo_applied": "Código aplicado",
-  "company_contact_copied": "No se pudo abrir aquí — {value} copiado."
+  "company_contact_copied": "No se pudo abrir aquí — {value} copiado.",
+  "driver_detail_book_company": "Reservar coche"
 }

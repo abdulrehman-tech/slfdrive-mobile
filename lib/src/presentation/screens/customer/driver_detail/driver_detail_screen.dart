@@ -17,6 +17,7 @@ import 'provider/driver_detail_provider.dart';
 import 'widgets/about_card.dart';
 import 'widgets/availability_card.dart';
 import 'widgets/cover_header.dart';
+import '../../../widgets/company_link.dart';
 import 'widgets/desktop_hire_button.dart';
 import 'widgets/glass_header_overlay.dart';
 import 'widgets/hire_bar.dart';
@@ -48,7 +49,21 @@ class _DriverDetailView extends StatelessWidget {
     return tp.isDarkMode || (tp.isSystemMode && MediaQuery.of(context).platformBrightness == Brightness.dark);
   }
 
+  /// Primary action: freelance drivers are hired directly; company drivers
+  /// only come with one of their company's cars, so send the customer to the
+  /// company's vehicles instead.
+  void _onPrimaryAction(BuildContext context, DriverProfile profile) {
+    final companyId = profile.companyId;
+    if (companyId != null) {
+      openCompanyProfile(context, companyId);
+    } else {
+      _launchHireFlow(context, profile);
+    }
+  }
+
   Future<void> _launchHireFlow(BuildContext context, DriverProfile profile) async {
+    // Company drivers are never hired standalone (see _onPrimaryAction).
+    if (profile.companyId != null) return;
     // Hiring a driver is a gated action — prompt guests to log in first.
     if (!await requireLogin(context)) return;
     if (!context.mounted) return;
@@ -195,7 +210,7 @@ class _DriverDetailView extends StatelessWidget {
             profile: profile,
             isDark: isDark,
             cs: cs,
-            onHire: () => _launchHireFlow(context, profile),
+            onHire: () => _onPrimaryAction(context, profile),
           ),
         ),
       ],
@@ -280,7 +295,7 @@ class _DriverDetailView extends StatelessWidget {
                         DesktopHireButton(
                           profile: profile,
                           cs: cs,
-                          onTap: () => _launchHireFlow(context, profile),
+                          onTap: () => _onPrimaryAction(context, profile),
                         ),
                       ],
                     ),

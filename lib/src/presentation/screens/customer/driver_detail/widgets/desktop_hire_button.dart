@@ -32,10 +32,11 @@ class DesktopHireButton extends StatelessWidget {
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(Iconsax.user_octagon_copy, size: 16.r, color: Colors.white),
+              Icon(profile.companyId != null ? Iconsax.car_copy : Iconsax.user_octagon_copy, size: 16.r, color: Colors.white),
               SizedBox(width: 6.r),
               Text(
-                'driver_detail_hire'.tr(),
+                // Company drivers are booked with one of the company's cars.
+                (profile.companyId != null ? 'driver_detail_book_company' : 'driver_detail_hire').tr(),
                 style: TextStyle(fontSize: 15.r, fontWeight: FontWeight.w800, color: Colors.white),
               ),
               SizedBox(width: 8.r),
