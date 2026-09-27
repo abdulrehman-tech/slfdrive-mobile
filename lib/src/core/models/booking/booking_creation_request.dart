@@ -14,6 +14,11 @@ class BookingCreationRequest {
   final int? paymentTypeId;
   final double? commissionPercent;
   final double? commissionAmount;
+
+  /// Customer-typed promo code. The server resolves it (rental company first,
+  /// then all-company codes) and computes the discount on both pre-booking
+  /// quote and create; every other promo field is server-derived.
+  final String? promoCode;
   final List<BookingDetailsCreationRequest> bookingDetails;
 
   const BookingCreationRequest({
@@ -29,6 +34,7 @@ class BookingCreationRequest {
     this.paymentTypeId,
     this.commissionPercent,
     this.commissionAmount,
+    this.promoCode,
     this.bookingDetails = const [],
   });
 
@@ -45,6 +51,7 @@ class BookingCreationRequest {
         if (paymentTypeId != null) 'paymentTypeId': paymentTypeId,
         if (commissionPercent != null) 'commissionPercent': commissionPercent,
         if (commissionAmount != null) 'commissionAmount': commissionAmount,
+        if (promoCode != null && promoCode!.isNotEmpty) 'promoCode': promoCode,
         'bookingDetails': bookingDetails.map((d) => d.toJson()).toList(),
       };
 }

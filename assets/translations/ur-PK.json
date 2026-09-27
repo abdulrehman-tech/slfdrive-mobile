@@ -505,5 +505,40 @@
   "units_trips": {
     "one": "{} ٹرپ",
     "other": "{} ٹرپس"
-  }
+  },
+  "promo_title": "پرومو کوڈ",
+  "promo_hint": "پرومو کوڈ درج کریں",
+  "promo_apply": "لاگو کریں",
+  "promo_remove": "ہٹائیں",
+  "promo_you_save": "آپ کی بچت",
+  "promo_available": "دستیاب آفرز",
+  "promo_discount_line": "پرومو ({code})",
+  "promo_invalid": "یہ پرومو کوڈ درست نہیں ہے۔",
+  "promo_not_applicable": "یہ پرومو کوڈ اس بکنگ پر لاگو نہیں ہوتا۔",
+  "company_load_failed": "اس کمپنی کو لوڈ نہیں کیا جا سکا۔",
+  "company_new": "نیا",
+  "company_about": "تعارف",
+  "company_no_vehicles": "ابھی کوئی گاڑی نہیں۔",
+  "company_no_drivers": "ابھی کوئی ڈرائیور نہیں۔",
+  "company_no_reviews": "ابھی کوئی جائزہ نہیں۔",
+  "company_tab_vehicles": "گاڑیاں",
+  "company_tab_drivers": "ڈرائیور",
+  "company_tab_reviews": "جائزے",
+  "company_view_profile": "کمپنی پروفائل دیکھیں",
+  "company_vehicles_count": {
+    "one": "{} گاڑی",
+    "other": "{} گاڑیاں"
+  },
+  "company_read_more": "مزید پڑھیں",
+  "company_read_less": "کم دکھائیں",
+  "company_listed_by": "فہرست کنندہ",
+  "company_type_rental": "رینٹل کمپنی",
+  "company_stat_rating": "ریٹنگ",
+  "company_stat_trips": "سفر",
+  "company_stat_branches": "شاخیں",
+  "company_action_call": "کال",
+  "company_action_email": "ای میل",
+  "company_action_website": "ویب سائٹ",
+  "promo_subtitle": "کوڈ ہے؟ کرایے پر بچت کے لیے لاگو کریں۔",
+  "promo_applied": "کوڈ لاگو ہو گیا"
 }

@@ -12,6 +12,7 @@ import '../auth_gate.dart';
 import '../omr_icon.dart';
 import 'availability_pill.dart';
 import 'lookup_label.dart';
+import '../company_link.dart';
 
 /// Row card for vehicle lists (browse cars, search): photo with favourite,
 /// then name with its availability status, brand · year · type, the renting
@@ -23,39 +24,66 @@ class VehicleCard extends StatelessWidget {
   final bool ar;
   final VoidCallback onTap;
 
+  /// Show the owning company as a link to its profile. Off on the company's
+  /// own profile page, where every card belongs to it.
+  final bool showCompany;
+
+  /// Design height at 1.0 text scale (the skeleton uses it as is).
   static const double height = 152;
 
-  const VehicleCard({super.key, required this.vehicle, required this.onTap, this.rating, this.ar = false});
+  /// Text scaling is capped here inside the card: it is a dense list row.
+  static const double _maxTextScale = 1.3;
+
+  /// Row height for the ambient text scale: the photo is fixed, the text
+  /// column (~100 design px of type) grows with the (capped) scale. Lists must
+  /// size their rows with this, not [height].
+  static double extentOf(BuildContext context) {
+    final scale = MediaQuery.textScalerOf(context).scale(1).clamp(1.0, _maxTextScale);
+    return (height + 100 * (scale - 1)).r;
+  }
+
+  const VehicleCard({
+    super.key,
+    required this.vehicle,
+    required this.onTap,
+    this.rating,
+    this.ar = false,
+    this.showCompany = true,
+  });
 
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        height: height.r,
-        clipBehavior: Clip.antiAlias,
-        decoration: BoxDecoration(
-          color: isDark ? Colors.white.withValues(alpha: 0.07) : Colors.white,
-          borderRadius: BorderRadius.circular(18.r),
-          border: Border.all(
-            color: isDark ? Colors.white.withValues(alpha: 0.1) : Colors.black.withValues(alpha: 0.06),
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: isDark ? 0.22 : 0.05),
-              blurRadius: 14.r,
-              offset: Offset(0, 4.r),
+    final extent = extentOf(context);
+    return MediaQuery.withClampedTextScaling(
+      maxScaleFactor: _maxTextScale,
+      child: GestureDetector(
+        onTap: onTap,
+        child: Container(
+          height: extent,
+          clipBehavior: Clip.antiAlias,
+          decoration: BoxDecoration(
+            color: isDark ? Colors.white.withValues(alpha: 0.07) : Colors.white,
+            borderRadius: BorderRadius.circular(18.r),
+            border: Border.all(
+              color: isDark ? Colors.white.withValues(alpha: 0.1) : Colors.black.withValues(alpha: 0.06),
             ),
-          ],
-        ),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            _Photo(vehicle: vehicle, rating: rating, isDark: isDark, cs: cs),
-            Expanded(child: _Info(vehicle: vehicle, rating: rating, ar: ar, isDark: isDark, cs: cs)),
-          ],
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: isDark ? 0.22 : 0.05),
+                blurRadius: 14.r,
+                offset: Offset(0, 4.r),
+              ),
+            ],
+          ),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              _Photo(vehicle: vehicle, rating: rating, isDark: isDark, cs: cs),
+              Expanded(child: _Info(vehicle: vehicle, rating: rating, ar: ar, isDark: isDark, cs: cs, showCompany: showCompany)),
+            ],
+          ),
         ),
       ),
     );
@@ -139,8 +167,16 @@ class _Info extends StatelessWidget {
   final bool ar;
   final bool isDark;
   final ColorScheme cs;
+  final bool showCompany;
 
-  const _Info({required this.vehicle, required this.rating, required this.ar, required this.isDark, required this.cs});
+  const _Info({
+    required this.vehicle,
+    required this.rating,
+    required this.ar,
+    required this.isDark,
+    required this.cs,
+    required this.showCompany,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -185,22 +221,9 @@ class _Info extends StatelessWidget {
               overflow: TextOverflow.ellipsis,
               style: TextStyle(fontSize: 11.r, color: muted, fontWeight: FontWeight.w500),
             ),
-          if (company.isNotEmpty) ...[
-            SizedBox(height: 3.r),
-            Row(
-              children: [
-                Icon(Iconsax.building_copy, size: 11.r, color: cs.primary.withValues(alpha: 0.8)),
-                SizedBox(width: 4.r),
-                Expanded(
-                  child: Text(
-                    company,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(fontSize: 10.r, color: cs.primary, fontWeight: FontWeight.w600),
-                  ),
-                ),
-              ],
-            ),
+          if (showCompany && company.isNotEmpty) ...[
+            SizedBox(height: 1.r),
+            CompanyLink(name: company, companyId: v.companyId, fontSize: 10),
           ],
           SizedBox(height: 7.r),
           // One line; extra pills are clipped rather than wrapping into the price.

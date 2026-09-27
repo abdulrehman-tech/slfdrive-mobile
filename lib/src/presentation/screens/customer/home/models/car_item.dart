@@ -27,6 +27,10 @@ class CarItem {
   /// Bookable now ([Vehicle.isAvailable]).
   final bool isAvailable;
 
+  /// Owning rental company, shown as a link to its profile.
+  final int? companyId;
+  final String companyName;
+
   CarItem({
     required this.id,
     required this.name,
@@ -40,6 +44,8 @@ class CarItem {
     this.rating,
     this.hasPrice = true,
     this.isAvailable = true,
+    this.companyId,
+    this.companyName = '',
   });
 
   /// Maps a backend [Vehicle] to a home CarItem. [ar] selects Arabic names.
@@ -61,6 +67,8 @@ class CarItem {
       rating: rating ?? v.rating,
       hasPrice: v.hasPrice,
       isAvailable: v.isAvailable,
+      companyId: v.companyId,
+      companyName: ((ar ? v.companyNameAr : null) ?? v.companyName ?? '').trim(),
     );
   }
 }

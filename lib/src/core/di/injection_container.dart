@@ -27,6 +27,7 @@ import '../data/repositories/review_repository.dart';
 import '../data/repositories/vehicle_repository.dart';
 import '../network/api_client.dart';
 import '../services/booking_lookups.dart';
+import '../services/company_directory.dart';
 import '../services/customer_avatars.dart';
 import '../services/driver_session.dart';
 import '../services/notification_inbox_store.dart';
@@ -38,6 +39,10 @@ import '../services/session_manager.dart';
 import '../../presentation/providers/auth_provider.dart';
 import '../../presentation/screens/customer/notifications/provider/notifications_provider.dart';
 import '../../presentation/screens/driver/shell/driver_shell_provider.dart';
+import '../data/datasources/promo_code_remote_data_source.dart';
+import '../data/repositories/promo_code_repository.dart';
+import '../data/datasources/company_remote_data_source.dart';
+import '../data/repositories/company_repository.dart';
 
 final getIt = GetIt.instance;
 
@@ -84,6 +89,12 @@ Future<void> setupDependencyInjection() async {
   getIt.registerLazySingleton<CorporateMembershipRemoteDataSource>(
     () => CorporateMembershipRemoteDataSourceImpl(getIt<ApiClient>()),
   );
+  getIt.registerLazySingleton<CompanyRemoteDataSource>(
+    () => CompanyRemoteDataSourceImpl(getIt<ApiClient>()),
+  );
+  getIt.registerLazySingleton<PromoCodeRemoteDataSource>(
+    () => PromoCodeRemoteDataSourceImpl(getIt<ApiClient>()),
+  );
   getIt.registerLazySingleton<DeliveryFeeRemoteDataSource>(
     () => DeliveryFeeRemoteDataSourceImpl(getIt<ApiClient>()),
   );
@@ -127,6 +138,12 @@ Future<void> setupDependencyInjection() async {
       getIt<CorporateMembershipRemoteDataSource>(),
     ),
   );
+  getIt.registerLazySingleton<CompanyRepository>(
+    () => CompanyRepositoryImpl(getIt<CompanyRemoteDataSource>()),
+  );
+  getIt.registerLazySingleton<PromoCodeRepository>(
+    () => PromoCodeRepositoryImpl(getIt<PromoCodeRemoteDataSource>()),
+  );
   getIt.registerLazySingleton<DeliveryFeeRepository>(
     () => DeliveryFeeRepositoryImpl(getIt<DeliveryFeeRemoteDataSource>()),
   );
@@ -158,6 +175,9 @@ Future<void> setupDependencyInjection() async {
   );
   getIt.registerLazySingleton<ReviewAggregates>(
     () => ReviewAggregates(getIt<ReviewRepository>()),
+  );
+  getIt.registerLazySingleton<CompanyDirectory>(
+    () => CompanyDirectory(getIt<CompanyRepository>()),
   );
   getIt.registerLazySingleton<NotificationInboxStore>(
     () => NotificationInboxStore(),

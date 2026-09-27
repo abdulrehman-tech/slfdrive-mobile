@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 import '../provider/home_provider.dart';
+import '../../../../widgets/network_logo.dart';
 import 'section_header.dart';
 
 class BrandsSection extends StatelessWidget {
@@ -45,7 +46,7 @@ class BrandsSection extends StatelessWidget {
                 },
                 child: AnimatedContainer(
                   duration: const Duration(milliseconds: 220),
-                  margin: EdgeInsetsDirectional.only(end: 14.r),
+                  margin: EdgeInsetsDirectional.only(end: 8.r),
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
@@ -55,9 +56,13 @@ class BrandsSection extends StatelessWidget {
                         height: 58.r,
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          color: isDark
-                              ? (selected ? cs.primary.withValues(alpha: 0.15) : const Color(0xFF1E1E2E))
-                              : (selected ? cs.primary.withValues(alpha: 0.08) : Colors.white),
+                          // Real logos get a white plate (drawn for light
+                          // backgrounds); letter fallbacks keep the tinted one.
+                          color: brand.logoUrl != null
+                              ? Colors.white
+                              : isDark
+                                  ? (selected ? cs.primary.withValues(alpha: 0.15) : const Color(0xFF1E1E2E))
+                                  : (selected ? cs.primary.withValues(alpha: 0.08) : Colors.white),
                           border: Border.all(
                             color: selected
                                 ? cs.primary
@@ -82,24 +87,25 @@ class BrandsSection extends StatelessWidget {
                         ),
                         child: ClipOval(
                           child: Padding(
-                            padding: EdgeInsets.all(10.r),
-                            child: Image.asset(
-                              brand.logoUrl,
-                              fit: BoxFit.contain,
-                              errorBuilder: (_, _, _) => Center(
-                                child: Text(
-                                  brand.name[0],
-                                  style: TextStyle(fontSize: 18.r, fontWeight: FontWeight.bold, color: cs.primary),
-                                ),
-                              ),
+                            padding: EdgeInsets.all(brand.logoUrl != null ? 8.r : 10.r),
+                            child: NetworkLogo(
+                              url: brand.logoUrl,
+                              name: brand.name,
+                              letterStyle: TextStyle(fontSize: 18.r, fontWeight: FontWeight.bold, color: cs.primary),
                             ),
                           ),
                         ),
                       ),
                       SizedBox(height: 6.r),
-                      Text(
-                        brand.name,
-                        style: TextStyle(fontSize: 11.r, fontWeight: FontWeight.w600, color: cs.onSurface),
+                      SizedBox(
+                        width: 66.r,
+                        child: Text(
+                          brand.name,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          textAlign: TextAlign.center,
+                          style: TextStyle(fontSize: 11.r, fontWeight: FontWeight.w600, color: cs.onSurface),
+                        ),
                       ),
                     ],
                   ),

@@ -199,7 +199,7 @@ class _BookingFlowView extends StatelessWidget {
       submitting: provider.submitting,
       // Prefer the authoritative backend quote; fall back to the client estimate
       // while it loads or if it failed.
-      totalPrice: provider.data.quote?.totalAmount ?? provider.data.totalPrice,
+      totalPrice: provider.data.payableTotal,
       nextLabelKey: provider.nextLabelKey,
       onBack: () => _handleBack(context),
       onNext: () => _handleNext(context),

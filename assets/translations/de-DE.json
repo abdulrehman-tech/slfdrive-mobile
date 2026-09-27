@@ -505,5 +505,40 @@
   "units_trips": {
     "one": "{} Fahrt",
     "other": "{} Fahrten"
-  }
+  },
+  "promo_title": "Gutscheincode",
+  "promo_hint": "Gutscheincode eingeben",
+  "promo_apply": "Anwenden",
+  "promo_remove": "Entfernen",
+  "promo_you_save": "Du sparst",
+  "promo_available": "Verfügbare Angebote",
+  "promo_discount_line": "Gutschein ({code})",
+  "promo_invalid": "Dieser Gutscheincode ist ungültig.",
+  "promo_not_applicable": "Dieser Gutscheincode gilt nicht für diese Buchung.",
+  "company_load_failed": "Unternehmen konnte nicht geladen werden.",
+  "company_new": "Neu",
+  "company_about": "Über uns",
+  "company_no_vehicles": "Noch keine Fahrzeuge.",
+  "company_no_drivers": "Noch keine Fahrer.",
+  "company_no_reviews": "Noch keine Bewertungen.",
+  "company_tab_vehicles": "Fahrzeuge",
+  "company_tab_drivers": "Fahrer",
+  "company_tab_reviews": "Bewertungen",
+  "company_view_profile": "Firmenprofil ansehen",
+  "company_vehicles_count": {
+    "one": "{} Fahrzeug",
+    "other": "{} Fahrzeuge"
+  },
+  "company_read_more": "Mehr lesen",
+  "company_read_less": "Weniger anzeigen",
+  "company_listed_by": "Angeboten von",
+  "company_type_rental": "Autovermietung",
+  "company_stat_rating": "Bewertung",
+  "company_stat_trips": "Fahrten",
+  "company_stat_branches": "Filialen",
+  "company_action_call": "Anrufen",
+  "company_action_email": "E-Mail",
+  "company_action_website": "Website",
+  "promo_subtitle": "Haben Sie einen Code? Lösen Sie ihn ein und sparen Sie.",
+  "promo_applied": "Code eingelöst"
 }

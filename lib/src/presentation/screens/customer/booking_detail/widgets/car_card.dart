@@ -8,6 +8,7 @@ import '../../../../widgets/customer/oman_plate.dart';
 import '../../../../widgets/omr_icon.dart';
 import '../models/booking_detail.dart';
 import 'glass_card.dart';
+import '../../../../widgets/company_link.dart';
 
 class BookingCarCard extends StatelessWidget {
   final BookingDetail booking;
@@ -62,24 +63,7 @@ class BookingCarCard extends StatelessWidget {
                       ),
                       if ((booking.companyName ?? '').isNotEmpty) ...[
                         SizedBox(height: 4.r),
-                        Row(
-                          children: [
-                            Icon(Iconsax.building_copy, size: 12.r, color: cs.primary),
-                            SizedBox(width: 4.r),
-                            Flexible(
-                              child: Text(
-                                booking.companyName!,
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                style: TextStyle(
-                                  fontSize: 11.r,
-                                  fontWeight: FontWeight.w600,
-                                  color: cs.onSurface.withValues(alpha: 0.7),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
+                        CompanyLink(name: booking.companyName!, companyId: booking.rentalCompanyId),
                       ],
                       SizedBox(height: 6.r),
                       Row(

@@ -31,6 +31,8 @@ class DriverDetails {
   final double? lat;
   final double? lon;
   final int? allCompanyId;
+  final String? allCompanyName;
+  final String? allCompanyNameAr;
   /// Server-side availability flag (`is_online` on `mst_driver`); null when the
   /// driver never toggled it (treated as offline). Seeds the home toggle.
   final bool? isOnline;
@@ -63,6 +65,8 @@ class DriverDetails {
     this.lat,
     this.lon,
     this.allCompanyId,
+    this.allCompanyName,
+    this.allCompanyNameAr,
     this.isOnline,
   });
 
@@ -95,6 +99,8 @@ class DriverDetails {
       lat: (json['lat'] as num?)?.toDouble(),
       lon: (json['lon'] as num?)?.toDouble(),
       allCompanyId: (json['allCompanyId'] as num?)?.toInt(),
+      allCompanyName: json['allCompanyName'] as String?,
+      allCompanyNameAr: json['allCompanyNameAr'] as String?,
       isOnline: json['isOnline'] as bool?,
     );
   }

@@ -80,6 +80,14 @@ class SummaryPricingCard extends StatelessWidget {
         ),
       if (q.totalDeliveryFee > 0)
         SummaryPriceRow(label: 'booking_summary_delivery_fee'.tr(), amount: q.totalDeliveryFee),
+      // Server-computed promo discount (rental amount only, never delivery).
+      if (q.hasPromo)
+        SummaryPriceRow(
+          label: 'promo_discount_line'.tr(namedArgs: {'code': q.promoCode ?? ''}),
+          amount: q.discountAmount,
+          highlight: const Color(0xFF2E9E57),
+          isDeduction: true,
+        ),
       _divider(),
       _totalRow(cs, q.totalAmount),
     ];

@@ -59,7 +59,7 @@ class SuccessSummaryCard extends StatelessWidget {
                   ),
                   const Spacer(),
                   OmrAmount(
-                    data.totalPrice.toStringAsFixed(2),
+                    data.payableTotal.toStringAsFixed(2),
                     style: TextStyle(fontSize: 20.r, fontWeight: FontWeight.w900, color: cs.primary),
                   ),
                 ],

@@ -54,6 +54,11 @@ class BookingDetail {
   final double extrasPerDay;
   final double deliveryFee;
 
+  /// Applied promo snapshot (null / 0 when none). [totalAmount] is already net
+  /// of [discountAmount].
+  final String? promoCode;
+  final double discountAmount;
+
   /// Backend price breakdown (`BookingResponseDto`): the vehicle- and driver-side
   /// charges, and the authoritative grand total. When the booking is same-day
   /// these represent per-hour billing (see [isHourly]).
@@ -135,6 +140,8 @@ class BookingDetail {
     required this.pricePerDay,
     required this.extrasPerDay,
     required this.deliveryFee,
+    this.promoCode,
+    this.discountAmount = 0,
     this.vehicleAmount = 0,
     this.driverAmount = 0,
     this.totalAmount = 0,
@@ -194,6 +201,8 @@ class BookingDetail {
       status == BookingStatus.pending || status == BookingStatus.corporateApproved;
 
   BookingDetail copyWith({
+    String? promoCode,
+    double? discountAmount,
     String? carName,
     String? carImageUrl,
     String? brand,
@@ -235,6 +244,8 @@ class BookingDetail {
       pricePerDay: pricePerDay,
       extrasPerDay: extrasPerDay,
       deliveryFee: deliveryFee,
+      promoCode: promoCode ?? this.promoCode,
+      discountAmount: discountAmount ?? this.discountAmount,
       vehicleAmount: vehicleAmount,
       driverAmount: driverAmount,
       totalAmount: totalAmount,
@@ -359,10 +370,15 @@ class BookingDetail {
       // so the breakdown reconciles to the total instead of leaving a silent gap.
       // Only when there IS a per-side split; otherwise the lump line already
       // covers the whole total and a residual would double-count.
+      // totalAmount is NET of any promo discount, so add the discount back
+      // before taking the residual.
       deliveryFee: b.deliveryFee ??
           (((b.vehicleAmount ?? 0) > 0 || (b.driverAmount ?? 0) > 0)
-              ? (((b.totalAmount ?? 0) - (b.vehicleAmount ?? 0) - (b.driverAmount ?? 0)).clamp(0, double.infinity))
+              ? (((b.totalAmount ?? 0) + (b.discountAmount ?? 0) - (b.vehicleAmount ?? 0) - (b.driverAmount ?? 0))
+                  .clamp(0, double.infinity))
               : 0),
+      promoCode: (b.promoCode?.trim().isNotEmpty ?? false) ? b.promoCode!.trim() : null,
+      discountAmount: b.discountAmount ?? 0,
       // Real price breakdown from the response.
       vehicleAmount: b.vehicleAmount ?? 0,
       driverAmount: b.driverAmount ?? 0,

@@ -32,7 +32,7 @@ class AppTheme {
         elevation: 0,
         centerTitle: true,
         iconTheme: IconThemeData(color: blackColor, size: 24.sp),
-        titleTextStyle: TextStyle(color: blackColor, fontSize: 20.sp, fontWeight: FontWeight.w600),
+        titleTextStyle: TextStyle(fontFamily: fontFamily, color: blackColor, fontSize: 20.sp, fontWeight: FontWeight.w600),
       ),
 
       elevatedButtonTheme: ElevatedButtonThemeData(
@@ -42,7 +42,7 @@ class AppTheme {
           elevation: 0,
           padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 16.h),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
-          textStyle: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.w600),
+          textStyle: TextStyle(fontFamily: fontFamily, fontSize: 16.sp, fontWeight: FontWeight.w600),
         ),
       ),
 
@@ -52,7 +52,7 @@ class AppTheme {
           side: BorderSide(color: primaryColor, width: 2.w),
           padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 16.h),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
-          textStyle: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.w600),
+          textStyle: TextStyle(fontFamily: fontFamily, fontSize: 16.sp, fontWeight: FontWeight.w600),
         ),
       ),
 
@@ -60,7 +60,7 @@ class AppTheme {
         style: TextButton.styleFrom(
           foregroundColor: primaryColor,
           padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
-          textStyle: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.w600),
+          textStyle: TextStyle(fontFamily: fontFamily, fontSize: 16.sp, fontWeight: FontWeight.w600),
         ),
       ),
 
@@ -85,7 +85,7 @@ class AppTheme {
           borderSide: BorderSide(color: errorColor, width: 2.w),
         ),
         contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
-        hintStyle: TextStyle(color: grayColor.withValues(alpha: 0.6), fontSize: 16.sp),
+        hintStyle: TextStyle(fontFamily: fontFamily, color: grayColor.withValues(alpha: 0.6), fontSize: 16.sp),
       ),
 
       cardTheme: CardThemeData(
@@ -101,8 +101,8 @@ class AppTheme {
         unselectedItemColor: grayColor,
         type: BottomNavigationBarType.fixed,
         elevation: 8,
-        selectedLabelStyle: TextStyle(fontSize: 12.sp, fontWeight: FontWeight.w600),
-        unselectedLabelStyle: TextStyle(fontSize: 12.sp, fontWeight: FontWeight.w500),
+        selectedLabelStyle: TextStyle(fontFamily: fontFamily, fontSize: 12.sp, fontWeight: FontWeight.w600),
+        unselectedLabelStyle: TextStyle(fontFamily: fontFamily, fontSize: 12.sp, fontWeight: FontWeight.w500),
       ),
 
       floatingActionButtonTheme: const FloatingActionButtonThemeData(
@@ -114,8 +114,8 @@ class AppTheme {
       chipTheme: ChipThemeData(
         backgroundColor: lightGrayColor.withValues(alpha: 0.3),
         selectedColor: primaryColor,
-        labelStyle: TextStyle(color: blackColor, fontSize: 14.sp),
-        secondaryLabelStyle: TextStyle(color: whiteColor, fontSize: 14.sp),
+        labelStyle: TextStyle(fontFamily: fontFamily, color: blackColor, fontSize: 14.sp),
+        secondaryLabelStyle: TextStyle(fontFamily: fontFamily, color: whiteColor, fontSize: 14.sp),
         padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.r)),
       ),
@@ -125,21 +125,21 @@ class AppTheme {
       iconTheme: IconThemeData(color: blackColor, size: 24.sp),
 
       textTheme: TextTheme(
-        displayLarge: TextStyle(fontSize: 32.sp, fontWeight: FontWeight.bold, color: blackColor),
-        displayMedium: TextStyle(fontSize: 28.sp, fontWeight: FontWeight.bold, color: blackColor),
-        displaySmall: TextStyle(fontSize: 24.sp, fontWeight: FontWeight.bold, color: blackColor),
-        headlineLarge: TextStyle(fontSize: 22.sp, fontWeight: FontWeight.w600, color: blackColor),
-        headlineMedium: TextStyle(fontSize: 20.sp, fontWeight: FontWeight.w600, color: blackColor),
-        headlineSmall: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.w600, color: blackColor),
-        titleLarge: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.w600, color: blackColor),
-        titleMedium: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.w600, color: blackColor),
-        titleSmall: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.w600, color: blackColor),
-        bodyLarge: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.normal, color: blackColor),
-        bodyMedium: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.normal, color: blackColor),
-        bodySmall: TextStyle(fontSize: 12.sp, fontWeight: FontWeight.normal, color: grayColor),
-        labelLarge: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.w600, color: blackColor),
-        labelMedium: TextStyle(fontSize: 12.sp, fontWeight: FontWeight.w600, color: blackColor),
-        labelSmall: TextStyle(fontSize: 10.sp, fontWeight: FontWeight.w600, color: grayColor),
+        displayLarge: TextStyle(fontFamily: fontFamily, fontSize: 32.sp, fontWeight: FontWeight.bold, color: blackColor),
+        displayMedium: TextStyle(fontFamily: fontFamily, fontSize: 28.sp, fontWeight: FontWeight.bold, color: blackColor),
+        displaySmall: TextStyle(fontFamily: fontFamily, fontSize: 24.sp, fontWeight: FontWeight.bold, color: blackColor),
+        headlineLarge: TextStyle(fontFamily: fontFamily, fontSize: 22.sp, fontWeight: FontWeight.w600, color: blackColor),
+        headlineMedium: TextStyle(fontFamily: fontFamily, fontSize: 20.sp, fontWeight: FontWeight.w600, color: blackColor),
+        headlineSmall: TextStyle(fontFamily: fontFamily, fontSize: 18.sp, fontWeight: FontWeight.w600, color: blackColor),
+        titleLarge: TextStyle(fontFamily: fontFamily, fontSize: 18.sp, fontWeight: FontWeight.w600, color: blackColor),
+        titleMedium: TextStyle(fontFamily: fontFamily, fontSize: 16.sp, fontWeight: FontWeight.w600, color: blackColor),
+        titleSmall: TextStyle(fontFamily: fontFamily, fontSize: 14.sp, fontWeight: FontWeight.w600, color: blackColor),
+        bodyLarge: TextStyle(fontFamily: fontFamily, fontSize: 16.sp, fontWeight: FontWeight.normal, color: blackColor),
+        bodyMedium: TextStyle(fontFamily: fontFamily, fontSize: 14.sp, fontWeight: FontWeight.normal, color: blackColor),
+        bodySmall: TextStyle(fontFamily: fontFamily, fontSize: 12.sp, fontWeight: FontWeight.normal, color: grayColor),
+        labelLarge: TextStyle(fontFamily: fontFamily, fontSize: 14.sp, fontWeight: FontWeight.w600, color: blackColor),
+        labelMedium: TextStyle(fontFamily: fontFamily, fontSize: 12.sp, fontWeight: FontWeight.w600, color: blackColor),
+        labelSmall: TextStyle(fontFamily: fontFamily, fontSize: 10.sp, fontWeight: FontWeight.w600, color: grayColor),
       ),
 
       pageTransitionsTheme: const PageTransitionsTheme(
@@ -180,7 +180,7 @@ class AppTheme {
         elevation: 0,
         centerTitle: true,
         iconTheme: IconThemeData(color: whiteColor, size: 24.sp),
-        titleTextStyle: TextStyle(color: whiteColor, fontSize: 20.sp, fontWeight: FontWeight.w600),
+        titleTextStyle: TextStyle(fontFamily: fontFamily, color: whiteColor, fontSize: 20.sp, fontWeight: FontWeight.w600),
       ),
 
       elevatedButtonTheme: ElevatedButtonThemeData(
@@ -190,7 +190,7 @@ class AppTheme {
           elevation: 0,
           padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 16.h),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
-          textStyle: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.w600),
+          textStyle: TextStyle(fontFamily: fontFamily, fontSize: 16.sp, fontWeight: FontWeight.w600),
         ),
       ),
 
@@ -200,7 +200,7 @@ class AppTheme {
           side: BorderSide(color: secondaryColor, width: 2.w),
           padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 16.h),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
-          textStyle: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.w600),
+          textStyle: TextStyle(fontFamily: fontFamily, fontSize: 16.sp, fontWeight: FontWeight.w600),
         ),
       ),
 
@@ -208,7 +208,7 @@ class AppTheme {
         style: TextButton.styleFrom(
           foregroundColor: secondaryColor,
           padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
-          textStyle: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.w600),
+          textStyle: TextStyle(fontFamily: fontFamily, fontSize: 16.sp, fontWeight: FontWeight.w600),
         ),
       ),
 
@@ -233,7 +233,7 @@ class AppTheme {
           borderSide: BorderSide(color: errorColor, width: 2.w),
         ),
         contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
-        hintStyle: TextStyle(color: grayColor.withValues(alpha: 0.6), fontSize: 16.sp),
+        hintStyle: TextStyle(fontFamily: fontFamily, color: grayColor.withValues(alpha: 0.6), fontSize: 16.sp),
       ),
 
       cardTheme: CardThemeData(
@@ -249,8 +249,8 @@ class AppTheme {
         unselectedItemColor: grayColor,
         type: BottomNavigationBarType.fixed,
         elevation: 8,
-        selectedLabelStyle: TextStyle(fontSize: 12.sp, fontWeight: FontWeight.w600),
-        unselectedLabelStyle: TextStyle(fontSize: 12.sp, fontWeight: FontWeight.w500),
+        selectedLabelStyle: TextStyle(fontFamily: fontFamily, fontSize: 12.sp, fontWeight: FontWeight.w600),
+        unselectedLabelStyle: TextStyle(fontFamily: fontFamily, fontSize: 12.sp, fontWeight: FontWeight.w500),
       ),
 
       floatingActionButtonTheme: const FloatingActionButtonThemeData(
@@ -262,8 +262,8 @@ class AppTheme {
       chipTheme: ChipThemeData(
         backgroundColor: const Color(0xFF2D2D2D),
         selectedColor: secondaryColor,
-        labelStyle: TextStyle(color: whiteColor, fontSize: 14.sp),
-        secondaryLabelStyle: TextStyle(color: whiteColor, fontSize: 14.sp),
+        labelStyle: TextStyle(fontFamily: fontFamily, color: whiteColor, fontSize: 14.sp),
+        secondaryLabelStyle: TextStyle(fontFamily: fontFamily, color: whiteColor, fontSize: 14.sp),
         padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.r)),
       ),
@@ -273,21 +273,21 @@ class AppTheme {
       iconTheme: IconThemeData(color: whiteColor, size: 24.sp),
 
       textTheme: TextTheme(
-        displayLarge: TextStyle(fontSize: 32.sp, fontWeight: FontWeight.bold, color: whiteColor),
-        displayMedium: TextStyle(fontSize: 28.sp, fontWeight: FontWeight.bold, color: whiteColor),
-        displaySmall: TextStyle(fontSize: 24.sp, fontWeight: FontWeight.bold, color: whiteColor),
-        headlineLarge: TextStyle(fontSize: 22.sp, fontWeight: FontWeight.w600, color: whiteColor),
-        headlineMedium: TextStyle(fontSize: 20.sp, fontWeight: FontWeight.w600, color: whiteColor),
-        headlineSmall: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.w600, color: whiteColor),
-        titleLarge: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.w600, color: whiteColor),
-        titleMedium: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.w600, color: whiteColor),
-        titleSmall: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.w600, color: whiteColor),
-        bodyLarge: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.normal, color: whiteColor),
-        bodyMedium: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.normal, color: whiteColor),
-        bodySmall: TextStyle(fontSize: 12.sp, fontWeight: FontWeight.normal, color: grayColor),
-        labelLarge: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.w600, color: whiteColor),
-        labelMedium: TextStyle(fontSize: 12.sp, fontWeight: FontWeight.w600, color: whiteColor),
-        labelSmall: TextStyle(fontSize: 10.sp, fontWeight: FontWeight.w600, color: grayColor),
+        displayLarge: TextStyle(fontFamily: fontFamily, fontSize: 32.sp, fontWeight: FontWeight.bold, color: whiteColor),
+        displayMedium: TextStyle(fontFamily: fontFamily, fontSize: 28.sp, fontWeight: FontWeight.bold, color: whiteColor),
+        displaySmall: TextStyle(fontFamily: fontFamily, fontSize: 24.sp, fontWeight: FontWeight.bold, color: whiteColor),
+        headlineLarge: TextStyle(fontFamily: fontFamily, fontSize: 22.sp, fontWeight: FontWeight.w600, color: whiteColor),
+        headlineMedium: TextStyle(fontFamily: fontFamily, fontSize: 20.sp, fontWeight: FontWeight.w600, color: whiteColor),
+        headlineSmall: TextStyle(fontFamily: fontFamily, fontSize: 18.sp, fontWeight: FontWeight.w600, color: whiteColor),
+        titleLarge: TextStyle(fontFamily: fontFamily, fontSize: 18.sp, fontWeight: FontWeight.w600, color: whiteColor),
+        titleMedium: TextStyle(fontFamily: fontFamily, fontSize: 16.sp, fontWeight: FontWeight.w600, color: whiteColor),
+        titleSmall: TextStyle(fontFamily: fontFamily, fontSize: 14.sp, fontWeight: FontWeight.w600, color: whiteColor),
+        bodyLarge: TextStyle(fontFamily: fontFamily, fontSize: 16.sp, fontWeight: FontWeight.normal, color: whiteColor),
+        bodyMedium: TextStyle(fontFamily: fontFamily, fontSize: 14.sp, fontWeight: FontWeight.normal, color: whiteColor),
+        bodySmall: TextStyle(fontFamily: fontFamily, fontSize: 12.sp, fontWeight: FontWeight.normal, color: grayColor),
+        labelLarge: TextStyle(fontFamily: fontFamily, fontSize: 14.sp, fontWeight: FontWeight.w600, color: whiteColor),
+        labelMedium: TextStyle(fontFamily: fontFamily, fontSize: 12.sp, fontWeight: FontWeight.w600, color: whiteColor),
+        labelSmall: TextStyle(fontFamily: fontFamily, fontSize: 10.sp, fontWeight: FontWeight.w600, color: grayColor),
       ),
 
       pageTransitionsTheme: const PageTransitionsTheme(
