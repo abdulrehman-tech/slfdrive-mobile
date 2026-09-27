@@ -11,6 +11,7 @@ import '../../../widgets/confirm_dialog.dart';
 import '../booking/provider/corporate_companies_provider.dart';
 import '../booking/steps/corporate_widgets/corporate_company_picker.dart';
 import 'provider/corporate_membership_provider.dart';
+import '../../../utils/bidi.dart';
 
 /// Form to apply for a corporate membership: pick a company (required) plus
 /// optional employment details. On success pops `true`.
@@ -308,7 +309,10 @@ class _CompanyField extends StatelessWidget {
                 ),
               ),
             ),
-            Icon(Iconsax.arrow_right_3_copy, size: 18.r, color: cs.onSurface.withValues(alpha: 0.4)),
+            Transform.flip(
+              flipX: isRtl(context),
+              child: Icon(Iconsax.arrow_right_3_copy, size: 18.r, color: cs.onSurface.withValues(alpha: 0.4)),
+            ),
           ],
         ),
       ),

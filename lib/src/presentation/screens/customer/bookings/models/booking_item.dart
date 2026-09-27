@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 
 import '../../../../../core/models/booking/booking.dart';
+import '../../../../utils/date_labels.dart';
 
 /// Backend booking lifecycle (booking_status): pending(5) → approved(6) →
 /// completed(8), or rejected(7) / cancelled(15). Corporate bookings get an
@@ -110,13 +111,11 @@ class BookingItem {
   factory BookingItem.fromBooking(Booking b) {
     // The backend returns timestamps in UTC; convert to local before taking the
     // calendar date, else a +tz user sees the previous day (one day less).
-    // Formatted as "27 Jun 2026".
-    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    // Formatted as "27 Jun 2026" in the current locale.
     String date(String? iso) {
       final dt = DateTime.tryParse(iso ?? '');
       if (dt == null) return '';
-      final l = dt.toLocal();
-      return '${l.day} ${months[l.month - 1]} ${l.year}';
+      return formatDayMonthYear(dt.toLocal());
     }
     return BookingItem(
       id: b.id,

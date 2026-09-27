@@ -6,6 +6,7 @@ import 'package:iconsax_flutter/iconsax_flutter.dart';
 
 import 'drawer_bottom.dart';
 import 'drawer_header.dart';
+import '../../../../utils/bidi.dart';
 
 class AppDrawer extends StatelessWidget {
   final bool isDark;
@@ -173,7 +174,10 @@ class AppDrawer extends StatelessWidget {
                 ),
               ),
             ),
-            Icon(Iconsax.arrow_right_3_copy, size: 15.r, color: cs.onSurface.withValues(alpha: 0.3)),
+            Transform.flip(
+              flipX: isRtl(context),
+              child: Icon(Iconsax.arrow_right_3_copy, size: 15.r, color: cs.onSurface.withValues(alpha: 0.3)),
+            ),
           ],
         ),
       ),

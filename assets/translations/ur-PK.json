@@ -279,7 +279,6 @@
   "about_title": "SLF Drive کے بارے میں",
   "settings_cache_cleared": "کیشے صاف ہو گیا",
   "driver_accept_snack": "سفر قبول کر لیا گیا",
-  "driver_request_days": "{n} دن",
   "driver_request_total": "کل کرایہ",
   "driver_request_per_day": "فی دن",
   "driver_request_pickup": "پک اپ",
@@ -395,7 +394,6 @@
   "legal_consent_privacy": "رازداری کی پالیسی",
   "legal_load_error": "صفحہ لوڈ نہیں ہو سکا۔ اپنا کنکشن چیک کریں اور دوبارہ کوشش کریں۔",
   "legal_retry": "دوبارہ کوشش کریں",
-  "booking_dates_hours": "گھنٹے",
   "booking_summary_vehicle": "گاڑی",
   "booking_summary_driver": "ڈرائیور",
   "booking_summary_duration": "مدت",
@@ -490,5 +488,19 @@
   "sort_experience": "سب سے زیادہ تجربہ کار",
   "trips_count_label": "{n} سفر",
   "years_short_label": "{n} سال",
-  "common_customer": "کسٹمر"
+  "common_customer": "کسٹمر",
+  "units_days": {
+    "one": "{} دن",
+    "other": "{} دن"
+  },
+  "units_hours": {
+    "one": "{} گھنٹا",
+    "other": "{} گھنٹے"
+  },
+  "price_unit_hour": "/گھنٹا",
+  "price_unit_day": "/دن",
+  "price_unit_week": "/ہفتہ",
+  "driver_request_awaiting_company": "کمپنی کی منظوری کا انتظار",
+  "booking_success_subtitle_corporate": "آپ کی بکنگ آپ کی کمپنی کی منظوری کی منتظر ہے — اس کا بل آپ کی کمپنی کو جائے گا۔",
+  "location_default_delivery_label": "ڈیلیوری کا پتہ"
 }

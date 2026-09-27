@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 import 'package:provider/provider.dart';
@@ -29,6 +30,8 @@ class CarSliverAppBar extends StatelessWidget {
       toolbarHeight: 56.r,
       automaticallyImplyLeading: false,
       backgroundColor: const Color(0xFF0C2485),
+      // Photo / navy header: light icons regardless of the app theme.
+      systemOverlayStyle: SystemUiOverlayStyle.light,
       surfaceTintColor: Colors.transparent,
       title: Text(
         title,

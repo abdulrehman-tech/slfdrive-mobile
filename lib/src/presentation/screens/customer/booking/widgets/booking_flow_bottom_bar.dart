@@ -8,6 +8,7 @@ import 'package:iconsax_flutter/iconsax_flutter.dart';
 
 import '../../../../../constants/color_constants.dart';
 import '../../../../widgets/omr_icon.dart';
+import '../../../../utils/bidi.dart';
 
 /// Bottom action bar shared across mobile + desktop.
 ///
@@ -64,7 +65,7 @@ class BookingFlowBottomBar extends StatelessWidget {
                 Expanded(child: _buildPriceBlock(cs)),
               ] else
                 Expanded(child: SizedBox(width: 14.r)),
-              _buildPrimaryAction(),
+              _buildPrimaryAction(context),
             ],
           ),
         ),
@@ -116,7 +117,7 @@ class BookingFlowBottomBar extends StatelessWidget {
     );
   }
 
-  Widget _buildPrimaryAction() {
+  Widget _buildPrimaryAction(BuildContext context) {
     return GestureDetector(
       onTap: canGoNext ? onNext : null,
       child: Opacity(
@@ -152,10 +153,15 @@ class BookingFlowBottomBar extends StatelessWidget {
                   style: TextStyle(fontSize: 14.r, fontWeight: FontWeight.w800, color: Colors.white),
                 ),
               SizedBox(width: 8.r),
-              Icon(
-                isLastStep ? Iconsax.tick_square_copy : CupertinoIcons.arrow_right,
-                size: 15.r,
-                color: Colors.white,
+              // CupertinoIcons don't mirror in RTL; flip the "next" arrow so it
+              // points the reading direction in Arabic/Urdu.
+              Transform.flip(
+                flipX: !isLastStep && isRtl(context),
+                child: Icon(
+                  isLastStep ? Iconsax.tick_square_copy : CupertinoIcons.arrow_right,
+                  size: 15.r,
+                  color: Colors.white,
+                ),
               ),
             ],
           ),

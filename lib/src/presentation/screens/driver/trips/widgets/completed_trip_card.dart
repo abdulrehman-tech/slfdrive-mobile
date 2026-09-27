@@ -61,7 +61,7 @@ class CompletedTripCard extends StatelessWidget {
                 ),
                 SizedBox(height: 4.r),
                 Text(
-                  '${'trips_to_label'.tr()}: ${trip.destination}',
+                  trip.destination != null ? '${'trips_to_label'.tr()}: ${trip.destination}' : trip.serviceLabel,
                   style: TextStyle(
                     fontSize: 13.r,
                     color: isDark ? Colors.white60 : const Color(0xFF757575),

@@ -14,6 +14,7 @@ import '../../common/profile/sections/support_section.dart';
 import '../../common/profile/widgets/profile_header_card.dart';
 import '../../common/profile/widgets/profile_section.dart';
 import '../../common/profile/widgets/profile_tile.dart';
+import '../../../utils/bidi.dart';
 
 class DriverProfileScreen extends StatelessWidget {
   const DriverProfileScreen({super.key});
@@ -89,7 +90,7 @@ class _DriverProfileViewState extends State<_DriverProfileView> {
                   icon: Iconsax.call_copy,
                   iconColor: const Color(0xFF4CAF50),
                   title: 'profile_phone'.tr(),
-                  value: auth.displayPhone ?? '',
+                  value: ltr(auth.displayPhone ?? ''),
                   isDark: isDark,
                   onTap: () => _openEdit(context),
                 ),

@@ -64,7 +64,7 @@ class BookingScheduleCard extends StatelessWidget {
               cs: cs,
               isDark: isDark,
               label: 'booking_summary_duration'.tr(),
-              value: '${booking.units} ${booking.unitLabelKey.tr()}',
+              value: booking.unitsLabel,
             ),
           ],
         ),

@@ -10,6 +10,8 @@ import '../models/trip_request.dart';
 import 'driver_header.dart';
 import 'online_status_dialog.dart';
 import 'trip_action_dialog.dart';
+import '../../../../utils/duration_label.dart';
+import '../../../../utils/bidi.dart';
 
 class TripRequestsSection extends StatelessWidget {
   final bool isDark;
@@ -219,8 +221,7 @@ class TripRequestCard extends StatelessWidget {
     );
   }
 
-  String _daysLabel() =>
-      'driver_request_days'.tr(namedArgs: {'n': trip.days.toString()});
+  String _daysLabel() => durationLabel(trip.days);
 
   Widget _serviceChip() {
     return Container(
@@ -359,7 +360,7 @@ class TripRequestCard extends StatelessWidget {
                     ),
                     SizedBox(height: 2.r),
                     Text(
-                      trip.customerPhone ?? trip.reference,
+                      ltr(trip.customerPhone ?? trip.reference),
                       style: TextStyle(fontSize: 12.r, color: muted),
                     ),
                   ],
@@ -432,6 +433,23 @@ class TripRequestCard extends StatelessWidget {
                   ),
                 ),
                 SizedBox(width: 12.r),
+                if (trip.awaitingCorporateApproval)
+                  Expanded(
+                    child: Container(
+                      padding: EdgeInsets.symmetric(vertical: 12.r, horizontal: 6.r),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF00BFA5).withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(12.r),
+                      ),
+                      child: Text(
+                        'driver_request_awaiting_company'.tr(),
+                        textAlign: TextAlign.center,
+                        maxLines: 2,
+                        style: TextStyle(fontSize: 12.r, fontWeight: FontWeight.w600, color: const Color(0xFF00897B)),
+                      ),
+                    ),
+                  )
+                else
                 Expanded(
                   child: GestureDetector(
                     onTap: () => _confirm(context, accept: true),

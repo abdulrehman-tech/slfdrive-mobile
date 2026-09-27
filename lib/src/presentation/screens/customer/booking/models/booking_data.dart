@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import '../../../../../core/models/booking/booking_quote.dart';
 import '../../../../../core/models/company/all_company.dart';
 import '../../../../../core/models/lookup/location_option.dart';
+import '../../../../utils/duration_label.dart';
 
 // ============================================================
 // ENUMS
@@ -172,8 +173,8 @@ class BookingPricing {
     required this.deliveryFee,
   });
 
-  /// Translation key for the unit label ("hours" / "days").
-  String get unitLabelKey => isHourly ? 'booking_dates_hours' : 'booking_dates_days';
+  /// Localised billing duration, e.g. "1 day" / "3 days" / "2 hours".
+  String get unitsLabel => durationLabel(units, hourly: isHourly);
 
   double get subtotal => baseRate * units + deliveryFee;
   double get total => subtotal;
@@ -293,8 +294,8 @@ class BookingData extends ChangeNotifier {
   /// Billing units: hours for a same-day booking, otherwise days.
   int get units => isHourly ? hours : days;
 
-  /// Translation key for the unit label ("hours" / "days").
-  String get unitLabelKey => isHourly ? 'booking_dates_hours' : 'booking_dates_days';
+  /// Localised billing duration, e.g. "1 day" / "3 days" / "2 hours".
+  String get unitsLabel => durationLabel(units, hourly: isHourly);
 
   double get basePerDay {
     double base = 0;

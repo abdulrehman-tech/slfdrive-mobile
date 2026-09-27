@@ -128,29 +128,29 @@ class BookingPriceCard extends StatelessWidget {
   /// `rate × units {days|hours}`. Same-day bookings are billed per hour. Falls
   /// back to a single derived line when no breakdown is present.
   List<Widget> _breakdownRows(ColorScheme cs) {
-    final unit = booking.unitLabelKey.tr();
-    final units = booking.units;
+    final unitsLabel = booking.unitsLabel;
     final rows = <Widget>[];
 
     if (booking.vehicleAmount > 0) {
       rows.add(_priceRow(
         cs,
-        '${'booking_summary_vehicle'.tr()} · ${booking.vehicleUnitRate.toStringAsFixed(2)} × $units $unit',
+        '${'booking_summary_vehicle'.tr()} · ${booking.vehicleUnitRate.toStringAsFixed(2)} × $unitsLabel',
         booking.vehicleAmount,
       ));
     }
     if (booking.driverAmount > 0) {
       rows.add(_priceRow(
         cs,
-        '${'booking_summary_driver'.tr()} · ${booking.driverUnitRate.toStringAsFixed(2)} × $units $unit',
+        '${'booking_summary_driver'.tr()} · ${booking.driverUnitRate.toStringAsFixed(2)} × $unitsLabel',
         booking.driverAmount,
       ));
     }
 
     // No per-side breakdown from the backend — show the derived lump line.
     if (rows.isEmpty) {
+      final units = booking.units;
       final rate = units > 0 ? booking.total / units : booking.total;
-      rows.add(_priceRow(cs, '${rate.toStringAsFixed(2)} × $units $unit', booking.total));
+      rows.add(_priceRow(cs, '${rate.toStringAsFixed(2)} × $unitsLabel', booking.total));
     }
     return rows;
   }

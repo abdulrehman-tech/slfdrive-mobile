@@ -5,6 +5,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../../../../widgets/omr_icon.dart';
 import '../../models/booking_data.dart';
+import '../../../../../utils/date_labels.dart';
 
 class SuccessSummaryCard extends StatelessWidget {
   final BookingData data;
@@ -82,13 +83,6 @@ class SuccessSummaryCard extends StatelessWidget {
 
   String _formatDate(DateTime? d, bool includeTime) {
     if (d == null) return '-';
-    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-    final dateStr = '${d.day} ${months[d.month - 1]} ${d.year}';
-    if (!includeTime) return dateStr;
-
-    final hour = d.hour == 0 ? 12 : (d.hour > 12 ? d.hour - 12 : d.hour);
-    final amPm = d.hour >= 12 ? 'PM' : 'AM';
-    final minute = d.minute.toString().padLeft(2, '0');
-    return '$dateStr, $hour:$minute $amPm';
+    return includeTime ? formatDayMonthYearTime(d) : formatDayMonthYear(d);
   }
 }

@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
@@ -49,23 +50,27 @@ class _OnboardingView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: LayoutBuilder(
-        builder: (context, constraints) {
-          final isDesktop = Breakpoints.isDesktop(constraints.maxWidth);
+    // Full-bleed dark photo under the status bar: light icons.
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: SystemUiOverlayStyle.light,
+      child: Scaffold(
+        body: LayoutBuilder(
+          builder: (context, constraints) {
+            final isDesktop = Breakpoints.isDesktop(constraints.maxWidth);
 
-          if (isDesktop) {
-            return OnboardingDesktopLayout(
+            if (isDesktop) {
+              return OnboardingDesktopLayout(
+                onNext: () => _onNext(context),
+                onSkip: () => _onSkip(context),
+              );
+            }
+
+            return OnboardingMobileLayout(
               onNext: () => _onNext(context),
               onSkip: () => _onSkip(context),
             );
-          }
-
-          return OnboardingMobileLayout(
-            onNext: () => _onNext(context),
-            onSkip: () => _onSkip(context),
-          );
-        },
+          },
+        ),
       ),
     );
   }

@@ -18,9 +18,9 @@ class PricingCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final tiers = <(String, double, String)>[
-      ('driver_price_hourly', profile.hourlyRate, 'hr'),
-      ('driver_price_daily', profile.dailyRate, 'day'),
-      ('driver_price_weekly', profile.weeklyRate, 'wk'),
+      ('driver_price_hourly', profile.hourlyRate, 'price_unit_hour'),
+      ('driver_price_daily', profile.dailyRate, 'price_unit_day'),
+      ('driver_price_weekly', profile.weeklyRate, 'price_unit_week'),
     ];
     return DriverGlassCard(
       isDark: isDark,
@@ -76,7 +76,7 @@ class PricingCard extends StatelessWidget {
                         ),
                         SizedBox(height: 2.r),
                         Text(
-                          '/${t.$3}',
+                          t.$3.tr(),
                           style: TextStyle(fontSize: 9.r, color: cs.onSurface.withValues(alpha: 0.4)),
                         ),
                       ],

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../constants/color_constants.dart';
 
@@ -25,6 +26,9 @@ class AppTheme {
 
       appBarTheme: AppBarTheme(
         backgroundColor: Colors.transparent,
+        // Explicit: Flutter reads a transparent AppBar as "dark" and would give
+        // light screens white (invisible) status bar icons.
+        systemOverlayStyle: SystemUiOverlayStyle.dark.copyWith(statusBarColor: Colors.transparent),
         elevation: 0,
         centerTitle: true,
         iconTheme: IconThemeData(color: blackColor, size: 24.sp),
@@ -172,6 +176,7 @@ class AppTheme {
 
       appBarTheme: AppBarTheme(
         backgroundColor: Colors.transparent,
+        systemOverlayStyle: SystemUiOverlayStyle.light.copyWith(statusBarColor: Colors.transparent),
         elevation: 0,
         centerTitle: true,
         iconTheme: IconThemeData(color: whiteColor, size: 24.sp),

@@ -20,6 +20,7 @@ class BookingDetailProvider extends ChangeNotifier {
   BookingDetailProvider({
     required this.bookingId,
     this.seed,
+    this.ar = false,
     BookingRepository? repository,
     VehicleRepository? vehicleRepository,
     DriverListingRepository? driverRepository,
@@ -36,6 +37,9 @@ class BookingDetailProvider extends ChangeNotifier {
   /// Optional vehicle/driver display values from the bookings list, applied to
   /// the first paint so the card image/name show without waiting for re-fetch.
   final BookingDetailSeed? seed;
+
+  /// Show the vehicle's Arabic names (backend `...NameAr`) when the UI is Arabic.
+  final bool ar;
   final BookingRepository _repository;
   final VehicleRepository _vehicles;
   final DriverListingRepository _drivers;
@@ -133,21 +137,21 @@ class BookingDetailProvider extends ChangeNotifier {
         final v = await _vehicles.getById(detail.vehicleId!);
         if (v != null) {
           out = out.copyWith(
-            carName: v.displayTitle(),
+            carName: v.displayTitle(ar: ar),
             carImageUrl: v.primaryPhoto ?? '',
-            brand: v.brandName ?? '',
+            brand: (ar ? v.brandNameAr : null) ?? v.brandName ?? '',
             plateNumber: v.plateNumber ?? '',
-            companyName: v.companyName,
+            companyName: (ar ? v.companyNameAr : null) ?? v.companyName,
             // Booking DTOs sometimes omit rentalCompanyId; the vehicle's owning
             // company is the same entity, so use it as the fallback.
             rentalCompanyId: out.rentalCompanyId ?? v.companyId,
             color: v.color,
             year: v.year,
             seats: v.seats,
-            transmission: v.transmissionTypeName,
-            fuelType: v.fuelTypeName,
-            vehicleType: v.vehicleTypeName,
-            vehicleLocation: v.locationName,
+            transmission: (ar ? v.transmissionTypeNameAr : null) ?? v.transmissionTypeName,
+            fuelType: (ar ? v.fuelTypeNameAr : null) ?? v.fuelTypeName,
+            vehicleType: (ar ? v.vehicleTypeNameAr : null) ?? v.vehicleTypeName,
+            vehicleLocation: (ar ? v.locationNameAr : null) ?? v.locationName,
           );
         }
       } catch (_) {/* keep base */}
