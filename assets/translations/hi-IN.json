@@ -540,5 +540,7 @@
   "company_action_email": "ईमेल",
   "company_action_website": "वेबसाइट",
   "promo_subtitle": "कोड है? किराये पर बचत के लिए लागू करें।",
-  "promo_applied": "कोड लागू हुआ"
+  "promo_applied": "कोड लागू हुआ",
+  "company_contact_copied": "यहाँ नहीं खुल सका — {value} कॉपी किया गया।",
+  "driver_detail_book_company": "कार बुक करें"
 }

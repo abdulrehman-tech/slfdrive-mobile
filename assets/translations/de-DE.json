@@ -540,5 +540,7 @@
   "company_action_email": "E-Mail",
   "company_action_website": "Website",
   "promo_subtitle": "Haben Sie einen Code? Lösen Sie ihn ein und sparen Sie.",
-  "promo_applied": "Code eingelöst"
+  "promo_applied": "Code eingelöst",
+  "company_contact_copied": "Konnte hier nicht geöffnet werden — {value} kopiert.",
+  "driver_detail_book_company": "Auto buchen"
 }

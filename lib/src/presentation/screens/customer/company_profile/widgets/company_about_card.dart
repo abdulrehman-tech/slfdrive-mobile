@@ -1,3 +1,5 @@
+import 'dart:ui' as ui;
+
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -48,10 +50,13 @@ class _CompanyAboutCardState extends State<CompanyAboutCard> {
             // toggle only appears when the text actually overflows.
             LayoutBuilder(builder: (context, box) {
               final style = TextStyle(fontSize: 13.r, height: 1.5, color: cs.onSurface.withValues(alpha: 0.7));
+              // Follow the text's own script: an English description on an
+              // Arabic page must still read (and ellipsize) left-to-right.
+              final dir = Bidi.detectRtlDirectionality(c.description!) ? ui.TextDirection.rtl : ui.TextDirection.ltr;
               final painter = TextPainter(
                 text: TextSpan(text: c.description, style: style),
                 maxLines: 4,
-                textDirection: Directionality.of(context),
+                textDirection: dir,
               )..layout(maxWidth: box.maxWidth);
               final overflows = painter.didExceedMaxLines;
               painter.dispose();
@@ -60,6 +65,7 @@ class _CompanyAboutCardState extends State<CompanyAboutCard> {
                 children: [
                   Text(
                     c.description!,
+                    textDirection: dir,
                     maxLines: _expanded ? null : 4,
                     overflow: _expanded ? TextOverflow.visible : TextOverflow.ellipsis,
                     style: style,

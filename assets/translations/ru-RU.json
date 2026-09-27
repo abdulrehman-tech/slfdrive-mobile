@@ -548,5 +548,7 @@
   "company_action_email": "Почта",
   "company_action_website": "Сайт",
   "promo_subtitle": "Есть код? Примените его и сэкономьте на аренде.",
-  "promo_applied": "Код применён"
+  "promo_applied": "Код применён",
+  "company_contact_copied": "Не удалось открыть — {value} скопировано.",
+  "driver_detail_book_company": "Выбрать авто"
 }
