@@ -3,6 +3,7 @@ import 'package:easy_localization/easy_localization.dart';
 import '../../../../../core/models/booking/booking.dart';
 import '../../../../../core/utils/booking_status.dart';
 import '../../home/models/trip_request.dart' show serviceKeyFor;
+import '../../../../utils/date_labels.dart';
 
 enum DriverTripStatus { active, completed, cancelled }
 
@@ -97,11 +98,9 @@ DriverTripStatus? _statusFromBooking(Booking b) {
   }
 }
 
-/// Compact `YYYY-MM-DD HH:MM` from an ISO timestamp, or '' when unparseable.
+/// Locale-aware "21 Aug 2026, 5:00 PM" from an ISO timestamp, or '' when
+/// unparseable.
 String _dateLabel(String? iso) {
   final dt = DateTime.tryParse(iso ?? '');
-  if (dt == null) return '';
-  final l = dt.toLocal();
-  String two(int v) => v.toString().padLeft(2, '0');
-  return '${l.year}-${two(l.month)}-${two(l.day)} ${two(l.hour)}:${two(l.minute)}';
+  return dt == null ? '' : formatDayMonthYearTime(dt.toLocal());
 }

@@ -5,6 +5,7 @@ import 'package:iconsax_flutter/iconsax_flutter.dart';
 import 'package:provider/provider.dart';
 
 import '../../shell/driver_shell_provider.dart';
+import '../../shell/widgets/driver_stat_tile.dart';
 
 class QuickStatsRow extends StatelessWidget {
   final bool isDark;
@@ -17,83 +18,39 @@ class QuickStatsRow extends StatelessWidget {
 
     return Padding(
       padding: EdgeInsets.all(20.r),
-      child: Row(
-        children: [
-          _StatCard(
-            icon: Iconsax.car,
-            value: provider.totalTrips.toString(),
-            label: 'driver_trips'.tr(),
-            color: const Color(0xFF4D63DD),
-            isDark: isDark,
-          ),
-          SizedBox(width: 12.r),
-          _StatCard(
-            icon: Iconsax.star_1,
-            value: provider.ratingLabel,
-            label: 'driver_rating'.tr(),
-            color: const Color(0xFFFFA000),
-            isDark: isDark,
-          ),
-          SizedBox(width: 12.r),
-          _StatCard(
-            icon: Iconsax.tick_circle,
-            value: provider.completionLabel,
-            label: 'driver_completion'.tr(),
-            color: const Color(0xFF4CAF50),
-            isDark: isDark,
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _StatCard extends StatelessWidget {
-  final IconData icon;
-  final String value;
-  final String label;
-  final Color color;
-  final bool isDark;
-
-  const _StatCard({
-    required this.icon,
-    required this.value,
-    required this.label,
-    required this.color,
-    required this.isDark,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Expanded(
-      child: Container(
-        padding: EdgeInsets.all(16.r),
-        decoration: BoxDecoration(
-          color: isDark ? const Color(0xFF1E1E2E) : Colors.white,
-          borderRadius: BorderRadius.circular(16.r),
-          boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 10.r, offset: Offset(0, 4.r))],
-        ),
-        child: Column(
+      // IntrinsicHeight + stretch: equal-height tiles even when one label wraps.
+      child: IntrinsicHeight(
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Container(
-              width: 40.r,
-              height: 40.r,
-              decoration: BoxDecoration(color: color.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(12.r)),
-              child: Icon(icon, color: color, size: 20.r),
-            ),
-            SizedBox(height: 12.r),
-            Text(
-              value,
-              style: TextStyle(
-                fontSize: 20.r,
-                fontWeight: FontWeight.bold,
-                color: isDark ? Colors.white : Colors.black87,
+            Expanded(
+              child: DriverStatTile(
+                icon: Iconsax.car,
+                value: provider.totalTrips.toString(),
+                label: 'driver_trips'.tr(),
+                color: const Color(0xFF4D63DD),
+                isDark: isDark,
               ),
             ),
-            SizedBox(height: 4.r),
-            Text(
-              label,
-              style: TextStyle(fontSize: 12.r, color: isDark ? Colors.white60 : const Color(0xFF757575)),
+            SizedBox(width: 12.r),
+            Expanded(
+              child: DriverStatTile(
+                icon: Iconsax.star_1,
+                value: provider.ratingLabel,
+                label: 'driver_rating'.tr(),
+                color: const Color(0xFFFFA000),
+                isDark: isDark,
+              ),
+            ),
+            SizedBox(width: 12.r),
+            Expanded(
+              child: DriverStatTile(
+                icon: Iconsax.tick_circle,
+                value: provider.completionLabel,
+                label: 'driver_completion'.tr(),
+                color: const Color(0xFF4CAF50),
+                isDark: isDark,
+              ),
             ),
           ],
         ),

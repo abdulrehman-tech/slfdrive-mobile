@@ -943,7 +943,6 @@
   "mon_nov": "Nov",
   "mon_dec": "Dec",
   "earnings_week_short": "W{}",
-  "earnings_trips_hours": "{trips} trips • {hours} hours",
   "earnings_revenue": "Revenue",
   "driver_go_online_title": "Go Online?",
   "driver_go_online_message": "You'll start receiving trip requests from nearby customers.",
@@ -1067,5 +1066,10 @@
   "price_unit_week": "/wk",
   "driver_request_awaiting_company": "Awaiting company approval",
   "booking_success_subtitle_corporate": "Your booking is waiting for your company's approval — it will be billed to your company.",
-  "location_default_delivery_label": "Delivery address"
+  "location_default_delivery_label": "Delivery address",
+  "units_trips": {
+    "zero": "{} trips",
+    "one": "{} trip",
+    "other": "{} trips"
+  }
 }

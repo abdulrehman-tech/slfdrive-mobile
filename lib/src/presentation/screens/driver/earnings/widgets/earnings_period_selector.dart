@@ -10,11 +10,15 @@ class EarningsPeriodSelector extends StatelessWidget {
 
   const EarningsPeriodSelector({super.key, required this.isDark});
 
+  /// Exact height, so the pinned header can reserve precisely this much.
+  static double get height => 64.r;
+
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.fromLTRB(20.r, 8.r, 20.r, 16.r),
+      padding: EdgeInsets.fromLTRB(20.r, 4.r, 20.r, 12.r),
       child: Container(
+        height: 48.r,
         padding: EdgeInsets.all(4.r),
         decoration: BoxDecoration(
           color: isDark ? const Color(0xFF2A2A2A) : const Color(0xFFE8E8E8),
@@ -55,7 +59,7 @@ class _PeriodTab extends StatelessWidget {
         onTap: () => context.read<DriverEarningsProvider>().setPeriodIndex(index),
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 200),
-          padding: EdgeInsets.symmetric(vertical: 10.r),
+          alignment: Alignment.center,
           decoration: BoxDecoration(
             color: isSelected
                 ? (isDark ? const Color(0xFF1E1E1E) : Colors.white)

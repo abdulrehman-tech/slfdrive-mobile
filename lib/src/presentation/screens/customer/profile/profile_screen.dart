@@ -1,7 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:package_info_plus/package_info_plus.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../constants/breakpoints.dart';
@@ -11,9 +10,10 @@ import '../../common/profile/sections/preferences_section.dart';
 import '../../common/profile/sections/sign_out_button.dart';
 import '../../common/profile/sections/support_section.dart';
 import '../../common/profile/widgets/profile_header_card.dart';
-import 'provider/profile_provider.dart';
+import '../../common/profile/provider/profile_scroll_provider.dart';
 import 'widgets/account_section.dart';
-import 'widgets/glass_header_overlay.dart';
+import '../../common/profile/widgets/profile_glass_header.dart';
+import '../../common/profile/widgets/app_version_label.dart';
 import 'widgets/my_data_section.dart';
 
 // ============================================================
@@ -33,7 +33,7 @@ class ProfileScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(create: (_) => ProfileProvider(), child: const _ProfileView());
+    return ChangeNotifierProvider(create: (_) => ProfileScrollProvider(), child: const _ProfileView());
   }
 }
 
@@ -56,9 +56,8 @@ class _ProfileView extends StatelessWidget {
   }
 
   Widget _buildMobile(BuildContext context, bool isDark) {
-    final cs = Theme.of(context).colorScheme;
     final topPad = MediaQuery.of(context).padding.top;
-    final scroll = context.read<ProfileProvider>().scroll;
+    final scroll = context.read<ProfileScrollProvider>().scroll;
 
     return Stack(
       children: [
@@ -87,36 +86,20 @@ class _ProfileView extends StatelessWidget {
                   SizedBox(height: 16.r),
                   SignOutButton(isDark: isDark),
                   SizedBox(height: 20.r),
-                  Center(
-                    child: FutureBuilder<PackageInfo>(
-                      future: PackageInfo.fromPlatform(),
-                      builder: (context, snap) {
-                        final info = snap.data;
-                        if (info == null) return const SizedBox.shrink();
-                        return Text(
-                          'profile_version'.tr(namedArgs: {'version': '${info.version} (${info.buildNumber})'}),
-                          style: TextStyle(
-                            fontSize: 11.r,
-                            color: cs.onSurface.withValues(alpha: 0.35),
-                            fontWeight: FontWeight.w500,
-                          ),
-                        );
-                      },
-                    ),
-                  ),
+                  const AppVersionLabel(),
                 ],
               ),
             ),
           ],
         ),
-        Positioned(left: 0, right: 0, top: 0, child: GlassHeaderOverlay(isDark: isDark)),
+        Positioned(left: 0, right: 0, top: 0, child: ProfileGlassHeader(isDark: isDark)),
       ],
     );
   }
 
   Widget _buildDesktop(BuildContext context, bool isDark) {
     final cs = Theme.of(context).colorScheme;
-    final scroll = context.read<ProfileProvider>().scroll;
+    final scroll = context.read<ProfileScrollProvider>().scroll;
 
     return SingleChildScrollView(
       controller: scroll,

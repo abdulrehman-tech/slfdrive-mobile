@@ -12,6 +12,7 @@ import 'widgets/earnings_skeleton.dart';
 import 'widgets/earnings_stats_grid.dart';
 import 'widgets/earnings_total_card.dart';
 import 'widgets/recent_earnings_section.dart';
+import '../shell/widgets/driver_sliver_header.dart';
 
 class DriverEarningsScreen extends StatelessWidget {
   const DriverEarningsScreen({super.key});
@@ -38,79 +39,60 @@ class _DriverEarningsView extends StatelessWidget {
     final showSkeleton = provider.isInitialLoading;
     final showError = !showSkeleton && provider.error != null && !provider.hasData;
 
-    return Scaffold(
-      backgroundColor: isDark
-          ? const Color(0xFF121212)
-          : const Color(0xFFF8F9FA),
-      body: SafeArea(
-        child: RefreshIndicator(
-          onRefresh: () => context.read<DriverEarningsProvider>().load(),
-          child: CustomScrollView(
-            physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
-            slivers: [
-              SliverAppBar(
-                floating: true,
-                pinned: true,
-                backgroundColor: isDark
-                    ? const Color(0xFF1E1E1E)
-                    : Colors.white,
-                elevation: 0,
-                leadingWidth: 56.r,
-                titleSpacing: 0,
-                title: Text(
-                  'driver_earnings'.tr(),
-                  style: TextStyle(
-                    fontSize: 20.r,
-                    fontWeight: FontWeight.w700,
-                    color: isDark ? Colors.white : Colors.black87,
-                  ),
-                ),
-                bottom: PreferredSize(
-                  preferredSize: Size.fromHeight(72.r),
-                  child: EarningsPeriodSelector(isDark: isDark),
-                ),
-              ),
-              SliverToBoxAdapter(child: SizedBox(height: 20.r)),
-              if (showSkeleton)
-                const SliverToBoxAdapter(child: EarningsSkeleton())
-              else if (showError)
-                SliverFillRemaining(
-                  hasScrollBody: false,
-                  child: AppErrorState(
-                    message: provider.error,
-                    onRetry: provider.load,
-                    isDark: isDark,
-                  ),
-                )
-              else ...[
-                // A refresh that fails with data on screen keeps the numbers
-                // and explains itself in a banner instead of failing silently.
-                if (provider.error != null)
-                  SliverToBoxAdapter(
-                    child: _EarningsErrorBanner(isDark: isDark),
-                  ),
-                SliverToBoxAdapter(
-                  child: EarningsTotalCard(snapshot: snapshot, trendPercent: provider.trendPercent),
-                ),
-                SliverToBoxAdapter(child: SizedBox(height: 20.r)),
-                SliverToBoxAdapter(
-                  child: EarningsChartCard(isDark: isDark),
-                ),
-                SliverToBoxAdapter(child: SizedBox(height: 20.r)),
-                SliverToBoxAdapter(
-                  child: EarningsStatsGrid(snapshot: snapshot, isDark: isDark),
-                ),
-                SliverToBoxAdapter(
-                  child: RecentEarningsSection(
-                    earnings: provider.recentEarnings,
-                    isDark: isDark,
-                  ),
-                ),
-                SliverToBoxAdapter(child: SizedBox(height: 100.r)),
-              ],
-            ],
+    return RefreshIndicator(
+      onRefresh: () => context.read<DriverEarningsProvider>().load(),
+      // Spinner appears below the pinned header, not behind it.
+      edgeOffset: DriverSliverHeader.expandedExtent(context, bottomHeight: EarningsPeriodSelector.height),
+      child: CustomScrollView(
+        physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
+        slivers: [
+          // Large title that collapses into a compact one; the selector stays
+          // pinned underneath and the bar turns to glass over the content.
+          DriverSliverHeader(
+            title: 'driver_earnings'.tr(),
+            isDark: isDark,
+            bottom: EarningsPeriodSelector(isDark: isDark),
+            bottomHeight: EarningsPeriodSelector.height,
           ),
-        ),
+          SliverToBoxAdapter(child: SizedBox(height: 8.r)),
+          if (showSkeleton)
+            const SliverToBoxAdapter(child: EarningsSkeleton())
+          else if (showError)
+            SliverFillRemaining(
+              hasScrollBody: false,
+              child: AppErrorState(
+                message: provider.error,
+                onRetry: provider.load,
+                isDark: isDark,
+              ),
+            )
+          else ...[
+            // A refresh that fails with data on screen keeps the numbers
+            // and explains itself in a banner instead of failing silently.
+            if (provider.error != null)
+              SliverToBoxAdapter(
+                child: _EarningsErrorBanner(isDark: isDark),
+              ),
+            SliverToBoxAdapter(
+              child: EarningsTotalCard(snapshot: snapshot, trendPercent: provider.trendPercent),
+            ),
+            SliverToBoxAdapter(child: SizedBox(height: 20.r)),
+            SliverToBoxAdapter(
+              child: EarningsChartCard(isDark: isDark),
+            ),
+            SliverToBoxAdapter(child: SizedBox(height: 20.r)),
+            SliverToBoxAdapter(
+              child: EarningsStatsGrid(snapshot: snapshot, isDark: isDark),
+            ),
+            SliverToBoxAdapter(
+              child: RecentEarningsSection(
+                earnings: provider.recentEarnings,
+                isDark: isDark,
+              ),
+            ),
+            SliverToBoxAdapter(child: SizedBox(height: driverBottomClearance(context))),
+          ],
+        ],
       ),
     );
   }

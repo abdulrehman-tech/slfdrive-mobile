@@ -943,7 +943,6 @@
   "mon_nov": "نوفمبر",
   "mon_dec": "ديسمبر",
   "earnings_week_short": "أ{}",
-  "earnings_trips_hours": "{trips} رحلة • {hours} ساعة",
   "earnings_revenue": "الإيرادات",
   "driver_go_online_title": "التحوّل إلى متصل؟",
   "driver_go_online_message": "ستبدأ في تلقّي طلبات الرحلات من العملاء القريبين.",
@@ -1073,5 +1072,13 @@
   "price_unit_week": "/أسبوع",
   "driver_request_awaiting_company": "بانتظار موافقة الشركة",
   "booking_success_subtitle_corporate": "حجزك بانتظار موافقة جهة عملك، وستُحتسب التكلفة على الشركة.",
-  "location_default_delivery_label": "عنوان التوصيل"
+  "location_default_delivery_label": "عنوان التوصيل",
+  "units_trips": {
+    "zero": "{} رحلة",
+    "one": "رحلة واحدة",
+    "two": "رحلتان",
+    "few": "{} رحلات",
+    "many": "{} رحلة",
+    "other": "{} رحلة"
+  }
 }

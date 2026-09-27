@@ -6,17 +6,24 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../providers/auth_provider.dart';
-import '../provider/profile_provider.dart';
+import '../provider/profile_scroll_provider.dart';
 
-class GlassHeaderOverlay extends StatelessWidget {
+/// Compact frosted header (avatar, name, email) that fades in over a profile
+/// page once its big header card has scrolled away. Reads the offset from the
+/// [ProfileScrollProvider] above it.
+class ProfileGlassHeader extends StatelessWidget {
   final bool isDark;
-  const GlassHeaderOverlay({super.key, required this.isDark});
+
+  /// Optional chip shown at the end (the driver's verification status).
+  final Widget? trailing;
+
+  const ProfileGlassHeader({super.key, required this.isDark, this.trailing});
 
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
     final topPad = MediaQuery.of(context).padding.top;
-    final scrollOffset = context.watch<ProfileProvider>().scrollOffset;
+    final scrollOffset = context.watch<ProfileScrollProvider>().scrollOffset;
 
     final auth = context.watch<AuthProvider>();
     final name = (auth.displayName?.trim().isNotEmpty ?? false)
@@ -40,7 +47,8 @@ class GlassHeaderOverlay extends StatelessWidget {
           child: BackdropFilter(
             filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
             child: Container(
-              padding: EdgeInsets.fromLTRB(12.r, topPad + 6.r, 12.r, 10.r),
+              // 16 side padding lines the avatar and chip up with the cards below.
+              padding: EdgeInsets.fromLTRB(16.r, topPad + 6.r, 16.r, 10.r),
               decoration: BoxDecoration(
                 color: isDark ? const Color(0xFF1A1A28).withValues(alpha: 0.74) : Colors.white.withValues(alpha: 0.82),
                 border: Border(
@@ -77,6 +85,7 @@ class GlassHeaderOverlay extends StatelessWidget {
                       ],
                     ),
                   ),
+                  if (trailing != null) ...[SizedBox(width: 10.r), trailing!],
                 ],
               ),
             ),

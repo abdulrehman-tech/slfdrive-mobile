@@ -135,6 +135,8 @@ class ActiveTripCard extends StatelessWidget {
             children: [
               Text(
                 trip.customer,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
                 style: TextStyle(
                   fontSize: 15.r,
                   fontWeight: FontWeight.w600,

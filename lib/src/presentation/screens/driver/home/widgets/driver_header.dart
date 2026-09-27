@@ -14,6 +14,11 @@ class DriverHeader extends StatelessWidget {
 
   const DriverHeader({super.key, required this.isDark});
 
+  /// Fixed bar height: 12 vertical padding each side around the 52-tall
+  /// greeting + name column (the tallest child). The home screen pins it at
+  /// exactly this height.
+  static double get height => 76.r;
+
   /// Runs the online/offline toggle and surfaces a failure snackbar — the pill
   /// itself shows the in-flight spinner via [DriverShellProvider.isTogglingOnline].
   static Future<void> runToggle(BuildContext context) async {
@@ -41,7 +46,7 @@ class DriverHeader extends StatelessWidget {
         : 'driver_name'.tr();
 
     return Padding(
-      padding: EdgeInsets.all(20.r),
+      padding: EdgeInsets.symmetric(horizontal: 20.r, vertical: 12.r),
       child: Row(
         children: [
           Builder(

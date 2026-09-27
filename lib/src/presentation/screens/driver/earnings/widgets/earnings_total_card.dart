@@ -98,12 +98,10 @@ class EarningsTotalCard extends StatelessWidget {
             ),
             SizedBox(height: 8.r),
             Text(
-              'earnings_trips_hours'.tr(
-                namedArgs: {
-                  'trips': '${snapshot.trips}',
-                  'hours': '${snapshot.hours}',
-                },
-              ),
+              // Plural-aware ("1 trip • 2 hours", "رحلتان • ساعة واحدة");
+              // whole hours drop the ".0".
+              '${'units_trips'.plural(snapshot.trips)} • '
+              '${'units_hours'.plural(snapshot.hours == snapshot.hours.roundToDouble() ? snapshot.hours.toInt() : snapshot.hours)}',
               style: TextStyle(
                 fontSize: 14.r,
                 color: Colors.white.withValues(alpha: 0.8),

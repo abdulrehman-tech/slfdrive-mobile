@@ -421,7 +421,6 @@
   "mon_nov": "Nov",
   "mon_dec": "Dez",
   "earnings_week_short": "W{}",
-  "earnings_trips_hours": "{trips} Fahrten • {hours} Std.",
   "earnings_revenue": "Umsatz",
   "driver_online": "Online",
   "driver_offline": "Offline",
@@ -502,5 +501,9 @@
   "price_unit_week": "/Woche",
   "driver_request_awaiting_company": "Wartet auf Freigabe der Firma",
   "booking_success_subtitle_corporate": "Ihre Buchung wartet auf die Freigabe Ihrer Firma — sie wird Ihrer Firma in Rechnung gestellt.",
-  "location_default_delivery_label": "Lieferadresse"
+  "location_default_delivery_label": "Lieferadresse",
+  "units_trips": {
+    "one": "{} Fahrt",
+    "other": "{} Fahrten"
+  }
 }

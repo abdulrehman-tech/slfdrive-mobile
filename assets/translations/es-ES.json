@@ -421,7 +421,6 @@
   "mon_nov": "Nov",
   "mon_dec": "Dic",
   "earnings_week_short": "Sem {}",
-  "earnings_trips_hours": "{trips} viajes • {hours} horas",
   "earnings_revenue": "Ingresos",
   "driver_online": "En línea",
   "driver_offline": "Desconectado",
@@ -502,5 +501,9 @@
   "price_unit_week": "/sem.",
   "driver_request_awaiting_company": "Pendiente de aprobación de la empresa",
   "booking_success_subtitle_corporate": "Tu reserva está pendiente de la aprobación de tu empresa; se facturará a tu empresa.",
-  "location_default_delivery_label": "Dirección de entrega"
+  "location_default_delivery_label": "Dirección de entrega",
+  "units_trips": {
+    "one": "{} viaje",
+    "other": "{} viajes"
+  }
 }

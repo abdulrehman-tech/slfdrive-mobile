@@ -49,6 +49,8 @@ class CancelledTripCard extends StatelessWidget {
               children: [
                 Text(
                   trip.customer,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                     fontSize: 15.r,
                     fontWeight: FontWeight.w600,
@@ -58,6 +60,8 @@ class CancelledTripCard extends StatelessWidget {
                 SizedBox(height: 4.r),
                 Text(
                   trip.destination != null ? '${'trips_to_label'.tr()}: ${trip.destination}' : trip.serviceLabel,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                     fontSize: 13.r,
                     color: isDark ? Colors.white60 : const Color(0xFF757575),
