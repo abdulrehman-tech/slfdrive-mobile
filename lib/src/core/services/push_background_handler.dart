@@ -59,7 +59,7 @@ Future<void> _showDataOnlyNotification(PushPayload payload) async {
   // the channels re-created here. Both calls are idempotent.
   final local = FlutterLocalNotificationsPlugin();
   await local.initialize(
-    const InitializationSettings(
+    settings: const InitializationSettings(
       android: AndroidInitializationSettings('ic_stat_notification'),
       iOS: DarwinInitializationSettings(
         requestAlertPermission: false,
@@ -72,10 +72,10 @@ Future<void> _showDataOnlyNotification(PushPayload payload) async {
 
   final channel = NotificationChannels.channelFor(payload.category);
   await local.show(
-    payload.id.hashCode,
-    payload.title,
-    payload.body,
-    NotificationDetails(
+    id: payload.id.hashCode,
+    title: payload.title,
+    body: payload.body,
+    notificationDetails: NotificationDetails(
       android: AndroidNotificationDetails(
         channel.id,
         channel.name,
