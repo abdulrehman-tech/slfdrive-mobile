@@ -6,7 +6,7 @@ import FirebaseCore
 import FirebaseMessaging
 
 @main
-@objc class AppDelegate: FlutterAppDelegate {
+@objc class AppDelegate: FlutterAppDelegate, FlutterImplicitEngineDelegate {
   override func application(
     _ application: UIApplication,
     didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
@@ -26,12 +26,12 @@ import FirebaseMessaging
       NSLog("⚠️ slfdrive: GMSApiKey missing — see ios/Flutter/Secrets.xcconfig.example")
     }
 
-    GeneratedPluginRegistrant.register(with: self)
-
     // FlutterAppDelegate already conforms to UNUserNotificationCenterDelegate and
     // forwards to plugins, so this is what routes foreground presentation and tap
-    // callbacks to flutter_local_notifications / firebase_messaging. Set it after
-    // the registrant so it wins over anything a plugin installed.
+    // callbacks to flutter_local_notifications / firebase_messaging. Under the
+    // UIScene lifecycle plugins register later (didInitializeImplicitFlutterEngine),
+    // but Apple requires the delegate to be assigned before launch completes or
+    // the response for a cold-start notification tap is dropped.
     UNUserNotificationCenter.current().delegate = self
 
     // Ask APNs for a device token eagerly, before Dart requests notification
@@ -41,6 +41,16 @@ import FirebaseMessaging
     application.registerForRemoteNotifications()
 
     return super.application(application, didFinishLaunchingWithOptions: launchOptions)
+  }
+
+  // UIScene lifecycle: the engine is created by the storyboard's
+  // FlutterViewController when the scene connects, after didFinishLaunching, so
+  // plugin registration has to happen here rather than against the app delegate.
+  func didInitializeImplicitFlutterEngine(_ engineBridge: FlutterImplicitEngineBridge) {
+    GeneratedPluginRegistrant.register(with: engineBridge.pluginRegistry)
+
+    // Re-assert after the registrant so it wins over anything a plugin installed.
+    UNUserNotificationCenter.current().delegate = self
   }
 
   // Firebase's method swizzling (left enabled — see FirebaseAppDelegateProxyEnabled
