@@ -45,6 +45,7 @@ import '../screens/driver/home/driver_home_screen.dart';
 import '../screens/driver/earnings/driver_earnings_screen.dart';
 import '../screens/driver/trips/driver_trips_screen.dart';
 import '../screens/driver/profile/driver_profile_screen.dart';
+import '../widgets/exit_confirm_scope.dart';
 
 /// Professional page transition with shared axis pattern.
 /// Uses Material 3 motion principles with elegant easing curves.
@@ -203,7 +204,7 @@ class AppRouter {
       GoRoute(
         path: '/auth',
         name: 'auth',
-        pageBuilder: (context, state) => AppPageTransition(child: const PreLoginScreen(), name: state.name),
+        pageBuilder: (context, state) => AppPageTransition(child: const ExitConfirmScope(child: PreLoginScreen()), name: state.name),
       ),
       GoRoute(
         path: '/auth/phone',
@@ -262,13 +263,13 @@ class AppRouter {
       GoRoute(
         path: '/home',
         name: 'home',
-        pageBuilder: (context, state) => AppPageTransition(child: const CustomerHomeScreen(), name: state.name),
+        pageBuilder: (context, state) => AppPageTransition(child: const ExitConfirmScope(child: CustomerHomeScreen()), name: state.name),
       ),
       GoRoute(
         path: '/favorites',
         name: 'favorites',
         pageBuilder: (context, state) => AppPageTransition(
-          child: const CustomerHomeScreen(tabBody: FavoritesScreen()),
+          child: const ExitConfirmScope(child: CustomerHomeScreen(tabBody: FavoritesScreen())),
           name: state.name,
         ),
       ),
@@ -276,7 +277,7 @@ class AppRouter {
         path: '/bookings',
         name: 'bookings',
         pageBuilder: (context, state) => AppPageTransition(
-          child: const CustomerHomeScreen(tabBody: BookingsScreen()),
+          child: const ExitConfirmScope(child: CustomerHomeScreen(tabBody: BookingsScreen())),
           name: state.name,
         ),
       ),
@@ -284,7 +285,7 @@ class AppRouter {
         path: '/profile',
         name: 'profile',
         pageBuilder: (context, state) => AppPageTransition(
-          child: const CustomerHomeScreen(tabBody: ProfileScreen()),
+          child: const ExitConfirmScope(child: CustomerHomeScreen(tabBody: ProfileScreen())),
           name: state.name,
         ),
       ),
@@ -538,13 +539,13 @@ class AppRouter {
       GoRoute(
         path: '/driver/home',
         name: 'driver-home',
-        pageBuilder: (context, state) => AppPageTransition(child: const DriverHomeScreen(), name: state.name),
+        pageBuilder: (context, state) => AppPageTransition(child: const ExitConfirmScope(child: DriverHomeScreen()), name: state.name),
       ),
       GoRoute(
         path: '/driver/earnings',
         name: 'driver-earnings',
         pageBuilder: (context, state) => AppPageTransition(
-          child: const DriverHomeScreen(tabBody: DriverEarningsScreen()),
+          child: const ExitConfirmScope(child: DriverHomeScreen(tabBody: DriverEarningsScreen())),
           name: state.name,
         ),
       ),
@@ -552,7 +553,7 @@ class AppRouter {
         path: '/driver/trips',
         name: 'driver-trips',
         pageBuilder: (context, state) => AppPageTransition(
-          child: const DriverHomeScreen(tabBody: DriverTripsScreen()),
+          child: const ExitConfirmScope(child: DriverHomeScreen(tabBody: DriverTripsScreen())),
           name: state.name,
         ),
       ),
@@ -560,7 +561,7 @@ class AppRouter {
         path: '/driver/profile',
         name: 'driver-profile',
         pageBuilder: (context, state) => AppPageTransition(
-          child: const DriverHomeScreen(tabBody: DriverProfileScreen()),
+          child: const ExitConfirmScope(child: DriverHomeScreen(tabBody: DriverProfileScreen())),
           name: state.name,
         ),
       ),
