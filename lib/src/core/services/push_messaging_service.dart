@@ -137,7 +137,7 @@ class PushMessagingService implements NotificationTray {
 
   Future<void> _initLocalNotifications() async {
     await _local.initialize(
-      const InitializationSettings(
+      settings: const InitializationSettings(
         // Monochrome silhouette; see res/drawable/ic_stat_notification.xml.
         android: AndroidInitializationSettings('ic_stat_notification'),
         // All three false: permission is owned solely by the pre-permission
@@ -221,6 +221,7 @@ class PushMessagingService implements NotificationTray {
       case AuthorizationStatus.provisional:
         return PushAuthStatus.provisional;
       case AuthorizationStatus.denied:
+      case AuthorizationStatus.deniedPermanently:
         return PushAuthStatus.denied;
       case AuthorizationStatus.notDetermined:
         return PushAuthStatus.notDetermined;
@@ -411,10 +412,10 @@ class PushMessagingService implements NotificationTray {
     final channel = NotificationChannels.channelFor(p.category);
     try {
       await _local.show(
-        p.id.hashCode,
-        p.title,
-        p.body,
-        NotificationDetails(
+        id: p.id.hashCode,
+        title: p.title,
+        body: p.body,
+        notificationDetails: NotificationDetails(
           android: AndroidNotificationDetails(
             channel.id,
             channel.name,
@@ -476,7 +477,7 @@ class PushMessagingService implements NotificationTray {
   Future<void> cancelDelivered(String payloadId) async {
     if (!_supported) return;
     try {
-      await _local.cancel(payloadId.hashCode);
+      await _local.cancel(id: payloadId.hashCode);
     } catch (e) {
       debugPrint('[Push] cancel failed: $e');
     }

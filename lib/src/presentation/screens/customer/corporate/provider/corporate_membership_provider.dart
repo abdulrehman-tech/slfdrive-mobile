@@ -8,6 +8,7 @@ import '../../../../../core/di/injection_container.dart';
 import '../../../../../core/errors/app_exception.dart';
 import '../../../../../core/models/company/all_company.dart';
 import '../../../../../core/models/corporate/corporate_membership.dart';
+import '../../../../../core/errors/error_handler.dart';
 
 /// Loads the signed-in user's corporate memberships and exposes whether they
 /// can make a corporate booking (gate) plus which companies are eligible.
@@ -82,7 +83,7 @@ class CorporateMembershipProvider extends ChangeNotifier {
     } on AppException catch (e) {
       _error = e.message;
     } catch (e) {
-      _error = e.toString();
+      _error = ErrorHandler.handleError(e).message;
     }
     _isLoading = false;
     _hasLoaded = true;
@@ -118,7 +119,7 @@ class CorporateMembershipProvider extends ChangeNotifier {
       notifyListeners();
       return false;
     } catch (e) {
-      _error = e.toString();
+      _error = ErrorHandler.handleError(e).message;
       notifyListeners();
       return false;
     }

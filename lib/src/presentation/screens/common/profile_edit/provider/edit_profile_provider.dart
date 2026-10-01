@@ -16,6 +16,7 @@ import '../../../../../core/models/lookup/location_option.dart';
 import '../../../../providers/auth_provider.dart';
 import '../../../../providers/role_provider.dart';
 import '../../auth/profile_completion_models/profile_field_codecs.dart';
+import '../../../../../core/errors/error_handler.dart';
 
 /// The editable field group a focused editor renders. Driver editing is split
 /// into these; customers use [personal] and [documents] only.
@@ -198,7 +199,7 @@ class EditProfileProvider extends ChangeNotifier {
     } on AppException catch (e) {
       _loadError = e.message;
     } catch (e) {
-      _loadError = e.toString();
+      _loadError = ErrorHandler.handleError(e).message;
     } finally {
       _isInitialLoading = false;
       notifyListeners();
@@ -454,7 +455,7 @@ class EditProfileProvider extends ChangeNotifier {
       _error = e.message;
       return false;
     } catch (e) {
-      _error = e.toString();
+      _error = ErrorHandler.handleError(e).message;
       return false;
     } finally {
       _isSaving = false;

@@ -8,6 +8,7 @@ import '../../../../../core/services/review_aggregates.dart';
 import '../../favorites/models/fav_driver.dart';
 import '../models/driver_profile.dart';
 import '../models/driver_review.dart';
+import '../../../../../core/errors/error_handler.dart';
 
 /// Loads a single driver from `GET /api/Driver/{id}` and exposes it as the
 /// screen's `DriverProfile` view model, enriched with the driver's rating
@@ -75,7 +76,7 @@ class DriverDetailProvider extends ChangeNotifier {
     } on AppException catch (e) {
       _error = e.message;
     } catch (e) {
-      _error = e.toString();
+      _error = ErrorHandler.handleError(e).message;
     } finally {
       _isLoading = false;
       notifyListeners();

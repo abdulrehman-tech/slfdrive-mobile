@@ -4,6 +4,7 @@ import '../../../../../core/data/repositories/lookup_repository.dart';
 import '../../../../../core/di/injection_container.dart';
 import '../../../../../core/errors/app_exception.dart';
 import '../../../../../core/models/company/all_company.dart';
+import '../../../../../core/errors/error_handler.dart';
 
 /// Loads the active corporate companies (`GET /api/AllCompanies/active`) for the
 /// booking flow's corporate company picker.
@@ -36,7 +37,7 @@ class CorporateCompaniesProvider extends ChangeNotifier {
     } on AppException catch (e) {
       _error = e.message;
     } catch (e) {
-      _error = e.toString();
+      _error = ErrorHandler.handleError(e).message;
     } finally {
       _isLoading = false;
       notifyListeners();

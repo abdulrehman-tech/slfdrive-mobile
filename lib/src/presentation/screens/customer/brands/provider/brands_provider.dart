@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import '../../../../../core/data/repositories/lookup_repository.dart';
 import '../../../../../core/di/injection_container.dart';
 import '../models/brand.dart';
+import '../../../../../core/errors/error_handler.dart';
 
 /// Loads active vehicle brands from the backend (`VehicleBrand/active`) and
 /// filters them by the search query.
@@ -47,7 +48,7 @@ class BrandsProvider extends ChangeNotifier {
               tagline: '',
             )));
     } catch (e) {
-      _error = e.toString();
+      _error = ErrorHandler.handleError(e).message;
     } finally {
       _isLoading = false;
       notifyListeners();

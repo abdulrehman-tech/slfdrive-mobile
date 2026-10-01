@@ -17,6 +17,7 @@ import '../../core/errors/app_exception.dart';
 import '../../core/models/auth/auth_session.dart';
 import '../../core/models/user/user_model.dart';
 import '../screens/driver/shell/driver_shell_provider.dart';
+import '../../core/errors/error_handler.dart';
 
 /// UI-facing auth state. Follows the [RoleProvider] pattern.
 ///
@@ -228,7 +229,7 @@ class AuthProvider extends ChangeNotifier {
       _error = e.message;
       return null;
     } catch (e) {
-      _error = e.toString();
+      _error = ErrorHandler.handleError(e).message;
       return null;
     } finally {
       _setLoading(false);
@@ -248,7 +249,7 @@ class AuthProvider extends ChangeNotifier {
       _error = e.message;
       return null;
     } catch (e) {
-      _error = e.toString();
+      _error = ErrorHandler.handleError(e).message;
       return null;
     } finally {
       _setLoading(false);
@@ -290,7 +291,7 @@ class AuthProvider extends ChangeNotifier {
       _error = e.message;
       return null;
     } catch (e) {
-      _error = e.toString();
+      _error = ErrorHandler.handleError(e).message;
       return null;
     } finally {
       _setLoading(false);
@@ -360,7 +361,7 @@ class AuthProvider extends ChangeNotifier {
       _error = e.message;
       return null;
     } catch (e) {
-      _error = e.toString();
+      _error = ErrorHandler.handleError(e).message;
       return null;
     } finally {
       _setLoading(false);
@@ -386,7 +387,7 @@ class AuthProvider extends ChangeNotifier {
       notifyListeners();
       return false;
     } catch (e) {
-      _error = e.toString();
+      _error = ErrorHandler.handleError(e).message;
       notifyListeners();
       return false;
     }

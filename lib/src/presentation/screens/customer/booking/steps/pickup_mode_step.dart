@@ -13,6 +13,7 @@ import 'pickup_mode_widgets/pickup_delivery_location_section.dart';
 import 'pickup_mode_widgets/pickup_delivery_notes_section.dart';
 import 'pickup_mode_widgets/pickup_mode_toggle_row.dart';
 import 'pickup_mode_widgets/pickup_self_section.dart';
+import '../../../../../core/errors/error_handler.dart';
 
 class PickupModeStep extends StatefulWidget {
   final BookingData data;
@@ -61,7 +62,7 @@ class _PickupModeStepState extends State<PickupModeStep> {
     } catch (e) {
       if (!mounted) return;
       setState(() {
-        _areasError = e.toString();
+        _areasError = ErrorHandler.handleError(e).message;
         _areasLoading = false;
       });
     }
