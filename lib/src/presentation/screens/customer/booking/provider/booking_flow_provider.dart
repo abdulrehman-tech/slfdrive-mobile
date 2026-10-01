@@ -12,6 +12,7 @@ import '../../../../../core/services/booking_lookups.dart';
 import '../models/booking_data.dart';
 import '../models/booking_step_id.dart';
 import '../../../../../core/data/repositories/promo_code_repository.dart';
+import '../../../../../core/errors/error_handler.dart';
 
 /// Orchestrates the multi-step booking flow.
 ///
@@ -220,7 +221,7 @@ class BookingFlowProvider extends ChangeNotifier {
       _error = e.message;
       return false;
     } catch (e) {
-      _error = e.toString();
+      _error = ErrorHandler.handleError(e).message;
       return false;
     } finally {
       _submitting = false;
@@ -251,7 +252,7 @@ class BookingFlowProvider extends ChangeNotifier {
       }
       data.setQuoteError(e.message);
     } catch (e) {
-      data.setQuoteError(e.toString());
+      data.setQuoteError(ErrorHandler.handleError(e).message);
     }
   }
 

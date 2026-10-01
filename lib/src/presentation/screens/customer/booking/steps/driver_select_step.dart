@@ -15,6 +15,7 @@ import '../../../../widgets/confirm_dialog.dart';
 import '../../../../widgets/omr_icon.dart';
 import '../models/booking_data.dart';
 import '../widgets/booking_glass_card.dart';
+import '../../../../../core/errors/error_handler.dart';
 
 /// Driver picker shown for "Car + driver" and "Hire driver" when no driver was
 /// pre-selected. Loads real drivers from the backend.
@@ -79,7 +80,7 @@ class _DriverSelectStepState extends State<DriverSelectStep> {
       setState(() => _error = e.message);
     } catch (e) {
       if (!mounted) return;
-      setState(() => _error = e.toString());
+      setState(() => _error = ErrorHandler.handleError(e).message);
     } finally {
       if (mounted) setState(() => _loading = false);
     }

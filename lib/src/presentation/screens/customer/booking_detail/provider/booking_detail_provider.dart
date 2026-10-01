@@ -12,6 +12,7 @@ import '../../../../../core/models/driver/driver_listing_item.dart';
 import '../../../../../core/models/review/review.dart';
 import '../../../../../core/utils/paged_list.dart';
 import '../models/booking_detail.dart';
+import '../../../../../core/errors/error_handler.dart';
 
 /// Loads a single booking from `GET /api/Booking/{id}` and enriches it with the
 /// vehicle (`Vehicle/{id}`) and driver details — `BookingResponseDto` only
@@ -109,7 +110,7 @@ class BookingDetailProvider extends ChangeNotifier {
     } on AppException catch (e) {
       _error = e.message;
     } catch (e) {
-      _error = e.toString();
+      _error = ErrorHandler.handleError(e).message;
     }
     _isLoading = false;
     notifyListeners();

@@ -17,6 +17,7 @@ import '../../../../../core/utils/paged_list.dart';
 import '../../../../widgets/omr_icon.dart';
 import '../models/booking_data.dart';
 import '../widgets/booking_glass_card.dart';
+import '../../../../../core/errors/error_handler.dart';
 
 /// Vehicle picker shown when the service needs a car and none was pre-selected
 /// (e.g. the "Car + driver" flow). Loads real vehicles from the backend.
@@ -87,7 +88,7 @@ class _VehicleSelectStepState extends State<VehicleSelectStep> {
       setState(() => _error = e.message);
     } catch (e) {
       if (!mounted) return;
-      setState(() => _error = e.toString());
+      setState(() => _error = ErrorHandler.handleError(e).message);
     } finally {
       if (mounted) setState(() => _loading = false);
     }

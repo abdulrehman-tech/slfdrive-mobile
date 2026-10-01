@@ -1,4 +1,6 @@
 import 'package:dio/dio.dart';
+import 'package:easy_localization/easy_localization.dart';
+import 'package:flutter/foundation.dart';
 import 'app_exception.dart';
 
 class ErrorHandler {
@@ -8,7 +10,12 @@ class ErrorHandler {
     } else if (error is AppException) {
       return error;
     } else {
-      return AppException(message: error.toString());
+      // Anything else is a programming-level failure the user can do nothing
+      // with — typically a `res.data as Map` cast on a 404/empty/HTML body from
+      // an endpoint that is missing in this environment. Never surface the raw
+      // text ("type 'String' is not a subtype of …").
+      debugPrint('[ErrorHandler] Unexpected ${error.runtimeType}: $error');
+      return AppException(message: 'error_service_unavailable'.tr());
     }
   }
 
@@ -17,10 +24,7 @@ class ErrorHandler {
       case DioExceptionType.connectionTimeout:
       case DioExceptionType.sendTimeout:
       case DioExceptionType.receiveTimeout:
-        return TimeoutException(
-          message: 'Connection timeout. Please try again.',
-          messageAr: 'انتهت مهلة الاتصال. يرجى المحاولة مرة أخرى.',
-        );
+        return TimeoutException(message: 'error_timeout'.tr());
 
       case DioExceptionType.badResponse:
         return _handleResponseError(error.response);
@@ -29,44 +33,49 @@ class ErrorHandler {
         return AppException(message: 'Request cancelled', messageAr: 'تم إلغاء الطلب');
 
       case DioExceptionType.connectionError:
-        return NetworkException(message: 'No internet connection', messageAr: 'لا يوجد اتصال بالإنترنت');
+        return NetworkException(message: 'error_no_internet'.tr());
 
       default:
-        return AppException(message: 'Something went wrong', messageAr: 'حدث خطأ ما');
+        return AppException(message: 'error_occurred'.tr());
     }
   }
 
   static AppException _handleResponseError(Response? response) {
+    final unavailable = 'error_service_unavailable'.tr();
     if (response == null) {
-      return ServerException(message: 'No response from server');
+      return ServerException(message: unavailable);
     }
 
     final statusCode = response.statusCode;
     final data = response.data;
 
+    // 5xx bodies carry server internals (exception text, stack traces), not
+    // something written for the user — always show the generic message.
+    if (statusCode != null && statusCode >= 500) {
+      return ServerException(message: unavailable, statusCode: statusCode);
+    }
+
     if (data is Map<String, dynamic>) {
-      final message = data['message'] ?? 'An error occurred';
-      final messageAr = data['messageAr'];
-      final errors = data['errors'] != null ? List<String>.from(data['errors']) : null;
+      final message = _text(data['message']) ?? unavailable;
+      final messageAr = _text(data['messageAr']);
+      // The API envelope sends `errors` as a list; ASP.NET's own validation
+      // responses (ProblemDetails) send a map — only the former is usable.
+      final rawErrors = data['errors'];
+      final errors = rawErrors is List ? rawErrors.map((e) => e.toString()).toList() : null;
 
       switch (statusCode) {
         case 400:
           return ValidationException(message: message, messageAr: messageAr, errors: errors);
         case 401:
           return UnauthorizedException(message: message, messageAr: messageAr);
-        case 403:
-          return AppException(message: message, messageAr: messageAr, statusCode: 403);
-        case 404:
-          return AppException(message: message, messageAr: messageAr, statusCode: 404);
-        case 500:
-        case 502:
-        case 503:
-          return ServerException(message: message, messageAr: messageAr, statusCode: statusCode);
         default:
           return AppException(message: message, messageAr: messageAr, statusCode: statusCode);
       }
     }
 
-    return ServerException(message: 'Server error', statusCode: statusCode);
+    // Empty / plain-text / HTML body (e.g. a 404 from the gateway).
+    return ServerException(message: unavailable, statusCode: statusCode);
   }
+
+  static String? _text(dynamic value) => value is String && value.trim().isNotEmpty ? value : null;
 }
